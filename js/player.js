@@ -4,6 +4,8 @@ import { ITEMS } from '../data/itemData.js';
 export function createPlayer(name) { return { name, level:1, exp:0, gold:100, maxHp:100, hp:100, baseAttack:10, baseDefense:5, inventory:{herb:1}, equipment:{weapon:null,armor:null}, generals:[], month:1, location:'village' }; }
 // 舊版存檔載入時補上新系統欄位，保留原先養成進度。
 export function normalizePlayer(player) { const base=createPlayer(player.name); return {...base,...player, inventory:{...base.inventory,...(player.inventory||{})}, equipment:{...base.equipment,...(player.equipment||{})}, generals:Array.isArray(player.generals)?player.generals:[], month:Number.isFinite(player.month)?player.month:1}; }
+// 最多三位忠誠尚存的武將會隨主人進入戰鬥。
+export function activeGenerals(player) { return (player.generals||[]).filter(general=>general.loyalty>0).slice(0,3); }
 export function expNeeded(player) { return 50 + (player.level-1)*35; }
 export function stat(player, kind) { const equip = player.equipment.weapon ? ITEMS[player.equipment.weapon].attack || 0 : 0; const armor = player.equipment.armor ? ITEMS[player.equipment.armor].defense || 0 : 0; return kind==='attack' ? player.baseAttack+equip : player.baseDefense+armor; }
 export function addItem(player,id,count=1) { player.inventory[id]=(player.inventory[id]||0)+count; }
