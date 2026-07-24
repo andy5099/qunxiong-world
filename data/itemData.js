@@ -2,6 +2,8 @@
 export const ITEMS = {
   woodenSword: { id:'woodenSword', name:'木刀', type:'weapon', price:60, attack:4, description:'樸實木刀，能讓攻擊提升 4 點。' },
   clothArmor: { id:'clothArmor', name:'布衣', type:'armor', price:50, defense:3, description:'輕便的布衣，能讓防禦提升 3 點。' },
+  ironSword: { id:'ironSword', name:'精鐵劍', type:'weapon', price:180, attack:9, description:'打磨精良的長劍，能讓攻擊提升 9 點。' },
+  leatherArmor: { id:'leatherArmor', name:'皮甲', type:'armor', price:150, defense:7, description:'韌皮縫製的護甲，能讓防禦提升 7 點。' },
   herb: { id:'herb', name:'藥草', type:'consumable', price:15, heal:35, description:'回復 35 點生命。' }
 };
-export const SHOP_ITEMS = ['woodenSword','clothArmor','herb'];
+export const SHOP_ITEMS = ['woodenSword','clothArmor','ironSword','leatherArmor','herb'];
