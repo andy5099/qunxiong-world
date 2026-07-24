@@ -1,18 +1,13 @@
-import { ITEMS } from '../data/itemData.js';
-
-// 角色物件負責能力計算、升級、背包與裝備。
-export function createPlayer(name) { return { name, level:1, exp:0, gold:100, maxHp:100, hp:100, baseAttack:10, baseDefense:5, inventory:{herb:1}, equipment:{weapon:null,armor:null}, generals:[], formation:[], month:1, location:'village' }; }
-// 舊版存檔載入時補上新系統欄位，保留原先養成進度。
-export function normalizePlayer(player) { const base=createPlayer(player.name); const normalized={...base,...player, inventory:{...base.inventory,...(player.inventory||{})}, equipment:{...base.equipment,...(player.equipment||{})}, generals:Array.isArray(player.generals)?player.generals:[], month:Number.isFinite(player.month)?player.month:1}; normalized.formation=Array.isArray(player.formation)?player.formation:normalized.generals.slice(0,3).map(general=>general.id); syncFormation(normalized); return normalized; }
-// 維持隊伍只含現有武將、沒有重複，且最多三位。
-export function syncFormation(player) { const valid=new Set((player.generals||[]).filter(general=>general.loyalty>0).map(general=>general.id)); player.formation=[...(player.formation||[])].filter((id,index,list)=>valid.has(id)&&list.indexOf(id)===index).slice(0,3); }
-export function addToFormation(player,id) { syncFormation(player); if(player.formation.length<3) player.formation.push(id); }
-export function switchFormation(player,id) { syncFormation(player); const general=player.generals.find(member=>member.id===id); if(!general || general.loyalty<=0) return {ok:false,message:'此武將目前無法隨行。'}; const index=player.formation.indexOf(id); if(index>=0){player.formation.splice(index,1);return {ok:true,message:`${general.name}已撤下隨行隊伍。`};} if(player.formation.length>=3) return {ok:false,message:'隨行隊伍已滿，請先撤下一位武將。'}; player.formation.push(id);return {ok:true,message:`${general.name}加入隨行隊伍。`}; }
-// 隊伍中的武將會隨主人進入戰鬥。
-export function activeGenerals(player) { syncFormation(player); return player.formation.map(id=>(player.generals||[]).find(general=>general.id===id)).filter(Boolean); }
-export function expNeeded(player) { return 50 + (player.level-1)*35; }
-export function stat(player, kind) { const equip = player.equipment.weapon ? ITEMS[player.equipment.weapon].attack || 0 : 0; const armor = player.equipment.armor ? ITEMS[player.equipment.armor].defense || 0 : 0; return kind==='attack' ? player.baseAttack+equip : player.baseDefense+armor; }
-export function addItem(player,id,count=1) { player.inventory[id]=(player.inventory[id]||0)+count; }
-export function useHerb(player) { if (!player.inventory.herb) return {ok:false,message:'背包裡沒有藥草。'}; if(player.hp>=player.maxHp) return {ok:false,message:'生命已滿，不需要使用藥草。'}; player.inventory.herb--; const healed=Math.min(ITEMS.herb.heal,player.maxHp-player.hp); player.hp+=healed; return {ok:true,message:`使用藥草，回復 ${healed} HP。`}; }
-export function equipItem(player,id) { const item=ITEMS[id]; if(!item || !player.inventory[id]) return {ok:false,message:'沒有這件物品。'}; if(item.type!=='weapon' && item.type!=='armor') return {ok:false,message:'此物品無法裝備。'}; const slot=item.type; const old=player.equipment[slot]; player.inventory[id]--; if(old) addItem(player,old); player.equipment[slot]=id; return {ok:true,message:`已裝備${item.name}。`}; }
-export function gainExp(player,amount) { player.exp+=amount; const levels=[]; while(player.exp>=expNeeded(player)){ player.exp-=expNeeded(player); player.level++;player.maxHp+=20;player.baseAttack+=2;player.baseDefense+=1;player.hp=player.maxHp;levels.push(player.level); } return levels; }
+import {ITEMS} from '../data/itemData.js';
+export function createPlayer(name){return{name,level:1,exp:0,gold:100,maxHp:100,hp:100,maxMp:24,mp:24,baseAttack:10,baseDefense:5,inventory:{herb:1},equipment:{weapon:null,armor:null},generals:[],formation:[],month:1,location:'village'};}
+export function normalizePlayer(player){const base=createPlayer(player.name),p={...base,...player,inventory:{...base.inventory,...player.inventory},equipment:{...base.equipment,...player.equipment},generals:Array.isArray(player.generals)?player.generals:[]};p.maxMp=Number.isFinite(p.maxMp)?p.maxMp:24;p.mp=Number.isFinite(p.mp)?Math.min(p.mp,p.maxMp):p.maxMp;p.formation=Array.isArray(player.formation)?player.formation:p.generals.slice(0,3).map(g=>g.id);syncFormation(p);return p;}
+export function syncFormation(p){const valid=new Set(p.generals.filter(g=>g.loyalty>0).map(g=>g.id));p.formation=[...p.formation].filter((id,i,a)=>valid.has(id)&&a.indexOf(id)===i).slice(0,3);}
+export function addToFormation(p,id){syncFormation(p);if(p.formation.length<3)p.formation.push(id);}
+export function switchFormation(p,id){syncFormation(p);const g=p.generals.find(m=>m.id===id);if(!g||g.loyalty<=0)return{ok:false,message:'此武將目前無法編入。'};const i=p.formation.indexOf(id);if(i>=0){p.formation.splice(i,1);return{ok:true,message:`${g.name} 已撤下。`};}if(p.formation.length>=3)return{ok:false,message:'隨行隊伍最多三人。'};p.formation.push(id);return{ok:true,message:`${g.name} 已編入隊伍。`};}
+export function activeGenerals(p){syncFormation(p);return p.formation.map(id=>p.generals.find(g=>g.id===id)).filter(Boolean);}
+export const expNeeded=p=>50+(p.level-1)*35;
+export function stat(p,kind){const weapon=p.equipment.weapon?ITEMS[p.equipment.weapon]?.attack||0:0,armor=p.equipment.armor?ITEMS[p.equipment.armor]?.defense||0:0;return kind==='attack'?p.baseAttack+weapon:p.baseDefense+armor;}
+export function addItem(p,id,count=1){p.inventory[id]=(p.inventory[id]||0)+count;}
+export function useHerb(p){if(!p.inventory.herb)return{ok:false,message:'背包裡沒有藥草。'};if(p.hp>=p.maxHp)return{ok:false,message:'體力已滿。'};p.inventory.herb--;const healed=Math.min(ITEMS.herb.heal,p.maxHp-p.hp);p.hp+=healed;return{ok:true,message:`使用藥草，恢復 ${healed} HP。`};}
+export function equipItem(p,id){const item=ITEMS[id];if(!item||!p.inventory[id])return{ok:false,message:'找不到這件物品。'};if(!['weapon','armor'].includes(item.type))return{ok:false,message:'此物品無法裝備。'};const old=p.equipment[item.type];p.inventory[id]--;if(old)addItem(p,old);p.equipment[item.type]=id;return{ok:true,message:`已裝備 ${item.name}。`};}
+export function gainExp(p,amount){p.exp+=amount;const levels=[];while(p.exp>=expNeeded(p)){p.exp-=expNeeded(p);p.level++;p.maxHp+=20;p.maxMp+=4;p.baseAttack+=2;p.baseDefense+=1;p.hp=p.maxHp;p.mp=p.maxMp;levels.push(p.level);}return levels;}
