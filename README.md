@@ -1,34 +1,25 @@
-# 群雄天下 Demo v0.0.1
+# 群雄天下
 
-不需要安裝套件或啟動伺服器。直接以現代瀏覽器雙擊開啟 `index.html` 即可遊玩。
+一款不需安裝套件的原創三國文字 RPG。保留角色建立、地圖探索、回合戰鬥、武將招募與編組、背包、裝備、商店、存檔等系統，支援手機與桌面瀏覽器。
 
-## 發布至 GitHub Pages
+## 遊玩
 
-專案已包含 GitHub Pages 自動發布工作流程。將整個專案推送到 GitHub 儲存庫後：
+以本機靜態伺服器開啟專案根目錄，再瀏覽 `index.html`。使用伺服器是為了讓 JavaScript 模組、PWA 與離線快取正常運作。
 
-1. 在儲存庫開啟 **Settings → Pages**。
-2. 在 **Build and deployment** 的 **Source** 選擇 **GitHub Actions**。
-3. 推送 `master` 或 `main` 分支，或在 **Actions** 手動執行「Deploy 群雄天下 to GitHub Pages」。
-4. 工作流程完成後，可在該次執行結果或 Pages 設定頁取得遊戲網址。
+戰鬥可手動操作，也可選擇普通攻擊、破陣擊或疾風突作為自動策略。氣力不足時會自動改用普通攻擊；勝負、玩家死亡、按下停止、頁面背景化或切換畫面都會停止自動戰鬥。
 
-此專案是純靜態網站，發布後會以根目錄的 `index.html` 作為遊戲入口。
+## PWA
 
-## 遊玩內容
+網站包含 manifest、Service Worker 與 192/512 圖示。以 HTTPS（GitHub Pages）載入一次後，可加入 iPhone 主畫面並在離線時再次開啟。
 
-- 建立角色、探索森林、自動／手動回合制戰鬥與自動升級
-- 世界地圖分為小怪地圖「蒼林」、菁英地圖「斷崖嶺」、BOSS 地圖「黑風寨」
-- 戰勝敵人後可降服為武將；可自由編組、替換最多三位隨行武將協同作戰
-- 武將忠誠與每月隨機事件，忠誠歸零時武將會離去
-- 村莊商店：木刀、布衣、精鐵劍、皮甲、藥草
-- 背包使用與武器、護甲裝備管理
-- 瀏覽器 LocalStorage 完整存檔／讀檔
+## GitHub Pages
 
-## 專案架構
+`.github/workflows/deploy-pages.yml` 保留既有部署流程。Repository Settings → Pages 的 Source 請選擇 **GitHub Actions**；推送至 `master` 或 `main` 後會自動部署。
 
-- `js/game.js`：GameState 與探索流程
-- `js/battle.js`：回合制戰鬥與結算
-- `js/player.js`、`js/enemy.js`、`js/shop.js`、`js/tavern.js`：各領域的遊戲規則
-- `js/ui.js`、`js/main.js`：畫面渲染與互動入口
-- `data/`：怪物、道具、武將及地點資料
+## 專案結構
 
-存檔僅儲存在目前瀏覽器與裝置；清除該網站的瀏覽資料可能會一併清除進度。
+- `index.html`、`style.css`：入口與響應式介面
+- `js/`：遊戲、戰鬥、玩家、介面、商店、酒館與存檔邏輯
+- `data/`：原創敵人、道具、武將與地圖資料
+- `manifest.webmanifest`、`service-worker.js`、`icons/`：PWA 與離線支援
+- `.github/workflows/deploy-pages.yml`：GitHub Pages 發布

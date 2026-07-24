@@ -1,0 +1,15 @@
+{
+  "name":"群雄天下：原創三國文字冒險",
+  "short_name":"群雄天下",
+  "description":"適合手機與桌面的原創三國文字角色扮演遊戲。",
+  "lang":"zh-Hant",
+  "start_url":"./",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#17130f",
+  "theme_color":"#17130f",
+  "icons":[
+    {"src":"icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  ]
+}
