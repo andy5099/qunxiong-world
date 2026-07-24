@@ -1,0 +1,8 @@
+[
+  {"id":"attackPct","name":"攻擊力","unit":"%","min":2,"max":12},{"id":"defensePct","name":"防禦力","unit":"%","min":2,"max":12},{"id":"maxHp","name":"最大生命","unit":"","min":20,"max":160},{"id":"speed","name":"速度","unit":"","min":1,"max":10},
+  {"id":"critRate","name":"爆擊率","unit":"%","min":1,"max":8},{"id":"critDamage","name":"爆擊傷害","unit":"%","min":5,"max":30},{"id":"lifesteal","name":"吸血","unit":"%","min":1,"max":8},{"id":"expBonus","name":"經驗加成","unit":"%","min":2,"max":15},
+  {"id":"goldBonus","name":"金幣加成","unit":"%","min":2,"max":18},{"id":"dropRate","name":"裝備掉落率","unit":"%","min":1,"max":10},{"id":"bossDamage","name":"Boss 傷害","unit":"%","min":2,"max":15},{"id":"eliteDamage","name":"精英怪傷害","unit":"%","min":2,"max":15},
+  {"id":"captureRate","name":"收服成功率","unit":"%","min":1,"max":8},{"id":"bossPartnerDamage","name":"Boss 夥伴傷害","unit":"%","min":2,"max":15},{"id":"autoHeal","name":"自動回血效果","unit":"%","min":2,"max":12},
+  {"id":"accuracy","name":"命中率","unit":"%","min":1,"max":8},{"id":"dodge","name":"閃避率","unit":"%","min":1,"max":8},{"id":"mpRegen","name":"技力回復","unit":"","min":1,"max":6},
+  {"id":"damageReduce","name":"傷害減免","unit":"%","min":1,"max":8},{"id":"execute","name":"斬殺傷害","unit":"%","min":2,"max":12},{"id":"captureItemSave","name":"收服符節省率","unit":"%","min":1,"max":6}
+]

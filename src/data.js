@@ -1,4 +1,4 @@
-const FILES=['monsters','items','skills','heroes','maps','quests','bosses','achievements','formations','daily-quests','events','artifacts','dungeons'];
+const FILES=['monsters','items','skills','heroes','maps','quests','bosses','achievements','formations','daily-quests','events','artifacts','dungeons','hunt-maps','hunt-monsters','hunt-bosses','affixes'];
 export async function loadGameData(){
   const entries=await Promise.all(FILES.map(async name=>{
     const response=await fetch(`./data/${name}.json`);
