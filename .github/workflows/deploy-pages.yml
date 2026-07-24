@@ -1,0 +1,35 @@
+name: Deploy 群雄天下 to GitHub Pages
+
+# 靜態遊戲在主要分支更新時自動發布，也可從 GitHub Actions 手動執行。
+on:
+  push:
+    branches: [master, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 取得遊戲檔案
+        uses: actions/checkout@v6
+      - name: 設定 GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: 上傳靜態網站
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .
+      - name: 發布網站
+        id: deployment
+        uses: actions/deploy-pages@v4
