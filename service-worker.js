@@ -1,4 +1,4 @@
-const CACHE='qunxiong-world-v1';
+const CACHE='qunxiong-world-v2';
 const ASSETS=['./','./index.html','./style.css','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./js/main.js','./js/ui.js','./js/game.js','./js/battle.js','./js/player.js','./js/enemy.js','./js/shop.js','./js/tavern.js','./js/save.js','./js/utils.js','./data/mapData.js','./data/itemData.js','./data/generalData.js','./data/enemyData.js'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
