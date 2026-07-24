@@ -1,0 +1,274 @@
+[
+  {
+    "id": "boss-1",
+    "name": "黃沙統領",
+    "type": "區域頭目",
+    "level": 5,
+    "hp": 420,
+    "attack": 28,
+    "defense": 12,
+    "speed": 12,
+    "refreshMinutes": 0,
+    "mechanic": "狂暴",
+    "drops": [
+      "gear-20",
+      "artifact-shard-1"
+    ]
+  },
+  {
+    "id": "boss-2",
+    "name": "黑風寨主",
+    "type": "區域頭目",
+    "level": 10,
+    "hp": 570,
+    "attack": 34,
+    "defense": 16,
+    "speed": 13,
+    "refreshMinutes": 0,
+    "mechanic": "召援",
+    "drops": [
+      "gear-23",
+      "artifact-shard-2"
+    ]
+  },
+  {
+    "id": "boss-3",
+    "name": "白馬軍侯",
+    "type": "區域頭目",
+    "level": 15,
+    "hp": 720,
+    "attack": 40,
+    "defense": 20,
+    "speed": 14,
+    "refreshMinutes": 0,
+    "mechanic": "反擊",
+    "drops": [
+      "gear-26",
+      "artifact-shard-3"
+    ]
+  },
+  {
+    "id": "boss-4",
+    "name": "淮水霸主",
+    "type": "區域頭目",
+    "level": 20,
+    "hp": 870,
+    "attack": 46,
+    "defense": 24,
+    "speed": 15,
+    "refreshMinutes": 0,
+    "mechanic": "護盾",
+    "drops": [
+      "gear-29",
+      "artifact-shard-4"
+    ]
+  },
+  {
+    "id": "boss-5",
+    "name": "荊襄智將",
+    "type": "區域頭目",
+    "level": 25,
+    "hp": 1020,
+    "attack": 52,
+    "defense": 28,
+    "speed": 16,
+    "refreshMinutes": 0,
+    "mechanic": "狂暴",
+    "drops": [
+      "gear-32",
+      "artifact-shard-5"
+    ]
+  },
+  {
+    "id": "boss-6",
+    "name": "赤潮都督",
+    "type": "區域頭目",
+    "level": 30,
+    "hp": 1170,
+    "attack": 58,
+    "defense": 32,
+    "speed": 17,
+    "refreshMinutes": 0,
+    "mechanic": "召援",
+    "drops": [
+      "gear-35",
+      "artifact-shard-1"
+    ]
+  },
+  {
+    "id": "boss-7",
+    "name": "蜀道巨獸",
+    "type": "區域頭目",
+    "level": 35,
+    "hp": 1320,
+    "attack": 64,
+    "defense": 36,
+    "speed": 18,
+    "refreshMinutes": 0,
+    "mechanic": "反擊",
+    "drops": [
+      "gear-38",
+      "artifact-shard-2"
+    ]
+  },
+  {
+    "id": "boss-8",
+    "name": "西涼戰魂",
+    "type": "區域頭目",
+    "level": 40,
+    "hp": 1470,
+    "attack": 70,
+    "defense": 40,
+    "speed": 19,
+    "refreshMinutes": 0,
+    "mechanic": "護盾",
+    "drops": [
+      "gear-41",
+      "artifact-shard-3"
+    ]
+  },
+  {
+    "id": "boss-9",
+    "name": "帝都禁衛",
+    "type": "區域頭目",
+    "level": 45,
+    "hp": 1620,
+    "attack": 76,
+    "defense": 44,
+    "speed": 20,
+    "refreshMinutes": 0,
+    "mechanic": "狂暴",
+    "drops": [
+      "gear-44",
+      "artifact-shard-4"
+    ]
+  },
+  {
+    "id": "boss-10",
+    "name": "虎豹先鋒",
+    "type": "區域頭目",
+    "level": 50,
+    "hp": 1770,
+    "attack": 82,
+    "defense": 48,
+    "speed": 21,
+    "refreshMinutes": 0,
+    "mechanic": "召援",
+    "drops": [
+      "gear-47",
+      "artifact-shard-5"
+    ]
+  },
+  {
+    "id": "boss-11",
+    "name": "江表英傑",
+    "type": "區域頭目",
+    "level": 55,
+    "hp": 1920,
+    "attack": 88,
+    "defense": 52,
+    "speed": 22,
+    "refreshMinutes": 0,
+    "mechanic": "反擊",
+    "drops": [
+      "gear-50",
+      "artifact-shard-1"
+    ]
+  },
+  {
+    "id": "boss-12",
+    "name": "定軍山王",
+    "type": "區域頭目",
+    "level": 60,
+    "hp": 2070,
+    "attack": 94,
+    "defense": 56,
+    "speed": 23,
+    "refreshMinutes": 0,
+    "mechanic": "護盾",
+    "drops": [
+      "gear-53",
+      "artifact-shard-2"
+    ]
+  },
+  {
+    "id": "world-1",
+    "name": "無雙飛將",
+    "type": "世界頭目",
+    "level": 30,
+    "hp": 8000,
+    "attack": 120,
+    "defense": 55,
+    "speed": 30,
+    "refreshMinutes": 30,
+    "mechanic": "連擊狂暴",
+    "drops": [
+      "mythic-1",
+      "artifact-shard-1"
+    ]
+  },
+  {
+    "id": "world-2",
+    "name": "暴政相國",
+    "type": "世界頭目",
+    "level": 45,
+    "hp": 13500,
+    "attack": 175,
+    "defense": 80,
+    "speed": 34,
+    "refreshMinutes": 45,
+    "mechanic": "全體火計",
+    "drops": [
+      "mythic-2",
+      "artifact-shard-2"
+    ]
+  },
+  {
+    "id": "world-3",
+    "name": "河北霸主",
+    "type": "世界頭目",
+    "level": 60,
+    "hp": 19000,
+    "attack": 230,
+    "defense": 105,
+    "speed": 38,
+    "refreshMinutes": 60,
+    "mechanic": "兵力護盾",
+    "drops": [
+      "mythic-3",
+      "artifact-shard-3"
+    ]
+  },
+  {
+    "id": "world-4",
+    "name": "亂世梟雄",
+    "type": "世界頭目",
+    "level": 75,
+    "hp": 24500,
+    "attack": 285,
+    "defense": 130,
+    "speed": 42,
+    "refreshMinutes": 75,
+    "mechanic": "吸血反擊",
+    "drops": [
+      "mythic-4",
+      "artifact-shard-4"
+    ]
+  },
+  {
+    "id": "world-5",
+    "name": "冢虎軍師",
+    "type": "世界頭目",
+    "level": 90,
+    "hp": 30000,
+    "attack": 340,
+    "defense": 155,
+    "speed": 46,
+    "refreshMinutes": 90,
+    "mechanic": "八陣封鎖",
+    "drops": [
+      "mythic-5",
+      "artifact-shard-5"
+    ]
+  }
+]

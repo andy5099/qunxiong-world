@@ -1,0 +1,3202 @@
+[
+  {
+    "id": "skill-1",
+    "name": "火斬·1式",
+    "type": "單體",
+    "mp": 4,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-2",
+    "name": "水斬·1式",
+    "type": "全體",
+    "mp": 5,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-3",
+    "name": "雷斬·1式",
+    "type": "DOT",
+    "mp": 6,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-4",
+    "name": "風斬·1式",
+    "type": "治療",
+    "mp": 7,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-5",
+    "name": "冰斬·1式",
+    "type": "控制",
+    "mp": 8,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-6",
+    "name": "岩斬·1式",
+    "type": "BUFF",
+    "mp": 9,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-7",
+    "name": "光斬·1式",
+    "type": "DEBUFF",
+    "mp": 10,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-8",
+    "name": "影斬·1式",
+    "type": "爆擊",
+    "mp": 11,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-9",
+    "name": "木斬·1式",
+    "type": "連擊",
+    "mp": 12,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-10",
+    "name": "金斬·1式",
+    "type": "反擊",
+    "mp": 13,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-11",
+    "name": "火擊·1式",
+    "type": "吸血",
+    "mp": 14,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-12",
+    "name": "水擊·1式",
+    "type": "單體",
+    "mp": 15,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-13",
+    "name": "雷擊·1式",
+    "type": "全體",
+    "mp": 16,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-14",
+    "name": "風擊·1式",
+    "type": "DOT",
+    "mp": 17,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-15",
+    "name": "冰擊·1式",
+    "type": "治療",
+    "mp": 18,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-16",
+    "name": "岩擊·1式",
+    "type": "控制",
+    "mp": 19,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-17",
+    "name": "光擊·1式",
+    "type": "BUFF",
+    "mp": 20,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-18",
+    "name": "影擊·1式",
+    "type": "DEBUFF",
+    "mp": 21,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-19",
+    "name": "木擊·1式",
+    "type": "爆擊",
+    "mp": 4,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-20",
+    "name": "金擊·1式",
+    "type": "連擊",
+    "mp": 5,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-21",
+    "name": "火陣·1式",
+    "type": "反擊",
+    "mp": 6,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-22",
+    "name": "水陣·1式",
+    "type": "吸血",
+    "mp": 7,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-23",
+    "name": "雷陣·1式",
+    "type": "單體",
+    "mp": 8,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-24",
+    "name": "風陣·1式",
+    "type": "全體",
+    "mp": 9,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-25",
+    "name": "冰陣·1式",
+    "type": "DOT",
+    "mp": 10,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-26",
+    "name": "岩陣·1式",
+    "type": "治療",
+    "mp": 11,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-27",
+    "name": "光陣·1式",
+    "type": "控制",
+    "mp": 12,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-28",
+    "name": "影陣·1式",
+    "type": "BUFF",
+    "mp": 13,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-29",
+    "name": "木陣·1式",
+    "type": "DEBUFF",
+    "mp": 14,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-30",
+    "name": "金陣·1式",
+    "type": "爆擊",
+    "mp": 15,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-31",
+    "name": "火計·1式",
+    "type": "連擊",
+    "mp": 16,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-32",
+    "name": "水計·1式",
+    "type": "反擊",
+    "mp": 17,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-33",
+    "name": "雷計·1式",
+    "type": "吸血",
+    "mp": 18,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-34",
+    "name": "風計·1式",
+    "type": "單體",
+    "mp": 19,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-35",
+    "name": "冰計·1式",
+    "type": "全體",
+    "mp": 20,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-36",
+    "name": "岩計·1式",
+    "type": "DOT",
+    "mp": 21,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-37",
+    "name": "光計·1式",
+    "type": "治療",
+    "mp": 4,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-38",
+    "name": "影計·1式",
+    "type": "控制",
+    "mp": 5,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-39",
+    "name": "木計·1式",
+    "type": "BUFF",
+    "mp": 6,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-40",
+    "name": "金計·1式",
+    "type": "DEBUFF",
+    "mp": 7,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-41",
+    "name": "火咒·1式",
+    "type": "爆擊",
+    "mp": 8,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-42",
+    "name": "水咒·1式",
+    "type": "連擊",
+    "mp": 9,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-43",
+    "name": "雷咒·1式",
+    "type": "反擊",
+    "mp": 10,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-44",
+    "name": "風咒·1式",
+    "type": "吸血",
+    "mp": 11,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-45",
+    "name": "冰咒·1式",
+    "type": "單體",
+    "mp": 12,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-46",
+    "name": "岩咒·1式",
+    "type": "全體",
+    "mp": 13,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-47",
+    "name": "光咒·1式",
+    "type": "DOT",
+    "mp": 14,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-48",
+    "name": "影咒·1式",
+    "type": "治療",
+    "mp": 15,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-49",
+    "name": "木咒·1式",
+    "type": "控制",
+    "mp": 16,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-50",
+    "name": "金咒·1式",
+    "type": "BUFF",
+    "mp": 17,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-51",
+    "name": "火箭·1式",
+    "type": "DEBUFF",
+    "mp": 18,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-52",
+    "name": "水箭·1式",
+    "type": "爆擊",
+    "mp": 19,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-53",
+    "name": "雷箭·1式",
+    "type": "連擊",
+    "mp": 20,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-54",
+    "name": "風箭·1式",
+    "type": "反擊",
+    "mp": 21,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-55",
+    "name": "冰箭·1式",
+    "type": "吸血",
+    "mp": 4,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-56",
+    "name": "岩箭·1式",
+    "type": "單體",
+    "mp": 5,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-57",
+    "name": "光箭·1式",
+    "type": "全體",
+    "mp": 6,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-58",
+    "name": "影箭·1式",
+    "type": "DOT",
+    "mp": 7,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-59",
+    "name": "木箭·1式",
+    "type": "治療",
+    "mp": 8,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-60",
+    "name": "金箭·1式",
+    "type": "控制",
+    "mp": 9,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-61",
+    "name": "火舞·1式",
+    "type": "BUFF",
+    "mp": 10,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-62",
+    "name": "水舞·1式",
+    "type": "DEBUFF",
+    "mp": 11,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-63",
+    "name": "雷舞·1式",
+    "type": "爆擊",
+    "mp": 12,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-64",
+    "name": "風舞·1式",
+    "type": "連擊",
+    "mp": 13,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-65",
+    "name": "冰舞·1式",
+    "type": "反擊",
+    "mp": 14,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-66",
+    "name": "岩舞·1式",
+    "type": "吸血",
+    "mp": 15,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-67",
+    "name": "光舞·1式",
+    "type": "單體",
+    "mp": 16,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-68",
+    "name": "影舞·1式",
+    "type": "全體",
+    "mp": 17,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-69",
+    "name": "木舞·1式",
+    "type": "DOT",
+    "mp": 18,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-70",
+    "name": "金舞·1式",
+    "type": "治療",
+    "mp": 19,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-71",
+    "name": "火破·1式",
+    "type": "控制",
+    "mp": 20,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-72",
+    "name": "水破·1式",
+    "type": "BUFF",
+    "mp": 21,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-73",
+    "name": "雷破·1式",
+    "type": "DEBUFF",
+    "mp": 4,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-74",
+    "name": "風破·1式",
+    "type": "爆擊",
+    "mp": 5,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-75",
+    "name": "冰破·1式",
+    "type": "連擊",
+    "mp": 6,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-76",
+    "name": "岩破·1式",
+    "type": "反擊",
+    "mp": 7,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-77",
+    "name": "光破·1式",
+    "type": "吸血",
+    "mp": 8,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-78",
+    "name": "影破·1式",
+    "type": "單體",
+    "mp": 9,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-79",
+    "name": "木破·1式",
+    "type": "全體",
+    "mp": 10,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-80",
+    "name": "金破·1式",
+    "type": "DOT",
+    "mp": 11,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-81",
+    "name": "火護·1式",
+    "type": "治療",
+    "mp": 12,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-82",
+    "name": "水護·1式",
+    "type": "控制",
+    "mp": 13,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-83",
+    "name": "雷護·1式",
+    "type": "BUFF",
+    "mp": 14,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-84",
+    "name": "風護·1式",
+    "type": "DEBUFF",
+    "mp": 15,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-85",
+    "name": "冰護·1式",
+    "type": "爆擊",
+    "mp": 16,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-86",
+    "name": "岩護·1式",
+    "type": "連擊",
+    "mp": 17,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-87",
+    "name": "光護·1式",
+    "type": "反擊",
+    "mp": 18,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-88",
+    "name": "影護·1式",
+    "type": "吸血",
+    "mp": 19,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-89",
+    "name": "木護·1式",
+    "type": "單體",
+    "mp": 20,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-90",
+    "name": "金護·1式",
+    "type": "全體",
+    "mp": 21,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-91",
+    "name": "火療·1式",
+    "type": "DOT",
+    "mp": 4,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-92",
+    "name": "水療·1式",
+    "type": "治療",
+    "mp": 5,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-93",
+    "name": "雷療·1式",
+    "type": "控制",
+    "mp": 6,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-94",
+    "name": "風療·1式",
+    "type": "BUFF",
+    "mp": 7,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-95",
+    "name": "冰療·1式",
+    "type": "DEBUFF",
+    "mp": 8,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-96",
+    "name": "岩療·1式",
+    "type": "爆擊",
+    "mp": 9,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-97",
+    "name": "光療·1式",
+    "type": "連擊",
+    "mp": 10,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-98",
+    "name": "影療·1式",
+    "type": "反擊",
+    "mp": 11,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-99",
+    "name": "木療·1式",
+    "type": "吸血",
+    "mp": 12,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-100",
+    "name": "金療·1式",
+    "type": "單體",
+    "mp": 13,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-101",
+    "name": "火斬·2式",
+    "type": "全體",
+    "mp": 14,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-102",
+    "name": "水斬·2式",
+    "type": "DOT",
+    "mp": 15,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-103",
+    "name": "雷斬·2式",
+    "type": "治療",
+    "mp": 16,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-104",
+    "name": "風斬·2式",
+    "type": "控制",
+    "mp": 17,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-105",
+    "name": "冰斬·2式",
+    "type": "BUFF",
+    "mp": 18,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-106",
+    "name": "岩斬·2式",
+    "type": "DEBUFF",
+    "mp": 19,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-107",
+    "name": "光斬·2式",
+    "type": "爆擊",
+    "mp": 20,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-108",
+    "name": "影斬·2式",
+    "type": "連擊",
+    "mp": 21,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-109",
+    "name": "木斬·2式",
+    "type": "反擊",
+    "mp": 4,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-110",
+    "name": "金斬·2式",
+    "type": "吸血",
+    "mp": 5,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-111",
+    "name": "火擊·2式",
+    "type": "單體",
+    "mp": 6,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-112",
+    "name": "水擊·2式",
+    "type": "全體",
+    "mp": 7,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-113",
+    "name": "雷擊·2式",
+    "type": "DOT",
+    "mp": 8,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-114",
+    "name": "風擊·2式",
+    "type": "治療",
+    "mp": 9,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-115",
+    "name": "冰擊·2式",
+    "type": "控制",
+    "mp": 10,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-116",
+    "name": "岩擊·2式",
+    "type": "BUFF",
+    "mp": 11,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-117",
+    "name": "光擊·2式",
+    "type": "DEBUFF",
+    "mp": 12,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-118",
+    "name": "影擊·2式",
+    "type": "爆擊",
+    "mp": 13,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-119",
+    "name": "木擊·2式",
+    "type": "連擊",
+    "mp": 14,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-120",
+    "name": "金擊·2式",
+    "type": "反擊",
+    "mp": 15,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-121",
+    "name": "火陣·2式",
+    "type": "吸血",
+    "mp": 16,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-122",
+    "name": "水陣·2式",
+    "type": "單體",
+    "mp": 17,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-123",
+    "name": "雷陣·2式",
+    "type": "全體",
+    "mp": 18,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-124",
+    "name": "風陣·2式",
+    "type": "DOT",
+    "mp": 19,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-125",
+    "name": "冰陣·2式",
+    "type": "治療",
+    "mp": 20,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-126",
+    "name": "岩陣·2式",
+    "type": "控制",
+    "mp": 21,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-127",
+    "name": "光陣·2式",
+    "type": "BUFF",
+    "mp": 4,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-128",
+    "name": "影陣·2式",
+    "type": "DEBUFF",
+    "mp": 5,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-129",
+    "name": "木陣·2式",
+    "type": "爆擊",
+    "mp": 6,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-130",
+    "name": "金陣·2式",
+    "type": "連擊",
+    "mp": 7,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-131",
+    "name": "火計·2式",
+    "type": "反擊",
+    "mp": 8,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-132",
+    "name": "水計·2式",
+    "type": "吸血",
+    "mp": 9,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-133",
+    "name": "雷計·2式",
+    "type": "單體",
+    "mp": 10,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-134",
+    "name": "風計·2式",
+    "type": "全體",
+    "mp": 11,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-135",
+    "name": "冰計·2式",
+    "type": "DOT",
+    "mp": 12,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-136",
+    "name": "岩計·2式",
+    "type": "治療",
+    "mp": 13,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-137",
+    "name": "光計·2式",
+    "type": "控制",
+    "mp": 14,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-138",
+    "name": "影計·2式",
+    "type": "BUFF",
+    "mp": 15,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-139",
+    "name": "木計·2式",
+    "type": "DEBUFF",
+    "mp": 16,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-140",
+    "name": "金計·2式",
+    "type": "爆擊",
+    "mp": 17,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-141",
+    "name": "火咒·2式",
+    "type": "連擊",
+    "mp": 18,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-142",
+    "name": "水咒·2式",
+    "type": "反擊",
+    "mp": 19,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-143",
+    "name": "雷咒·2式",
+    "type": "吸血",
+    "mp": 20,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-144",
+    "name": "風咒·2式",
+    "type": "單體",
+    "mp": 21,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-145",
+    "name": "冰咒·2式",
+    "type": "全體",
+    "mp": 4,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-146",
+    "name": "岩咒·2式",
+    "type": "DOT",
+    "mp": 5,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-147",
+    "name": "光咒·2式",
+    "type": "治療",
+    "mp": 6,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-148",
+    "name": "影咒·2式",
+    "type": "控制",
+    "mp": 7,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-149",
+    "name": "木咒·2式",
+    "type": "BUFF",
+    "mp": 8,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-150",
+    "name": "金咒·2式",
+    "type": "DEBUFF",
+    "mp": 9,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-151",
+    "name": "火箭·2式",
+    "type": "爆擊",
+    "mp": 10,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-152",
+    "name": "水箭·2式",
+    "type": "連擊",
+    "mp": 11,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-153",
+    "name": "雷箭·2式",
+    "type": "反擊",
+    "mp": 12,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-154",
+    "name": "風箭·2式",
+    "type": "吸血",
+    "mp": 13,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-155",
+    "name": "冰箭·2式",
+    "type": "單體",
+    "mp": 14,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-156",
+    "name": "岩箭·2式",
+    "type": "全體",
+    "mp": 15,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-157",
+    "name": "光箭·2式",
+    "type": "DOT",
+    "mp": 16,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-158",
+    "name": "影箭·2式",
+    "type": "治療",
+    "mp": 17,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-159",
+    "name": "木箭·2式",
+    "type": "控制",
+    "mp": 18,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-160",
+    "name": "金箭·2式",
+    "type": "BUFF",
+    "mp": 19,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-161",
+    "name": "火舞·2式",
+    "type": "DEBUFF",
+    "mp": 20,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-162",
+    "name": "水舞·2式",
+    "type": "爆擊",
+    "mp": 21,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-163",
+    "name": "雷舞·2式",
+    "type": "連擊",
+    "mp": 4,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-164",
+    "name": "風舞·2式",
+    "type": "反擊",
+    "mp": 5,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-165",
+    "name": "冰舞·2式",
+    "type": "吸血",
+    "mp": 6,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-166",
+    "name": "岩舞·2式",
+    "type": "單體",
+    "mp": 7,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-167",
+    "name": "光舞·2式",
+    "type": "全體",
+    "mp": 8,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-168",
+    "name": "影舞·2式",
+    "type": "DOT",
+    "mp": 9,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-169",
+    "name": "木舞·2式",
+    "type": "治療",
+    "mp": 10,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-170",
+    "name": "金舞·2式",
+    "type": "控制",
+    "mp": 11,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-171",
+    "name": "火破·2式",
+    "type": "BUFF",
+    "mp": 12,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-172",
+    "name": "水破·2式",
+    "type": "DEBUFF",
+    "mp": 13,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-173",
+    "name": "雷破·2式",
+    "type": "爆擊",
+    "mp": 14,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-174",
+    "name": "風破·2式",
+    "type": "連擊",
+    "mp": 15,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-175",
+    "name": "冰破·2式",
+    "type": "反擊",
+    "mp": 16,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-176",
+    "name": "岩破·2式",
+    "type": "吸血",
+    "mp": 17,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-177",
+    "name": "光破·2式",
+    "type": "單體",
+    "mp": 18,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-178",
+    "name": "影破·2式",
+    "type": "全體",
+    "mp": 19,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-179",
+    "name": "木破·2式",
+    "type": "DOT",
+    "mp": 20,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-180",
+    "name": "金破·2式",
+    "type": "治療",
+    "mp": 21,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-181",
+    "name": "火護·2式",
+    "type": "控制",
+    "mp": 4,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-182",
+    "name": "水護·2式",
+    "type": "BUFF",
+    "mp": 5,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-183",
+    "name": "雷護·2式",
+    "type": "DEBUFF",
+    "mp": 6,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-184",
+    "name": "風護·2式",
+    "type": "爆擊",
+    "mp": 7,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-185",
+    "name": "冰護·2式",
+    "type": "連擊",
+    "mp": 8,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-186",
+    "name": "岩護·2式",
+    "type": "反擊",
+    "mp": 9,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-187",
+    "name": "光護·2式",
+    "type": "吸血",
+    "mp": 10,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-188",
+    "name": "影護·2式",
+    "type": "單體",
+    "mp": 11,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-189",
+    "name": "木護·2式",
+    "type": "全體",
+    "mp": 12,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-190",
+    "name": "金護·2式",
+    "type": "DOT",
+    "mp": 13,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-191",
+    "name": "火療·2式",
+    "type": "治療",
+    "mp": 14,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-192",
+    "name": "水療·2式",
+    "type": "控制",
+    "mp": 15,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-193",
+    "name": "雷療·2式",
+    "type": "BUFF",
+    "mp": 16,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-194",
+    "name": "風療·2式",
+    "type": "DEBUFF",
+    "mp": 17,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-195",
+    "name": "冰療·2式",
+    "type": "爆擊",
+    "mp": 18,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-196",
+    "name": "岩療·2式",
+    "type": "連擊",
+    "mp": 19,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-197",
+    "name": "光療·2式",
+    "type": "反擊",
+    "mp": 20,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-198",
+    "name": "影療·2式",
+    "type": "吸血",
+    "mp": 21,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-199",
+    "name": "木療·2式",
+    "type": "單體",
+    "mp": 4,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-200",
+    "name": "金療·2式",
+    "type": "全體",
+    "mp": 5,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-201",
+    "name": "火斬·3式",
+    "type": "DOT",
+    "mp": 6,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-202",
+    "name": "水斬·3式",
+    "type": "治療",
+    "mp": 7,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-203",
+    "name": "雷斬·3式",
+    "type": "控制",
+    "mp": 8,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-204",
+    "name": "風斬·3式",
+    "type": "BUFF",
+    "mp": 9,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-205",
+    "name": "冰斬·3式",
+    "type": "DEBUFF",
+    "mp": 10,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-206",
+    "name": "岩斬·3式",
+    "type": "爆擊",
+    "mp": 11,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-207",
+    "name": "光斬·3式",
+    "type": "連擊",
+    "mp": 12,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-208",
+    "name": "影斬·3式",
+    "type": "反擊",
+    "mp": 13,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-209",
+    "name": "木斬·3式",
+    "type": "吸血",
+    "mp": 14,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-210",
+    "name": "金斬·3式",
+    "type": "單體",
+    "mp": 15,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-211",
+    "name": "火擊·3式",
+    "type": "全體",
+    "mp": 16,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-212",
+    "name": "水擊·3式",
+    "type": "DOT",
+    "mp": 17,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-213",
+    "name": "雷擊·3式",
+    "type": "治療",
+    "mp": 18,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-214",
+    "name": "風擊·3式",
+    "type": "控制",
+    "mp": 19,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-215",
+    "name": "冰擊·3式",
+    "type": "BUFF",
+    "mp": 20,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-216",
+    "name": "岩擊·3式",
+    "type": "DEBUFF",
+    "mp": 21,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-217",
+    "name": "光擊·3式",
+    "type": "爆擊",
+    "mp": 4,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-218",
+    "name": "影擊·3式",
+    "type": "連擊",
+    "mp": 5,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-219",
+    "name": "木擊·3式",
+    "type": "反擊",
+    "mp": 6,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-220",
+    "name": "金擊·3式",
+    "type": "吸血",
+    "mp": 7,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-221",
+    "name": "火陣·3式",
+    "type": "單體",
+    "mp": 8,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-222",
+    "name": "水陣·3式",
+    "type": "全體",
+    "mp": 9,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-223",
+    "name": "雷陣·3式",
+    "type": "DOT",
+    "mp": 10,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-224",
+    "name": "風陣·3式",
+    "type": "治療",
+    "mp": 11,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-225",
+    "name": "冰陣·3式",
+    "type": "控制",
+    "mp": 12,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-226",
+    "name": "岩陣·3式",
+    "type": "BUFF",
+    "mp": 13,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-227",
+    "name": "光陣·3式",
+    "type": "DEBUFF",
+    "mp": 14,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-228",
+    "name": "影陣·3式",
+    "type": "爆擊",
+    "mp": 15,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-229",
+    "name": "木陣·3式",
+    "type": "連擊",
+    "mp": 16,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-230",
+    "name": "金陣·3式",
+    "type": "反擊",
+    "mp": 17,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-231",
+    "name": "火計·3式",
+    "type": "吸血",
+    "mp": 18,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-232",
+    "name": "水計·3式",
+    "type": "單體",
+    "mp": 19,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-233",
+    "name": "雷計·3式",
+    "type": "全體",
+    "mp": 20,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-234",
+    "name": "風計·3式",
+    "type": "DOT",
+    "mp": 21,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-235",
+    "name": "冰計·3式",
+    "type": "治療",
+    "mp": 4,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-236",
+    "name": "岩計·3式",
+    "type": "控制",
+    "mp": 5,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-237",
+    "name": "光計·3式",
+    "type": "BUFF",
+    "mp": 6,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-238",
+    "name": "影計·3式",
+    "type": "DEBUFF",
+    "mp": 7,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-239",
+    "name": "木計·3式",
+    "type": "爆擊",
+    "mp": 8,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-240",
+    "name": "金計·3式",
+    "type": "連擊",
+    "mp": 9,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-241",
+    "name": "火咒·3式",
+    "type": "反擊",
+    "mp": 10,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-242",
+    "name": "水咒·3式",
+    "type": "吸血",
+    "mp": 11,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-243",
+    "name": "雷咒·3式",
+    "type": "單體",
+    "mp": 12,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-244",
+    "name": "風咒·3式",
+    "type": "全體",
+    "mp": 13,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-245",
+    "name": "冰咒·3式",
+    "type": "DOT",
+    "mp": 14,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-246",
+    "name": "岩咒·3式",
+    "type": "治療",
+    "mp": 15,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-247",
+    "name": "光咒·3式",
+    "type": "控制",
+    "mp": 16,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-248",
+    "name": "影咒·3式",
+    "type": "BUFF",
+    "mp": 17,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-249",
+    "name": "木咒·3式",
+    "type": "DEBUFF",
+    "mp": 18,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-250",
+    "name": "金咒·3式",
+    "type": "爆擊",
+    "mp": 19,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-251",
+    "name": "火箭·3式",
+    "type": "連擊",
+    "mp": 20,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-252",
+    "name": "水箭·3式",
+    "type": "反擊",
+    "mp": 21,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-253",
+    "name": "雷箭·3式",
+    "type": "吸血",
+    "mp": 4,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-254",
+    "name": "風箭·3式",
+    "type": "單體",
+    "mp": 5,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-255",
+    "name": "冰箭·3式",
+    "type": "全體",
+    "mp": 6,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-256",
+    "name": "岩箭·3式",
+    "type": "DOT",
+    "mp": 7,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-257",
+    "name": "光箭·3式",
+    "type": "治療",
+    "mp": 8,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-258",
+    "name": "影箭·3式",
+    "type": "控制",
+    "mp": 9,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-259",
+    "name": "木箭·3式",
+    "type": "BUFF",
+    "mp": 10,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-260",
+    "name": "金箭·3式",
+    "type": "DEBUFF",
+    "mp": 11,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-261",
+    "name": "火舞·3式",
+    "type": "爆擊",
+    "mp": 12,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-262",
+    "name": "水舞·3式",
+    "type": "連擊",
+    "mp": 13,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-263",
+    "name": "雷舞·3式",
+    "type": "反擊",
+    "mp": 14,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-264",
+    "name": "風舞·3式",
+    "type": "吸血",
+    "mp": 15,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-265",
+    "name": "冰舞·3式",
+    "type": "單體",
+    "mp": 16,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-266",
+    "name": "岩舞·3式",
+    "type": "全體",
+    "mp": 17,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-267",
+    "name": "光舞·3式",
+    "type": "DOT",
+    "mp": 18,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-268",
+    "name": "影舞·3式",
+    "type": "治療",
+    "mp": 19,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-269",
+    "name": "木舞·3式",
+    "type": "控制",
+    "mp": 20,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-270",
+    "name": "金舞·3式",
+    "type": "BUFF",
+    "mp": 21,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-271",
+    "name": "火破·3式",
+    "type": "DEBUFF",
+    "mp": 4,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-272",
+    "name": "水破·3式",
+    "type": "爆擊",
+    "mp": 5,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-273",
+    "name": "雷破·3式",
+    "type": "連擊",
+    "mp": 6,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-274",
+    "name": "風破·3式",
+    "type": "反擊",
+    "mp": 7,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-275",
+    "name": "冰破·3式",
+    "type": "吸血",
+    "mp": 8,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-276",
+    "name": "岩破·3式",
+    "type": "單體",
+    "mp": 9,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-277",
+    "name": "光破·3式",
+    "type": "全體",
+    "mp": 10,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-278",
+    "name": "影破·3式",
+    "type": "DOT",
+    "mp": 11,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-279",
+    "name": "木破·3式",
+    "type": "治療",
+    "mp": 12,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-280",
+    "name": "金破·3式",
+    "type": "控制",
+    "mp": 13,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-281",
+    "name": "火護·3式",
+    "type": "BUFF",
+    "mp": 14,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-282",
+    "name": "水護·3式",
+    "type": "DEBUFF",
+    "mp": 15,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-283",
+    "name": "雷護·3式",
+    "type": "爆擊",
+    "mp": 16,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-284",
+    "name": "風護·3式",
+    "type": "連擊",
+    "mp": 17,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-285",
+    "name": "冰護·3式",
+    "type": "反擊",
+    "mp": 18,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-286",
+    "name": "岩護·3式",
+    "type": "吸血",
+    "mp": 19,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-287",
+    "name": "光護·3式",
+    "type": "單體",
+    "mp": 20,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-288",
+    "name": "影護·3式",
+    "type": "全體",
+    "mp": 21,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-289",
+    "name": "木護·3式",
+    "type": "DOT",
+    "mp": 4,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-290",
+    "name": "金護·3式",
+    "type": "治療",
+    "mp": 5,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-291",
+    "name": "火療·3式",
+    "type": "控制",
+    "mp": 6,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-292",
+    "name": "水療·3式",
+    "type": "BUFF",
+    "mp": 7,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-293",
+    "name": "雷療·3式",
+    "type": "DEBUFF",
+    "mp": 8,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-294",
+    "name": "風療·3式",
+    "type": "爆擊",
+    "mp": 9,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-295",
+    "name": "冰療·3式",
+    "type": "連擊",
+    "mp": 10,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-296",
+    "name": "岩療·3式",
+    "type": "反擊",
+    "mp": 11,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-297",
+    "name": "光療·3式",
+    "type": "吸血",
+    "mp": 12,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-298",
+    "name": "影療·3式",
+    "type": "單體",
+    "mp": 13,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-299",
+    "name": "木療·3式",
+    "type": "全體",
+    "mp": 14,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-300",
+    "name": "金療·3式",
+    "type": "DOT",
+    "mp": 15,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-301",
+    "name": "火斬·4式",
+    "type": "治療",
+    "mp": 16,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-302",
+    "name": "水斬·4式",
+    "type": "控制",
+    "mp": 17,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-303",
+    "name": "雷斬·4式",
+    "type": "BUFF",
+    "mp": 18,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-304",
+    "name": "風斬·4式",
+    "type": "DEBUFF",
+    "mp": 19,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-305",
+    "name": "冰斬·4式",
+    "type": "爆擊",
+    "mp": 20,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-306",
+    "name": "岩斬·4式",
+    "type": "連擊",
+    "mp": 21,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-307",
+    "name": "光斬·4式",
+    "type": "反擊",
+    "mp": 4,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-308",
+    "name": "影斬·4式",
+    "type": "吸血",
+    "mp": 5,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-309",
+    "name": "木斬·4式",
+    "type": "單體",
+    "mp": 6,
+    "power": 186,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 186% 效果，附帶單體特性。"
+  },
+  {
+    "id": "skill-310",
+    "name": "金斬·4式",
+    "type": "全體",
+    "mp": 7,
+    "power": 198,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 198% 效果，附帶全體特性。"
+  },
+  {
+    "id": "skill-311",
+    "name": "火擊·4式",
+    "type": "DOT",
+    "mp": 8,
+    "power": 210,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 210% 效果，附帶DOT特性。"
+  },
+  {
+    "id": "skill-312",
+    "name": "水擊·4式",
+    "type": "治療",
+    "mp": 9,
+    "power": 222,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 222% 效果，附帶治療特性。"
+  },
+  {
+    "id": "skill-313",
+    "name": "雷擊·4式",
+    "type": "控制",
+    "mp": 10,
+    "power": 90,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 90% 效果，附帶控制特性。"
+  },
+  {
+    "id": "skill-314",
+    "name": "風擊·4式",
+    "type": "BUFF",
+    "mp": 11,
+    "power": 102,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 102% 效果，附帶BUFF特性。"
+  },
+  {
+    "id": "skill-315",
+    "name": "冰擊·4式",
+    "type": "DEBUFF",
+    "mp": 12,
+    "power": 114,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 114% 效果，附帶DEBUFF特性。"
+  },
+  {
+    "id": "skill-316",
+    "name": "岩擊·4式",
+    "type": "爆擊",
+    "mp": 13,
+    "power": 126,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 126% 效果，附帶爆擊特性。"
+  },
+  {
+    "id": "skill-317",
+    "name": "光擊·4式",
+    "type": "連擊",
+    "mp": 14,
+    "power": 138,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 138% 效果，附帶連擊特性。"
+  },
+  {
+    "id": "skill-318",
+    "name": "影擊·4式",
+    "type": "反擊",
+    "mp": 15,
+    "power": 150,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 150% 效果，附帶反擊特性。"
+  },
+  {
+    "id": "skill-319",
+    "name": "木擊·4式",
+    "type": "吸血",
+    "mp": 16,
+    "power": 162,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 162% 效果，附帶吸血特性。"
+  },
+  {
+    "id": "skill-320",
+    "name": "金擊·4式",
+    "type": "單體",
+    "mp": 17,
+    "power": 174,
+    "level": 1,
+    "maxLevel": 10,
+    "description": "造成 174% 效果，附帶單體特性。"
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "daily-explore",
+    "name": "巡行四方",
+    "type": "explore",
+    "target": 20,
+    "reward": {
+      "gold": 300,
+      "gems": 10
+    }
+  },
+  {
+    "id": "daily-kill",
+    "name": "平定亂兵",
+    "type": "kills",
+    "target": 30,
+    "reward": {
+      "gold": 450,
+      "gems": 10
+    }
+  },
+  {
+    "id": "daily-boss",
+    "name": "討伐首領",
+    "type": "bosses",
+    "target": 2,
+    "reward": {
+      "gold": 700,
+      "gems": 20
+    }
+  }
+]

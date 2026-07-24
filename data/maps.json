@@ -1,0 +1,242 @@
+[
+  {
+    "id": "region-1",
+    "name": "桃源鄉",
+    "level": 1,
+    "description": "桃源鄉境內局勢多變，旅人與軍隊往來不絕。",
+    "weather": "晴天",
+    "monsters": [
+      "monster-1",
+      "monster-2",
+      "monster-3"
+    ],
+    "boss": "boss-1",
+    "npcs": [
+      "桃源鄉商人",
+      "桃源鄉守備官"
+    ],
+    "shopTier": 1,
+    "quest": "quest-1",
+    "hiddenEvent": "event-1"
+  },
+  {
+    "id": "region-2",
+    "name": "幽州",
+    "level": 5,
+    "description": "幽州境內局勢多變，旅人與軍隊往來不絕。",
+    "weather": "雨天",
+    "monsters": [
+      "monster-4",
+      "monster-5",
+      "monster-6"
+    ],
+    "boss": "boss-2",
+    "npcs": [
+      "幽州商人",
+      "幽州守備官"
+    ],
+    "shopTier": 1,
+    "quest": "quest-2",
+    "hiddenEvent": "event-2"
+  },
+  {
+    "id": "region-3",
+    "name": "冀州",
+    "level": 9,
+    "description": "冀州境內局勢多變，旅人與軍隊往來不絕。",
+    "weather": "大雪",
+    "monsters": [
+      "monster-7",
+      "monster-8",
+      "monster-9"
+    ],
+    "boss": "boss-3",
+    "npcs": [
+      "冀州商人",
+      "冀州守備官"
+    ],
+    "shopTier": 2,
+    "quest": "quest-3",
+    "hiddenEvent": "event-3"
+  },
+  {
+    "id": "region-4",
+    "name": "徐州",
+    "level": 13,
+    "description": "徐州境內局勢多變，旅人與軍隊往來不絕。",
+    "weather": "雷雨",
+    "monsters": [
+      "monster-10",
+      "monster-11",
+      "monster-12"
+    ],
+    "boss": "boss-4",
+    "npcs": [
+      "徐州商人",
+      "徐州守備官"
+    ],
+    "shopTier": 2,
+    "quest": "quest-4",
+    "hiddenEvent": "event-4"
+  },
+  {
+    "id": "region-5",
+    "name": "荊州",
+    "level": 17,
+    "description": "荊州境內局勢多變，旅人與軍隊往來不絕。",
+    "weather": "沙塵暴",
+    "monsters": [
+      "monster-13",
+      "monster-14",
+      "monster-15"
+    ],
+    "boss": "boss-5",
+    "npcs": [
+      "荊州商人",
+      "荊州守備官"
+    ],
+    "shopTier": 3,
+    "quest": "quest-5",
+    "hiddenEvent": "event-5"
+  },
+  {
+    "id": "region-6",
+    "name": "江東",
+    "level": 21,
+    "description": "江東境內局勢多變，旅人與軍隊往來不絕。",
+    "weather": "晴天",
+    "monsters": [
+      "monster-16",
+      "monster-17",
+      "monster-18"
+    ],
+    "boss": "boss-6",
+    "npcs": [
+      "江東商人",
+      "江東守備官"
+    ],
+    "shopTier": 3,
+    "quest": "quest-6",
+    "hiddenEvent": "event-6"
+  },
+  {
+    "id": "region-7",
+    "name": "益州",
+    "level": 25,
+    "description": "益州境內局勢多變，旅人與軍隊往來不絕。",
+    "weather": "雨天",
+    "monsters": [
+      "monster-19",
+      "monster-20",
+      "monster-21"
+    ],
+    "boss": "boss-7",
+    "npcs": [
+      "益州商人",
+      "益州守備官"
+    ],
+    "shopTier": 4,
+    "quest": "quest-7",
+    "hiddenEvent": "event-1"
+  },
+  {
+    "id": "region-8",
+    "name": "長安",
+    "level": 29,
+    "description": "長安境內局勢多變，旅人與軍隊往來不絕。",
+    "weather": "大雪",
+    "monsters": [
+      "monster-22",
+      "monster-23",
+      "monster-24"
+    ],
+    "boss": "boss-8",
+    "npcs": [
+      "長安商人",
+      "長安守備官"
+    ],
+    "shopTier": 4,
+    "quest": "quest-8",
+    "hiddenEvent": "event-2"
+  },
+  {
+    "id": "region-9",
+    "name": "洛陽",
+    "level": 33,
+    "description": "洛陽境內局勢多變，旅人與軍隊往來不絕。",
+    "weather": "雷雨",
+    "monsters": [
+      "monster-25",
+      "monster-26",
+      "monster-27"
+    ],
+    "boss": "boss-9",
+    "npcs": [
+      "洛陽商人",
+      "洛陽守備官"
+    ],
+    "shopTier": 5,
+    "quest": "quest-9",
+    "hiddenEvent": "event-3"
+  },
+  {
+    "id": "region-10",
+    "name": "許昌",
+    "level": 37,
+    "description": "許昌境內局勢多變，旅人與軍隊往來不絕。",
+    "weather": "沙塵暴",
+    "monsters": [
+      "monster-28",
+      "monster-29",
+      "monster-30"
+    ],
+    "boss": "boss-10",
+    "npcs": [
+      "許昌商人",
+      "許昌守備官"
+    ],
+    "shopTier": 5,
+    "quest": "quest-10",
+    "hiddenEvent": "event-4"
+  },
+  {
+    "id": "region-11",
+    "name": "建業",
+    "level": 41,
+    "description": "建業境內局勢多變，旅人與軍隊往來不絕。",
+    "weather": "晴天",
+    "monsters": [
+      "monster-31",
+      "monster-32",
+      "monster-33"
+    ],
+    "boss": "boss-11",
+    "npcs": [
+      "建業商人",
+      "建業守備官"
+    ],
+    "shopTier": 6,
+    "quest": "quest-11",
+    "hiddenEvent": "event-5"
+  },
+  {
+    "id": "region-12",
+    "name": "漢中",
+    "level": 45,
+    "description": "漢中境內局勢多變，旅人與軍隊往來不絕。",
+    "weather": "雨天",
+    "monsters": [
+      "monster-34",
+      "monster-35",
+      "monster-36"
+    ],
+    "boss": "boss-12",
+    "npcs": [
+      "漢中商人",
+      "漢中守備官"
+    ],
+    "shopTier": 6,
+    "quest": "quest-12",
+    "hiddenEvent": "event-6"
+  }
+]
