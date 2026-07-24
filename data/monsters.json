@@ -1,0 +1,722 @@
+[
+  {
+    "id": "monster-1",
+    "name": "桃源鄉流寇",
+    "level": 1,
+    "hp": 55,
+    "attack": 9,
+    "defense": 3,
+    "speed": 8,
+    "exp": 25,
+    "gold": 15,
+    "drops": [
+      "material-1",
+      "gear-1"
+    ]
+  },
+  {
+    "id": "monster-2",
+    "name": "幽州野狼",
+    "level": 2,
+    "hp": 73,
+    "attack": 11,
+    "defense": 4,
+    "speed": 9,
+    "exp": 33,
+    "gold": 20,
+    "drops": [
+      "material-2",
+      "gear-2"
+    ]
+  },
+  {
+    "id": "monster-3",
+    "name": "冀州斥候",
+    "level": 3,
+    "hp": 91,
+    "attack": 13,
+    "defense": 5,
+    "speed": 10,
+    "exp": 41,
+    "gold": 25,
+    "drops": [
+      "material-3",
+      "gear-3"
+    ]
+  },
+  {
+    "id": "monster-4",
+    "name": "徐州逃兵",
+    "level": 4,
+    "hp": 109,
+    "attack": 15,
+    "defense": 6,
+    "speed": 11,
+    "exp": 49,
+    "gold": 30,
+    "drops": [
+      "material-4",
+      "gear-4"
+    ]
+  },
+  {
+    "id": "monster-5",
+    "name": "荊州山越獵手",
+    "level": 5,
+    "hp": 127,
+    "attack": 17,
+    "defense": 7,
+    "speed": 12,
+    "exp": 57,
+    "gold": 35,
+    "drops": [
+      "material-5",
+      "gear-5"
+    ]
+  },
+  {
+    "id": "monster-6",
+    "name": "江東水寨兵",
+    "level": 6,
+    "hp": 145,
+    "attack": 19,
+    "defense": 8,
+    "speed": 13,
+    "exp": 65,
+    "gold": 40,
+    "drops": [
+      "material-6",
+      "gear-6"
+    ]
+  },
+  {
+    "id": "monster-7",
+    "name": "益州西涼騎手",
+    "level": 7,
+    "hp": 163,
+    "attack": 21,
+    "defense": 9,
+    "speed": 14,
+    "exp": 73,
+    "gold": 45,
+    "drops": [
+      "material-7",
+      "gear-7"
+    ]
+  },
+  {
+    "id": "monster-8",
+    "name": "長安古城守衛",
+    "level": 8,
+    "hp": 181,
+    "attack": 23,
+    "defense": 10,
+    "speed": 15,
+    "exp": 81,
+    "gold": 50,
+    "drops": [
+      "material-8",
+      "gear-8"
+    ]
+  },
+  {
+    "id": "monster-9",
+    "name": "洛陽流寇",
+    "level": 9,
+    "hp": 199,
+    "attack": 25,
+    "defense": 11,
+    "speed": 16,
+    "exp": 89,
+    "gold": 55,
+    "drops": [
+      "material-9",
+      "gear-9"
+    ]
+  },
+  {
+    "id": "monster-10",
+    "name": "許昌野狼",
+    "level": 10,
+    "hp": 217,
+    "attack": 27,
+    "defense": 12,
+    "speed": 17,
+    "exp": 97,
+    "gold": 60,
+    "drops": [
+      "material-10",
+      "gear-10"
+    ]
+  },
+  {
+    "id": "monster-11",
+    "name": "建業斥候",
+    "level": 11,
+    "hp": 235,
+    "attack": 29,
+    "defense": 14,
+    "speed": 18,
+    "exp": 105,
+    "gold": 65,
+    "drops": [
+      "material-11",
+      "gear-11"
+    ]
+  },
+  {
+    "id": "monster-12",
+    "name": "漢中逃兵",
+    "level": 12,
+    "hp": 253,
+    "attack": 31,
+    "defense": 15,
+    "speed": 19,
+    "exp": 113,
+    "gold": 70,
+    "drops": [
+      "material-12",
+      "gear-12"
+    ]
+  },
+  {
+    "id": "monster-13",
+    "name": "桃源鄉山越獵手",
+    "level": 13,
+    "hp": 271,
+    "attack": 33,
+    "defense": 16,
+    "speed": 8,
+    "exp": 121,
+    "gold": 75,
+    "drops": [
+      "material-1",
+      "gear-13"
+    ]
+  },
+  {
+    "id": "monster-14",
+    "name": "幽州水寨兵",
+    "level": 14,
+    "hp": 289,
+    "attack": 35,
+    "defense": 17,
+    "speed": 9,
+    "exp": 129,
+    "gold": 80,
+    "drops": [
+      "material-2",
+      "gear-14"
+    ]
+  },
+  {
+    "id": "monster-15",
+    "name": "冀州西涼騎手",
+    "level": 15,
+    "hp": 307,
+    "attack": 37,
+    "defense": 18,
+    "speed": 10,
+    "exp": 137,
+    "gold": 85,
+    "drops": [
+      "material-3",
+      "gear-15"
+    ]
+  },
+  {
+    "id": "monster-16",
+    "name": "徐州古城守衛",
+    "level": 16,
+    "hp": 325,
+    "attack": 39,
+    "defense": 19,
+    "speed": 11,
+    "exp": 145,
+    "gold": 90,
+    "drops": [
+      "material-4",
+      "gear-16"
+    ]
+  },
+  {
+    "id": "monster-17",
+    "name": "荊州流寇",
+    "level": 17,
+    "hp": 343,
+    "attack": 41,
+    "defense": 20,
+    "speed": 12,
+    "exp": 153,
+    "gold": 95,
+    "drops": [
+      "material-5",
+      "gear-17"
+    ]
+  },
+  {
+    "id": "monster-18",
+    "name": "江東野狼",
+    "level": 18,
+    "hp": 361,
+    "attack": 43,
+    "defense": 21,
+    "speed": 13,
+    "exp": 161,
+    "gold": 100,
+    "drops": [
+      "material-6",
+      "gear-18"
+    ]
+  },
+  {
+    "id": "monster-19",
+    "name": "益州斥候",
+    "level": 19,
+    "hp": 379,
+    "attack": 45,
+    "defense": 22,
+    "speed": 14,
+    "exp": 169,
+    "gold": 105,
+    "drops": [
+      "material-7",
+      "gear-19"
+    ]
+  },
+  {
+    "id": "monster-20",
+    "name": "長安逃兵",
+    "level": 20,
+    "hp": 397,
+    "attack": 47,
+    "defense": 23,
+    "speed": 15,
+    "exp": 177,
+    "gold": 110,
+    "drops": [
+      "material-8",
+      "gear-20"
+    ]
+  },
+  {
+    "id": "monster-21",
+    "name": "洛陽山越獵手",
+    "level": 21,
+    "hp": 415,
+    "attack": 49,
+    "defense": 25,
+    "speed": 16,
+    "exp": 185,
+    "gold": 115,
+    "drops": [
+      "material-9",
+      "gear-21"
+    ]
+  },
+  {
+    "id": "monster-22",
+    "name": "許昌水寨兵",
+    "level": 22,
+    "hp": 433,
+    "attack": 51,
+    "defense": 26,
+    "speed": 17,
+    "exp": 193,
+    "gold": 120,
+    "drops": [
+      "material-10",
+      "gear-22"
+    ]
+  },
+  {
+    "id": "monster-23",
+    "name": "建業西涼騎手",
+    "level": 23,
+    "hp": 451,
+    "attack": 53,
+    "defense": 27,
+    "speed": 18,
+    "exp": 201,
+    "gold": 125,
+    "drops": [
+      "material-11",
+      "gear-23"
+    ]
+  },
+  {
+    "id": "monster-24",
+    "name": "漢中古城守衛",
+    "level": 24,
+    "hp": 469,
+    "attack": 55,
+    "defense": 28,
+    "speed": 19,
+    "exp": 209,
+    "gold": 130,
+    "drops": [
+      "material-12",
+      "gear-24"
+    ]
+  },
+  {
+    "id": "monster-25",
+    "name": "桃源鄉流寇",
+    "level": 25,
+    "hp": 487,
+    "attack": 57,
+    "defense": 29,
+    "speed": 8,
+    "exp": 217,
+    "gold": 135,
+    "drops": [
+      "material-1",
+      "gear-25"
+    ]
+  },
+  {
+    "id": "monster-26",
+    "name": "幽州野狼",
+    "level": 26,
+    "hp": 505,
+    "attack": 59,
+    "defense": 30,
+    "speed": 9,
+    "exp": 225,
+    "gold": 140,
+    "drops": [
+      "material-2",
+      "gear-26"
+    ]
+  },
+  {
+    "id": "monster-27",
+    "name": "冀州斥候",
+    "level": 27,
+    "hp": 523,
+    "attack": 61,
+    "defense": 31,
+    "speed": 10,
+    "exp": 233,
+    "gold": 145,
+    "drops": [
+      "material-3",
+      "gear-27"
+    ]
+  },
+  {
+    "id": "monster-28",
+    "name": "徐州逃兵",
+    "level": 28,
+    "hp": 541,
+    "attack": 63,
+    "defense": 32,
+    "speed": 11,
+    "exp": 241,
+    "gold": 150,
+    "drops": [
+      "material-4",
+      "gear-28"
+    ]
+  },
+  {
+    "id": "monster-29",
+    "name": "荊州山越獵手",
+    "level": 29,
+    "hp": 559,
+    "attack": 65,
+    "defense": 33,
+    "speed": 12,
+    "exp": 249,
+    "gold": 155,
+    "drops": [
+      "material-5",
+      "gear-29"
+    ]
+  },
+  {
+    "id": "monster-30",
+    "name": "江東水寨兵",
+    "level": 30,
+    "hp": 577,
+    "attack": 67,
+    "defense": 34,
+    "speed": 13,
+    "exp": 257,
+    "gold": 160,
+    "drops": [
+      "material-6",
+      "gear-30"
+    ]
+  },
+  {
+    "id": "monster-31",
+    "name": "益州西涼騎手",
+    "level": 31,
+    "hp": 595,
+    "attack": 69,
+    "defense": 36,
+    "speed": 14,
+    "exp": 265,
+    "gold": 165,
+    "drops": [
+      "material-7",
+      "gear-31"
+    ]
+  },
+  {
+    "id": "monster-32",
+    "name": "長安古城守衛",
+    "level": 32,
+    "hp": 613,
+    "attack": 71,
+    "defense": 37,
+    "speed": 15,
+    "exp": 273,
+    "gold": 170,
+    "drops": [
+      "material-8",
+      "gear-32"
+    ]
+  },
+  {
+    "id": "monster-33",
+    "name": "洛陽流寇",
+    "level": 33,
+    "hp": 631,
+    "attack": 73,
+    "defense": 38,
+    "speed": 16,
+    "exp": 281,
+    "gold": 175,
+    "drops": [
+      "material-9",
+      "gear-33"
+    ]
+  },
+  {
+    "id": "monster-34",
+    "name": "許昌野狼",
+    "level": 34,
+    "hp": 649,
+    "attack": 75,
+    "defense": 39,
+    "speed": 17,
+    "exp": 289,
+    "gold": 180,
+    "drops": [
+      "material-10",
+      "gear-34"
+    ]
+  },
+  {
+    "id": "monster-35",
+    "name": "建業斥候",
+    "level": 35,
+    "hp": 667,
+    "attack": 77,
+    "defense": 40,
+    "speed": 18,
+    "exp": 297,
+    "gold": 185,
+    "drops": [
+      "material-11",
+      "gear-35"
+    ]
+  },
+  {
+    "id": "monster-36",
+    "name": "漢中逃兵",
+    "level": 36,
+    "hp": 685,
+    "attack": 79,
+    "defense": 41,
+    "speed": 19,
+    "exp": 305,
+    "gold": 190,
+    "drops": [
+      "material-12",
+      "gear-36"
+    ]
+  },
+  {
+    "id": "monster-37",
+    "name": "桃源鄉山越獵手",
+    "level": 37,
+    "hp": 703,
+    "attack": 81,
+    "defense": 42,
+    "speed": 8,
+    "exp": 313,
+    "gold": 195,
+    "drops": [
+      "material-1",
+      "gear-37"
+    ]
+  },
+  {
+    "id": "monster-38",
+    "name": "幽州水寨兵",
+    "level": 38,
+    "hp": 721,
+    "attack": 83,
+    "defense": 43,
+    "speed": 9,
+    "exp": 321,
+    "gold": 200,
+    "drops": [
+      "material-2",
+      "gear-38"
+    ]
+  },
+  {
+    "id": "monster-39",
+    "name": "冀州西涼騎手",
+    "level": 39,
+    "hp": 739,
+    "attack": 85,
+    "defense": 44,
+    "speed": 10,
+    "exp": 329,
+    "gold": 205,
+    "drops": [
+      "material-3",
+      "gear-39"
+    ]
+  },
+  {
+    "id": "monster-40",
+    "name": "徐州古城守衛",
+    "level": 40,
+    "hp": 757,
+    "attack": 87,
+    "defense": 45,
+    "speed": 11,
+    "exp": 337,
+    "gold": 210,
+    "drops": [
+      "material-4",
+      "gear-40"
+    ]
+  },
+  {
+    "id": "monster-41",
+    "name": "荊州流寇",
+    "level": 41,
+    "hp": 775,
+    "attack": 89,
+    "defense": 47,
+    "speed": 12,
+    "exp": 345,
+    "gold": 215,
+    "drops": [
+      "material-5",
+      "gear-1"
+    ]
+  },
+  {
+    "id": "monster-42",
+    "name": "江東野狼",
+    "level": 42,
+    "hp": 793,
+    "attack": 91,
+    "defense": 48,
+    "speed": 13,
+    "exp": 353,
+    "gold": 220,
+    "drops": [
+      "material-6",
+      "gear-2"
+    ]
+  },
+  {
+    "id": "monster-43",
+    "name": "益州斥候",
+    "level": 43,
+    "hp": 811,
+    "attack": 93,
+    "defense": 49,
+    "speed": 14,
+    "exp": 361,
+    "gold": 225,
+    "drops": [
+      "material-7",
+      "gear-3"
+    ]
+  },
+  {
+    "id": "monster-44",
+    "name": "長安逃兵",
+    "level": 44,
+    "hp": 829,
+    "attack": 95,
+    "defense": 50,
+    "speed": 15,
+    "exp": 369,
+    "gold": 230,
+    "drops": [
+      "material-8",
+      "gear-4"
+    ]
+  },
+  {
+    "id": "monster-45",
+    "name": "洛陽山越獵手",
+    "level": 45,
+    "hp": 847,
+    "attack": 97,
+    "defense": 51,
+    "speed": 16,
+    "exp": 377,
+    "gold": 235,
+    "drops": [
+      "material-9",
+      "gear-5"
+    ]
+  },
+  {
+    "id": "monster-46",
+    "name": "許昌水寨兵",
+    "level": 46,
+    "hp": 865,
+    "attack": 99,
+    "defense": 52,
+    "speed": 17,
+    "exp": 385,
+    "gold": 240,
+    "drops": [
+      "material-10",
+      "gear-6"
+    ]
+  },
+  {
+    "id": "monster-47",
+    "name": "建業西涼騎手",
+    "level": 47,
+    "hp": 883,
+    "attack": 101,
+    "defense": 53,
+    "speed": 18,
+    "exp": 393,
+    "gold": 245,
+    "drops": [
+      "material-11",
+      "gear-7"
+    ]
+  },
+  {
+    "id": "monster-48",
+    "name": "漢中古城守衛",
+    "level": 48,
+    "hp": 901,
+    "attack": 103,
+    "defense": 54,
+    "speed": 19,
+    "exp": 401,
+    "gold": 250,
+    "drops": [
+      "material-12",
+      "gear-8"
+    ]
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "fish",
+    "name": "魚鱗陣",
+    "attack": 1.08,
+    "defense": 1.05,
+    "speed": 1,
+    "accuracy": 1,
+    "crit": 1
+  },
+  {
+    "id": "snake",
+    "name": "長蛇陣",
+    "attack": 1,
+    "speed": 1.12,
+    "defense": 0.96,
+    "accuracy": 1.05,
+    "crit": 1
+  },
+  {
+    "id": "crane",
+    "name": "鶴翼陣",
+    "attack": 1.05,
+    "defense": 1,
+    "speed": 1,
+    "accuracy": 1,
+    "crit": 1.1
+  },
+  {
+    "id": "arrow",
+    "name": "鋒矢陣",
+    "attack": 1.16,
+    "defense": 0.9,
+    "speed": 1.05,
+    "accuracy": 1,
+    "crit": 1.05
+  },
+  {
+    "id": "circle",
+    "name": "方圓陣",
+    "attack": 0.94,
+    "defense": 1.18,
+    "speed": 0.95,
+    "accuracy": 1.08,
+    "crit": 1
+  }
+]

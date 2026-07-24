@@ -1,0 +1,13 @@
+import {loadGameData} from './data.js';import {newState,load,save,exportSave,importSave} from './store.js';import {start,stop,step,equip} from './engine.js';import {render} from './ui.js';
+const app=document.querySelector('#app');let data,state,timer=null;
+function schedule(){if(timer||!state.exploration.running)return;timer=setTimeout(()=>{timer=null;step(state,data);save(state);draw();},Math.max(180,900/state.settings.speed));}
+function draw(){app.innerHTML=render(state,data);requestAnimationFrame(()=>{const log=app.querySelector('.battle-log');if(log)log.scrollTop=log.scrollHeight;});schedule();}
+function stopTimer(){if(timer){clearTimeout(timer);timer=null;}}
+function setScreen(screen){stop(state);stopTimer();state.screen=screen;draw();}
+async function boot(){try{data=await loadGameData();state=load()||newState();draw();}catch(error){app.innerHTML=`<div class="app-wrap"><section class="card notice bad">遊戲資料載入失敗：${error.message}</section></div>`;}}
+app.addEventListener('click',async event=>{const target=event.target.closest('[data-action]');if(!target)return;const action=target.dataset.action;
+  if(action==='start')start(state);else if(action==='stop'){stop(state);stopTimer();}else if(action.startsWith('screen:'))return setScreen(action.slice(7));else if(action.startsWith('map:')){state.mapId=action.slice(4);state.screen='home';}else if(action.startsWith('equip:'))equip(state,data,action.slice(6));else if(action==='save')save(state);else if(action==='export')exportSave(state);else if(action==='import')document.querySelector('#save-file')?.click();save(state);draw();
+});
+app.addEventListener('change',async event=>{const el=event.target;if(el.dataset.setting){state.exploration[el.dataset.setting]=el.type==='checkbox'?el.checked:Number(el.value);}if(el.matches('[data-formation]'))state.formation=el.value;if(el.matches('[data-speed]'))state.settings.speed=Number(el.value);if(el.id==='save-file'&&el.files[0]){stopTimer();state=await importSave(el.files[0]);}save(state);draw();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){stopTimer();save(state);}else schedule();});window.addEventListener('pagehide',()=>save(state));
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));boot();
