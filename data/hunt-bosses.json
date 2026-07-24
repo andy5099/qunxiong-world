@@ -1,0 +1,12 @@
+[
+  {"id":"boss-field","name":"荒原狼王","rarity":"普通","role":"均衡","level":6,"hp":240,"attack":22,"defense":8,"speed":14,"activeSkill":"狼王撲擊","passiveSkill":"狩獵經驗提升 5%"},
+  {"id":"boss-blackwind","name":"黑風寨主","rarity":"普通","role":"坦克","level":12,"hp":760,"attack":45,"defense":25,"speed":12,"activeSkill":"霸王斬","passiveSkill":"玩家防禦提升 8%"},
+  {"id":"boss-yellow","name":"黃巾力士","rarity":"精英","role":"反擊","level":18,"hp":1180,"attack":68,"defense":31,"speed":15,"activeSkill":"黃天重擊","passiveSkill":"金幣掉落提升 10%"},
+  {"id":"boss-poison","name":"毒龍王","rarity":"稀有","role":"持續傷害","level":26,"hp":1850,"attack":92,"defense":43,"speed":18,"activeSkill":"劇毒爆發","passiveSkill":"對 Boss 傷害提升 10%"},
+  {"id":"boss-warrior","name":"關外戰神","rarity":"傳說","role":"爆發輸出","level":38,"hp":3300,"attack":145,"defense":62,"speed":25,"activeSkill":"無雙破軍","passiveSkill":"Boss 夥伴傷害提升 15%"},
+  {"id":"hidden-golden-wolf","name":"金鬃獸王","rarity":"精英","role":"速度","level":9,"hp":650,"attack":48,"defense":18,"speed":24,"activeSkill":"金影連襲","passiveSkill":"裝備掉落率提升 8%"},
+  {"id":"hidden-tiger","name":"赤焰虎王","rarity":"稀有","role":"爆發輸出","level":15,"hp":1050,"attack":80,"defense":28,"speed":22,"activeSkill":"烈焰撕咬","passiveSkill":"爆擊率提升 5%"},
+  {"id":"hidden-warlock","name":"天雷祭師","rarity":"稀有","role":"控制","level":22,"hp":1420,"attack":100,"defense":34,"speed":20,"activeSkill":"天雷封鎖","passiveSkill":"技能傷害提升 8%"},
+  {"id":"hidden-dragon","name":"幽井毒龍","rarity":"傳說","role":"持續傷害","level":32,"hp":2600,"attack":128,"defense":54,"speed":23,"activeSkill":"萬毒吞天","passiveSkill":"收服率提升 4%"},
+  {"id":"hidden-phantom","name":"虎牢幻將","rarity":"傳說","role":"反擊","level":45,"hp":4200,"attack":178,"defense":78,"speed":29,"activeSkill":"幻影反斬","passiveSkill":"玩家攻擊提升 10%"}
+]

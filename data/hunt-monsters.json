@@ -1,0 +1,7 @@
+[
+  {"id":"field-wolf","name":"灰原狼","level":1},{"id":"field-bandit","name":"流竄山賊","level":2},{"id":"field-boar","name":"鐵鬃野豬","level":3},{"id":"field-captain","name":"荒原隊長","level":5},
+  {"id":"forest-wolf","name":"黑風狼","level":5},{"id":"forest-bandit","name":"黑風山賊","level":6},{"id":"forest-snake","name":"斑紋毒蛇","level":7},{"id":"forest-chief","name":"黑風頭目","level":10},
+  {"id":"camp-scout","name":"營地斥候","level":10},{"id":"camp-soldier","name":"黃巾兵","level":11},{"id":"camp-archer","name":"黃巾弓手","level":12},{"id":"camp-medic","name":"符水醫兵","level":13},{"id":"camp-general","name":"黃巾猛將","level":16},
+  {"id":"cave-bat","name":"噬血洞蝠","level":16},{"id":"cave-scorpion","name":"玄甲毒蠍","level":17},{"id":"cave-guard","name":"古井石衛","level":19},{"id":"cave-beast","name":"地穴魔獸","level":23},
+  {"id":"gate-rider","name":"西涼騎兵","level":24},{"id":"gate-guard","name":"關外重衛","level":25},{"id":"gate-spear","name":"長槍精兵","level":27},{"id":"gate-crossbow","name":"連弩手","level":28},{"id":"gate-commander","name":"虎牢統領","level":33}
+]
