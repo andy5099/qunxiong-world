@@ -1,0 +1,7 @@
+[
+  {"id":"artifact-1","name":"蒼龍月刃","description":"月華鑄成的長刃，覺醒後提升攻擊與爆擊。","shard":"artifact-shard-1","attack":18,"defense":0,"speed":2},
+  {"id":"artifact-2","name":"裂天戰戟","description":"沉重戰戟，蘊藏破軍之力。","shard":"artifact-shard-2","attack":24,"defense":0,"speed":0},
+  {"id":"artifact-3","name":"星衡古劍","description":"劍身刻有星軌，能強化智略技能。","shard":"artifact-shard-3","attack":15,"defense":6,"speed":3},
+  {"id":"artifact-4","name":"玄甲蛇矛","description":"攻守兼備的玄鐵長矛。","shard":"artifact-shard-4","attack":19,"defense":8,"speed":0},
+  {"id":"artifact-5","name":"雙曜義劍","description":"成對短劍，覺醒後提升速度。","shard":"artifact-shard-5","attack":14,"defense":3,"speed":7}
+]
