@@ -1,11 +1,15 @@
 import { ITEMS } from '../data/itemData.js';
 
 // 角色物件負責能力計算、升級、背包與裝備。
-export function createPlayer(name) { return { name, level:1, exp:0, gold:100, maxHp:100, hp:100, baseAttack:10, baseDefense:5, inventory:{herb:1}, equipment:{weapon:null,armor:null}, generals:[], month:1, location:'village' }; }
+export function createPlayer(name) { return { name, level:1, exp:0, gold:100, maxHp:100, hp:100, baseAttack:10, baseDefense:5, inventory:{herb:1}, equipment:{weapon:null,armor:null}, generals:[], formation:[], month:1, location:'village' }; }
 // 舊版存檔載入時補上新系統欄位，保留原先養成進度。
-export function normalizePlayer(player) { const base=createPlayer(player.name); return {...base,...player, inventory:{...base.inventory,...(player.inventory||{})}, equipment:{...base.equipment,...(player.equipment||{})}, generals:Array.isArray(player.generals)?player.generals:[], month:Number.isFinite(player.month)?player.month:1}; }
-// 最多三位忠誠尚存的武將會隨主人進入戰鬥。
-export function activeGenerals(player) { return (player.generals||[]).filter(general=>general.loyalty>0).slice(0,3); }
+export function normalizePlayer(player) { const base=createPlayer(player.name); const normalized={...base,...player, inventory:{...base.inventory,...(player.inventory||{})}, equipment:{...base.equipment,...(player.equipment||{})}, generals:Array.isArray(player.generals)?player.generals:[], month:Number.isFinite(player.month)?player.month:1}; normalized.formation=Array.isArray(player.formation)?player.formation:normalized.generals.slice(0,3).map(general=>general.id); syncFormation(normalized); return normalized; }
+// 維持隊伍只含現有武將、沒有重複，且最多三位。
+export function syncFormation(player) { const valid=new Set((player.generals||[]).filter(general=>general.loyalty>0).map(general=>general.id)); player.formation=[...(player.formation||[])].filter((id,index,list)=>valid.has(id)&&list.indexOf(id)===index).slice(0,3); }
+export function addToFormation(player,id) { syncFormation(player); if(player.formation.length<3) player.formation.push(id); }
+export function switchFormation(player,id) { syncFormation(player); const general=player.generals.find(member=>member.id===id); if(!general || general.loyalty<=0) return {ok:false,message:'此武將目前無法隨行。'}; const index=player.formation.indexOf(id); if(index>=0){player.formation.splice(index,1);return {ok:true,message:`${general.name}已撤下隨行隊伍。`};} if(player.formation.length>=3) return {ok:false,message:'隨行隊伍已滿，請先撤下一位武將。'}; player.formation.push(id);return {ok:true,message:`${general.name}加入隨行隊伍。`}; }
+// 隊伍中的武將會隨主人進入戰鬥。
+export function activeGenerals(player) { syncFormation(player); return player.formation.map(id=>(player.generals||[]).find(general=>general.id===id)).filter(Boolean); }
 export function expNeeded(player) { return 50 + (player.level-1)*35; }
 export function stat(player, kind) { const equip = player.equipment.weapon ? ITEMS[player.equipment.weapon].attack || 0 : 0; const armor = player.equipment.armor ? ITEMS[player.equipment.armor].defense || 0 : 0; return kind==='attack' ? player.baseAttack+equip : player.baseDefense+armor; }
 export function addItem(player,id,count=1) { player.inventory[id]=(player.inventory[id]||0)+count; }

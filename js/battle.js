@@ -1,4 +1,4 @@
-import { stat, useHerb, gainExp, addItem, activeGenerals } from './player.js';
+import { stat, useHerb, gainExp, addItem, activeGenerals, addToFormation } from './player.js';
 import { resolveDrops } from './enemy.js';
 import { randomInt } from './utils.js';
 
@@ -14,5 +14,5 @@ export function battleAction(state,action) { const {player,battle}=state; if(!ba
  if(action==='flee'){ if(Math.random()<.6){ battle.ended=true;battle.result={fled:true};battle.log.push('你成功脫離戰場。'); }else{battle.log.push('逃跑失敗！');enemyTurn(state);} }
 }
 // 勝利後可將敵人納入麾下；同名武將只能降服一次。
-export function recruitDefeatedEnemy(state) { const battle=state.battle; if(!battle?.result?.win || battle.result.recruited) return {ok:false,message:'目前沒有可降服的敵人。'}; const enemy=battle.enemy; const id=`captured-${enemy.id}`; if(state.player.generals.some(general=>general.id===id)) return {ok:false,message:`${enemy.name}已在你的麾下。`}; const loyalty=randomInt(48,68); const title=enemy.tier==='普通'?'降將':`${enemy.tier}降將`; state.player.generals.push({id,name:enemy.name,title,attack:enemy.attack,defense:enemy.defense,loyalty,price:0,source:`降服・${enemy.tier}`}); battle.result.recruited=true; battle.log.push(`${enemy.name}歸順了你，忠誠 ${loyalty}。`); return {ok:true,message:`成功降服${enemy.name}！`}; }
+export function recruitDefeatedEnemy(state) { const battle=state.battle; if(!battle?.result?.win || battle.result.recruited) return {ok:false,message:'目前沒有可降服的敵人。'}; const enemy=battle.enemy; const id=`captured-${enemy.id}`; if(state.player.generals.some(general=>general.id===id)) return {ok:false,message:`${enemy.name}已在你的麾下。`}; const loyalty=randomInt(48,68); const title=enemy.tier==='普通'?'降將':`${enemy.tier}降將`; state.player.generals.push({id,name:enemy.name,title,attack:enemy.attack,defense:enemy.defense,loyalty,price:0,source:`降服・${enemy.tier}`}); addToFormation(state.player,id); battle.result.recruited=true; battle.log.push(`${enemy.name}歸順了你，忠誠 ${loyalty}。`); return {ok:true,message:`成功降服${enemy.name}！`}; }
 export function leaveBattle(state) { const result=state.battle?.result; if(result && !result.win) state.player.hp=Math.max(1,Math.ceil(state.player.maxHp*.35)); state.battle=null;state.screen='village';state.notice=result?.fled?'你平安返回新手村。':result?.win?'帶著戰利品回到了新手村。':'你被村民救回，先養精蓄銳吧。';state.noticeType=result?.win?'good':result?.fled?'':'bad'; }
