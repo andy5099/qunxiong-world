@@ -1,9 +1,10 @@
 import { ITEMS } from '../data/itemData.js';
+import { migrateCore } from './hunting.js';
 
 // 角色物件負責能力計算、升級、背包與裝備。
-export function createPlayer(name) { return { name, level:1, exp:0, gold:100, maxHp:100, hp:100, baseAttack:10, baseDefense:5, inventory:{herb:1}, equipment:{weapon:null,armor:null}, generals:[], formation:[], month:1, location:'village' }; }
+export function createPlayer(name) { return migrateCore({ name, level:1, exp:0, gold:100, maxHp:100, hp:100, baseAttack:10, baseDefense:5, inventory:{herb:1}, equipment:{weapon:null,armor:null}, generals:[], formation:[], month:1, location:'plains' }); }
 // 舊版存檔載入時補上新系統欄位，保留原先養成進度。
-export function normalizePlayer(player) { const base=createPlayer(player.name); const normalized={...base,...player, inventory:{...base.inventory,...(player.inventory||{})}, equipment:{...base.equipment,...(player.equipment||{})}, generals:Array.isArray(player.generals)?player.generals:[], month:Number.isFinite(player.month)?player.month:1}; normalized.formation=Array.isArray(player.formation)?player.formation:normalized.generals.slice(0,3).map(general=>general.id); syncFormation(normalized); return normalized; }
+export function normalizePlayer(player) { const base=createPlayer(player.name); const normalized={...base,...player, inventory:{...base.inventory,...(player.inventory||{})}, equipment:{...base.equipment,...(player.equipment||{})}, generals:Array.isArray(player.generals)?player.generals:[], month:Number.isFinite(player.month)?player.month:1}; normalized.formation=Array.isArray(player.formation)?player.formation:normalized.generals.slice(0,3).map(general=>general.id); syncFormation(normalized); return migrateCore(normalized); }
 // 維持隊伍只含現有武將、沒有重複，且最多三位。
 export function syncFormation(player) { const valid=new Set((player.generals||[]).filter(general=>general.loyalty>0).map(general=>general.id)); player.formation=[...(player.formation||[])].filter((id,index,list)=>valid.has(id)&&list.indexOf(id)===index).slice(0,3); }
 export function addToFormation(player,id) { syncFormation(player); if(player.formation.length<3) player.formation.push(id); }
