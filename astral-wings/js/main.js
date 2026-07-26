@@ -2,7 +2,7 @@ import { load, save, reset } from './save.js';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
 import { game } from './game.js?v=20260726-v05-balance';
-import { menu, equipmentView, missionsView } from './ui.js?v=20260726-v05-ui-fix-2';
+import { menu, equipmentView, missionsView } from './ui.js?v=20260726-v05-missions';
 import { equipmentTemplates } from './data/equipment.js?v=20260726-v05-ui-fix';
 import { C } from './config.js';
 
@@ -10,6 +10,12 @@ import { C } from './config.js';
 let data = load();
 let run = null;
 const app = document.querySelector('#app');
+
+function refreshDaily() {
+  const today = new Date().toLocaleDateString('sv-SE');
+  if (data.missions.date !== today) data.missions = { date: today, kills: 0, stages: 0, bosses: 0, claimed: {} };
+}
+refreshDaily();
 
 function home() {
   if (run) run.stop();
@@ -62,6 +68,8 @@ function start(mode = 'stage') {
     data.high = Math.max(data.high, result.score);
     data.maxCombo = Math.max(data.maxCombo, result.combo);
     data.missions.kills = (data.missions.kills || 0) + result.kills;
+    if (result.win && result.mode === 'stage') data.missions.stages += 1;
+    if (result.win && result.mode === 'boss') data.missions.bosses += 1;
     if (result.win) {
       const first = !data.complete;
       data.complete = true;
@@ -147,6 +155,15 @@ app.addEventListener('click', (event) => {
     const equipped = Object.values(data.equipped).includes(id);
     if (item && !item.locked && !equipped) { data.equipment = data.equipment.filter(entry => entry.id !== id); data.materials += 8 + item.level * 2; save(data); }
     equipment();
+  }
+  if (action.startsWith('claim:')) {
+    const id = action.split(':')[1];
+    const daily = { 'daily-kills': [data.missions.kills >= 30, 'gold', 80], 'daily-stage': [data.missions.stages >= 1, 'materials', 4], 'daily-boss': [data.missions.bosses >= 1, 'fragments', 2] };
+    const achievement = { 'ach-first': [data.complete, 'gold', 150], 'ach-combo': [data.maxCombo >= 25, 'materials', 8], 'ach-endless': [data.endlessBest >= 10, 'fragments', 3] };
+    const source = daily[id] || achievement[id];
+    const claims = daily[id] ? data.missions.claimed : data.achievements.claimed;
+    if (source && source[0] && !claims[id]) { data[source[1]] += source[2]; claims[id] = true; save(data); }
+    missions();
   }
   if (action === 'craft') {
     if (data.materials >= 25) { data.materials -= 25; const missing = equipmentTemplates.filter(template => !data.equipment.some(item => item.id === template.id)); if (missing.length) data.equipment.push({ id: missing[Math.floor(Math.random() * missing.length)].id, level: 0, locked: false }); save(data); }

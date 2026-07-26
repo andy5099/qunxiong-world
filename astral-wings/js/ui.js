@@ -16,4 +16,18 @@ export const equipmentView = state => {
   return `<div class="shell panel menu"><h2>裝備與強化</h2><p class="note">首通關獲得新手裝備；強化 100% 成功，已裝備物不可分解。</p>${button('消耗 25 材料合成新裝備','craft')}<div class="equip-grid">${cards.join('')}</div>${button('返回主選單','home')}</div>`;
 };
 
-export const missionsView = state => `<div class="shell panel menu"><h2>任務與成就</h2><p>累積擊破：${state.missions.kills || 0} / 100</p><p>首次通關：${state.complete ? '已完成' : '進行中'}</p><p>最大連擊：${state.maxCombo}</p>${button('返回主選單','home')}</div>`;
+export const missionsView = state => {
+  const mission = state.missions;
+  const daily = [
+    ['daily-kills','每日：擊敗 30 名敵人', mission.kills >= 30, '80 金幣'],
+    ['daily-stage','每日：完成 1 次關卡', mission.stages >= 1, '4 強化材'],
+    ['daily-boss','每日：擊敗 1 次 Boss', mission.bosses >= 1, '2 星核']
+  ];
+  const achievements = [
+    ['ach-first','成就：首次通關', state.complete, '150 金幣'],
+    ['ach-combo','成就：最大連擊 25', state.maxCombo >= 25, '8 強化材'],
+    ['ach-endless','成就：無盡航線到達第 10 波', state.endlessBest >= 10, '3 星核']
+  ];
+  const row = ([id, label, ready, reward], claims) => `<article class="mission"><b>${label}</b><span>${ready ? '可領取' : '進行中'}・${reward}</span>${!claims[id] && ready ? button('領取', `claim:${id}`) : `<small>${claims[id] ? '已領取' : '尚未達成'}</small>`}</article>`;
+  return `<div class="shell panel menu"><h2>任務與成就</h2><p class="note">每日任務依裝置日期重置；獎勵每次只能領取一次。</p><h3>每日任務</h3>${daily.map(item => row(item, mission.claimed || {})).join('')}<h3>成就</h3>${achievements.map(item => row(item, state.achievements.claimed || {})).join('')}${button('返回主選單','home')}</div>`;
+};
