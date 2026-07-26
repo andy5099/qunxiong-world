@@ -1,7 +1,7 @@
 import { load, save, reset } from './save.js';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260726-game-loop-fix';
+import { game } from './game.js?v=20260726-v02-power';
 import { menu } from './ui.js';
 import { C } from './config.js';
 
@@ -38,6 +38,9 @@ function start() {
         <div class="bar hp"><i id="hp"></i></div>
         <div class="bar shield"><i id="shield"></i></div>
         <span id="score">分數 0・連擊 0・能量 0%</span>
+        <span id="power" class="power-label">火力 Lv1</span>
+        <span id="buffs" class="buff-label"></span>
+        <div id="boss-hud" class="boss-hud hidden"><b>鐵幕吞噬者</b><div class="bar boss-bar"><i id="boss-hp"></i></div></div>
       </div>
       <div class="actions">
         <button data-a="pause">暫停</button>
@@ -60,9 +63,26 @@ function start() {
     const hp = app.querySelector('#hp');
     const shield = app.querySelector('#shield');
     const score = app.querySelector('#score');
+    const power = app.querySelector('#power');
+    const buffs = app.querySelector('#buffs');
+    const bossHud = app.querySelector('#boss-hud');
+    const bossHp = app.querySelector('#boss-hp');
     if (hp) hp.style.width = `${Math.max(0, state.p.hp / state.p.maxHp * 100)}%`;
     if (shield) shield.style.width = `${Math.max(0, state.p.shield / state.p.maxShield * 100)}%`;
     if (score) score.textContent = `分數 ${state.score}・連擊 ${state.combo}・能量 ${Math.floor(state.p.energy)}%`;
+    if (power) power.textContent = `火力 Lv${state.p.fireLevel}`;
+    if (buffs) {
+      const active = [];
+      if (state.p.magnet > 0) active.push(`磁力 ${Math.ceil(state.p.magnet).toString().padStart(2, '0')}`);
+      if (state.p.rage > 0) active.push(`狂暴 ${Math.ceil(state.p.rage).toString().padStart(2, '0')}`);
+      if (state.p.doubleGold > 0) active.push(`雙倍金幣 ${Math.ceil(state.p.doubleGold).toString().padStart(2, '0')}`);
+      buffs.textContent = active.join('・');
+      buffs.hidden = active.length === 0;
+    }
+    if (bossHud && bossHp) {
+      bossHud.classList.toggle('hidden', !state.boss);
+      if (state.boss) bossHp.style.width = `${Math.max(0, state.boss.hp / state.boss.maxHp * 100)}%`;
+    }
   });
 }
 
