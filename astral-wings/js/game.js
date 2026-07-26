@@ -17,7 +17,7 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
     p: player(saveData), enemies: [], bullets: [], pickups: [], particles: [], boss: null,
     stars: Array.from({ length: 50 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, a: Math.random() })),
     wave: 0, left: 0, kind: 'scout', nextId: 1, score: 0, gold: 0, combo: 0, maxCombo: 0,
-    kills: 0, paused: false, over: false, last: 0, hitStop: 0, shake: 0, bossEntrance: 0, message: ''
+    kills: 0, paused: false, over: false, last: 0, hitStop: 0, shake: 0, bossEntrance: 0, victoryTimer: 0, message: ''
   };
   let animationFrame = 0;
 
@@ -41,7 +41,7 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
   }
 
   function spawnNextWave() {
-    if (state.boss || state.enemies.length || state.left || state.bossEntrance > 0) return;
+    if (state.boss || state.enemies.length || state.left || state.bossEntrance > 0 || state.victoryTimer > 0) return;
     const wave = stage.waves[state.wave++];
     if (!wave) return finish(true);
     if (wave[0] === 'boss') {
@@ -252,7 +252,7 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
     state.enemies.filter((entry) => entry.hp <= 0).forEach(defeat);
     state.enemies = state.enemies.filter((entry) => entry.hp > 0);
     if (state.boss && state.boss.hp <= 0) {
-      const defeated = state.boss; defeated.isBoss = true; defeat(defeated); state.boss = null; state.left = 0; state.message = '鐵幕吞噬者已瓦解';
+      const defeated = state.boss; defeated.isBoss = true; defeat(defeated); state.boss = null; state.left = 0; state.victoryTimer = 1.1; state.message = '鐵幕吞噬者已瓦解';
     }
   }
 
@@ -267,7 +267,10 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
     if (!state.paused && !state.over) {
       if (state.hitStop > 0) state.hitStop -= dt;
       else {
-        if (state.bossEntrance > 0) {
+        if (state.victoryTimer > 0) {
+          state.victoryTimer -= dt;
+          if (state.victoryTimer <= 0) finish(true);
+        } else if (state.bossEntrance > 0) {
           state.bossEntrance -= dt;
           if (state.bossEntrance <= 0) { state.boss = makeBoss(); state.boss.id = 'boss'; state.message = ''; state.shake = 7; }
         } else {
