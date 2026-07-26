@@ -1,0 +1,1 @@
+export const enemies={scout:{name:'掠光偵察機',hp:25,speed:95,score:80,color:'#64d8ff',fire:0},wing:{name:'裂翼攻擊機',hp:52,speed:65,score:150,color:'#ffb56e',fire:1},interceptor:{name:'軌道攔截者',hp:65,speed:50,score:190,color:'#d495ff',fire:2},elite:{name:'重甲鎮壓者',hp:430,speed:28,score:900,color:'#ff6376',fire:3}};
