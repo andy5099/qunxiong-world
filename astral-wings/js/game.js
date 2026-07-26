@@ -1,1 +1,222 @@
-import{C}from'./config.js';import{player}from'./entities/player.js';import{enemy}from'./entities/enemy.js';import{makeBoss}from'./entities/boss.js';import{bullet}from'./entities/bullet.js';import{pickup}from'./entities/pickup.js';import{stage}from'./data/stages.js';import{render}from'./renderer.js';const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);export function game(canvas,save,input,onEnd,onHud){const ctx=canvas.getContext('2d'),g={p:player(save),enemies:[],bullets:[],pickups:[],boss:null,stars:Array.from({length:50},()=>({x:Math.random()*360,y:Math.random()*640,a:Math.random()})),wave:0,left:0,score:0,combo:0,maxCombo:0,kills:0,paused:false,over:false,last:0};let raf;function spawn(){if(g.boss||g.enemies.length||g.left)return;const w=stage.waves[g.wave++];if(!w){end(true);return}if(w[0]==='boss'){g.boss=makeBoss();return}g.left=w[1];g.kind=w[0]}function shot(){const p=g.p;p.fire-=C.shot/(p.boost?1.8:1);if(p.fire>0)return;p.fire=1;g.bullets.push(bullet(p.x-8,p.y-16,0,-430,'p',p.atk),bullet(p.x+8,p.y-16,0,-430,'p',p.atk))}function hurt(d){const p=g.p;if(p.inv>0)return;p.inv=C.inv;p.shield-=d;if(p.shield<0){p.hp+=p.shield;p.shield=0}g.combo=0;if(p.hp<=0)end(false)}function kill(o){g.score+=o.score||60;g.combo++;g.maxCombo=Math.max(g.maxCombo,g.combo);g.kills++;g.p.energy=Math.min(100,g.p.energy+8);if(Math.random()<.45)g.pickups.push(pickup(o.x,o.y,['hp','shield','energy','fire','gold'][Math.floor(Math.random()*5)]));}function end(win){if(g.over)return;g.over=true;cancelAnimationFrame(raf);onEnd({win,score:g.score,kills:g.kills,combo:g.maxCombo,hp:g.p.hp,shield:g.p.shield,gold:Math.floor(g.score/15)})}function ultimate(){if(g.p.energy<100)return;g.p.energy=0;g.p.inv=2;g.bullets=g.bullets.filter(b=>b.from==='p');g.enemies.forEach(e=>e.hp-=180);if(g.boss)g.boss.hp-=400}function loop(t){const dt=Math.min(.033,(t-g.last||0)/1000);g.last=t;if(!g.paused&&!g.over){const p=g.p,sp=260*dt;if(input.drag){p.x+=(input.x-p.x)*Math.min(1,12*dt);p.y+=(input.y-38-p.y)*Math.min(1,12*dt)}if(input.keys.arrowleft||input.keys.a)p.x-=sp;if(input.keys.arrowright||input.keys.d)p.x+=sp;if(input.keys.arrowup||input.keys.w)p.y-=sp;if(input.keys.arrowdown||input.keys.s)p.y+=sp;p.x=Math.max(15,Math.min(345,p.x));p.y=Math.max(40,Math.min(610,p.y));p.inv-=dt;p.fire-=dt;shot();g.stars.forEach(s=>{s.y+=35*dt;if(s.y>640)s.y=0});if(g.left&&g.enemies.length<4){g.enemies.push(enemy(g.kind,35+Math.random()*290));g.left--}g.enemies.forEach(e=>{e.y+=e.speed*dt;e.x+=Math.sin(t/400+e.phase)*40*dt;e.fireCd-=dt;if(e.fireCd<0&&e.fire){e.fireCd=e.kind==='elite'?.55:1.2;[-.25,0,.25].forEach(v=>g.bullets.push(bullet(e.x,e.y,110*v,160,'e',10)))}if(e.y>680)e.hp=0});if(g.boss){const b=g.boss;b.phase=b.hp/b.maxHp>.7?1:b.hp/b.maxHp>.35?2:3;b.x+=b.dir*(b.phase===3?95:55)*dt;if(b.x<55||b.x>305)b.dir*=-1;b.fireCd-=dt;if(b.fireCd<0){b.fireCd=b.phase===1?1.05:b.phase===2?.65:.38;const n=b.phase===1?5:b.phase===2?9:11;for(let i=0;i<n;i++){const a=Math.PI*(.2+i/(n-1)*.6);g.bullets.push(bullet(b.x,b.y,Math.cos(a)*150,Math.sin(a)*150,'e',b.phase===3?13:10))}}}g.bullets.forEach(b=>{b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt});g.bullets=g.bullets.filter(b=>b.life>0&&b.y>-30&&b.y<680);g.bullets.filter(b=>b.from==='p').forEach(b=>{g.enemies.forEach(e=>{if(e.hp>0&&dist(b,e)<b.r+e.r){e.hp-=b.damage;b.life=0;g.p.energy=Math.min(100,g.p.energy+1)}});if(g.boss&&dist(b,g.boss)<b.r+g.boss.r){g.boss.hp-=b.damage;b.life=0;g.p.energy=Math.min(100,g.p.energy+1)}});g.bullets.filter(b=>b.from==='e').forEach(b=>{if(dist(b,p)<b.r+p.r){hurt(b.damage);b.life=0}});g.enemies.filter(e=>e.hp<=0).forEach(kill);g.enemies=g.enemies.filter(e=>e.hp>0);if(g.boss&&g.boss.hp<=0){kill(g.boss);g.boss=null;g.left=0}g.pickups.forEach(x=>{x.y+=x.vy*dt;if(dist(x,p)<35){if(x.type==='hp')p.hp=Math.min(p.maxHp,p.hp+28);if(x.type==='shield')p.shield=Math.min(p.maxShield,p.shield+25);if(x.type==='energy')p.energy=Math.min(100,p.energy+30);if(x.type==='fire')p.boost=6;if(x.type==='gold')g.score+=100;x.y=700}p.boost-=dt});g.pickups=g.pickups.filter(x=>x.y<670);spawn();onHud(g)}render(ctx,g)}raf=requestAnimationFrame(loop)}raf=requestAnimationFrame(loop);return{pause:()=>g.paused=!g.paused,ultimate,retry:()=>{cancelAnimationFrame(raf);return game(canvas,save,input,onEnd,onHud)},stop:()=>cancelAnimationFrame(raf)}}
+import { C } from './config.js';
+import { player } from './entities/player.js';
+import { enemy } from './entities/enemy.js';
+import { makeBoss } from './entities/boss.js';
+import { bullet } from './entities/bullet.js';
+import { pickup } from './entities/pickup.js';
+import { stage } from './data/stages.js';
+import { render } from './renderer.js';
+
+const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+
+// 使用單一 requestAnimationFrame 執行整場關卡，避免重複計時器。
+export function game(canvas, saveData, controls, onEnd, onHud) {
+  const ctx = canvas.getContext('2d');
+  const state = {
+    p: player(saveData),
+    enemies: [], bullets: [], pickups: [], boss: null,
+    stars: Array.from({ length: 50 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, a: Math.random() })),
+    wave: 0, left: 0, kind: 'scout', score: 0, combo: 0, maxCombo: 0,
+    kills: 0, paused: false, over: false, last: 0
+  };
+  let animationFrame = 0;
+
+  function finish(win) {
+    if (state.over) return;
+    state.over = true;
+    cancelAnimationFrame(animationFrame);
+    onEnd({
+      win, score: state.score, kills: state.kills, combo: state.maxCombo,
+      hp: state.p.hp, shield: state.p.shield, gold: Math.floor(state.score / 15)
+    });
+  }
+
+  function spawnNextWave() {
+    if (state.boss || state.enemies.length || state.left) return;
+    const wave = stage.waves[state.wave++];
+    if (!wave) {
+      finish(true);
+      return;
+    }
+    if (wave[0] === 'boss') {
+      state.boss = makeBoss();
+      return;
+    }
+    state.kind = wave[0];
+    state.left = wave[1];
+  }
+
+  function firePlayer() {
+    const p = state.p;
+    if (p.fire > 0) return;
+    p.fire = C.shot / (p.boost > 0 ? 1.8 : 1);
+    state.bullets.push(
+      bullet(p.x - 8, p.y - 16, 0, -430, 'p', p.atk),
+      bullet(p.x + 8, p.y - 16, 0, -430, 'p', p.atk)
+    );
+  }
+
+  function damagePlayer(amount) {
+    const p = state.p;
+    if (p.inv > 0 || state.over) return;
+    p.inv = C.invincible;
+    p.shield -= amount;
+    if (p.shield < 0) {
+      p.hp += p.shield;
+      p.shield = 0;
+    }
+    state.combo = 0;
+    if (p.hp <= 0) finish(false);
+  }
+
+  function defeat(target) {
+    state.score += target.score || 60;
+    state.combo += 1;
+    state.maxCombo = Math.max(state.maxCombo, state.combo);
+    state.kills += 1;
+    state.p.energy = Math.min(100, state.p.energy + 8);
+    if (Math.random() < 0.45) {
+      const kinds = ['hp', 'shield', 'energy', 'fire', 'gold'];
+      state.pickups.push(pickup(target.x, target.y, kinds[Math.floor(Math.random() * kinds.length)]));
+    }
+  }
+
+  function ultimate() {
+    if (state.p.energy < 100 || state.over) return;
+    state.p.energy = 0;
+    state.p.inv = 2;
+    state.bullets = state.bullets.filter((entry) => entry.from === 'p');
+    state.enemies.forEach((entry) => { entry.hp -= 180; });
+    if (state.boss) state.boss.hp -= Math.min(400, state.boss.maxHp * 0.16);
+  }
+
+  function updatePlayer(dt) {
+    const p = state.p;
+    const speed = 260 * dt;
+    if (controls.drag) {
+      p.x += (controls.x - p.x) * Math.min(1, 12 * dt);
+      p.y += (controls.y - 38 - p.y) * Math.min(1, 12 * dt);
+    }
+    if (controls.keys.arrowleft || controls.keys.a) p.x -= speed;
+    if (controls.keys.arrowright || controls.keys.d) p.x += speed;
+    if (controls.keys.arrowup || controls.keys.w) p.y -= speed;
+    if (controls.keys.arrowdown || controls.keys.s) p.y += speed;
+    p.x = Math.max(15, Math.min(345, p.x));
+    p.y = Math.max(40, Math.min(610, p.y));
+    p.inv -= dt;
+    p.fire -= dt;
+    p.boost -= dt;
+    firePlayer();
+  }
+
+  function updateEnemies(dt, time) {
+    if (state.left && state.enemies.length < 4) {
+      state.enemies.push(enemy(state.kind, 35 + Math.random() * 290));
+      state.left -= 1;
+    }
+    state.enemies.forEach((entry) => {
+      entry.y += entry.speed * dt;
+      entry.x += Math.sin(time / 400 + entry.phase) * 40 * dt;
+      entry.fireCd -= dt;
+      if (entry.fireCd < 0 && entry.fire) {
+        entry.fireCd = entry.kind === 'elite' ? 0.55 : 1.2;
+        [-0.25, 0, 0.25].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, 110 * spread, 160, 'e', 10)));
+      }
+      if (entry.y > 680) entry.hp = 0;
+    });
+
+    const boss = state.boss;
+    if (!boss) return;
+    boss.phase = boss.hp / boss.maxHp > 0.7 ? 1 : boss.hp / boss.maxHp > 0.35 ? 2 : 3;
+    boss.x += boss.dir * (boss.phase === 3 ? 95 : 55) * dt;
+    if (boss.x < 55 || boss.x > 305) boss.dir *= -1;
+    boss.fireCd -= dt;
+    if (boss.fireCd < 0) {
+      boss.fireCd = boss.phase === 1 ? 1.05 : boss.phase === 2 ? 0.65 : 0.38;
+      const count = boss.phase === 1 ? 5 : boss.phase === 2 ? 9 : 11;
+      for (let index = 0; index < count; index += 1) {
+        const angle = Math.PI * (0.2 + index / (count - 1) * 0.6);
+        state.bullets.push(bullet(boss.x, boss.y, Math.cos(angle) * 150, Math.sin(angle) * 150, 'e', boss.phase === 3 ? 13 : 10));
+      }
+    }
+  }
+
+  function updateProjectiles(dt) {
+    state.bullets.forEach((entry) => {
+      entry.x += entry.vx * dt;
+      entry.y += entry.vy * dt;
+      entry.life -= dt;
+    });
+    state.bullets = state.bullets.filter((entry) => entry.life > 0 && entry.y > -30 && entry.y < 680);
+    state.bullets.filter((entry) => entry.from === 'p').forEach((entry) => {
+      state.enemies.forEach((target) => {
+        if (target.hp > 0 && distance(entry, target) < entry.r + target.r) {
+          target.hp -= entry.damage;
+          entry.life = 0;
+          state.p.energy = Math.min(100, state.p.energy + 1);
+        }
+      });
+      if (state.boss && distance(entry, state.boss) < entry.r + state.boss.r) {
+        state.boss.hp -= entry.damage;
+        entry.life = 0;
+        state.p.energy = Math.min(100, state.p.energy + 1);
+      }
+    });
+    state.bullets.filter((entry) => entry.from === 'e').forEach((entry) => {
+      if (distance(entry, state.p) < entry.r + state.p.r) {
+        damagePlayer(entry.damage);
+        entry.life = 0;
+      }
+    });
+  }
+
+  function updatePickups(dt) {
+    const p = state.p;
+    state.pickups.forEach((entry) => {
+      entry.y += entry.vy * dt;
+      if (distance(entry, p) >= 35) return;
+      if (entry.type === 'hp') p.hp = Math.min(p.maxHp, p.hp + 28);
+      if (entry.type === 'shield') p.shield = Math.min(p.maxShield, p.shield + 25);
+      if (entry.type === 'energy') p.energy = Math.min(100, p.energy + 30);
+      if (entry.type === 'fire') p.boost = 6;
+      if (entry.type === 'gold') state.score += 100;
+      entry.y = 700;
+    });
+    state.pickups = state.pickups.filter((entry) => entry.y < 670);
+  }
+
+  function resolveDefeats() {
+    state.enemies.filter((entry) => entry.hp <= 0).forEach(defeat);
+    state.enemies = state.enemies.filter((entry) => entry.hp > 0);
+    if (state.boss && state.boss.hp <= 0) {
+      defeat(state.boss);
+      state.boss = null;
+      state.left = 0;
+    }
+  }
+
+  function frame(time) {
+    const dt = Math.min(0.033, (time - state.last || 0) / 1000);
+    state.last = time;
+    if (!state.paused && !state.over) {
+      updatePlayer(dt);
+      state.stars.forEach((star) => { star.y = star.y > 640 ? 0 : star.y + 35 * dt; });
+      updateEnemies(dt, time);
+      updateProjectiles(dt);
+      resolveDefeats();
+      updatePickups(dt);
+      spawnNextWave();
+      onHud(state);
+    }
+    render(ctx, state);
+    if (!state.over) animationFrame = requestAnimationFrame(frame);
+  }
+
+  animationFrame = requestAnimationFrame(frame);
+  return {
+    pause: () => { state.paused = !state.paused; },
+    ultimate,
+    retry: () => { cancelAnimationFrame(animationFrame); return game(canvas, saveData, controls, onEnd, onHud); },
+    stop: () => cancelAnimationFrame(animationFrame)
+  };
+}
