@@ -13,8 +13,8 @@
   <main id="app"></main>
   <!-- 版本參數可避開舊版 Service Worker 的失敗快取；失敗時顯示可理解訊息，避免空白畫面。 -->
   <script type="module">
-    import('./js/main.js?v=20260726-v05-balance').catch(() => {
-      document.querySelector('#app').innerHTML = '<section class="shell panel menu"><h1>星界戰翼</h1><p>載入遊戲核心時發生錯誤。請重新整理一次；若仍未恢復，請清除本網站資料後再開啟。</p><button onclick="location.reload()">重新載入</button></section>';
+    import('./js/main.js?v=20260726-v05-balance').catch((error) => {
+      document.querySelector('#app').innerHTML = `<section class="shell panel menu"><h1>星界戰翼</h1><p>載入遊戲核心時發生錯誤：${error.message}</p><button onclick="location.reload()">重新載入</button></section>`;
     });
   </script>
 </body>
