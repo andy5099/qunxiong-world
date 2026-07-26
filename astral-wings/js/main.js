@@ -2,14 +2,21 @@ import { load, save, reset } from './save.js';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
 import { game } from './game.js?v=20260726-v05-economy';
-import { menu, equipmentView, missionsView, fusionView } from './ui.js?v=20260726-v05-fusion';
-import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-fusion';
+import { menu, equipmentView, missionsView, fusionView } from './ui.js?v=20260726-v05-boss-loot';
+import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-boss-loot';
 import { C } from './config.js';
 
 // 此檔案只負責頁面切換、遊戲實例與存檔的銜接。
 let data = load();
 let run = null;
 const app = document.querySelector('#app');
+
+function bossLootTemplate() {
+  const roll = Math.random();
+  const quality = roll < 0.02 ? '傳說' : roll < 0.1 ? '史詩' : roll < 0.3 ? '稀有' : roll < 0.62 ? '優良' : '普通';
+  const pool = equipmentTemplates.filter(item => item.quality === quality);
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 
 function refreshDaily() {
   const today = new Date().toLocaleDateString('sv-SE');
@@ -76,9 +83,10 @@ function start(mode = 'stage') {
       data.complete = true;
       data.materials += 8;
       if (first && !data.equipment.some(item => item.id === 'w2')) data.equipment.push({ id: 'w2', level: 0, locked: true });
-      const reward = equipmentTemplates[Math.floor(Math.random() * equipmentTemplates.length)];
+      const reward = bossLootTemplate();
       if (!data.equipment.some(item => item.id === reward.id)) data.equipment.push({ id: reward.id, level: 0, locked: false });
       data.fragments += result.mode === 'boss' ? 3 : 1;
+      data.blueprints += result.mode === 'boss' ? 2 : 1;
     }
     if (result.mode === 'endless') data.endlessBest = Math.max(data.endlessBest || 0, result.wave);
     if (result.mode === 'boss') data.bossBest = Math.max(data.bossBest || 0, result.score);
@@ -184,6 +192,22 @@ app.addEventListener('click', (event) => {
   }
   if (action === 'craft') {
     if (data.materials >= 25) { data.materials -= 25; const missing = equipmentTemplates.filter(template => !data.equipment.some(item => item.id === template.id)); if (missing.length) data.equipment.push({ id: missing[Math.floor(Math.random() * missing.length)].id, level: 0, locked: false }); save(data); }
+    equipment();
+  }
+  if (action.startsWith('synth:')) {
+    const quality = action.split(':')[1];
+    const order = ['普通', '優良', '稀有', '史詩', '傳說'];
+    const next = order[order.indexOf(quality) + 1];
+    const candidates = data.equipment.filter(item => { const template = equipmentTemplates.find(entry => entry.id === item.id); return template?.quality === quality && !item.locked && !Object.values(data.equipped).includes(item.id); });
+    if (next && candidates.length >= 3) {
+      const consumed = candidates.slice(0, 3).map(item => item.id);
+      data.equipment = data.equipment.filter(item => !consumed.includes(item.id));
+      const pool = equipmentTemplates.filter(item => item.quality === next);
+      const reward = pool[Math.floor(Math.random() * pool.length)];
+      if (!data.equipment.some(item => item.id === reward.id)) data.equipment.push({ id: reward.id, level: 0, locked: false });
+      else data.materials += 15;
+      save(data);
+    }
     equipment();
   }
   if (action === 'help') {

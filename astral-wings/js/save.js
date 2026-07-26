@@ -1,7 +1,7 @@
 import { C } from './config.js';
 
 const base = () => ({
-  version: 5, level: 1, star: 1, fragments: 0, gold: 0, materials: 0, high: 0, maxCombo: 0, complete: false,
+  version: 5, level: 1, star: 1, fragments: 0, blueprints: 0, gold: 0, materials: 0, high: 0, maxCombo: 0, complete: false,
   equipment: [], equipped: { weapon: null, secondary: null, armor: null, engine: null, core: null }, fusion: null, fusionAwaken: 0, fusionEvolution: 0,
   endlessBest: 0, bossBest: 0, missions: { date: '', kills: 0, stages: 0, bosses: 0, claimed: {} }, achievements: { claimed: {} }, settings: { reduceFlash: false, shake: true, showCore: false, powerSave: false }
 });
