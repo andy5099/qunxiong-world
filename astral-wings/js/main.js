@@ -1,7 +1,7 @@
 import { load, save, reset } from './save.js';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260726-v02-power';
+import { game } from './game.js?v=20260726-v03-feel';
 import { menu } from './ui.js';
 import { C } from './config.js';
 
@@ -38,6 +38,7 @@ function start() {
         <div class="bar hp"><i id="hp"></i></div>
         <div class="bar shield"><i id="shield"></i></div>
         <span id="score">分數 0・連擊 0・能量 0%</span>
+        <span id="progress" class="progress-label">區域進度 0%</span>
         <span id="power" class="power-label">火力 Lv1</span>
         <span id="buffs" class="buff-label"></span>
         <div id="boss-hud" class="boss-hud hidden"><b>鐵幕吞噬者</b><div class="bar boss-bar"><i id="boss-hp"></i></div></div>
@@ -63,6 +64,7 @@ function start() {
     const hp = app.querySelector('#hp');
     const shield = app.querySelector('#shield');
     const score = app.querySelector('#score');
+    const progress = app.querySelector('#progress');
     const power = app.querySelector('#power');
     const buffs = app.querySelector('#buffs');
     const bossHud = app.querySelector('#boss-hud');
@@ -70,6 +72,7 @@ function start() {
     if (hp) hp.style.width = `${Math.max(0, state.p.hp / state.p.maxHp * 100)}%`;
     if (shield) shield.style.width = `${Math.max(0, state.p.shield / state.p.maxShield * 100)}%`;
     if (score) score.textContent = `分數 ${state.score}・連擊 ${state.combo}・能量 ${Math.floor(state.p.energy)}%`;
+    if (progress) progress.textContent = state.boss ? '區域進度 100%・Boss 戰' : `區域進度 ${Math.min(99, Math.floor(state.wave / 10 * 100))}%`;
     if (power) power.textContent = `火力 Lv${state.p.fireLevel}`;
     if (buffs) {
       const active = [];

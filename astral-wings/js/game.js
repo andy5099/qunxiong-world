@@ -15,9 +15,12 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
   const ctx = canvas.getContext('2d');
   const state = {
     p: player(saveData), enemies: [], bullets: [], pickups: [], particles: [], boss: null,
-    stars: Array.from({ length: 50 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, a: Math.random() })),
+    stars: Array.from({ length: 50 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, a: Math.random(), speed: 18 + Math.random() * 42 })),
+    nebulae: Array.from({ length: 4 }, () => ({ x: Math.random() * 440 - 40, y: Math.random() * 720 - 40, r: 65 + Math.random() * 85, speed: 5 + Math.random() * 8, color: Math.random() > 0.5 ? '#243f7655' : '#542d6a44' })),
+    debris: Array.from({ length: 8 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, r: 2 + Math.random() * 5, speed: 45 + Math.random() * 55, spin: Math.random() * 6 })),
     wave: 0, left: 0, kind: 'scout', nextId: 1, score: 0, gold: 0, combo: 0, maxCombo: 0,
-    kills: 0, paused: false, over: false, last: 0, hitStop: 0, shake: 0, bossEntrance: 0, victoryTimer: 0, message: ''
+    kills: 0, paused: false, over: false, last: 0, hitStop: 0, shake: 0,
+    bossEntrance: 0, supplyTimer: 0, victoryTimer: 0, message: '', messageTimer: 0
   };
   let animationFrame = 0;
 
@@ -40,13 +43,24 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
     onEnd({ win, score: state.score, kills: state.kills, combo: state.maxCombo, hp: state.p.hp, shield: state.p.shield, gold: state.gold });
   }
 
+  function announce(message, seconds = 1.3) {
+    state.message = message;
+    state.messageTimer = seconds;
+  }
+
   function spawnNextWave() {
-    if (state.boss || state.enemies.length || state.left || state.bossEntrance > 0 || state.victoryTimer > 0) return;
+    if (state.boss || state.enemies.length || state.left || state.bossEntrance > 0 || state.supplyTimer > 0 || state.victoryTimer > 0) return;
     const wave = stage.waves[state.wave++];
     if (!wave) return finish(true);
     if (wave[0] === 'boss') {
       state.bossEntrance = 2.2;
-      state.message = '警告：鐵幕吞噬者接近中';
+      announce('警告：鐵幕吞噬者接近中', 2.2);
+      return;
+    }
+    if (wave[0] === 'supply') {
+      ['power', 'energy', Math.random() < 0.5 ? 'hp' : 'shield', 'gold', 'gold'].forEach((type, index) => addPickup(112 + index * 34, 170, type));
+      state.supplyTimer = 1.8;
+      announce('補給艙已開啟', 1.8);
       return;
     }
     state.kind = wave[0];
@@ -55,7 +69,8 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
 
   function emitPlayerShot(xOffset, angle, speed, pierce = 0, laser = false) {
     const p = state.p;
-    const entry = bullet(p.x + xOffset, p.y - 18, Math.sin(angle) * speed, -Math.cos(angle) * speed, 'p', p.atk, pierce);
+    const damage = p.atk * (1 + (p.fireLevel - 1) * 0.18);
+    const entry = bullet(p.x + xOffset, p.y - 18, Math.sin(angle) * speed, -Math.cos(angle) * speed, 'p', damage, pierce);
     entry.laser = laser;
     entry.trail = p.fireLevel >= 5 || p.rage > 0;
     state.bullets.push(entry);
@@ -174,16 +189,28 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
   function updateEnemies(dt, time) {
     if (state.left && state.enemies.length < 4) { spawnEnemy(state.kind, 35 + Math.random() * 290); state.left -= 1; }
     state.enemies.forEach((entry) => {
-      entry.y += entry.speed * dt; entry.x += Math.sin(time / 400 + entry.phase) * 40 * dt; entry.fireCd -= dt;
-      if (entry.fireCd < 0 && entry.fire) {
-        entry.fireCd = entry.kind === 'elite' ? 0.55 : 1.2;
-        [-0.25, 0, 0.25].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, 110 * spread, 160, 'e', 10)));
-      }
+      entry.age += dt; entry.fireCd -= dt;
+      if (entry.pattern === 'dash') { entry.y += entry.speed * dt; entry.x += Math.sin(entry.age * 8 + entry.phase) * 105 * dt; }
+      if (entry.pattern === 'drift') { entry.y += entry.speed * dt; entry.x += Math.sin(entry.age * 2 + entry.phase) * 38 * dt; }
+      if (entry.pattern === 'heavy') { entry.y = Math.min(entry.lockedY, entry.y + entry.speed * dt); entry.x += Math.sin(entry.age + entry.phase) * 16 * dt; }
+      if (entry.pattern === 'hold') { entry.y = Math.min(entry.lockedY, entry.y + entry.speed * dt); }
+      if (entry.pattern === 'suicide') { entry.y += entry.speed * dt; entry.x += Math.sign(state.p.x - entry.x) * 38 * dt; }
+      if (entry.pattern === 'orbit') { entry.y = Math.min(entry.lockedY, entry.y + entry.speed * dt); entry.x += Math.sin(entry.age * 2.4 + entry.phase) * 62 * dt; }
+      if (entry.pattern === 'sweep') { entry.y = Math.min(entry.lockedY, entry.y + entry.speed * dt); entry.x += Math.cos(entry.age * 2 + entry.phase) * 68 * dt; }
+      entry.x = Math.max(18, Math.min(342, entry.x));
+      if (entry.fireCd <= 0 && entry.attack !== 'none') fireEnemy(entry);
+      if (entry.pattern === 'suicide' && distance(entry, state.p) < entry.r + state.p.r + 8) { damagePlayer(22); entry.hp = 0; }
       if (entry.y > 680) entry.hp = 0;
     });
     const boss = state.boss;
     if (!boss) return;
-    boss.phase = boss.hp / boss.maxHp > 0.7 ? 1 : boss.hp / boss.maxHp > 0.35 ? 2 : 3;
+    const nextPhase = boss.hp / boss.maxHp > 0.7 ? 1 : boss.hp / boss.maxHp > 0.35 ? 2 : 3;
+    if (boss.phase !== nextPhase) {
+      boss.phase = nextPhase;
+      state.shake = 7;
+      announce(`鐵幕吞噬者・第 ${nextPhase} 階段`, 1.15);
+      spawnParticle(boss.x, boss.y, nextPhase === 3 ? '#ff476d' : '#ffb0be', 24, 4);
+    }
     boss.x += boss.dir * (boss.phase === 3 ? 108 : 60) * dt;
     if (boss.x < 55 || boss.x > 305) boss.dir *= -1;
     boss.fireCd -= dt; boss.summonCd -= dt; boss.laserWarn -= dt; boss.laserActive -= dt;
@@ -196,10 +223,41 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
     if (boss.laserActive > 0 && Math.abs(state.p.x - boss.x) < state.p.r + 13) damagePlayer(20 * dt * 6);
   }
 
+  function fireEnemy(entry) {
+    const aimed = Math.atan2(state.p.y - entry.y, state.p.x - entry.x);
+    if (entry.attack === 'needle') {
+      entry.fireCd = 1.35;
+      state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed) * 210, Math.sin(aimed) * 210, 'e', 8));
+    }
+    if (entry.attack === 'fan') {
+      entry.fireCd = 1.45;
+      [-0.22, 0, 0.22].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed + spread) * 165, Math.sin(aimed + spread) * 165, 'e', 10)));
+    }
+    if (entry.attack === 'aim') {
+      entry.fireCd = 1.7;
+      state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed) * 265, Math.sin(aimed) * 265, 'e', 13));
+    }
+    if (entry.attack === 'burst') {
+      entry.fireCd = 1.05;
+      [-0.12, 0.12].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed + spread) * 175, Math.sin(aimed + spread) * 175, 'e', 9)));
+    }
+    if (entry.attack === 'ring') {
+      entry.fireCd = 1.65;
+      for (let index = 0; index < 6; index += 1) { const angle = Math.PI / 2 + index * Math.PI / 3; state.bullets.push(bullet(entry.x, entry.y, Math.cos(angle) * 130, Math.sin(angle) * 130, 'e', 8)); }
+    }
+    if (entry.attack === 'elite') {
+      entry.fireCd = 0.62;
+      [-0.32, -0.16, 0, 0.16, 0.32].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.sin(spread) * 180, Math.cos(spread) * 180, 'e', 11)));
+    }
+  }
+
   function hitTarget(entry, target) {
     if (entry.hit.has(target.id)) return;
     if (distance(entry, target) >= entry.r + target.r) return;
-    entry.hit.add(target.id); target.hp -= entry.damage; state.p.energy = Math.min(100, state.p.energy + 1);
+    entry.hit.add(target.id);
+    if (target.shield > 0) target.shield = Math.max(0, target.shield - entry.damage);
+    else target.hp -= entry.damage;
+    state.p.energy = Math.min(100, state.p.energy + 1);
     state.hitStop = Math.max(state.hitStop, 0.009);
     spawnParticle(entry.x, entry.y, entry.laser ? '#d6ffff' : '#fff1a0', 3, 1.5);
     if (entry.pierce > 0) entry.pierce -= 1; else entry.life = 0;
@@ -227,6 +285,10 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
     if (entry.type === 'magnet') p.magnet = 10;
     if (entry.type === 'rage') p.rage = 8;
     if (entry.type === 'double') p.doubleGold = 20;
+    if (entry.type === 'power') announce(`火力提升：Lv${p.fireLevel}`, 0.85);
+    if (entry.type === 'magnet') announce('磁力核心啟動', 0.85);
+    if (entry.type === 'rage') announce('狂暴核心啟動', 0.85);
+    if (entry.type === 'double') announce('雙倍金幣啟動', 0.85);
     state.shake = Math.max(state.shake, entry.type === 'power' ? 3 : 1);
     spawnParticle(entry.x, entry.y, '#fff2a2', entry.type === 'power' ? 15 : 6, 2);
     entry.collected = true;
@@ -252,7 +314,7 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
     state.enemies.filter((entry) => entry.hp <= 0).forEach(defeat);
     state.enemies = state.enemies.filter((entry) => entry.hp > 0);
     if (state.boss && state.boss.hp <= 0) {
-      const defeated = state.boss; defeated.isBoss = true; defeat(defeated); state.boss = null; state.left = 0; state.victoryTimer = 1.1; state.message = '鐵幕吞噬者已瓦解';
+      const defeated = state.boss; defeated.isBoss = true; defeat(defeated); state.boss = null; state.left = 0; state.victoryTimer = 1.1; announce('鐵幕吞噬者已瓦解', 1.1);
     }
   }
 
@@ -265,18 +327,24 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
     const dt = Math.min(0.033, (time - state.last || 0) / 1000);
     state.last = time;
     if (!state.paused && !state.over) {
+      state.messageTimer = Math.max(0, state.messageTimer - dt);
       if (state.hitStop > 0) state.hitStop -= dt;
       else {
         if (state.victoryTimer > 0) {
           state.victoryTimer -= dt;
           if (state.victoryTimer <= 0) finish(true);
+        } else if (state.supplyTimer > 0) {
+          state.supplyTimer -= dt;
+          updatePlayer(dt); updatePickups(dt);
         } else if (state.bossEntrance > 0) {
           state.bossEntrance -= dt;
-          if (state.bossEntrance <= 0) { state.boss = makeBoss(); state.boss.id = 'boss'; state.message = ''; state.shake = 7; }
+          if (state.bossEntrance <= 0) { state.boss = makeBoss(); state.boss.id = 'boss'; state.shake = 7; announce('鐵幕吞噬者・第一階段', 1.1); }
         } else {
           updatePlayer(dt); updateEnemies(dt, time); updateProjectiles(dt); resolveDefeats(); updatePickups(dt); spawnNextWave();
         }
-        state.stars.forEach((star) => { star.y = star.y > 640 ? 0 : star.y + 35 * dt; });
+        state.stars.forEach((star) => { star.y = star.y > 640 ? 0 : star.y + star.speed * dt; });
+        state.nebulae.forEach((cloud) => { cloud.y = cloud.y > 730 ? -cloud.r : cloud.y + cloud.speed * dt; });
+        state.debris.forEach((piece) => { piece.y = piece.y > 660 ? -piece.r : piece.y + piece.speed * dt; piece.spin += dt * 1.5; });
       }
       updateParticles(dt); state.shake = Math.max(0, state.shake - dt * 18); onHud(state);
     }
