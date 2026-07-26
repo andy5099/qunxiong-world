@@ -8,7 +8,10 @@ export const equipmentView = state => {
   const cards = equipmentTemplates.map(template => {
     const item = owned.find(entry => entry.id === template.id);
     const equipped = state.equipped[template.slot] === template.id;
-    return `<article class="equip ${item ? '' : 'locked'}"><b>${template.name}</b><small>${slotNames[template.slot]}・${template.quality}</small><span>主屬性 +${template.value + (item?.level || 0)}</span>${item ? `${button(equipped ? '已裝備' : '裝備', `equip:${template.id}`)}${button(`強化 +${item.level}（${30 + item.level * 28} 材）`, `enhance:${template.id}`)}` : '<em>尚未取得</em>'}</article>`;
+    const controls = item
+      ? button(equipped ? '已裝備' : '裝備', `equip:${template.id}`) + button(`強化 +${item.level}（${30 + item.level * 28} 材）`, `enhance:${template.id}`)
+      : '<em>尚未取得</em>';
+    return `<article class="equip ${item ? '' : 'locked'}"><b>${template.name}</b><small>${slotNames[template.slot]}・${template.quality}</small><span>主屬性 +${template.value + (item?.level || 0)}</span>${controls}</article>`;
   });
   return `<div class="shell panel menu"><h2>裝備與強化</h2><p class="note">首通關獲得新手裝備；強化 100% 成功，已裝備物不可分解。</p><div class="equip-grid">${cards.join('')}</div>${button('返回主選單','home')}</div>`;
 };

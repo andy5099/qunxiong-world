@@ -2,7 +2,7 @@ import { load, save, reset } from './save.js';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
 import { game } from './game.js?v=20260726-v05-balance';
-import { menu, equipmentView, missionsView } from './ui.js?v=20260726-v05-ui-fix';
+import { menu, equipmentView, missionsView } from './ui.js?v=20260726-v05-ui-fix-2';
 import { equipmentTemplates } from './data/equipment.js?v=20260726-v05-ui-fix';
 import { C } from './config.js';
 
