@@ -11,16 +11,16 @@ const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const pickupTypes = ['gold', 'power', 'hp', 'shield', 'energy', 'magnet', 'rage', 'double'];
 
 // v0.2 的單局戰鬥狀態：火力與增益只活在這一場，不會污染永久存檔。
-export function game(canvas, saveData, controls, onEnd, onHud) {
+export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage') {
   const ctx = canvas.getContext('2d');
   const state = {
     p: player(saveData), enemies: [], bullets: [], pickups: [], particles: [], boss: null,
     stars: Array.from({ length: 50 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, a: Math.random(), speed: 18 + Math.random() * 42 })),
     nebulae: Array.from({ length: 4 }, () => ({ x: Math.random() * 440 - 40, y: Math.random() * 720 - 40, r: 65 + Math.random() * 85, speed: 5 + Math.random() * 8, color: Math.random() > 0.5 ? '#243f7655' : '#542d6a44' })),
     debris: Array.from({ length: 8 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, r: 2 + Math.random() * 5, speed: 45 + Math.random() * 55, spin: Math.random() * 6 })),
-    wave: 0, left: 0, kind: 'scout', nextId: 1, score: 0, gold: 0, combo: 0, maxCombo: 0,
+    mode, wave: 0, left: 0, kind: 'scout', nextId: 1, score: 0, gold: 0, combo: 0, maxCombo: 0,
     kills: 0, paused: false, over: false, last: 0, hitStop: 0, shake: 0,
-    bossEntrance: 0, supplyTimer: 0, victoryTimer: 0, message: '', messageTimer: 0
+    bossEntrance: 0, supplyTimer: 0, victoryTimer: 0, message: '', messageTimer: 0, secondaryTimer: 0
   };
   let animationFrame = 0;
 
@@ -40,7 +40,7 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
     if (state.over) return;
     state.over = true;
     cancelAnimationFrame(animationFrame);
-    onEnd({ win, score: state.score, kills: state.kills, combo: state.maxCombo, hp: state.p.hp, shield: state.p.shield, gold: state.gold });
+    onEnd({ win, mode, wave: state.wave, score: state.score, kills: state.kills, combo: state.maxCombo, hp: state.p.hp, shield: state.p.shield, gold: state.gold });
   }
 
   function announce(message, seconds = 1.3) {
@@ -50,7 +50,7 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
 
   function spawnNextWave() {
     if (state.boss || state.enemies.length || state.left || state.bossEntrance > 0 || state.supplyTimer > 0 || state.victoryTimer > 0) return;
-    const wave = stage.waves[state.wave++];
+    const wave = getNextWave();
     if (!wave) return finish(true);
     if (wave[0] === 'boss') {
       state.bossEntrance = 2.2;
@@ -65,6 +65,16 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
     }
     state.kind = wave[0];
     state.left = wave[1];
+  }
+
+  function getNextWave() {
+    if (mode === 'boss') return state.wave++ === 0 ? ['supply', 1] : state.wave === 2 ? ['boss', 1] : null;
+    if (mode !== 'endless') return stage.waves[state.wave++];
+    const index = state.wave++;
+    if (index > 0 && index % 8 === 7) return ['boss', 1];
+    const types = ['scout', 'sprinter', 'armor', 'sniper', 'bomber', 'shield', 'support'];
+    const kind = index % 3 === 2 ? 'elite' : types[index % types.length];
+    return [kind, Math.min(6, 3 + Math.floor(index / 3))];
   }
 
   function emitPlayerShot(xOffset, angle, speed, pierce = 0, laser = false) {
@@ -167,7 +177,25 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
     if (controls.keys.arrowdown || controls.keys.s) p.y += speed;
     p.x = Math.max(15, Math.min(345, p.x)); p.y = Math.max(40, Math.min(610, p.y));
     p.inv -= dt; p.fire -= dt; p.magnet = Math.max(0, p.magnet - dt); p.rage = Math.max(0, p.rage - dt); p.doubleGold = Math.max(0, p.doubleGold - dt); p.pierceBuff = Math.max(0, p.pierceBuff - dt); p.crit = Math.max(0, p.crit - dt); p.rapid = Math.max(0, p.rapid - dt);
+    p.secondaryTimer -= dt;
     firePlayer();
+    fireSecondary(p);
+  }
+
+  function fireSecondary(p) {
+    const secondary = saveData.equipped?.secondary;
+    if (!secondary || p.secondaryTimer > 0) return;
+    if (secondary === 's1') {
+      const target = state.boss || state.enemies.reduce((best, item) => !best || distance(item, p) < distance(best, p) ? item : best, null);
+      if (target) { const aim = Math.atan2(target.y - p.y, target.x - p.x); state.bullets.push(bullet(p.x, p.y - 14, Math.cos(aim) * 285, Math.sin(aim) * 285, 'p', p.atk * 2.1, 0)); }
+      p.secondaryTimer = 2.1;
+    } else if (secondary === 's2') {
+      const beam = bullet(p.x, p.y - 20, 0, -610, 'p', p.atk * 1.65, 3, true); beam.laser = true; beam.trail = true; state.bullets.push(beam); p.secondaryTimer = 2.5;
+    } else if (secondary === 's3') {
+      [-22, 22].forEach(offset => state.bullets.push(bullet(p.x + offset, p.y - 9, 0, -360, 'p', p.atk * 0.6))); p.secondaryTimer = 0.62;
+    } else if (secondary === 's4') {
+      [-0.18, 0.18].forEach(angle => state.bullets.push(bullet(p.x, p.y - 18, Math.sin(angle) * 330, -Math.cos(angle) * 330, 'p', p.atk * 0.8, 1))); p.secondaryTimer = 1.15;
+    }
   }
 
   function spawnEnemy(kind, x) {
@@ -375,7 +403,7 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
       else {
         if (state.victoryTimer > 0) {
           state.victoryTimer -= dt;
-          if (state.victoryTimer <= 0) finish(true);
+          if (state.victoryTimer <= 0 && mode !== 'endless') finish(true);
         } else if (state.supplyTimer > 0) {
           state.supplyTimer -= dt;
           updatePlayer(dt); updatePickups(dt);

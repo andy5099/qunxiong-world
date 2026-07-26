@@ -33,12 +33,12 @@ function showResult(result) {
     </div>`;
 }
 
-function start() {
+function start(mode = 'stage') {
   app.innerHTML = `
     <div class="shell game">
       <canvas width="360" height="640" aria-label="星界戰翼遊戲畫面"></canvas>
       <div class="hud">
-        <b>第 1 關：破碎軌道</b>
+        <b>${mode === 'endless' ? '無盡航線' : mode === 'boss' ? 'Boss 挑戰' : '第 1 關：破碎軌道'}</b>
         <div class="bar hp"><i id="hp"></i></div>
         <div class="bar shield"><i id="shield"></i></div>
         <span id="score">分數 0・連擊 0・能量 0%</span>
@@ -67,7 +67,12 @@ function start() {
       data.complete = true;
       data.materials += 8;
       if (first && !data.equipment.some(item => item.id === 'w2')) data.equipment.push({ id: 'w2', level: 0, locked: true });
+      const reward = equipmentTemplates[Math.floor(Math.random() * equipmentTemplates.length)];
+      if (!data.equipment.some(item => item.id === reward.id)) data.equipment.push({ id: reward.id, level: 0, locked: false });
+      data.fragments += result.mode === 'boss' ? 3 : 1;
     }
+    if (result.mode === 'endless') data.endlessBest = Math.max(data.endlessBest || 0, result.wave);
+    if (result.mode === 'boss') data.bossBest = Math.max(data.bossBest || 0, result.score);
     save(data);
     showResult(result);
   }, (state) => {
@@ -100,13 +105,15 @@ function start() {
       bossHud.classList.toggle('hidden', !state.boss);
       if (state.boss) bossHp.style.width = `${Math.max(0, state.boss.hp / state.boss.maxHp * 100)}%`;
     }
-  });
+  }, mode);
 }
 
 app.addEventListener('click', (event) => {
   const action = event.target.closest('[data-a]')?.dataset.a;
   if (!action) return;
   if (action === 'start' || action === 'retry') start();
+  if (action === 'endless') start('endless');
+  if (action === 'boss') start('boss');
   if (action === 'home') home();
   if (action === 'equipment') equipment();
   if (action === 'missions') missions();
@@ -121,6 +128,11 @@ app.addEventListener('click', (event) => {
     }
     home();
   }
+  if (action === 'star') {
+    const cost = data.star * 5;
+    if (data.star < 5 && data.fragments >= cost) { data.fragments -= cost; data.star += 1; save(data); }
+    home();
+  }
   if (action.startsWith('equip:')) {
     const id = action.split(':')[1];
     const template = equipmentTemplates.find(item => item.id === id);
@@ -129,6 +141,16 @@ app.addEventListener('click', (event) => {
   if (action.startsWith('enhance:')) {
     const id = action.split(':')[1]; const item = data.equipment.find(entry => entry.id === id);
     if (item) { const cost = 30 + item.level * 28; if (data.materials >= cost && item.level < 20) { data.materials -= cost; item.level += 1; save(data); } equipment(); }
+  }
+  if (action.startsWith('dismantle:')) {
+    const id = action.split(':')[1]; const item = data.equipment.find(entry => entry.id === id);
+    const equipped = Object.values(data.equipped).includes(id);
+    if (item && !item.locked && !equipped) { data.equipment = data.equipment.filter(entry => entry.id !== id); data.materials += 8 + item.level * 2; save(data); }
+    equipment();
+  }
+  if (action === 'craft') {
+    if (data.materials >= 25) { data.materials -= 25; const missing = equipmentTemplates.filter(template => !data.equipment.some(item => item.id === template.id)); if (missing.length) data.equipment.push({ id: missing[Math.floor(Math.random() * missing.length)].id, level: 0, locked: false }); save(data); }
+    equipment();
   }
   if (action === 'help') {
     window.alert('手機：按住遊戲畫面拖曳戰機。電腦：滑鼠拖曳，或使用方向鍵與 WASD 移動；空白鍵使用必殺技，Esc 暫停。');
