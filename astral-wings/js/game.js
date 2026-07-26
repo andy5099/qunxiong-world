@@ -130,7 +130,8 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage') {
       roll(0.4, 'power'); roll(0.18, 'magnet'); roll(0.14, 'rage');
       return;
     }
-    roll(0.8, 'gold'); roll(0.15, 'power'); roll(0.06, 'hp'); roll(0.08, 'shield');
+    // 金幣是基礎成長來源：普通敵必掉，部分額外掉落；拾取時自動吸附。
+    addPickup(target.x, target.y, 'gold'); roll(0.42, 'gold'); roll(0.15, 'power'); roll(0.06, 'hp'); roll(0.08, 'shield');
     roll(0.1, 'energy'); roll(0.04, 'magnet'); roll(0.03, 'rage'); roll(0.02, 'double'); roll(0.025, 'pierce'); roll(0.02, 'crit'); roll(0.02, 'barrier'); roll(0.025, 'rapid');
   }
 
@@ -369,10 +370,10 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage') {
     const p = state.p;
     state.pickups.forEach((entry) => {
       entry.age += dt; entry.y += entry.vy * dt; entry.x += Math.sin(entry.age * 4 + entry.drift) * 18 * dt;
-      const range = p.magnet > 0 ? 150 : 42;
+      const range = entry.type === 'gold' ? 210 : p.magnet > 0 ? 150 : 42;
       const gap = distance(entry, p);
       if (gap < range) {
-        const pull = p.magnet > 0 ? 500 : 255;
+        const pull = entry.type === 'gold' ? 410 : p.magnet > 0 ? 500 : 255;
         entry.x += (p.x - entry.x) / Math.max(1, gap) * pull * dt;
         entry.y += (p.y - entry.y) / Math.max(1, gap) * pull * dt;
       }

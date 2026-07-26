@@ -1,7 +1,7 @@
-import { equipmentTemplates, slotNames } from './data/equipment.js';
+import { equipmentTemplates, slotNames, fusionForms } from './data/equipment.js';
 
 const button = (label, action) => `<button data-a="${action}">${label}</button>`;
-export const menu = state => `<div class="shell panel menu"><h1>星界戰翼</h1><p class="note">原創直向星際飛行射擊・v0.5</p><p>晨星突擊者 Lv.${state.level}・${'★'.repeat(state.star)}</p><p class="gold">金幣 ${state.gold}・強化材 ${state.materials}・星核 ${state.fragments}・最高分 ${state.high}</p><h3>戰鬥</h3>${button('開始：破碎軌道','start')}${button(`無盡航線・最高波 ${state.endlessBest || 0}`,'endless')}${button('Boss 挑戰','boss')}<h3>養成</h3>${button(`戰機升級（${80 + state.level * 70} 金幣）`,'upgrade')}${button(`戰機升星（${state.star * 5} 星核）`,'star')}${button('裝備與強化','equipment')}${button('任務與成就','missions')}<h3>設定</h3>${button('操作說明','help')}${button('重置存檔','reset')}</div>`;
+export const menu = state => `<div class="shell panel menu"><h1>星界戰翼</h1><p class="note">原創直向星際飛行射擊・v0.5</p><p>晨星突擊者 Lv.${state.level}・${'★'.repeat(state.star)}</p><p class="gold">金幣 ${state.gold}・強化材 ${state.materials}・星核 ${state.fragments}・最高分 ${state.high}</p><h3>戰鬥</h3>${button('開始：破碎軌道','start')}${button(`無盡航線・最高波 ${state.endlessBest || 0}`,'endless')}${button('Boss 挑戰','boss')}<h3>養成</h3>${button(`戰機升級（${80 + state.level * 70} 金幣）`,'upgrade')}${button(`戰機升星（${state.star * 5} 星核）`,'star')}${button('裝備與強化','equipment')}${button('戰翼工坊','fusion')}${button('任務與成就','missions')}<h3>設定</h3>${button('操作說明','help')}${button('重置存檔','reset')}</div>`;
 
 export const equipmentView = state => {
   const owned = state.equipment;
@@ -30,4 +30,15 @@ export const missionsView = state => {
   ];
   const row = ([id, label, ready, reward], claims) => `<article class="mission"><b>${label}</b><span>${ready ? '可領取' : '進行中'}・${reward}</span>${!claims[id] && ready ? button('領取', `claim:${id}`) : `<small>${claims[id] ? '已領取' : '尚未達成'}</small>`}</article>`;
   return `<div class="shell panel menu"><h2>任務與成就</h2><p class="note">每日任務依裝置日期重置；獎勵每次只能領取一次。</p><h3>每日任務</h3>${daily.map(item => row(item, mission.claimed || {})).join('')}<h3>成就</h3>${achievements.map(item => row(item, state.achievements.claimed || {})).join('')}${button('返回主選單','home')}</div>`;
+};
+
+export const fusionView = state => {
+  const owns = id => state.equipment.some(item => item.id === id);
+  const cards = fusionForms.map(form => {
+    const ready = form.need.every(owns); const active = state.fusion === form.id;
+    return `<article class="equip ${ready ? '' : 'locked'}"><b>${form.name}</b><small>需求：${form.need.join(' + ')}</small><span>${form.effect}</span>${ready ? button(active ? '已協調' : '啟用協調', `fusion:${form.id}`) : '<em>尚缺模組</em>'}</article>`;
+  }).join('');
+  const awakeCost = 16 + state.fusionAwaken * 10;
+  const evolveCost = 4 + state.fusionEvolution * 3;
+  return `<div class="shell panel menu"><h2>戰翼工坊</h2><p class="note">協調型可隨時更換。覺醒提升協調輸出；進化提供更高永久加成。</p><div class="equip-grid">${cards}</div><p>目前：${state.fusion || '未協調'}・覺醒 ${state.fusionAwaken}/3・進化 ${state.fusionEvolution}/2</p>${button(`覺醒（${awakeCost} 材料）`,'awaken')}${button(`進化（${evolveCost} 星核）`,'evolve')}${button('返回主選單','home')}</div>`;
 };

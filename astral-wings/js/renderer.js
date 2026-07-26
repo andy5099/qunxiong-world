@@ -1,6 +1,21 @@
 const pickupColors = { gold: '#ffd568', power: '#ff9b38', hp: '#70ff9c', shield: '#62dfff', energy: '#bb79ff', magnet: '#ffe66b', rage: '#ff5871', double: '#ffd26d', pierce: '#f6a5ff', crit: '#ffdf66', barrier: '#9cefff', rapid: '#ff9c5d' };
 const pickupMarks = { gold: '$', power: 'P', hp: '+', shield: 'S', energy: 'E', magnet: 'M', rage: 'R', double: '2', pierce: 'I', crit: 'C', barrier: 'B', rapid: 'H' };
 
+// 原創幾何輪廓讓敵機在手機小畫面上仍可一眼辨識職能。
+function drawEnemy(ctx, entry, triangle) {
+  ctx.save(); ctx.translate(entry.x, entry.y); ctx.shadowBlur = 8; ctx.shadowColor = entry.color;
+  ctx.fillStyle = entry.color;
+  if (entry.kind === 'sprinter') { ctx.beginPath(); ctx.moveTo(0, 18); ctx.lineTo(-11, -13); ctx.lineTo(0, -6); ctx.lineTo(11, -13); ctx.closePath(); ctx.fill(); }
+  else if (entry.kind === 'armor' || entry.kind === 'elite') { ctx.fillRect(-18, -14, 36, 28); ctx.fillStyle = '#3b2023'; ctx.fillRect(-5, -19, 10, 38); ctx.fillStyle = entry.color; ctx.fillRect(-25, -4, 12, 10); ctx.fillRect(13, -4, 12, 10); }
+  else if (entry.kind === 'sniper') { ctx.beginPath(); ctx.moveTo(0, 19); ctx.lineTo(-14, -12); ctx.lineTo(14, -12); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#f5dbff'; ctx.fillRect(-2, -19, 4, 25); }
+  else if (entry.kind === 'bomber') { ctx.beginPath(); ctx.arc(0, 0, 15, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#ffd166'; ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill(); }
+  else if (entry.kind === 'shield') { ctx.beginPath(); ctx.moveTo(0, 20); ctx.lineTo(-18, -4); ctx.lineTo(0, -18); ctx.lineTo(18, -4); ctx.closePath(); ctx.fill(); }
+  else if (entry.kind === 'support') { ctx.fillRect(-12, -10, 24, 20); ctx.fillStyle = '#fff3a0'; ctx.fillRect(-22, -3, 44, 6); }
+  else { ctx.restore(); triangle(entry, entry.color); if (entry.shield > 0) { ctx.strokeStyle = '#78cfff'; ctx.globalAlpha = 0.65; ctx.beginPath(); ctx.arc(entry.x, entry.y, entry.r + 4, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1; } return; }
+  ctx.restore();
+  if (entry.shield > 0) { ctx.strokeStyle = '#78cfff'; ctx.globalAlpha = 0.65; ctx.beginPath(); ctx.arc(entry.x, entry.y, entry.r + 5, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1; }
+}
+
 export function render(ctx, state) {
   const { p, enemies, bullets, pickups, particles, boss, stars, nebulae, debris } = state;
   const shakeX = state.shake ? (Math.random() - 0.5) * state.shake : 0;
@@ -22,18 +37,20 @@ export function render(ctx, state) {
     ctx.closePath(); ctx.fill();
   };
   if (p.inv <= 0 || Math.floor(p.inv * 12) % 2) {
-    triangle(p, '#74e8ff', true);
-    ctx.fillStyle = '#d8ffff'; ctx.fillRect(p.x - 3, p.y - 8, 6, 16);
+    ctx.save(); ctx.translate(p.x, p.y); ctx.shadowBlur = 14; ctx.shadowColor = '#4ee9ff';
+    ctx.fillStyle = '#254f78'; ctx.beginPath(); ctx.moveTo(0, -22); ctx.lineTo(-15, 16); ctx.lineTo(0, 11); ctx.lineTo(15, 16); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#8ff3ff'; ctx.beginPath(); ctx.moveTo(0, -19); ctx.lineTo(-6, 8); ctx.lineTo(0, 13); ctx.lineTo(6, 8); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#f3feff'; ctx.fillRect(-2, -14, 4, 18); ctx.fillStyle = '#ffb553'; ctx.fillRect(-9, 15, 5, 8); ctx.fillRect(4, 15, 5, 8); ctx.restore();
   }
-  enemies.forEach((entry) => {
-    triangle(entry, entry.color);
-    if (entry.shield > 0) { ctx.strokeStyle = '#78cfff'; ctx.globalAlpha = 0.65; ctx.beginPath(); ctx.arc(entry.x, entry.y, entry.r + 4, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1; }
-  });
+  enemies.forEach((entry) => drawEnemy(ctx, entry, triangle));
   if (boss) {
     ctx.save();
     ctx.shadowBlur = 18; ctx.shadowColor = boss.phase === 3 ? '#ff355f' : '#f98aaf';
-    ctx.fillStyle = boss.color; ctx.fillRect(boss.x - 45, boss.y - 26, 90, 52);
-    triangle({ x: boss.x, y: boss.y - 35, r: 25 }, '#ff91a7', true);
+    ctx.fillStyle = '#5c1835'; ctx.fillRect(boss.x - 49, boss.y - 24, 98, 51);
+    ctx.fillStyle = boss.color; ctx.fillRect(boss.x - 39, boss.y - 30, 78, 48);
+    ctx.fillStyle = '#ffc5d4'; ctx.fillRect(boss.x - 6, boss.y - 22, 12, 22);
+    ctx.fillStyle = '#2e1024'; ctx.fillRect(boss.x - 68, boss.y - 5, 25, 15); ctx.fillRect(boss.x + 43, boss.y - 5, 25, 15);
+    triangle({ x: boss.x, y: boss.y - 38, r: 25 }, '#ff91a7', true);
     ctx.restore();
     if (boss.laserWarn > 0 || boss.laserActive > 0) {
       ctx.fillStyle = boss.laserActive > 0 ? '#ff4571aa' : '#ff739066';

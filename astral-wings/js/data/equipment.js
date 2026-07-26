@@ -7,3 +7,10 @@ export const equipmentTemplates = [
   ['c1','藍晶核心','core','普通',6],['c2','日冕核心','core','優良',9],['c3','潮汐能量核','core','稀有',13],['c4','蒼穹奇點核','core','傳說',18]
 ].map(([id,name,slot,quality,value])=>({id,name,slot,quality,value,level:0,locked:false}));
 export const slotNames={weapon:'主武器',secondary:'副武器',armor:'護甲',engine:'引擎',core:'核心'};
+
+// 原創戰翼協調型態：用已取得模組組合出可逆的戰術傾向。
+export const fusionForms = [
+  { id: 'nova', name: '新星協調型', need: ['w2', 's2'], effect: '主炮傷害 +12%、光束冷卻縮短', stat: { attack: 0.12, fire: 0.12 } },
+  { id: 'aegis', name: '天穹護航型', need: ['a2', 'c2'], effect: '生命與護盾 +15%', stat: { vitality: 0.15 } },
+  { id: 'comet', name: '彗尾突進型', need: ['e2', 's3'], effect: '移動與無人機射速提升', stat: { speed: 0.16, drone: 0.2 } }
+];

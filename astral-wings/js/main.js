@@ -1,9 +1,9 @@
 import { load, save, reset } from './save.js';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260726-v05-balance';
-import { menu, equipmentView, missionsView } from './ui.js?v=20260726-v05-missions';
-import { equipmentTemplates } from './data/equipment.js?v=20260726-v05-ui-fix';
+import { game } from './game.js?v=20260726-v05-economy';
+import { menu, equipmentView, missionsView, fusionView } from './ui.js?v=20260726-v05-fusion';
+import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-fusion';
 import { C } from './config.js';
 
 // 此檔案只負責頁面切換、遊戲實例與存檔的銜接。
@@ -25,6 +25,7 @@ function home() {
 
 function equipment() { if (run) run.stop(); run = null; app.innerHTML = equipmentView(data); }
 function missions() { if (run) run.stop(); run = null; app.innerHTML = missionsView(data); }
+function fusion() { if (run) run.stop(); run = null; app.innerHTML = fusionView(data); }
 
 function showResult(result) {
   const box = app.querySelector('#result');
@@ -125,6 +126,7 @@ app.addEventListener('click', (event) => {
   if (action === 'home') home();
   if (action === 'equipment') equipment();
   if (action === 'missions') missions();
+  if (action === 'fusion') fusion();
   if (action === 'pause') run?.pause();
   if (action === 'ult') run?.ultimate();
   if (action === 'upgrade') {
@@ -140,6 +142,21 @@ app.addEventListener('click', (event) => {
     const cost = data.star * 5;
     if (data.star < 5 && data.fragments >= cost) { data.fragments -= cost; data.star += 1; save(data); }
     home();
+  }
+  if (action.startsWith('fusion:')) {
+    const id = action.split(':')[1]; const form = fusionForms.find(item => item.id === id);
+    if (form && form.need.every(need => data.equipment.some(item => item.id === need))) { data.fusion = id; save(data); }
+    fusion();
+  }
+  if (action === 'awaken') {
+    const cost = 16 + data.fusionAwaken * 10;
+    if (data.fusion && data.fusionAwaken < 3 && data.materials >= cost) { data.materials -= cost; data.fusionAwaken += 1; save(data); }
+    fusion();
+  }
+  if (action === 'evolve') {
+    const cost = 4 + data.fusionEvolution * 3;
+    if (data.fusion && data.fusionAwaken >= 3 && data.fusionEvolution < 2 && data.fragments >= cost) { data.fragments -= cost; data.fusionEvolution += 1; save(data); }
+    fusion();
   }
   if (action.startsWith('equip:')) {
     const id = action.split(':')[1];
