@@ -1,6 +1,7 @@
 import { load, save, reset } from './save.js';
 import { input } from './input.js';
-import { game } from './game.js';
+// 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
+import { game } from './game.js?v=20260726-game-loop-fix';
 import { menu } from './ui.js';
 import { C } from './config.js';
 
