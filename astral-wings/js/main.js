@@ -1,8 +1,9 @@
 import { load, save, reset } from './save.js';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260726-v03-feel';
-import { menu } from './ui.js';
+import { game } from './game.js?v=20260726-v05-balance';
+import { menu, equipmentView, missionsView } from './ui.js';
+import { equipmentTemplates } from './data/equipment.js';
 import { C } from './config.js';
 
 // 此檔案只負責頁面切換、遊戲實例與存檔的銜接。
@@ -15,6 +16,9 @@ function home() {
   run = null;
   app.innerHTML = menu(data);
 }
+
+function equipment() { if (run) run.stop(); run = null; app.innerHTML = equipmentView(data); }
+function missions() { if (run) run.stop(); run = null; app.innerHTML = missionsView(data); }
 
 function showResult(result) {
   const box = app.querySelector('#result');
@@ -57,7 +61,13 @@ function start() {
     data.gold += result.gold;
     data.high = Math.max(data.high, result.score);
     data.maxCombo = Math.max(data.maxCombo, result.combo);
-    if (result.win) data.complete = true;
+    data.missions.kills = (data.missions.kills || 0) + result.kills;
+    if (result.win) {
+      const first = !data.complete;
+      data.complete = true;
+      data.materials += 8;
+      if (first && !data.equipment.some(item => item.id === 'w2')) data.equipment.push({ id: 'w2', level: 0, locked: true });
+    }
     save(data);
     showResult(result);
   }, (state) => {
@@ -79,6 +89,10 @@ function start() {
       if (state.p.magnet > 0) active.push(`磁力 ${Math.ceil(state.p.magnet).toString().padStart(2, '0')}`);
       if (state.p.rage > 0) active.push(`狂暴 ${Math.ceil(state.p.rage).toString().padStart(2, '0')}`);
       if (state.p.doubleGold > 0) active.push(`雙倍金幣 ${Math.ceil(state.p.doubleGold).toString().padStart(2, '0')}`);
+      if (state.p.pierceBuff > 0) active.push(`穿透 ${Math.ceil(state.p.pierceBuff).toString().padStart(2, '0')}`);
+      if (state.p.crit > 0) active.push(`暴擊 ${Math.ceil(state.p.crit).toString().padStart(2, '0')}`);
+      if (state.p.barrier > 0) active.push('屏障 1');
+      if (state.p.rapid > 0) active.push(`急速 ${Math.ceil(state.p.rapid).toString().padStart(2, '0')}`);
       buffs.textContent = active.join('・');
       buffs.hidden = active.length === 0;
     }
@@ -94,6 +108,8 @@ app.addEventListener('click', (event) => {
   if (!action) return;
   if (action === 'start' || action === 'retry') start();
   if (action === 'home') home();
+  if (action === 'equipment') equipment();
+  if (action === 'missions') missions();
   if (action === 'pause') run?.pause();
   if (action === 'ult') run?.ultimate();
   if (action === 'upgrade') {
@@ -104,6 +120,15 @@ app.addEventListener('click', (event) => {
       save(data);
     }
     home();
+  }
+  if (action.startsWith('equip:')) {
+    const id = action.split(':')[1];
+    const template = equipmentTemplates.find(item => item.id === id);
+    if (template && data.equipment.some(item => item.id === id)) { data.equipped[template.slot] = id; save(data); equipment(); }
+  }
+  if (action.startsWith('enhance:')) {
+    const id = action.split(':')[1]; const item = data.equipment.find(entry => entry.id === id);
+    if (item) { const cost = 30 + item.level * 28; if (data.materials >= cost && item.level < 20) { data.materials -= cost; item.level += 1; save(data); } equipment(); }
   }
   if (action === 'help') {
     window.alert('手機：按住遊戲畫面拖曳戰機。電腦：滑鼠拖曳，或使用方向鍵與 WASD 移動；空白鍵使用必殺技，Esc 暫停。');

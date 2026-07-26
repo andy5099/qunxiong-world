@@ -1,1 +1,15 @@
-export const menu=s=>`<div class="shell panel menu"><h1>星界戰翼</h1><p class="note">原創直向星際飛行射擊</p><p>晨星突擊者 Lv.${s.level}・攻 ${10+s.level*2}・HP ${100+s.level*5}・盾 ${50+s.level*3}</p><p class="gold">金幣 ${s.gold}・最高分 ${s.high}</p><button data-a="start">開始：破碎軌道</button><button data-a="upgrade">戰機升級（${80+s.level*70} 金幣）</button><button data-a="help">操作說明</button><button data-a="reset">重置存檔</button></div>`;
+import { equipmentTemplates, slotNames } from './data/equipment.js';
+
+const button = (label, action) => `<button data-a="${action}">${label}</button>`;
+export const menu = state => `<div class="shell panel menu"><h1>星界戰翼</h1><p class="note">原創直向星際飛行射擊・v0.5</p><p>晨星突擊者 Lv.${state.level}・${'★'.repeat(state.star)}</p><p class="gold">金幣 ${state.gold}・強化材 ${state.materials}・最高分 ${state.high}</p><h3>戰鬥</h3>${button('開始：破碎軌道','start')}<h3>養成</h3>${button(`戰機升級（${80 + state.level * 70} 金幣）`,'upgrade')}${button('裝備與強化','equipment')}${button('任務與成就','missions')}<h3>設定</h3>${button('操作說明','help')}${button('重置存檔','reset')}</div>`;
+
+export const equipmentView = state => {
+  const owned = state.equipment;
+  const cards = equipmentTemplates.map(template => {
+    const item = owned.find(entry => entry.id === template.id);
+    const equipped = state.equipped[template.slot] === template.id;
+    return `<article class="equip ${item ? '' : 'locked'}"><b>${template.name}</b><small>${slotNames[template.slot]}・${template.quality}</small><span>主屬性 +${template.value + (item?.level || 0)}</span>${item ? `${button(equipped ? '已裝備' : '裝備',`equip:${template.id}`)}${button(`強化 +${item.level}（${30 + item.level * 28} 材）`,`enhance:${template.id}`)}` : '<em>尚未取得</em>'}</article>`;
+  return `<div class="shell panel menu"><h2>裝備與強化</h2><p class="note">首通關獲得新手裝備；強化 100% 成功，已裝備物不可分解。</p><div class="equip-grid">${cards.join('')}</div>${button('返回主選單','home')}</div>`;
+};
+
+export const missionsView = state => `<div class="shell panel menu"><h2>任務與成就</h2><p>累積擊破：${state.missions.kills || 0} / 100</p><p>首次通關：${state.complete ? '已完成' : '進行中'}</p><p>最大連擊：${state.maxCombo}</p>${button('返回主選單','home')}</div>`;

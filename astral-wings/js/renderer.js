@@ -1,5 +1,5 @@
-const pickupColors = { gold: '#ffd568', power: '#ff9b38', hp: '#70ff9c', shield: '#62dfff', energy: '#bb79ff', magnet: '#ffe66b', rage: '#ff5871', double: '#ffd26d' };
-const pickupMarks = { gold: '$', power: 'P', hp: '+', shield: 'S', energy: 'E', magnet: 'M', rage: 'R', double: '2' };
+const pickupColors = { gold: '#ffd568', power: '#ff9b38', hp: '#70ff9c', shield: '#62dfff', energy: '#bb79ff', magnet: '#ffe66b', rage: '#ff5871', double: '#ffd26d', pierce: '#f6a5ff', crit: '#ffdf66', barrier: '#9cefff', rapid: '#ff9c5d' };
+const pickupMarks = { gold: '$', power: 'P', hp: '+', shield: 'S', energy: 'E', magnet: 'M', rage: 'R', double: '2', pierce: 'I', crit: 'C', barrier: 'B', rapid: 'H' };
 
 export function render(ctx, state) {
   const { p, enemies, bullets, pickups, particles, boss, stars, nebulae, debris } = state;

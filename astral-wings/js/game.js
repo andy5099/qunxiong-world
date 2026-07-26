@@ -1,4 +1,4 @@
-import { C } from './config.js';
+import { C, balanceConfig } from './config.js';
 import { player } from './entities/player.js';
 import { enemy } from './entities/enemy.js';
 import { makeBoss } from './entities/boss.js';
@@ -70,7 +70,8 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
   function emitPlayerShot(xOffset, angle, speed, pierce = 0, laser = false) {
     const p = state.p;
     const damage = p.atk * (1 + (p.fireLevel - 1) * 0.18);
-    const entry = bullet(p.x + xOffset, p.y - 18, Math.sin(angle) * speed, -Math.cos(angle) * speed, 'p', damage, pierce);
+    const entry = bullet(p.x + xOffset, p.y - 18, Math.sin(angle) * speed, -Math.cos(angle) * speed, 'p', damage, pierce + (p.pierceBuff > 0 ? 1 : 0));
+    if (p.crit > 0 && Math.random() < 0.25) { entry.damage *= 1.65; entry.critical = true; }
     entry.laser = laser;
     entry.trail = p.fireLevel >= 5 || p.rage > 0;
     state.bullets.push(entry);
@@ -79,7 +80,7 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
   function firePlayer() {
     const p = state.p;
     if (p.fire > 0) return;
-    const rapid = p.rage > 0 ? 1.5 : 1;
+    const rapid = (p.rage > 0 ? 1.5 : 1) * (p.rapid > 0 ? 1.55 : 1);
     const level = p.fireLevel;
     const speed = (level >= 5 ? 540 : level >= 4 ? 510 : 455) * (p.rage > 0 ? 1.3 : 1);
     p.fire = C.shot / rapid;
@@ -94,6 +95,7 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
 
   function damagePlayer(amount) {
     const p = state.p;
+    if (p.barrier > 0) { p.barrier = 0; p.inv = 0.45; spawnParticle(p.x, p.y, '#82e8ff', 16, 3); return; }
     if (p.inv > 0 || state.over) return;
     p.inv = C.invincible;
     p.shield -= amount;
@@ -101,9 +103,11 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
     state.combo = 0;
     state.shake = Math.max(state.shake, 6);
     spawnParticle(p.x, p.y, '#ff648a', 11, 3);
+    // 只清除核心周圍的危險彈，避免受傷後被同一團彈幕連續鎖死。
+    state.bullets = state.bullets.filter(entry => entry.from === 'p' || distance(entry, p) > 54);
     if (p.hp <= 0) {
       // 火力與所有單局 Buff 在死亡瞬間清除；永久金幣仍在結算時保存。
-      p.fireLevel = 1; p.magnet = 0; p.rage = 0; p.doubleGold = 0;
+      p.fireLevel = 1; p.magnet = 0; p.rage = 0; p.doubleGold = 0; p.pierceBuff = 0; p.crit = 0; p.barrier = 0; p.rapid = 0;
       finish(false);
     }
   }
@@ -117,7 +121,7 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
       return;
     }
     roll(0.8, 'gold'); roll(0.15, 'power'); roll(0.06, 'hp'); roll(0.08, 'shield');
-    roll(0.1, 'energy'); roll(0.04, 'magnet'); roll(0.03, 'rage'); roll(0.02, 'double');
+    roll(0.1, 'energy'); roll(0.04, 'magnet'); roll(0.03, 'rage'); roll(0.02, 'double'); roll(0.025, 'pierce'); roll(0.02, 'crit'); roll(0.02, 'barrier'); roll(0.025, 'rapid');
   }
 
   function dropBoss(target) {
@@ -162,7 +166,7 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
     if (controls.keys.arrowup || controls.keys.w) p.y -= speed;
     if (controls.keys.arrowdown || controls.keys.s) p.y += speed;
     p.x = Math.max(15, Math.min(345, p.x)); p.y = Math.max(40, Math.min(610, p.y));
-    p.inv -= dt; p.fire -= dt; p.magnet = Math.max(0, p.magnet - dt); p.rage = Math.max(0, p.rage - dt); p.doubleGold = Math.max(0, p.doubleGold - dt);
+    p.inv -= dt; p.fire -= dt; p.magnet = Math.max(0, p.magnet - dt); p.rage = Math.max(0, p.rage - dt); p.doubleGold = Math.max(0, p.doubleGold - dt); p.pierceBuff = Math.max(0, p.pierceBuff - dt); p.crit = Math.max(0, p.crit - dt); p.rapid = Math.max(0, p.rapid - dt);
     firePlayer();
   }
 
@@ -204,23 +208,58 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
     });
     const boss = state.boss;
     if (!boss) return;
-    const nextPhase = boss.hp / boss.maxHp > 0.7 ? 1 : boss.hp / boss.maxHp > 0.35 ? 2 : 3;
+    const ratio = boss.hp / boss.maxHp;
+    const nextPhase = ratio > balanceConfig.boss.phaseTwo ? 1 : ratio > balanceConfig.boss.phaseThree ? 2 : 3;
     if (boss.phase !== nextPhase) {
-      boss.phase = nextPhase;
-      state.shake = 7;
-      announce(`鐵幕吞噬者・第 ${nextPhase} 階段`, 1.15);
-      spawnParticle(boss.x, boss.y, nextPhase === 3 ? '#ff476d' : '#ffb0be', 24, 4);
+      boss.phase = nextPhase; boss.rest = 1.0; boss.sequence = 0;
+      state.shake = 5; announce(`鐵幕吞噬者・第 ${nextPhase} 階段`, 1.15);
+      spawnParticle(boss.x, boss.y, nextPhase === 3 ? '#ff476d' : '#ffb0be', 20, 4);
     }
-    boss.x += boss.dir * (boss.phase === 3 ? 108 : 60) * dt;
-    if (boss.x < 55 || boss.x > 305) boss.dir *= -1;
-    boss.fireCd -= dt; boss.summonCd -= dt; boss.laserWarn -= dt; boss.laserActive -= dt;
-    if (boss.fireCd < 0) fireBoss(boss);
-    if (boss.phase === 3 && boss.summonCd < 0) {
-      boss.summonCd = 3.4;
-      spawnEnemy('scout', Math.max(25, boss.x - 55)); spawnEnemy('scout', Math.min(335, boss.x + 55));
+    boss.x += boss.dir * (boss.phase === 3 ? 72 : 48) * dt;
+    if (boss.x < 62 || boss.x > 298) boss.dir *= -1;
+    boss.rest -= dt; boss.telegraph -= dt; boss.laserWarn -= dt; boss.laserActive -= dt; boss.volley -= dt; boss.summonCd -= dt;
+    if (boss.telegraph > 0) return;
+    if (boss.pendingAimed) {
+      boss.pendingAimed = false;
+      for (let index = 0; index < 3; index += 1) state.bullets.push(bullet(boss.x, boss.y, Math.cos(boss.pendingAim) * balanceConfig.boss.aimedSpeed, Math.sin(boss.pendingAim) * balanceConfig.boss.aimedSpeed, 'e', 11));
+      return;
     }
-    if (boss.laserWarn <= 0 && boss.laserActive <= 0 && boss.phase === 3) boss.laserActive = 0.32;
-    if (boss.laserActive > 0 && Math.abs(state.p.x - boss.x) < state.p.r + 13) damagePlayer(20 * dt * 6);
+    if (boss.pendingLaser) { boss.pendingLaser = false; boss.laserActive = balanceConfig.boss.laserDuration; return; }
+    if (boss.laserActive > 0) {
+      if (Math.abs(state.p.x - boss.x) < state.p.r + 10) damagePlayer(14 * dt * 5);
+      return;
+    }
+    if (boss.rest > 0) return;
+    runBossPattern(boss);
+  }
+
+  function runBossPattern(boss) {
+    // 每輪只執行一種主攻擊，結束後固定喘息，避免攻擊模式疊加成無解。
+    const phasePatterns = boss.phase === 1 ? ['fan', 'lanes'] : boss.phase === 2 ? ['ring', 'aimed'] : ['laser', 'rageFan', 'summon'];
+    boss.attack = phasePatterns[boss.sequence++ % phasePatterns.length];
+    if (boss.attack === 'fan') {
+      [-0.42, -0.21, 0, 0.21, 0.42].forEach(spread => state.bullets.push(bullet(boss.x, boss.y, spread * 150, balanceConfig.boss.fanSpeed, 'e', 9)));
+      boss.rest = 1.0;
+    } else if (boss.attack === 'lanes') {
+      // 左右交替直線彈，中央保留可讀通道。
+      const side = boss.sequence % 2 ? -1 : 1;
+      [-1, 1].forEach(offset => state.bullets.push(bullet(boss.x + side * 26, boss.y, offset * 54, 148, 'e', 10)));
+      boss.rest = 0.9;
+    } else if (boss.attack === 'ring') {
+      for (let index = 0; index < 8; index += 1) { const angle = Math.PI / 2 + index * Math.PI / 4 + 0.18; state.bullets.push(bullet(boss.x, boss.y, Math.cos(angle) * balanceConfig.boss.ringSpeed, Math.sin(angle) * balanceConfig.boss.ringSpeed, 'e', 10)); }
+      boss.rest = 1.05;
+    } else if (boss.attack === 'aimed') {
+      boss.telegraph = 0.55; boss.pendingAimed = true; boss.rest = 1.3;
+      boss.pendingAim = Math.atan2(state.p.y - boss.y, state.p.x - boss.x);
+    } else if (boss.attack === 'laser') {
+      boss.laserWarn = balanceConfig.boss.laserWarning; boss.telegraph = balanceConfig.boss.laserWarning; boss.pendingLaser = true; boss.rest = 1.55;
+    } else if (boss.attack === 'rageFan') {
+      [-0.5, -0.33, -0.16, 0, 0.16, 0.33, 0.5].forEach(spread => state.bullets.push(bullet(boss.x, boss.y, spread * 135, 150, 'e', 11)));
+      boss.rest = 1.05;
+    } else {
+      spawnEnemy('scout', Math.max(35, boss.x - 54)); spawnEnemy('sprinter', Math.min(325, boss.x + 54));
+      boss.rest = 1.2;
+    }
   }
 
   function fireEnemy(entry) {
@@ -285,6 +324,10 @@ export function game(canvas, saveData, controls, onEnd, onHud) {
     if (entry.type === 'magnet') p.magnet = 10;
     if (entry.type === 'rage') p.rage = 8;
     if (entry.type === 'double') p.doubleGold = 20;
+    if (entry.type === 'pierce') p.pierceBuff = Math.min(15, p.pierceBuff + balanceConfig.buffs.pierce);
+    if (entry.type === 'crit') p.crit = Math.min(15, p.crit + balanceConfig.buffs.crit);
+    if (entry.type === 'barrier') p.barrier = 1;
+    if (entry.type === 'rapid') p.rapid = Math.min(12, p.rapid + balanceConfig.buffs.rapid);
     if (entry.type === 'power') announce(`火力提升：Lv${p.fireLevel}`, 0.85);
     if (entry.type === 'magnet') announce('磁力核心啟動', 0.85);
     if (entry.type === 'rage') announce('狂暴核心啟動', 0.85);
