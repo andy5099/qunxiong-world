@@ -247,6 +247,16 @@ export function render(ctx, state) {
     ctx.fillStyle = '#f3feff'; ctx.fillRect(-2, -14, 4, 18); ctx.fillStyle = '#ffb553'; ctx.fillRect(-9, 15, 5, 8); ctx.fillRect(4, 15, 5, 8); ctx.restore();
     }
   }
+  // 火力等級直接改變炮口數、核心環與待機光，不只增加子彈數值。
+  ctx.save();
+  const fireCount = p.fireLevel === 1 ? 2 : p.fireLevel === 2 ? 3 : p.fireLevel < 5 ? 5 : 7;
+  const fireSpread = fireCount === 2 ? [-11, 11] : Array.from({ length: fireCount }, (_, i) => (i - (fireCount - 1) / 2) * (p.fireLevel >= 5 ? 7 : 5));
+  ctx.globalAlpha = 0.62 + Math.sin((state.elapsed || 0) * 12) * 0.18;
+  ctx.fillStyle = p.fireLevel >= 5 ? '#fff0a0' : '#88eeff'; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 10 + p.fireLevel * 2;
+  fireSpread.forEach(offset => ctx.fillRect(p.x + offset - 2, p.y - 43 - Math.abs(offset) * 0.06, 4, 10 + p.fireLevel * 1.5));
+  if (p.fireLevel >= 4) { ctx.strokeStyle = '#8cf6ff99'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(p.x, p.y, 37 + Math.sin((state.elapsed || 0) * 5) * 3, 0, Math.PI * 2); ctx.stroke(); }
+  if (state.upgradePulse > 0) { const progress = 1 - state.upgradePulse / 0.72; ctx.strokeStyle = '#ffe99b'; ctx.lineWidth = 3 * (1 - progress); ctx.globalAlpha = 1 - progress; ctx.beginPath(); ctx.arc(p.x, p.y, 22 + progress * 74, 0, Math.PI * 2); ctx.stroke(); }
+  ctx.restore();
   drawSecondaryRig(ctx, p, state.secondary, state.elapsed || 0);
   drawWingmanRig(ctx, p, state.wingman, state.elapsed || 0);
   drawPlayerVitalBars(ctx, p);
@@ -336,12 +346,12 @@ export function render(ctx, state) {
     ctx.fillStyle = color; ctx.rotate(Math.PI / 4); ctx.fillRect(-8, -8, 16, 16); ctx.rotate(-Math.PI / 4);
     ctx.shadowBlur = 0; ctx.fillStyle = '#08111d'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(pickupMarks[entry.type], 0, 1); ctx.restore();
   });
+  if (state.messageTimer > 0 && state.message) {
+    ctx.save(); ctx.globalAlpha = Math.min(1, state.messageTimer * 2); ctx.textAlign = 'center';
+    ctx.font = '900 18px system-ui'; ctx.fillStyle = '#fff0a3'; ctx.shadowColor = '#ffbc55'; ctx.shadowBlur = 12;
+    ctx.fillText(state.message, 180, 330); ctx.restore();
+  }
   particles.forEach((entry) => { ctx.globalAlpha = Math.max(0, entry.life * 2); ctx.fillStyle = entry.color; ctx.fillRect(entry.x - entry.size / 2, entry.y - entry.size / 2, entry.size, entry.size); });
   ctx.globalAlpha = 1;
-  if (state.messageTimer > 0) {
-    ctx.fillStyle = '#fff2a3';
-    ctx.font = 'bold 19px system-ui'; ctx.textAlign = 'center';
-    ctx.fillText(state.message, 180, 300);
-  }
   ctx.restore();
 }

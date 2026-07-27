@@ -5,7 +5,7 @@ import { makeBoss } from './entities/boss.js?v=20260727-visual-12stage';
 import { bullet } from './entities/bullet.js';
 import { pickup } from './entities/pickup.js';
 import { stage } from './data/stages.js?v=20260727-visual-12stage';
-import { render } from './renderer.js?v=20260727-visual-12stage';
+import { render } from './renderer.js?v=20260727-gamefeel';
 
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const pickupTypes = ['gold', 'power', 'hp', 'shield', 'energy', 'magnet', 'rage', 'double', 'chest'];
@@ -20,7 +20,8 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     debris: Array.from({ length: 8 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, r: 2 + Math.random() * 5, speed: 45 + Math.random() * 55, spin: Math.random() * 6 })),
     mode, stage: selectedStage, fusion: saveData.fusion || null, primary: saveData.equipped?.weapon || 'w1', secondary: saveData.equipped?.secondary || null, wingman: saveData.equipped?.engine || null, wave: 0, left: 0, kind: 'scout', nextId: 1, score: 0, gold: 0, combo: 0, maxCombo: 0,
     kills: 0, chests: 0, paused: false, over: false, last: 0, shake: 0,
-    message: '', messageTimer: 0, secondaryTimer: 0, wingTimer: 0, elapsed: 0
+    message: '', messageTimer: 0, secondaryTimer: 0, wingTimer: 0, elapsed: 0,
+    formation: null, formationIndex: 0, upgradePulse: 0, timeScale: 1
   };
   let animationFrame = 0;
 
@@ -43,8 +44,8 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     onEnd({ win, mode, wave: state.wave, score: state.score, kills: state.kills, combo: state.maxCombo, hp: state.p.hp, shield: state.p.shield, gold: state.gold, chests: state.chests });
   }
 
-  // 所有關鍵狀態已由 HUD 呈現；不再以中央提示打斷關卡閱讀與操作。
-  function announce() {}
+  // 短暫提示只呈現關鍵事件，不會以彈窗或停頓打斷射擊。
+  function announce(text, duration = 0.8) { state.message = text; state.messageTimer = duration; }
 
   function spawnNextWave() {
     if (state.boss || state.enemies.length || state.left) return;
@@ -69,6 +70,10 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     }
     state.kind = wave[0];
     state.left = wave[1];
+    // 固定波次配合隊形，不再讓同種敵機隨機散落進場。
+    const forms = ['vee', 'column', 'cross', 'pincer', 'wave', 'spiral', 'pass'];
+    state.formation = forms[(state.wave + state.stage.order * 2) % forms.length];
+    state.formationIndex = 0;
   }
 
   function getNextWave() {
@@ -297,6 +302,17 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     }
   }
 
+  function formationX(style, index, count) {
+    const middle = (count - 1) / 2;
+    if (style === 'vee') return 180 + (index - middle) * 34;
+    if (style === 'column') return 180;
+    if (style === 'cross') return 180 + (index % 2 ? -1 : 1) * (34 + Math.floor(index / 2) * 27);
+    if (style === 'pincer') return index % 2 ? 58 + Math.floor(index / 2) * 22 : 302 - Math.floor(index / 2) * 22;
+    if (style === 'wave') return 50 + index * (260 / Math.max(1, count - 1));
+    if (style === 'spiral') return 180 + Math.sin(index * 1.75) * (44 + index * 12);
+    return index % 2 ? 44 : 316;
+  }
+
   function spawnEnemy(kind, x) {
     const entry = enemy(kind, x);
     const stageOrder = Math.max(0, state.stage?.order || 0);
@@ -308,6 +324,8 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     entry.speed *= 1 + Math.min(0.18, stageOrder * 0.025 + endlessScale * 0.01);
     entry.fireRateScale = Math.max(0.82, 1 - stageOrder * 0.025 - endlessScale * 0.015);
     entry.id = state.nextId++;
+    entry.formation = state.formation;
+    entry.formationSlot = state.formationIndex;
     state.enemies.push(entry);
   }
 
@@ -326,7 +344,12 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
   }
 
   function updateEnemies(dt, time) {
-    if (state.left && state.enemies.length < 4) { spawnEnemy(state.kind, 35 + Math.random() * 290); state.left -= 1; }
+    if (state.left && state.enemies.length < 6) {
+      const total = state.left + state.formationIndex;
+      spawnEnemy(state.kind, formationX(state.formation, state.formationIndex, total));
+      state.formationIndex += 1;
+      state.left -= 1;
+    }
     state.enemies.forEach((entry) => {
       entry.age += dt; entry.fireCd -= dt;
       if (entry.pattern === 'dash') { entry.y += entry.speed * dt; entry.x += Math.sin(entry.age * 8 + entry.phase) * 105 * dt; }
@@ -462,7 +485,16 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     const p = state.p;
     if (entry.type === 'gold') state.gold += (entry.value || 1) * (p.doubleGold > 0 ? 2 : 1);
     if (entry.type === 'chest') state.chests += entry.value || 1;
-    if (entry.type === 'power') p.fireLevel = Math.min(5, p.fireLevel + 1);
+    if (entry.type === 'power') {
+      const previous = p.fireLevel;
+      p.fireLevel = Math.min(5, p.fireLevel + 1);
+      if (p.fireLevel > previous) {
+        p.inv = Math.max(p.inv, 0.5);
+        state.upgradePulse = 0.72;
+        state.timeScale = 0.42;
+        announce(`FIRE UP ・ Lv${p.fireLevel}`, 0.85);
+      }
+    }
     if (entry.type === 'hp') p.hp = Math.min(p.maxHp, p.hp + 25);
     if (entry.type === 'shield') p.shield = Math.min(p.maxShield, p.shield + 30);
     if (entry.type === 'energy') p.energy = Math.min(100, p.energy + 25);
@@ -522,9 +554,12 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
   }
 
   function frame(time) {
-    const dt = Math.min(0.033, (time - state.last || 0) / 1000);
+    let dt = Math.min(0.033, (time - state.last || 0) / 1000);
     state.last = time;
     if (!state.paused && !state.over) {
+      state.upgradePulse = Math.max(0, state.upgradePulse - dt);
+      state.timeScale += (1 - state.timeScale) * Math.min(1, dt * 9);
+      dt *= state.timeScale;
       state.elapsed += dt;
       state.messageTimer = Math.max(0, state.messageTimer - dt);
       // 戰鬥流程全程用同一個 delta time 更新，不再因命中、補給或 Boss 事件凍結畫面。
