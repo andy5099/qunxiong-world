@@ -1,8 +1,8 @@
 import { load, save, reset } from './save.js?v=20260727-ships';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260727-visual-hangar-sweep';
-import { menu, equipmentView, missionsView, fusionView, stageView, codexView, shipView } from './ui.js?v=20260727-visual-hangar-sweep';
+import { game } from './game.js?v=20260727-endless-chests-vitals-v2';
+import { menu, equipmentView, missionsView, fusionView, stageView, codexView, shipView } from './ui.js?v=20260727-endless-chests-vitals-v2';
 import { ships } from './data/ships.js?v=20260727-visual-hangar-sweep';
 import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-boss-loot';
 import { stages, getStage } from './data/stages.js?v=20260727-stages-art';
@@ -78,7 +78,9 @@ function start(mode = 'stage', stageId = 'orbit') {
       <canvas width="360" height="640" aria-label="星界戰翼遊戲畫面"></canvas>
       <div class="hud">
         <b>${mode === 'endless' ? '無盡航線' : mode === 'boss' ? 'Boss 挑戰' : '第 1 關：破碎軌道'}</b>
+        <span id="hp-text">HP</span>
         <div class="bar hp"><i id="hp"></i></div>
+        <span id="shield-text">Shield</span>
         <div class="bar shield"><i id="shield"></i></div>
         <span id="score">分數 0・連擊 0・能量 0%</span>
         <span id="progress" class="progress-label">區域進度 0%</span>
@@ -90,7 +92,7 @@ function start(mode = 'stage', stageId = 'orbit') {
       <div class="actions">
         <button data-a="pause">暫停</button>
         <button data-a="ult">星能爆發</button>
-        <button data-a="home">返回</button>
+        ${mode === 'endless' ? '<button data-a="endless-claim">結算並領取</button>' : '<button data-a="home">返回</button>'}
       </div>
       <div id="result" class="modal hidden"></div>
     </div>`;
@@ -123,6 +125,24 @@ function start(mode = 'stage', stageId = 'orbit') {
       data.fragments += fragments; data.blueprints += blueprints;
       drops.push(`戰機碎片 +${fragments}`, `藍圖 +${blueprints}`);
     }
+    if (result.mode === 'endless' && result.chests > 0) {
+      const qualityOrder = ['普通', '優良', '稀有', '史詩', '傳說'];
+      const maxQuality = Math.min(4, Math.floor(result.wave / 12));
+      drops.push(`無盡星匣 ×${result.chests}`);
+      for (let index = 0; index < result.chests; index += 1) {
+        const quality = qualityOrder[Math.floor(Math.random() * (maxQuality + 1))];
+        const pool = equipmentTemplates.filter(item => item.quality === quality);
+        const reward = pool[Math.floor(Math.random() * pool.length)];
+        if (reward && !data.equipment.some(item => item.id === reward.id)) {
+          data.equipment.push({ id: reward.id, level: 0, locked: false });
+          drops.push(`星匣 ${index + 1}：${reward.quality}【${reward.name}】`);
+        } else {
+          const materialRefund = 10 + qualityOrder.indexOf(quality) * 5;
+          data.materials += materialRefund;
+          drops.push(`星匣 ${index + 1}：重複裝備 → 強化材料 +${materialRefund}`);
+        }
+      }
+    }
     if (result.mode === 'endless') data.endlessBest = Math.max(data.endlessBest || 0, result.wave);
     if (result.mode === 'boss') data.bossBest = Math.max(data.bossBest || 0, result.score);
     save(data);
@@ -130,6 +150,8 @@ function start(mode = 'stage', stageId = 'orbit') {
   }, (state) => {
     const hp = app.querySelector('#hp');
     const shield = app.querySelector('#shield');
+    const hpText = app.querySelector('#hp-text');
+    const shieldText = app.querySelector('#shield-text');
     const score = app.querySelector('#score');
     const progress = app.querySelector('#progress');
     const power = app.querySelector('#power');
@@ -139,7 +161,9 @@ function start(mode = 'stage', stageId = 'orbit') {
     const bossHp = app.querySelector('#boss-hp');
     if (hp) hp.style.width = `${Math.max(0, state.p.hp / state.p.maxHp * 100)}%`;
     if (shield) shield.style.width = `${Math.max(0, state.p.shield / state.p.maxShield * 100)}%`;
-    if (score) score.textContent = `分數 ${state.score}・連擊 ${state.combo}・能量 ${Math.floor(state.p.energy)}%`;
+    if (hpText) hpText.textContent = `HP ${Math.ceil(Math.max(0, state.p.hp))}/${state.p.maxHp}`;
+    if (shieldText) shieldText.textContent = `護盾 ${Math.ceil(Math.max(0, state.p.shield))}/${state.p.maxShield}`;
+    if (score) score.textContent = `分數 ${state.score}・連擊 ${state.combo}・能量 ${Math.floor(state.p.energy)}%${mode === 'endless' ? `・星匣 ${state.chests}` : ''}`;
     if (progress) progress.textContent = state.boss ? '區域進度 100%・Boss 戰' : `區域進度 ${Math.min(99, Math.floor(state.wave / 10 * 100))}%`;
     if (power) power.textContent = `火力 Lv${state.p.fireLevel}`;
     if (fusionSkill) {
@@ -194,6 +218,7 @@ app.addEventListener('click', (event) => {
     if (data.unlockedStages.includes(stageId)) start('stage', stageId);
   }
   if (action === 'endless') start('endless');
+  if (action === 'endless-claim') run?.claim();
   if (action === 'boss') start('boss');
   if (action === 'home') home();
   if (action === 'equipment') equipment();

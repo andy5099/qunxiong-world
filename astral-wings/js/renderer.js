@@ -1,5 +1,5 @@
-const pickupColors = { gold: '#ffd568', power: '#ff9b38', hp: '#70ff9c', shield: '#62dfff', energy: '#bb79ff', magnet: '#ffe66b', rage: '#ff5871', double: '#ffd26d', pierce: '#f6a5ff', crit: '#ffdf66', barrier: '#9cefff', rapid: '#ff9c5d' };
-const pickupMarks = { gold: '$', power: 'P', hp: '+', shield: 'S', energy: 'E', magnet: 'M', rage: 'R', double: '2', pierce: 'I', crit: 'C', barrier: 'B', rapid: 'H' };
+const pickupColors = { gold: '#ffd568', chest: '#ffc45e', power: '#ff9b38', hp: '#70ff9c', shield: '#62dfff', energy: '#bb79ff', magnet: '#ffe66b', rage: '#ff5871', double: '#ffd26d', pierce: '#f6a5ff', crit: '#ffdf66', barrier: '#9cefff', rapid: '#ff9c5d' };
+const pickupMarks = { gold: '$', chest: '箱', power: 'P', hp: '+', shield: 'S', energy: 'E', magnet: 'M', rage: 'R', double: '2', pierce: 'I', crit: 'C', barrier: 'B', rapid: 'H' };
 
 // 原創 AI 機體圖集。圖尚未完成載入時，會無縫退回原本的 Canvas 幾何造型。
 const aiCraftRoster = document.querySelector('#ai-craft-roster') || new Image();
@@ -112,6 +112,18 @@ function drawEnemy(ctx, entry, triangle) {
   if (entry.shield > 0) { ctx.strokeStyle = '#78cfff'; ctx.globalAlpha = 0.65; ctx.beginPath(); ctx.arc(entry.x, entry.y, entry.r + 5, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1; }
 }
 
+function drawEnemyVitalBar(ctx, entry, boss = false) {
+  const width = boss ? 104 : Math.max(28, entry.r * 2.1);
+  const x = entry.x - width / 2; const y = entry.y - entry.r - (boss ? 46 : 13);
+  const ratio = Math.max(0, entry.hp / entry.maxHp);
+  ctx.save();
+  ctx.fillStyle = '#12070dcc'; ctx.fillRect(x - 1, y - 1, width + 2, 6);
+  ctx.fillStyle = '#3b1825'; ctx.fillRect(x, y, width, 4);
+  ctx.fillStyle = boss ? '#ff5b78' : (entry.kind === 'elite' ? '#ffb45c' : '#ff6e87');
+  ctx.fillRect(x, y, width * ratio, 4);
+  ctx.restore();
+}
+
 // 副武器不只影響攻擊資料，也在戰機上繪出可辨識的掛載模組與動態能量核心。
 function drawSecondaryRig(ctx, p, secondary, elapsed) {
   if (!secondary) return;
@@ -140,6 +152,18 @@ function drawSecondaryRig(ctx, p, secondary, elapsed) {
     // 爆裂彈：兩座赤橙短炮塔。
     glow('#ff9a5a', 12); [-24, 24].forEach(x => { ctx.fillRect(p.x + x - 6, p.y - 9, 12, 15); ctx.fillStyle = '#ffdfb3'; ctx.fillRect(p.x + x - 2, p.y - 22, 4, 15); glow('#ff9a5a', 12); });
   }
+  ctx.restore();
+}
+
+// 直接顯示在我方戰機上的耐久條，讓玩家不必只看 HUD 也能掌握危險程度。
+function drawPlayerVitalBars(ctx, p) {
+  const width = 56; const x = p.x - width / 2; const y = p.y - 60;
+  ctx.save();
+  ctx.fillStyle = '#07111ccc'; ctx.fillRect(x - 1, y - 1, width + 2, 11);
+  ctx.fillStyle = '#271521'; ctx.fillRect(x, y, width, 4);
+  ctx.fillStyle = '#48e98d'; ctx.fillRect(x, y, width * Math.max(0, p.hp / p.maxHp), 4);
+  ctx.fillStyle = '#15283e'; ctx.fillRect(x, y + 6, width, 3);
+  ctx.fillStyle = '#66dfff'; ctx.fillRect(x, y + 6, width * Math.max(0, p.shield / p.maxShield), 3);
   ctx.restore();
 }
 
@@ -177,7 +201,8 @@ export function render(ctx, state) {
     }
   }
   drawSecondaryRig(ctx, p, state.secondary, state.elapsed || 0);
-  enemies.forEach((entry) => drawEnemy(ctx, entry, triangle));
+  drawPlayerVitalBars(ctx, p);
+  enemies.forEach((entry) => { drawEnemy(ctx, entry, triangle); drawEnemyVitalBar(ctx, entry); });
   if (boss) {
     if (!drawAiCraft(ctx, 1, boss.x, boss.y, 220, 190, 0.95)) { ctx.save();
     ctx.shadowBlur = 18; ctx.shadowColor = boss.phase === 3 ? '#ff355f' : '#f98aaf';
@@ -192,6 +217,7 @@ export function render(ctx, state) {
       ctx.fillRect(boss.x - 10, boss.y + 18, 20, 620 - boss.y);
       ctx.strokeStyle = '#fff2f4'; ctx.lineWidth = 1; ctx.strokeRect(boss.x - 10, boss.y + 18, 20, 620 - boss.y);
     }
+    drawEnemyVitalBar(ctx, boss, true);
   }
   bullets.forEach((entry) => {
     const projectileVisuals = {
@@ -232,6 +258,7 @@ export function render(ctx, state) {
     // 核心補給使用獨立圖樣；臨時增益亦沿用不同色相的能量標記，避免與玩家彈幕混淆。
     const pickupCells = { gold: 11, hp: 5, shield: 6, energy: 7, power: 8, magnet: 9, rage: 10, double: 11, pierce: 2, crit: 3, barrier: 6, rapid: 1 };
     if (pickupCells[entry.type] !== undefined && drawAiVfx(ctx, pickupCells[entry.type], 0, 0, 32, 32)) { ctx.restore(); return; }
+    if (entry.type === 'chest') { ctx.fillStyle = '#a76429'; ctx.fillRect(-10, -7, 20, 15); ctx.fillStyle = '#ffcb61'; ctx.fillRect(-10, -10, 20, 5); ctx.fillStyle = '#fff2b0'; ctx.fillRect(-2, -7, 4, 15); ctx.restore(); return; }
     ctx.fillStyle = color; ctx.rotate(Math.PI / 4); ctx.fillRect(-8, -8, 16, 16); ctx.rotate(-Math.PI / 4);
     ctx.shadowBlur = 0; ctx.fillStyle = '#08111d'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(pickupMarks[entry.type], 0, 1); ctx.restore();
   });

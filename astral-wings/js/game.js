@@ -1,14 +1,14 @@
 import { C, balanceConfig } from './config.js?v=20260727-dodge-balance';
-import { player } from './entities/player.js?v=20260727-visual-hangar-sweep';
+import { player } from './entities/player.js?v=20260727-endless-chests-vitals-v2';
 import { enemy } from './entities/enemy.js?v=20260727-hitbox';
 import { makeBoss } from './entities/boss.js?v=20260727-hitbox';
 import { bullet } from './entities/bullet.js';
 import { pickup } from './entities/pickup.js';
 import { stage } from './data/stages.js';
-import { render } from './renderer.js?v=20260727-visual-hangar-sweep';
+import { render } from './renderer.js?v=20260727-endless-chests-vitals-v2';
 
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-const pickupTypes = ['gold', 'power', 'hp', 'shield', 'energy', 'magnet', 'rage', 'double'];
+const pickupTypes = ['gold', 'power', 'hp', 'shield', 'energy', 'magnet', 'rage', 'double', 'chest'];
 
 // v0.2 的單局戰鬥狀態：火力與增益只活在這一場，不會污染永久存檔。
 export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', selectedStage = stage) {
@@ -19,7 +19,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     nebulae: Array.from({ length: 4 }, () => ({ x: Math.random() * 440 - 40, y: Math.random() * 720 - 40, r: 65 + Math.random() * 85, speed: 5 + Math.random() * 8, color: Math.random() > 0.5 ? '#243f7655' : '#542d6a44' })),
     debris: Array.from({ length: 8 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, r: 2 + Math.random() * 5, speed: 45 + Math.random() * 55, spin: Math.random() * 6 })),
     mode, stage: selectedStage, fusion: saveData.fusion || null, secondary: saveData.equipped?.secondary || null, wave: 0, left: 0, kind: 'scout', nextId: 1, score: 0, gold: 0, combo: 0, maxCombo: 0,
-    kills: 0, paused: false, over: false, last: 0, shake: 0,
+    kills: 0, chests: 0, paused: false, over: false, last: 0, shake: 0,
     message: '', messageTimer: 0, secondaryTimer: 0, elapsed: 0
   };
   let animationFrame = 0;
@@ -40,7 +40,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     if (state.over) return;
     state.over = true;
     cancelAnimationFrame(animationFrame);
-    onEnd({ win, mode, wave: state.wave, score: state.score, kills: state.kills, combo: state.maxCombo, hp: state.p.hp, shield: state.p.shield, gold: state.gold });
+    onEnd({ win, mode, wave: state.wave, score: state.score, kills: state.kills, combo: state.maxCombo, hp: state.p.hp, shield: state.p.shield, gold: state.gold, chests: state.chests });
   }
 
   // 所有關鍵狀態已由 HUD 呈現；不再以中央提示打斷關卡閱讀與操作。
@@ -148,6 +148,9 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     // Boss 必掉火力、金幣與星能，並在 HP／護盾中擇一；額外金幣營造大量掉寶感。
     ['power', 'energy', Math.random() < 0.5 ? 'hp' : 'shield'].forEach((type, index) => addPickup(target.x + (index - 1) * 18, target.y, type));
     for (let index = 0; index < 10; index += 1) addPickup(target.x + (Math.random() - 0.5) * 80, target.y + (Math.random() - 0.5) * 35, 'gold', 2);
+    // 無盡每擊破一隻 Boss 都掉星匣；越高層可同時取得更多箱子。
+    const chestCount = Math.min(5, 1 + Math.floor(state.wave / 16));
+    addPickup(target.x, target.y - 16, 'chest', chestCount);
   }
 
   function defeat(target) {
@@ -387,6 +390,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
   function collect(entry) {
     const p = state.p;
     if (entry.type === 'gold') state.gold += (entry.value || 1) * (p.doubleGold > 0 ? 2 : 1);
+    if (entry.type === 'chest') state.chests += entry.value || 1;
     if (entry.type === 'power') p.fireLevel = Math.min(5, p.fireLevel + 1);
     if (entry.type === 'hp') p.hp = Math.min(p.maxHp, p.hp + 25);
     if (entry.type === 'shield') p.shield = Math.min(p.maxShield, p.shield + 30);
@@ -461,5 +465,5 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
   }
 
   animationFrame = requestAnimationFrame(frame);
-  return { pause: () => { state.paused = !state.paused; }, ultimate, stop: () => cancelAnimationFrame(animationFrame) };
+  return { pause: () => { state.paused = !state.paused; }, ultimate, claim: () => { if (state.chests > 0) finish(true); }, stop: () => cancelAnimationFrame(animationFrame) };
 }
