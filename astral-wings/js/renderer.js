@@ -2,6 +2,25 @@ const pickupColors = { gold: '#ffd568', chest: '#ffc45e', power: '#ff9b38', hp: 
 const pickupMarks = { gold: '$', chest: '箱', power: 'P', hp: '+', shield: 'S', energy: 'E', magnet: 'M', rage: 'R', double: '2', pierce: 'I', crit: 'C', barrier: 'B', rapid: 'H' };
 
 // 原創 AI 機體圖集。圖尚未完成載入時，會無縫退回原本的 Canvas 幾何造型。
+// 原創敵機與補給圖集：透明 PNG 直接在 Canvas 內裁切，避免以單色幾何代替實體機械輪廓。
+const aiCombatRoster = document.querySelector('#ai-enemy-pickups-v2') || new Image();
+if (!aiCombatRoster.src) aiCombatRoster.src = new URL('../assets/images/astral-ai-enemy-pickups-v2.png', import.meta.url).href;
+const combatEnemyCells = {
+  scout: [18, 38, 324, 330], sprinter: [350, 22, 365, 380], sniper: [710, 25, 365, 370], shield: [1080, 48, 325, 350],
+  armor: [18, 420, 330, 350], bomber: [350, 420, 365, 350], support: [720, 415, 350, 365], elite: [1060, 392, 350, 390]
+};
+const combatPickupCells = {
+  power: [42, 780, 175, 265], shield: [240, 785, 190, 250], hp: [465, 805, 205, 225],
+  energy: [700, 795, 205, 240], magnet: [940, 790, 245, 245], rage: [1180, 785, 230, 250]
+};
+const drawCombatArt = (ctx, source, x, y, width, height, rotation = 0) => {
+  if (!source || !aiCombatRoster.complete || !aiCombatRoster.naturalWidth) return false;
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rotation);
+  ctx.drawImage(aiCombatRoster, source[0], source[1], source[2], source[3], -width / 2, -height / 2, width, height);
+  ctx.restore();
+  return true;
+};
+
 const aiCraftRoster = document.querySelector('#ai-craft-roster') || new Image();
 aiCraftRoster.decoding = 'async';
 if (!aiCraftRoster.src) aiCraftRoster.src = new URL('../assets/images/astral-ai-craft-premium.png', import.meta.url).href;
@@ -94,6 +113,12 @@ const drawEnemyVfx = (ctx, cell, x, y, width, height, rotation) => {
 
 // 原創幾何輪廓讓敵機在手機小畫面上仍可一眼辨識職能。
 function drawEnemy(ctx, entry, triangle) {
+  const combatCell = combatEnemyCells[entry.kind];
+  const visualSize = entry.kind === 'elite' ? 104 : entry.kind === 'armor' ? 76 : 66;
+  if (drawCombatArt(ctx, combatCell, entry.x, entry.y, visualSize, visualSize + 10, Math.sin(entry.age * 1.7) * 0.035)) {
+    if (entry.shield > 0) { ctx.save(); ctx.strokeStyle = '#78cfff'; ctx.globalAlpha = 0.7; ctx.beginPath(); ctx.arc(entry.x, entry.y, entry.r + 5, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
+    return;
+  }
   const aiCells = { scout: 2, sprinter: 2, armor: 3, sniper: 2, bomber: 3, shield: 4, support: 5, elite: 1 };
   if (aiCells[entry.kind] !== undefined && drawAiCraft(ctx, aiCells[entry.kind], entry.x, entry.y, entry.kind === 'elite' ? 112 : 82, entry.kind === 'elite' ? 112 : 82, 0.92)) {
     if (entry.shield > 0) { ctx.save(); ctx.strokeStyle = '#78cfff'; ctx.globalAlpha = 0.7; ctx.beginPath(); ctx.arc(entry.x, entry.y, entry.r + 5, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
@@ -260,6 +285,8 @@ export function render(ctx, state) {
       ctx.fillStyle = `${color}bb`; ctx.beginPath(); ctx.arc(Math.cos(entry.age * 3) * 12, Math.sin(entry.age * 3) * 12, 2, 0, Math.PI * 2); ctx.fill();
     }
     // 核心補給使用獨立圖樣；臨時增益亦沿用不同色相的能量標記，避免與玩家彈幕混淆。
+    const pickupArt = combatPickupCells[entry.type];
+    if (drawCombatArt(ctx, pickupArt, 0, 0, 34, 34, entry.age * 1.9)) { ctx.restore(); return; }
     const pickupCells = { gold: 11, hp: 5, shield: 6, energy: 7, power: 8, magnet: 9, rage: 10, double: 11, pierce: 2, crit: 3, barrier: 6, rapid: 1 };
     if (pickupCells[entry.type] !== undefined && drawAiVfx(ctx, pickupCells[entry.type], 0, 0, 32, 32)) { ctx.restore(); return; }
     if (entry.type === 'chest') { ctx.fillStyle = '#a76429'; ctx.fillRect(-10, -7, 20, 15); ctx.fillStyle = '#ffcb61'; ctx.fillRect(-10, -10, 20, 5); ctx.fillStyle = '#fff2b0'; ctx.fillRect(-2, -7, 4, 15); ctx.restore(); return; }

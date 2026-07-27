@@ -4,6 +4,15 @@ import { equipmentTemplates, fusionForms } from './data/equipment.js';
 const button = (label, action, disabled = false) => `<button data-a="${action}" ${disabled ? 'disabled' : ''}>${label}</button>`;
 const preview = sprite => `<div class="ship-preview sprite-${sprite}" aria-hidden="true"></div>`;
 
+// 基地首頁將最常用的戰機庫與背包倉庫直接放在首屏，所有入口皆連到已實作功能。
+export const homeDashboard = state => {
+  const active = ships.find(ship => ship.id === (state.activeShip || 'dawn')) || ships[0];
+  const level = Math.max(1, state.shipLevels?.[active.id] || state.level || 1);
+  const owned = (state.unlockedShips || ['dawn']).length;
+  const equipped = Object.values(state.equipped || {}).filter(Boolean).length;
+  return `<div class="shell panel menu home-dashboard"><div class="art-banner"><div><h1>星界戰翼</h1><p>原創直向星際射擊基地</p></div></div><section class="active-craft-card">${preview(active.sprite)}<div><b>目前出戰：${active.name}</b><small>${active.role}・戰機 Lv.${level}/30</small><span>攻擊 ×${active.attack}・生命 ×${active.hp}・護盾 ×${active.shield}</span></div></section><p class="gold">金幣 ${state.gold}　強化材料 ${state.materials}　星核 ${state.fragments}　最高分 ${state.high}</p><div class="home-shortcuts">${button(`戰機庫（${owned} 架）`, 'ships')}${button(`背包倉庫（${state.equipment.length}/${equipmentTemplates.length}）`, 'equipment')}${button(`已裝備 ${equipped}/5 件`, 'equipment')}${button('合體、覺醒與進化', 'fusion')}</div><h3>戰鬥</h3><div class="home-actions">${button('主線關卡', 'stages')}${button(`無盡航線・最高波 ${state.endlessBest || 0}`, 'endless')}${button('Boss 挑戰', 'boss')}</div><h3>養成與目標</h3><div class="home-actions">${button(`升級目前戰機（${80 + level * 70} 金幣）`, 'upgrade')}${button(`戰機升星（${state.star * 5} 星核）`, 'star')}${button('任務與成就', 'missions')}${button('星域圖鑑', 'codex')}</div><div class="home-actions">${button('操作說明', 'help')}${button('重置存檔', 'reset')}</div></div>`;
+};
+
 // 機庫以階級排序；每架戰機有獨立升級等級，不會再互相覆蓋能力值。
 export const upgradedShipView = state => {
   const unlocked = state.unlockedShips || ['dawn'];

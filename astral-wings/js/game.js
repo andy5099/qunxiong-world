@@ -54,6 +54,12 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
       // Boss 直接進場，保留安全起手時間但不凍結玩家、子彈或背景。
       state.boss = makeBoss(state.stage.boss);
       state.boss.id = 'boss';
+      // 後段關卡提高耐久與傷害；射速不會急遽增加，仍保留清楚的閃避空隙。
+      const stageOrder = Math.max(0, state.stage?.order || 0);
+      const bossScale = 1 + stageOrder * 0.16 + (mode === 'endless' ? Math.min(state.wave, 28) * 0.025 : 0);
+      state.boss.hp = Math.round(state.boss.hp * bossScale);
+      state.boss.maxHp = state.boss.hp;
+      state.boss.damageScale = 1 + stageOrder * 0.1;
       state.shake = 7;
       return;
     }
@@ -246,6 +252,14 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
 
   function spawnEnemy(kind, x) {
     const entry = enemy(kind, x);
+    const stageOrder = Math.max(0, state.stage?.order || 0);
+    const endlessScale = mode === 'endless' ? Math.min(state.wave, 36) * 0.045 : 0;
+    const hpScale = 1 + stageOrder * 0.28 + endlessScale;
+    entry.hp = Math.round(entry.hp * hpScale);
+    entry.maxHp = entry.hp;
+    entry.damageScale = 1 + stageOrder * 0.09 + endlessScale * 0.2;
+    entry.speed *= 1 + Math.min(0.18, stageOrder * 0.025 + endlessScale * 0.01);
+    entry.fireRateScale = Math.max(0.82, 1 - stageOrder * 0.025 - endlessScale * 0.015);
     entry.id = state.nextId++;
     state.enemies.push(entry);
   }
@@ -295,7 +309,8 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     if (boss.telegraph > 0) return;
     if (boss.pendingAimed) {
       boss.pendingAimed = false;
-      for (let index = 0; index < 3; index += 1) state.bullets.push(bullet(boss.x, boss.y, Math.cos(boss.pendingAim) * balanceConfig.boss.aimedSpeed, Math.sin(boss.pendingAim) * balanceConfig.boss.aimedSpeed, 'e', 11));
+      const damage = Math.round(11 * (boss.damageScale || 1));
+      for (let index = 0; index < 3; index += 1) state.bullets.push(bullet(boss.x, boss.y, Math.cos(boss.pendingAim) * balanceConfig.boss.aimedSpeed, Math.sin(boss.pendingAim) * balanceConfig.boss.aimedSpeed, 'e', damage));
       return;
     }
     if (boss.pendingLaser) { boss.pendingLaser = false; boss.laserActive = balanceConfig.boss.laserDuration; return; }
@@ -310,17 +325,18 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
   function runBossPattern(boss) {
     // 每輪只執行一種主攻擊，結束後固定喘息，避免攻擊模式疊加成無解。
     const phasePatterns = boss.phase === 1 ? ['fan', 'lanes'] : boss.phase === 2 ? ['ring', 'aimed'] : ['laser', 'rageFan', 'summon'];
+    const damage = value => Math.round(value * (boss.damageScale || 1));
     boss.attack = phasePatterns[boss.sequence++ % phasePatterns.length];
     if (boss.attack === 'fan') {
-      [-0.42, -0.21, 0, 0.21, 0.42].forEach(spread => state.bullets.push(bullet(boss.x, boss.y, spread * 128, balanceConfig.boss.fanSpeed, 'e', 9)));
+      [-0.42, -0.21, 0, 0.21, 0.42].forEach(spread => state.bullets.push(bullet(boss.x, boss.y, spread * 128, balanceConfig.boss.fanSpeed, 'e', damage(9))));
       boss.rest = 1.25;
     } else if (boss.attack === 'lanes') {
       // 左右交替直線彈，中央保留可讀通道。
       const side = boss.sequence % 2 ? -1 : 1;
-      [-1, 1].forEach(offset => state.bullets.push(bullet(boss.x + side * 26, boss.y, offset * 45, 118, 'e', 10)));
+      [-1, 1].forEach(offset => state.bullets.push(bullet(boss.x + side * 26, boss.y, offset * 45, 118, 'e', damage(10))));
       boss.rest = 1.12;
     } else if (boss.attack === 'ring') {
-      for (let index = 0; index < 8; index += 1) { const angle = Math.PI / 2 + index * Math.PI / 4 + 0.18; state.bullets.push(bullet(boss.x, boss.y, Math.cos(angle) * balanceConfig.boss.ringSpeed, Math.sin(angle) * balanceConfig.boss.ringSpeed, 'e', 10)); }
+      for (let index = 0; index < 8; index += 1) { const angle = Math.PI / 2 + index * Math.PI / 4 + 0.18; state.bullets.push(bullet(boss.x, boss.y, Math.cos(angle) * balanceConfig.boss.ringSpeed, Math.sin(angle) * balanceConfig.boss.ringSpeed, 'e', damage(10))); }
       boss.rest = 1.05;
     } else if (boss.attack === 'aimed') {
       boss.telegraph = 0.72; boss.pendingAimed = true; boss.rest = 1.5;
@@ -328,7 +344,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     } else if (boss.attack === 'laser') {
       boss.laserWarn = balanceConfig.boss.laserWarning; boss.telegraph = balanceConfig.boss.laserWarning; boss.pendingLaser = true; boss.rest = 1.55;
     } else if (boss.attack === 'rageFan') {
-      [-0.5, -0.33, -0.16, 0, 0.16, 0.33, 0.5].forEach(spread => state.bullets.push(bullet(boss.x, boss.y, spread * 112, 118, 'e', 11)));
+      [-0.5, -0.33, -0.16, 0, 0.16, 0.33, 0.5].forEach(spread => state.bullets.push(bullet(boss.x, boss.y, spread * 112, 118, 'e', damage(11))));
       boss.rest = 1.3;
     } else {
       spawnEnemy('scout', Math.max(35, boss.x - 54)); spawnEnemy('sprinter', Math.min(325, boss.x + 54));
@@ -338,29 +354,31 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
 
   function fireEnemy(entry) {
     const aimed = Math.atan2(state.p.y - entry.y, state.p.x - entry.x);
+    const damage = value => Math.max(1, Math.round(value * (entry.damageScale || 1)));
+    const cooldown = value => value * (entry.fireRateScale || 1);
     if (entry.attack === 'needle') {
-      entry.fireCd = 1.6;
-      state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed) * 150, Math.sin(aimed) * 150, 'e', 8));
+      entry.fireCd = cooldown(1.6);
+      state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed) * 150, Math.sin(aimed) * 150, 'e', damage(8)));
     }
     if (entry.attack === 'fan') {
-      entry.fireCd = 1.7;
-      [-0.24, 0, 0.24].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed + spread) * 120, Math.sin(aimed + spread) * 120, 'e', 10)));
+      entry.fireCd = cooldown(1.7);
+      [-0.24, 0, 0.24].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed + spread) * 120, Math.sin(aimed + spread) * 120, 'e', damage(10))));
     }
     if (entry.attack === 'aim') {
-      entry.fireCd = 2.05;
-      state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed) * 165, Math.sin(aimed) * 165, 'e', 13));
+      entry.fireCd = cooldown(2.05);
+      state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed) * 165, Math.sin(aimed) * 165, 'e', damage(13)));
     }
     if (entry.attack === 'burst') {
-      entry.fireCd = 1.35;
-      [-0.14, 0.14].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed + spread) * 128, Math.sin(aimed + spread) * 128, 'e', 9)));
+      entry.fireCd = cooldown(1.35);
+      [-0.14, 0.14].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed + spread) * 128, Math.sin(aimed + spread) * 128, 'e', damage(9))));
     }
     if (entry.attack === 'ring') {
-      entry.fireCd = 1.9;
-      for (let index = 0; index < 6; index += 1) { const angle = Math.PI / 2 + index * Math.PI / 3; state.bullets.push(bullet(entry.x, entry.y, Math.cos(angle) * 96, Math.sin(angle) * 96, 'e', 8)); }
+      entry.fireCd = cooldown(1.9);
+      for (let index = 0; index < 6; index += 1) { const angle = Math.PI / 2 + index * Math.PI / 3; state.bullets.push(bullet(entry.x, entry.y, Math.cos(angle) * 96, Math.sin(angle) * 96, 'e', damage(8))); }
     }
     if (entry.attack === 'elite') {
-      entry.fireCd = 0.9;
-      [-0.36, -0.18, 0, 0.18, 0.36].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.sin(spread) * 125, Math.cos(spread) * 125, 'e', 11)));
+      entry.fireCd = cooldown(0.9);
+      [-0.36, -0.18, 0, 0.18, 0.36].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.sin(spread) * 125, Math.cos(spread) * 125, 'e', damage(11))));
     }
   }
 
