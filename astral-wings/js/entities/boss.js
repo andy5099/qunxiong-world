@@ -1,4 +1,4 @@
-import { getBoss } from '../data/bosses.js';
+import { getBoss } from '../data/bosses.js?v=20260727-visual-12stage';
 export const makeBoss = (id) => {
   const boss = getBoss(id);
   return ({

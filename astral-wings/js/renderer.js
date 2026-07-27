@@ -8,6 +8,9 @@ if (!aiCombatRoster.src) aiCombatRoster.src = new URL('../assets/images/astral-a
 const combatEnemyCells = {
   scout: [18, 38, 324, 330], sprinter: [350, 22, 365, 380], sniper: [710, 25, 365, 370], shield: [1080, 48, 325, 350],
   armor: [18, 420, 330, 350], bomber: [350, 420, 365, 350], support: [720, 415, 350, 365], elite: [1060, 392, 350, 390]
+  ,flare: [18, 38, 324, 330], formation: [350, 22, 365, 380], thresher: [18, 420, 330, 350], reaper: [350, 420, 365, 350]
+  ,bastion: [1080, 48, 325, 350], medic: [720, 415, 350, 365], laser: [710, 25, 365, 370], phantom: [350, 22, 365, 380]
+  ,miner: [18, 420, 330, 350], warder: [1080, 48, 325, 350], beacon: [720, 415, 350, 365], splitter: [710, 25, 365, 370]
 };
 const combatPickupCells = {
   power: [42, 780, 175, 265], shield: [240, 785, 190, 250], hp: [465, 805, 205, 225],
@@ -114,7 +117,7 @@ const drawEnemyVfx = (ctx, cell, x, y, width, height, rotation) => {
 // 原創幾何輪廓讓敵機在手機小畫面上仍可一眼辨識職能。
 function drawEnemy(ctx, entry, triangle) {
   const combatCell = combatEnemyCells[entry.kind];
-  const visualSize = entry.kind === 'elite' ? 104 : entry.kind === 'armor' ? 76 : 66;
+  const visualSize = entry.kind === 'elite' ? 104 : entry.r >= 32 ? 82 : entry.r >= 28 ? 74 : 66;
   if (drawCombatArt(ctx, combatCell, entry.x, entry.y, visualSize, visualSize + 10, Math.sin(entry.age * 1.7) * 0.035)) {
     if (entry.shield > 0) { ctx.save(); ctx.strokeStyle = '#78cfff'; ctx.globalAlpha = 0.7; ctx.beginPath(); ctx.arc(entry.x, entry.y, entry.r + 5, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
     return;

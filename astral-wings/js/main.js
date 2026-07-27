@@ -1,12 +1,12 @@
 import { load, save, reset } from './save.js?v=20260727-ships';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260727-home-inventory-v4';
-import { menu, equipmentView, missionsView, fusionView, stageView, bossView, codexView, shipView } from './ui.js?v=20260727-home-inventory-v4';
-import { fusionStatusView, homeDashboard, upgradedShipView } from './uiEnhancements.js?v=20260727-home-inventory-v4';
+import { game } from './game.js?v=20260727-visual-12stage';
+import { menu, equipmentView, missionsView, fusionView, stageView, bossView, codexView, shipView } from './ui.js?v=20260727-visual-12stage';
+import { fusionStatusView, homeDashboard, upgradedShipView } from './uiEnhancements.js?v=20260727-visual-12stage';
 import { ships } from './data/ships.js?v=20260727-boss-routes-hangar-v3';
 import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-boss-loot';
-import { stages, getStage } from './data/stages.js?v=20260727-stages-art';
+import { stages, getStage } from './data/stages.js?v=20260727-visual-12stage';
 import { C } from './config.js';
 
 // 此檔案只負責頁面切換、遊戲實例與存檔的銜接。
@@ -80,7 +80,7 @@ function start(mode = 'stage', stageId = 'orbit') {
     <div class="shell game">
       <canvas width="360" height="640" aria-label="星界戰翼遊戲畫面"></canvas>
       <div class="hud">
-        <b>${mode === 'endless' ? '無盡航線' : mode === 'boss' ? 'Boss 挑戰' : '第 1 關：破碎軌道'}</b>
+        <b>${mode === 'endless' ? '無盡航線' : mode === 'boss' ? `${selectedStage.name}・Boss 挑戰` : selectedStage.name}</b>
         <span id="hp-text">HP</span>
         <div class="bar hp"><i id="hp"></i></div>
         <span id="shield-text">Shield</span>
