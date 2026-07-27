@@ -1,9 +1,9 @@
 import { load, save, reset } from './save.js?v=20260727-ships';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260727-equip-feedback';
-import { menu, equipmentView, missionsView, fusionView, stageView, codexView, shipView } from './ui.js?v=20260727-equip-feedback';
-import { ships } from './data/ships.js?v=20260727-ships';
+import { game } from './game.js?v=20260727-visual-hangar-sweep';
+import { menu, equipmentView, missionsView, fusionView, stageView, codexView, shipView } from './ui.js?v=20260727-visual-hangar-sweep';
+import { ships } from './data/ships.js?v=20260727-visual-hangar-sweep';
 import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-boss-loot';
 import { stages, getStage } from './data/stages.js?v=20260727-stages-art';
 import { C } from './config.js';
@@ -184,6 +184,7 @@ app.addEventListener('click', (event) => {
       const materials = count * (1 + Math.floor(selected.order / 2));
       data.gold += gold; data.materials += materials; data.missions.kills += count * 3;
       data.stageProgress[stageId] = Math.max(data.stageProgress[stageId], data.stageProgress[stageId] + count);
+      data.lastSweep = { stage: selected.name, count, gold, materials, kills: count * 3 };
       save(data);
     }
     stagesMenu();
@@ -275,7 +276,19 @@ app.addEventListener('click', (event) => {
     missions();
   }
   if (action === 'craft') {
-    if (data.materials >= 25) { data.materials -= 25; const missing = equipmentTemplates.filter(template => !data.equipment.some(item => item.id === template.id)); if (missing.length) data.equipment.push({ id: missing[Math.floor(Math.random() * missing.length)].id, level: 0, locked: false }); save(data); }
+    if (data.materials >= 25) {
+      data.materials -= 25;
+      const missing = equipmentTemplates.filter(template => !data.equipment.some(item => item.id === template.id));
+      if (missing.length) {
+        const reward = missing[Math.floor(Math.random() * missing.length)];
+        data.equipment.push({ id: reward.id, level: 0, locked: false });
+        data.lastCraft = { name: reward.name, quality: reward.quality, value: reward.value };
+      } else {
+        data.materials += 25;
+        data.lastCraft = { name: '所有裝備已收集', quality: '材料已返還 +25', value: 0, failed: true };
+      }
+      save(data);
+    } else data.lastCraft = { name: '強化材料不足', quality: '製作需要 25 強化材料', value: 0, failed: true };
     equipment(true);
   }
   if (action.startsWith('synth:')) {

@@ -1,11 +1,11 @@
 import { C, balanceConfig } from './config.js?v=20260727-dodge-balance';
-import { player } from './entities/player.js?v=20260727-enemy-vfx-results';
+import { player } from './entities/player.js?v=20260727-visual-hangar-sweep';
 import { enemy } from './entities/enemy.js?v=20260727-hitbox';
 import { makeBoss } from './entities/boss.js?v=20260727-hitbox';
 import { bullet } from './entities/bullet.js';
 import { pickup } from './entities/pickup.js';
 import { stage } from './data/stages.js';
-import { render } from './renderer.js?v=20260727-enemy-vfx-results';
+import { render } from './renderer.js?v=20260727-visual-hangar-sweep';
 
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const pickupTypes = ['gold', 'power', 'hp', 'shield', 'energy', 'magnet', 'rage', 'double'];
@@ -105,6 +105,10 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     if (p.shipId === 'violet') [-0.29, 0.29].forEach(angle => emitPlayerShot(0, angle, speed * 1.16, 0, false, 0.72, 'violet'));
     if (p.shipId === 'bulwark') [-20, 20].forEach(offset => emitPlayerShot(offset, 0, speed * 0.9, 1, false, 0.72, 'bulwark'));
     if (p.shipId === 'auric') emitPlayerShot(0, 0, speed * 1.08, 1, false, 1.1, 'auric');
+    if (p.shipId === 'specter') [-0.36, -0.18, 0.18, 0.36].forEach(angle => emitPlayerShot(0, angle, speed * 1.32, 0, false, 0.55, 'specter'));
+    if (p.shipId === 'tide') [-0.42, -0.21, 0, 0.21, 0.42].forEach(angle => emitPlayerShot(0, angle, speed * 0.93, 0, false, 0.5, 'tide'));
+    if (p.shipId === 'rime') emitPlayerShot(0, 0, speed * 0.76, 3, true, 1.8, 'rime');
+    if (p.shipId === 'nova') [-0.25, 0, 0.25].forEach(angle => emitPlayerShot(0, angle, speed * 1.1, 1, false, 0.85, 'nova'));
   }
 
   function damagePlayer(amount) {

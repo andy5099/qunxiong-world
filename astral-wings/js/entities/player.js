@@ -1,5 +1,5 @@
 import { equipmentTemplates, fusionForms } from '../data/equipment.js';
-import { getShip } from '../data/ships.js';
+import { getShip } from '../data/ships.js?v=20260727-visual-hangar-sweep';
 
 // 單局能力不寫入存檔，重新開始或返回選單時會自然重置。
 export const player = (save) => {

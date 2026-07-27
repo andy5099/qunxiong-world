@@ -166,7 +166,9 @@ export function render(ctx, state) {
   if (p.inv <= 0 || Math.floor(p.inv * 12) % 2) {
     if (drawAiCraft(ctx, p.sprite ?? 0, p.x, p.y, 94, 108, 0.96)) {
       // AI 戰機已繪製，仍保留尾焰讓移動與無敵狀態具有清楚辨識。
-      ctx.save(); ctx.fillStyle = '#ffb553'; ctx.shadowBlur = 12; ctx.shadowColor = '#ff9a4c'; ctx.fillRect(p.x - 9, p.y + 27, 5, 9); ctx.fillRect(p.x + 4, p.y + 27, 5, 9); ctx.restore();
+      const engineColors = { dawn: '#ffb553', ember: '#ff704f', violet: '#d488ff', bulwark: '#70dcff', auric: '#ffe27c', specter: '#ff90ef', tide: '#71e7ff', rime: '#a7f4ff', nova: '#fff0a5' };
+      const engineColor = engineColors[p.shipId] || '#ffb553';
+      ctx.save(); ctx.fillStyle = engineColor; ctx.shadowBlur = 12; ctx.shadowColor = engineColor; ctx.fillRect(p.x - 9, p.y + 27, 5, 9); ctx.fillRect(p.x + 4, p.y + 27, 5, 9); ctx.restore();
     } else {
     ctx.save(); ctx.translate(p.x, p.y); ctx.shadowBlur = 14; ctx.shadowColor = '#4ee9ff';
     ctx.fillStyle = '#254f78'; ctx.beginPath(); ctx.moveTo(0, -22); ctx.lineTo(-15, 16); ctx.lineTo(0, 11); ctx.lineTo(15, 16); ctx.closePath(); ctx.fill();
@@ -198,6 +200,10 @@ export function render(ctx, state) {
       violet: { cell: 2, color: '#c98bff', width: 16, height: 27, trail: '#d4a4ff99' },
       auric: { cell: 3, color: '#ffe078', width: 17, height: 30, trail: '#ffe98a99' },
       bulwark: { cell: 0, color: '#69dfff', width: 18, height: 27, trail: '#7de9ff99' },
+      specter: { cell: 2, color: '#ff8ff5', width: 13, height: 24, trail: '#e9a6ff99' },
+      tide: { cell: 0, color: '#63dfff', width: 15, height: 26, trail: '#83edff99' },
+      rime: { cell: 4, color: '#dfffff', width: 20, height: 42, trail: '#aef4ffcc' },
+      nova: { cell: 3, color: '#fff093', width: 16, height: 28, trail: '#ffe695aa' },
       'secondary-missile': { cell: 1, color: '#ff875f', width: 19, height: 33, trail: '#ff9a6fbb' },
       'secondary-rail': { cell: 4, color: '#dfffff', width: 20, height: 42, trail: '#b9f5ffcc' },
       'secondary-drone': { cell: 0, color: '#66eeff', width: 13, height: 24, trail: '#60e8ff99' },
