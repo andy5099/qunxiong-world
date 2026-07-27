@@ -1,8 +1,8 @@
 import { load, save, reset } from './save.js?v=20260727-ships';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260727-weapon-sweep';
-import { menu, equipmentView, missionsView, fusionView, stageView, codexView, shipView } from './ui.js?v=20260727-weapon-sweep';
+import { game } from './game.js?v=20260727-ai-vfx';
+import { menu, equipmentView, missionsView, fusionView, stageView, codexView, shipView } from './ui.js?v=20260727-ai-vfx';
 import { ships } from './data/ships.js?v=20260727-ships';
 import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-boss-loot';
 import { stages, getStage } from './data/stages.js?v=20260727-stages-art';

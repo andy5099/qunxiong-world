@@ -1,11 +1,11 @@
 import { C, balanceConfig } from './config.js?v=20260727-dodge-balance';
-import { player } from './entities/player.js?v=20260727-weapon-sweep';
+import { player } from './entities/player.js?v=20260727-ai-vfx';
 import { enemy } from './entities/enemy.js?v=20260727-hitbox';
 import { makeBoss } from './entities/boss.js?v=20260727-hitbox';
 import { bullet } from './entities/bullet.js';
 import { pickup } from './entities/pickup.js';
 import { stage } from './data/stages.js';
-import { render } from './renderer.js?v=20260727-weapon-sweep';
+import { render } from './renderer.js?v=20260727-ai-vfx';
 
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const pickupTypes = ['gold', 'power', 'hp', 'shield', 'energy', 'magnet', 'rage', 'double'];
@@ -214,26 +214,27 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
   function fireSecondary(p) {
     const secondary = saveData.equipped?.secondary;
     if (!secondary || p.secondaryTimer > 0) return;
+    const launch = (entry, style = 'secondary') => { entry.style = style; entry.trail = true; state.bullets.push(entry); };
     if (secondary === 's1') {
       const target = state.boss || state.enemies.reduce((best, item) => !best || distance(item, p) < distance(best, p) ? item : best, null);
-      if (target) { const aim = Math.atan2(target.y - p.y, target.x - p.x); state.bullets.push(bullet(p.x, p.y - 14, Math.cos(aim) * 285, Math.sin(aim) * 285, 'p', p.atk * 2.1, 0)); }
+      if (target) { const aim = Math.atan2(target.y - p.y, target.x - p.x); launch(bullet(p.x, p.y - 14, Math.cos(aim) * 285, Math.sin(aim) * 285, 'p', p.atk * 2.1, 0)); }
       p.secondaryTimer = 2.1;
     } else if (secondary === 's2') {
-      const beam = bullet(p.x, p.y - 20, 0, -610, 'p', p.atk * 1.65, 3, true); beam.laser = true; beam.trail = true; state.bullets.push(beam); p.secondaryTimer = 2.5;
+      const beam = bullet(p.x, p.y - 20, 0, -610, 'p', p.atk * 1.65, 3, true); beam.laser = true; launch(beam); p.secondaryTimer = 2.5;
     } else if (secondary === 's3') {
-      [-22, 22].forEach(offset => state.bullets.push(bullet(p.x + offset, p.y - 9, 0, -360, 'p', p.atk * 0.6))); p.secondaryTimer = 0.62;
+      [-22, 22].forEach(offset => launch(bullet(p.x + offset, p.y - 9, 0, -360, 'p', p.atk * 0.6))); p.secondaryTimer = 0.62;
     } else if (secondary === 's4') {
-      [-0.18, 0.18].forEach(angle => state.bullets.push(bullet(p.x, p.y - 18, Math.sin(angle) * 330, -Math.cos(angle) * 330, 'p', p.atk * 0.8, 1))); p.secondaryTimer = 1.15;
+      [-0.18, 0.18].forEach(angle => launch(bullet(p.x, p.y - 18, Math.sin(angle) * 330, -Math.cos(angle) * 330, 'p', p.atk * 0.8, 1))); p.secondaryTimer = 1.15;
     } else if (secondary === 's5') {
       const target = state.boss || state.enemies.reduce((best, item) => !best || distance(item, p) < distance(best, p) ? item : best, null);
-      if (target) [-0.18, 0, 0.18].forEach(offset => { const aim = Math.atan2(target.y - p.y, target.x - (p.x + offset * 40)); state.bullets.push(bullet(p.x + offset * 40, p.y - 16, Math.cos(aim) * 250, Math.sin(aim) * 250, 'p', p.atk * 0.82, 1)); });
+      if (target) [-0.18, 0, 0.18].forEach(offset => { const aim = Math.atan2(target.y - p.y, target.x - (p.x + offset * 40)); launch(bullet(p.x + offset * 40, p.y - 16, Math.cos(aim) * 250, Math.sin(aim) * 250, 'p', p.atk * 0.82, 1)); });
       p.secondaryTimer = 1.45;
     } else if (secondary === 's6') {
-      [-14, 14].forEach(offset => { const beam = bullet(p.x + offset, p.y - 20, 0, -520, 'p', p.atk * 0.9, 2, true); beam.laser = true; beam.trail = true; state.bullets.push(beam); }); p.secondaryTimer = 1.75;
+      [-14, 14].forEach(offset => { const beam = bullet(p.x + offset, p.y - 20, 0, -520, 'p', p.atk * 0.9, 2, true); beam.laser = true; launch(beam); }); p.secondaryTimer = 1.75;
     } else if (secondary === 's7') {
-      [-0.38, -0.13, 0.13, 0.38].forEach(angle => state.bullets.push(bullet(p.x, p.y - 16, Math.sin(angle) * 310, -Math.cos(angle) * 310, 'p', p.atk * 0.68, 1))); p.secondaryTimer = 1.05;
+      [-0.38, -0.13, 0.13, 0.38].forEach(angle => launch(bullet(p.x, p.y - 16, Math.sin(angle) * 310, -Math.cos(angle) * 310, 'p', p.atk * 0.68, 1))); p.secondaryTimer = 1.05;
     } else if (secondary === 's8') {
-      [-0.3, 0, 0.3].forEach(angle => { const shell = bullet(p.x, p.y - 18, Math.sin(angle) * 240, -Math.cos(angle) * 240, 'p', p.atk * 1.15, 2); shell.trail = true; state.bullets.push(shell); }); p.secondaryTimer = 1.55;
+      [-0.3, 0, 0.3].forEach(angle => { const shell = bullet(p.x, p.y - 18, Math.sin(angle) * 240, -Math.cos(angle) * 240, 'p', p.atk * 1.15, 2); launch(shell); }); p.secondaryTimer = 1.55;
     }
   }
 

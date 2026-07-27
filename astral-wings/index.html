@@ -12,9 +12,10 @@
 <body>
   <main id="app"></main>
   <img id="ai-craft-roster" src="assets/images/astral-ai-craft-premium.png" alt="" aria-hidden="true" hidden>
+  <img id="ai-vfx-roster" src="assets/images/astral-ai-vfx-sprites.png" alt="" aria-hidden="true" hidden>
   <!-- 版本參數可避開舊版 Service Worker 的失敗快取；失敗時顯示可理解訊息，避免空白畫面。 -->
   <script type="module">
-    import('./js/main.js?v=20260727-weapon-sweep').catch((error) => {
+    import('./js/main.js?v=20260727-ai-vfx').catch((error) => {
       document.querySelector('#app').innerHTML = `<section class="shell panel menu"><h1>星界戰翼</h1><p>載入遊戲核心時發生錯誤：${error.message}</p><button onclick="location.reload()">重新載入</button></section>`;
     });
   </script>

@@ -42,6 +42,30 @@ const drawAiCraft = (ctx, cell, x, y, width, height, alpha = 1) => {
   return true;
 };
 
+// 子彈與補給專用 AI 圖集；移除生成圖的淺色底後以小精靈形式繪製。
+const aiVfxRoster = document.querySelector('#ai-vfx-roster') || new Image();
+if (!aiVfxRoster.src) aiVfxRoster.src = new URL('../assets/images/astral-ai-vfx-sprites.png', import.meta.url).href;
+const aiVfxClean = document.createElement('canvas');
+let aiVfxReady = false;
+function prepareAiVfx() {
+  if (!aiVfxRoster.naturalWidth || aiVfxReady) return;
+  aiVfxClean.width = aiVfxRoster.naturalWidth; aiVfxClean.height = aiVfxRoster.naturalHeight;
+  const clean = aiVfxClean.getContext('2d', { willReadFrequently: true }); clean.drawImage(aiVfxRoster, 0, 0);
+  const pixels = clean.getImageData(0, 0, aiVfxClean.width, aiVfxClean.height);
+  for (let index = 0; index < pixels.data.length; index += 4) {
+    const red = pixels.data[index]; const green = pixels.data[index + 1]; const blue = pixels.data[index + 2];
+    if (Math.min(red, green, blue) > 180 && Math.max(red, green, blue) - Math.min(red, green, blue) < 34) pixels.data[index + 3] = 0;
+  }
+  clean.putImageData(pixels, 0, 0); aiVfxReady = true;
+}
+if (aiVfxRoster.complete) prepareAiVfx(); else aiVfxRoster.addEventListener('load', prepareAiVfx, { once: true });
+const drawAiVfx = (ctx, cell, x, y, width, height) => {
+  if (!aiVfxReady) return false;
+  const cellWidth = aiVfxClean.width / 4; const cellHeight = aiVfxClean.height / 3;
+  ctx.drawImage(aiVfxClean, (cell % 4) * cellWidth, Math.floor(cell / 4) * cellHeight, cellWidth, cellHeight, x - width / 2, y - height / 2, width, height);
+  return true;
+};
+
 // 原創幾何輪廓讓敵機在手機小畫面上仍可一眼辨識職能。
 function drawEnemy(ctx, entry, triangle) {
   const aiCells = { scout: 2, sprinter: 2, armor: 3, sniper: 2, bomber: 3, shield: 4, support: 5, elite: 1 };
@@ -112,12 +136,18 @@ export function render(ctx, state) {
   bullets.forEach((entry) => {
     if (entry.trail) { ctx.strokeStyle = entry.laser ? '#cfffff99' : '#ffde8299'; ctx.lineWidth = entry.laser ? 4 : 2; ctx.beginPath(); ctx.moveTo(entry.x, entry.y + 12); ctx.lineTo(entry.x - entry.vx * 0.025, entry.y - entry.vy * 0.025 + 12); ctx.stroke(); }
     const shipShotColors = { ember: '#ff8a55', violet: '#c98bff', bulwark: '#69dfff', auric: '#ffe078', dawn: '#fff4a0' };
+    const projectileCells = { dawn: 0, ember: 1, violet: 2, auric: 3, bulwark: 0, secondary: 4 };
+    const cell = entry.laser ? 4 : projectileCells[entry.style || 'dawn'];
+    if (entry.from === 'p' && drawAiVfx(ctx, cell, entry.x, entry.y, entry.laser ? 18 : 16, entry.laser ? 35 : 24)) return;
     ctx.fillStyle = entry.from === 'p' ? (entry.laser ? '#dfffff' : (shipShotColors[entry.style] || '#fff4a0')) : '#ff6e87';
     ctx.beginPath(); ctx.arc(entry.x, entry.y, entry.laser ? 5 : entry.r, 0, Math.PI * 2); ctx.fill();
   });
   pickups.forEach((entry) => {
     const color = pickupColors[entry.type]; const pulse = 1 + Math.sin(entry.age * 6) * 0.12;
     ctx.save(); ctx.translate(entry.x, entry.y); ctx.scale(pulse, pulse); ctx.shadowBlur = 12; ctx.shadowColor = color;
+    // 核心補給使用獨立圖樣；臨時增益亦沿用不同色相的能量標記，避免與玩家彈幕混淆。
+    const pickupCells = { hp: 5, shield: 6, energy: 7, power: 8, magnet: 9, rage: 10, double: 11, pierce: 2, crit: 3, barrier: 6, rapid: 1 };
+    if (pickupCells[entry.type] !== undefined && drawAiVfx(ctx, pickupCells[entry.type], 0, 0, 32, 32)) { ctx.restore(); return; }
     ctx.fillStyle = color; ctx.rotate(Math.PI / 4); ctx.fillRect(-8, -8, 16, 16); ctx.rotate(-Math.PI / 4);
     ctx.shadowBlur = 0; ctx.fillStyle = '#08111d'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(pickupMarks[entry.type], 0, 1); ctx.restore();
   });
