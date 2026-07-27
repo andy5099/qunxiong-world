@@ -1,8 +1,8 @@
 import { load, save, reset } from './save.js?v=20260727-ships';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260727-ships';
-import { menu, equipmentView, missionsView, fusionView, stageView, codexView, shipView } from './ui.js?v=20260727-ships';
+import { game } from './game.js?v=20260727-weapon-sweep';
+import { menu, equipmentView, missionsView, fusionView, stageView, codexView, shipView } from './ui.js?v=20260727-weapon-sweep';
 import { ships } from './data/ships.js?v=20260727-ships';
 import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-boss-loot';
 import { stages, getStage } from './data/stages.js?v=20260727-stages-art';
@@ -153,6 +153,18 @@ app.addEventListener('click', (event) => {
   if (action === 'start' || action === 'retry') start();
   if (action === 'stages') stagesMenu();
   if (action === 'codex') codex();
+  if (action.startsWith('sweep:')) {
+    const [, stageId, rawCount] = action.split(':'); const count = Number(rawCount);
+    const selected = getStage(stageId);
+    if (data.stageProgress?.[stageId] && [10, 50, 100].includes(count)) {
+      const gold = count * (18 + selected.order * 8);
+      const materials = count * (1 + Math.floor(selected.order / 2));
+      data.gold += gold; data.materials += materials; data.missions.kills += count * 3;
+      data.stageProgress[stageId] = Math.max(data.stageProgress[stageId], data.stageProgress[stageId] + count);
+      save(data);
+    }
+    stagesMenu();
+  }
   if (action.startsWith('stage:')) {
     const stageId = action.split(':')[1];
     if (data.unlockedStages.includes(stageId)) start('stage', stageId);

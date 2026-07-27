@@ -111,7 +111,8 @@ export function render(ctx, state) {
   }
   bullets.forEach((entry) => {
     if (entry.trail) { ctx.strokeStyle = entry.laser ? '#cfffff99' : '#ffde8299'; ctx.lineWidth = entry.laser ? 4 : 2; ctx.beginPath(); ctx.moveTo(entry.x, entry.y + 12); ctx.lineTo(entry.x - entry.vx * 0.025, entry.y - entry.vy * 0.025 + 12); ctx.stroke(); }
-    ctx.fillStyle = entry.from === 'p' ? (entry.laser ? '#dfffff' : '#fff4a0') : '#ff6e87';
+    const shipShotColors = { ember: '#ff8a55', violet: '#c98bff', bulwark: '#69dfff', auric: '#ffe078', dawn: '#fff4a0' };
+    ctx.fillStyle = entry.from === 'p' ? (entry.laser ? '#dfffff' : (shipShotColors[entry.style] || '#fff4a0')) : '#ff6e87';
     ctx.beginPath(); ctx.arc(entry.x, entry.y, entry.laser ? 5 : entry.r, 0, Math.PI * 2); ctx.fill();
   });
   pickups.forEach((entry) => {

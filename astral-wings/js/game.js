@@ -1,11 +1,11 @@
 import { C, balanceConfig } from './config.js?v=20260727-dodge-balance';
-import { player } from './entities/player.js?v=20260727-ships';
+import { player } from './entities/player.js?v=20260727-weapon-sweep';
 import { enemy } from './entities/enemy.js?v=20260727-hitbox';
 import { makeBoss } from './entities/boss.js?v=20260727-hitbox';
 import { bullet } from './entities/bullet.js';
 import { pickup } from './entities/pickup.js';
 import { stage } from './data/stages.js';
-import { render } from './renderer.js?v=20260727-premium-art';
+import { render } from './renderer.js?v=20260727-weapon-sweep';
 
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const pickupTypes = ['gold', 'power', 'hp', 'shield', 'energy', 'magnet', 'rage', 'double'];
@@ -77,11 +77,12 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     return [kind, Math.min(6, 3 + Math.floor(index / 3))];
   }
 
-  function emitPlayerShot(xOffset, angle, speed, pierce = 0, laser = false) {
+  function emitPlayerShot(xOffset, angle, speed, pierce = 0, laser = false, multiplier = 1, style = 'dawn') {
     const p = state.p;
-    const damage = p.atk * (1 + (p.fireLevel - 1) * 0.18);
+    const damage = p.atk * (1 + (p.fireLevel - 1) * 0.18) * multiplier;
     const entry = bullet(p.x + xOffset, p.y - 18, Math.sin(angle) * speed, -Math.cos(angle) * speed, 'p', damage, pierce + (p.pierceBuff > 0 ? 1 : 0));
-    if (p.crit > 0 && Math.random() < 0.25) { entry.damage *= 1.65; entry.critical = true; }
+    entry.style = style;
+    if (p.crit > 0 && Math.random() < 0.25 + (p.critBase || 0)) { entry.damage *= 1.65; entry.critical = true; }
     entry.laser = laser;
     entry.trail = p.fireLevel >= 5 || p.rage > 0;
     state.bullets.push(entry);
@@ -101,6 +102,11 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
       [-0.31, -0.21, -0.11, 0, 0.11, 0.21, 0.31].forEach((angle) => emitPlayerShot(0, angle, speed, 1));
       emitPlayerShot(0, 0, 650 * (p.rage > 0 ? 1.3 : 1), 2, true);
     }
+    // 每架戰機的額外主炮：改變射擊節奏與彈道，不只是數值倍率。
+    if (p.shipId === 'ember') emitPlayerShot(0, 0, speed * 0.82, 0, true, 1.45, 'ember');
+    if (p.shipId === 'violet') [-0.29, 0.29].forEach(angle => emitPlayerShot(0, angle, speed * 1.16, 0, false, 0.72, 'violet'));
+    if (p.shipId === 'bulwark') [-20, 20].forEach(offset => emitPlayerShot(offset, 0, speed * 0.9, 1, false, 0.72, 'bulwark'));
+    if (p.shipId === 'auric') emitPlayerShot(0, 0, speed * 1.08, 1, false, 1.1, 'auric');
   }
 
   function damagePlayer(amount) {
@@ -218,6 +224,16 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
       [-22, 22].forEach(offset => state.bullets.push(bullet(p.x + offset, p.y - 9, 0, -360, 'p', p.atk * 0.6))); p.secondaryTimer = 0.62;
     } else if (secondary === 's4') {
       [-0.18, 0.18].forEach(angle => state.bullets.push(bullet(p.x, p.y - 18, Math.sin(angle) * 330, -Math.cos(angle) * 330, 'p', p.atk * 0.8, 1))); p.secondaryTimer = 1.15;
+    } else if (secondary === 's5') {
+      const target = state.boss || state.enemies.reduce((best, item) => !best || distance(item, p) < distance(best, p) ? item : best, null);
+      if (target) [-0.18, 0, 0.18].forEach(offset => { const aim = Math.atan2(target.y - p.y, target.x - (p.x + offset * 40)); state.bullets.push(bullet(p.x + offset * 40, p.y - 16, Math.cos(aim) * 250, Math.sin(aim) * 250, 'p', p.atk * 0.82, 1)); });
+      p.secondaryTimer = 1.45;
+    } else if (secondary === 's6') {
+      [-14, 14].forEach(offset => { const beam = bullet(p.x + offset, p.y - 20, 0, -520, 'p', p.atk * 0.9, 2, true); beam.laser = true; beam.trail = true; state.bullets.push(beam); }); p.secondaryTimer = 1.75;
+    } else if (secondary === 's7') {
+      [-0.38, -0.13, 0.13, 0.38].forEach(angle => state.bullets.push(bullet(p.x, p.y - 16, Math.sin(angle) * 310, -Math.cos(angle) * 310, 'p', p.atk * 0.68, 1))); p.secondaryTimer = 1.05;
+    } else if (secondary === 's8') {
+      [-0.3, 0, 0.3].forEach(angle => { const shell = bullet(p.x, p.y - 18, Math.sin(angle) * 240, -Math.cos(angle) * 240, 'p', p.atk * 1.15, 2); shell.trail = true; state.bullets.push(shell); }); p.secondaryTimer = 1.55;
     }
   }
 

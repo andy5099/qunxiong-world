@@ -17,7 +17,8 @@ export const menu = state => `<div class="shell panel menu">
 
 export const stageView = (state, stages) => `<div class="shell panel menu"><h2>主線星域</h2><p class="note">通關目前區域即可解鎖下一個星域；每關都有固定波次、補給與三階段原創 Boss。</p><div class="stage-grid">${stages.map(stage => {
   const open = state.unlockedStages.includes(stage.id); const done = Boolean(state.stageProgress?.[stage.id]);
-  return `<article class="stage-card ${open ? '' : 'locked'}"><b>${stage.name}</b><small>${stage.subtitle}</small><span>${done ? '已通關' : open ? '可出擊' : `解鎖：${stage.unlock}`}</span>${button(open ? '進入關卡' : '尚未解鎖', `stage:${stage.id}`, !open)}</article>`;
+  const sweep = done ? `<div class="sweep-actions">${button('掃蕩 ×10', `sweep:${stage.id}:10`)}${button('×50', `sweep:${stage.id}:50`)}${button('×100', `sweep:${stage.id}:100`)}</div>` : '';
+  return `<article class="stage-card ${open ? '' : 'locked'}"><b>${stage.name}</b><small>${stage.subtitle}</small><span>${done ? '已通關・可掃蕩' : open ? '可出擊' : `解鎖：${stage.unlock}`}</span>${button(open ? '進入關卡' : '尚未解鎖', `stage:${stage.id}`, !open)}${sweep}</article>`;
 }).join('')}</div>${button('返回主選單','home')}</div>`;
 
 export const equipmentView = state => {

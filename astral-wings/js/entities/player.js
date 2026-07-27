@@ -15,7 +15,7 @@ export const player = (save) => {
   x: 180, y: 555, r: 6,
   hp: Math.floor((100 + save.level * 5 + bonus + (save.star - 1) * 8) * (1 + vitality) * ship.hp), maxHp: Math.floor((100 + save.level * 5 + bonus + (save.star - 1) * 8) * (1 + vitality) * ship.hp),
   shield: Math.floor((50 + save.level * 3 + Math.floor(bonus * 0.45) + (save.star - 1) * 4) * (1 + vitality) * ship.shield), maxShield: Math.floor((50 + save.level * 3 + Math.floor(bonus * 0.45) + (save.star - 1) * 4) * (1 + vitality) * ship.shield),
-  atk: Math.floor((10 + save.level * 2 + Math.floor(bonus * 0.4) + (save.star - 1) * 2) * (1 + attack + fusionGrowth) * ship.attack), speed: 260 * ship.speed, critBase: ship.crit, sprite: ship.sprite, shipName: ship.name, energy: 0, inv: 0, fire: 0,
+  atk: Math.floor((10 + save.level * 2 + Math.floor(bonus * 0.4) + (save.star - 1) * 2) * (1 + attack + fusionGrowth) * ship.attack), speed: 260 * ship.speed, critBase: ship.crit, shipId: ship.id, sprite: ship.sprite, shipName: ship.name, energy: 0, inv: 0, fire: 0,
   fireLevel: 1, magnet: 0, rage: 0, doubleGold: 0, pierceBuff: 0, crit: 0, barrier: 0, rapid: 0
   });
 };
