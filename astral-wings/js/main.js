@@ -2,8 +2,9 @@ import { load, save, reset } from './save.js';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
 import { game } from './game.js?v=20260727-fusion-skill';
-import { menu, equipmentView, missionsView, fusionView } from './ui.js?v=20260726-v05-boss-loot';
+import { menu, equipmentView, missionsView, fusionView, stageView, codexView } from './ui.js?v=20260727-stages-art';
 import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-boss-loot';
+import { stages, getStage } from './data/stages.js?v=20260727-stages-art';
 import { C } from './config.js';
 
 // 此檔案只負責頁面切換、遊戲實例與存檔的銜接。
@@ -33,6 +34,8 @@ function home() {
 function equipment() { if (run) run.stop(); run = null; app.innerHTML = equipmentView(data); }
 function missions() { if (run) run.stop(); run = null; app.innerHTML = missionsView(data); }
 function fusion() { if (run) run.stop(); run = null; app.innerHTML = fusionView(data); }
+function stagesMenu() { if (run) run.stop(); run = null; app.innerHTML = stageView(data, stages); }
+function codex() { if (run) run.stop(); run = null; app.innerHTML = codexView(data, stages); }
 
 function showResult(result) {
   const box = app.querySelector('#result');
@@ -47,7 +50,8 @@ function showResult(result) {
     </div>`;
 }
 
-function start(mode = 'stage') {
+function start(mode = 'stage', stageId = 'orbit') {
+  const selectedStage = getStage(stageId);
   app.innerHTML = `
     <div class="shell game">
       <canvas width="360" height="640" aria-label="星界戰翼遊戲畫面"></canvas>
@@ -77,7 +81,12 @@ function start(mode = 'stage') {
     data.high = Math.max(data.high, result.score);
     data.maxCombo = Math.max(data.maxCombo, result.combo);
     data.missions.kills = (data.missions.kills || 0) + result.kills;
-    if (result.win && result.mode === 'stage') data.missions.stages += 1;
+    if (result.win && result.mode === 'stage') {
+      data.missions.stages += 1;
+      data.stageProgress[selectedStage.id] = Math.max(data.stageProgress[selectedStage.id] || 0, result.score);
+      const next = stages[selectedStage.order + 1];
+      if (next && !data.unlockedStages.includes(next.id)) data.unlockedStages.push(next.id);
+    }
     if (result.win && result.mode === 'boss') data.missions.bosses += 1;
     if (result.win) {
       const first = !data.complete;
@@ -127,15 +136,25 @@ function start(mode = 'stage') {
     }
     if (bossHud && bossHp) {
       bossHud.classList.toggle('hidden', !state.boss);
-      if (state.boss) bossHp.style.width = `${Math.max(0, state.boss.hp / state.boss.maxHp * 100)}%`;
+      if (state.boss) {
+        bossHp.style.width = `${Math.max(0, state.boss.hp / state.boss.maxHp * 100)}%`;
+        const label = bossHud.querySelector('b');
+        if (label) label.textContent = `${state.boss.name}・第 ${state.boss.phase} 階段`;
+      }
     }
-  }, mode);
+  }, mode, selectedStage);
 }
 
 app.addEventListener('click', (event) => {
   const action = event.target.closest('[data-a]')?.dataset.a;
   if (!action) return;
   if (action === 'start' || action === 'retry') start();
+  if (action === 'stages') stagesMenu();
+  if (action === 'codex') codex();
+  if (action.startsWith('stage:')) {
+    const stageId = action.split(':')[1];
+    if (data.unlockedStages.includes(stageId)) start('stage', stageId);
+  }
   if (action === 'endless') start('endless');
   if (action === 'boss') start('boss');
   if (action === 'home') home();

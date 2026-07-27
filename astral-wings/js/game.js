@@ -11,14 +11,14 @@ const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const pickupTypes = ['gold', 'power', 'hp', 'shield', 'energy', 'magnet', 'rage', 'double'];
 
 // v0.2 的單局戰鬥狀態：火力與增益只活在這一場，不會污染永久存檔。
-export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage') {
+export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', selectedStage = stage) {
   const ctx = canvas.getContext('2d');
   const state = {
     p: player(saveData), enemies: [], bullets: [], pickups: [], particles: [], boss: null,
     stars: Array.from({ length: 50 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, a: Math.random(), speed: 18 + Math.random() * 42 })),
     nebulae: Array.from({ length: 4 }, () => ({ x: Math.random() * 440 - 40, y: Math.random() * 720 - 40, r: 65 + Math.random() * 85, speed: 5 + Math.random() * 8, color: Math.random() > 0.5 ? '#243f7655' : '#542d6a44' })),
     debris: Array.from({ length: 8 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, r: 2 + Math.random() * 5, speed: 45 + Math.random() * 55, spin: Math.random() * 6 })),
-    mode, fusion: saveData.fusion || null, wave: 0, left: 0, kind: 'scout', nextId: 1, score: 0, gold: 0, combo: 0, maxCombo: 0,
+    mode, stage: selectedStage, fusion: saveData.fusion || null, wave: 0, left: 0, kind: 'scout', nextId: 1, score: 0, gold: 0, combo: 0, maxCombo: 0,
     kills: 0, paused: false, over: false, last: 0, hitStop: 0, shake: 0,
     bossEntrance: 0, supplyTimer: 0, victoryTimer: 0, message: '', messageTimer: 0, secondaryTimer: 0
   };
@@ -69,7 +69,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage') {
 
   function getNextWave() {
     if (mode === 'boss') return state.wave++ === 0 ? ['supply', 1] : state.wave === 2 ? ['boss', 1] : null;
-    if (mode !== 'endless') return stage.waves[state.wave++];
+    if (mode !== 'endless') return state.stage.waves[state.wave++];
     const index = state.wave++;
     if (index > 0 && index % 8 === 7) return ['boss', 1];
     const types = ['scout', 'sprinter', 'armor', 'sniper', 'bomber', 'shield', 'support'];
@@ -432,7 +432,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage') {
           updatePlayer(dt); updatePickups(dt);
         } else if (state.bossEntrance > 0) {
           state.bossEntrance -= dt;
-          if (state.bossEntrance <= 0) { state.boss = makeBoss(); state.boss.id = 'boss'; state.shake = 7; announce('鐵幕吞噬者・第一階段', 1.1); }
+          if (state.bossEntrance <= 0) { state.boss = makeBoss(state.stage.boss); state.boss.id = 'boss'; state.shake = 7; announce(`${state.boss.name}・第一階段`, 1.1); }
         } else {
           updatePlayer(dt); updateEnemies(dt, time); updateProjectiles(dt); resolveDefeats(); updatePickups(dt); spawnNextWave();
         }
