@@ -1,9 +1,10 @@
 import { load, save, reset } from './save.js?v=20260727-ships';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260727-endless-chests-vitals-v2';
-import { menu, equipmentView, missionsView, fusionView, stageView, codexView, shipView } from './ui.js?v=20260727-endless-chests-vitals-v2';
-import { ships } from './data/ships.js?v=20260727-visual-hangar-sweep';
+import { game } from './game.js?v=20260727-boss-routes-hangar-v3';
+import { menu, equipmentView, missionsView, fusionView, stageView, bossView, codexView, shipView } from './ui.js?v=20260727-boss-routes-hangar-v3';
+import { fusionStatusView, upgradedShipView } from './uiEnhancements.js?v=20260727-boss-routes-hangar-v3';
+import { ships } from './data/ships.js?v=20260727-boss-routes-hangar-v3';
 import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-boss-loot';
 import { stages, getStage } from './data/stages.js?v=20260727-stages-art';
 import { C } from './config.js';
@@ -21,9 +22,10 @@ function currentAttack(state) {
     return template ? template.value + (owned?.level || 0) : 0;
   }).reduce((total, value) => total + value, 0);
   const ship = ships.find(entry => entry.id === (state.activeShip || 'dawn')) || ships[0];
+  const shipLevel = Math.max(1, state.shipLevels?.[ship.id] || state.level || 1);
   const form = fusionForms.find(entry => entry.id === state.fusion);
   const multiplier = 1 + (form?.stat.attack || 0) + (state.fusionAwaken || 0) * 0.06 + (state.fusionEvolution || 0) * 0.1;
-  return Math.floor((10 + state.level * 2 + Math.floor(bonus * 0.4) + (state.star - 1) * 2) * multiplier * ship.attack);
+  return Math.floor((10 + shipLevel * 2 + Math.floor(bonus * 0.4) + (state.star - 1) * 2) * multiplier * ship.attack);
 }
 
 function bossLootTemplate() {
@@ -52,9 +54,10 @@ function equipment(keepPosition = false) {
   if (keepPosition) requestAnimationFrame(() => { const panel = app.querySelector('.menu'); if (panel) panel.scrollTop = previousScroll; });
 }
 function missions() { if (run) run.stop(); run = null; app.innerHTML = missionsView(data); }
-function fusion() { if (run) run.stop(); run = null; app.innerHTML = fusionView(data); }
-function shipHangar() { if (run) run.stop(); run = null; app.innerHTML = shipView(data); }
+function fusion() { if (run) run.stop(); run = null; app.innerHTML = fusionStatusView(data); }
+function shipHangar() { if (run) run.stop(); run = null; app.innerHTML = upgradedShipView(data); }
 function stagesMenu() { if (run) run.stop(); run = null; app.innerHTML = stageView(data, stages); }
+function bossMenu() { if (run) run.stop(); run = null; app.innerHTML = bossView(data, stages); }
 function codex() { if (run) run.stop(); run = null; app.innerHTML = codexView(data, stages); }
 
 function showResult(result, drops = []) {
@@ -219,7 +222,11 @@ app.addEventListener('click', (event) => {
   }
   if (action === 'endless') start('endless');
   if (action === 'endless-claim') run?.claim();
-  if (action === 'boss') start('boss');
+  if (action === 'boss') bossMenu();
+  if (action.startsWith('bossstage:')) {
+    const stageId = action.split(':')[1];
+    if (data.unlockedStages.includes(stageId)) start('boss', stageId);
+  }
   if (action === 'home') home();
   if (action === 'equipment') equipment();
   if (action === 'missions') missions();
@@ -233,19 +240,33 @@ app.addEventListener('click', (event) => {
   if (action.startsWith('shipbuy:')) {
     const id = action.split(':')[1]; const ship = ships.find(item => item.id === id);
     data.unlockedShips ||= ['dawn'];
-    if (ship && !data.unlockedShips.includes(id) && data.gold >= ship.unlock) { data.gold -= ship.unlock; data.unlockedShips.push(id); data.activeShip = id; save(data); }
+    if (ship && !data.unlockedShips.includes(id) && data.gold >= ship.unlock) { data.gold -= ship.unlock; data.unlockedShips.push(id); data.shipLevels ||= {}; data.shipLevels[id] = 1; data.activeShip = id; save(data); }
+    shipHangar();
+  }
+  if (action.startsWith('shipupgrade:')) {
+    const id = action.split(':')[1];
+    const ship = ships.find(item => item.id === id);
+    data.shipLevels ||= {};
+    const level = Math.max(1, data.shipLevels[id] || (id === data.activeShip ? data.level : 1));
+    const cost = C.upgradeCost(level);
+    if (ship && data.unlockedShips?.includes(id) && level < C.maxLevel && data.gold >= cost) {
+      data.gold -= cost;
+      data.shipLevels[id] = level + 1;
+      if (id === data.activeShip) data.level = level + 1;
+      data.lastShipUpgrade = { id, name: ship.name, level: level + 1, cost, attack: Math.floor(2 * ship.attack), hp: Math.floor(5 * ship.hp), shield: Math.floor(3 * ship.shield) };
+      save(data);
+    }
     shipHangar();
   }
   if (action === 'pause') run?.pause();
   if (action === 'ult') run?.ultimate();
   if (action === 'upgrade') {
-    const cost = C.upgradeCost(data.level);
-    if (data.level < C.maxLevel && data.gold >= cost) {
-      data.gold -= cost;
-      data.level += 1;
-      save(data);
-    }
-    home();
+    const active = data.activeShip || 'dawn';
+    data.shipLevels ||= {};
+    const level = Math.max(1, data.shipLevels[active] || data.level || 1);
+    const cost = C.upgradeCost(level);
+    if (level < C.maxLevel && data.gold >= cost) { data.gold -= cost; data.shipLevels[active] = level + 1; data.level = level + 1; save(data); }
+    shipHangar();
   }
   if (action === 'star') {
     const cost = data.star * 5;
@@ -283,7 +304,20 @@ app.addEventListener('click', (event) => {
   }
   if (action.startsWith('enhance:')) {
     const id = action.split(':')[1]; const item = data.equipment.find(entry => entry.id === id);
-    if (item) { const cost = 30 + item.level * 28; if (data.materials >= cost && item.level < 20) { data.materials -= cost; item.level += 1; save(data); } equipment(true); }
+    if (item) {
+      const cost = 30 + item.level * 28;
+      if (data.materials >= cost && item.level < 20) {
+        const template = equipmentTemplates.find(entry => entry.id === id);
+        const before = item.level;
+        data.materials -= cost;
+        item.level += 1;
+        data.lastEnhance = { id, name: template?.name || id, before, after: item.level, delta: 1, cost };
+        save(data);
+      } else {
+        data.lastEnhance = { id, name: '強化條件不足', before: item.level, after: item.level, delta: 0, cost: item.level >= 20 ? '已達上限' : `需要 ${cost}` };
+      }
+      equipment(true);
+    }
   }
   if (action.startsWith('dismantle:')) {
     const id = action.split(':')[1]; const item = data.equipment.find(entry => entry.id === id);

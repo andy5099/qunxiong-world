@@ -23,14 +23,22 @@ export const stageView = (state, stages) => `<div class="shell panel menu"><h2>�
   return `<article class="stage-card ${open ? '' : 'locked'}"><b>${stage.name}</b><small>${stage.subtitle}</small><span>${done ? '已通關・可掃蕩' : open ? '可出擊' : `解鎖：${stage.unlock}`}</span>${button(open ? '進入關卡' : '尚未解鎖', `stage:${stage.id}`, !open)}${sweep}</article>`;
 }).join('')}</div>${button('返回主選單','home')}</div>`;
 
+export const bossView = (state, stages) => `<div class="shell panel menu"><h2>Boss 挑戰</h2><p class="note">選擇已解鎖星域的 Boss 直接挑戰。越後段的 Boss 生命更高，掉落的裝備與碎片獎勵也更豐富。</p><div class="stage-grid">${stages.map(stage => {
+  const open = state.unlockedStages.includes(stage.id);
+  return `<article class="stage-card ${open ? '' : 'locked'}"><div class="boss-card-art boss-${stage.order}" aria-hidden="true"></div><b>${stage.name}・${stage.boss}</b><small>${stage.subtitle}</small><span>${open ? '可挑戰・Boss 三階段' : `解鎖：${stage.unlock}`}</span>${button(open ? '挑戰 Boss' : '尚未解鎖', `bossstage:${stage.id}`, !open)}</article>`;
+}).join('')}</div>${button('返回主選單','home')}</div>`;
+
 export const equipmentView = state => {
+  const enhanceNotice = state.lastEnhance
+    ? `<section class="synthesis-notice"><b>強化完成</b><span>${state.lastEnhance.name}　+${state.lastEnhance.before} → +${state.lastEnhance.after}</span><small>主屬性 +${state.lastEnhance.delta}・消耗 ${state.lastEnhance.cost} 強化材料</small></section>`
+    : '';
   const synthesisNotice = state.lastSynthesis
     ? `<section class="synthesis-notice ${state.lastSynthesis.failed ? 'failed' : ''}"><b>${state.lastSynthesis.failed ? '合成未完成' : '合成完成'}</b><span>${state.lastSynthesis.failed ? state.lastSynthesis.name : `${state.lastSynthesis.from} ×3 → ${state.lastSynthesis.name}`}</span><small>${state.lastSynthesis.failed ? state.lastSynthesis.quality : `${state.lastSynthesis.quality}・基礎增幅 +${state.lastSynthesis.value}${state.lastSynthesis.duplicate ? '（重複轉為強化材料 +15）' : ''}`}</small></section>`
     : '';
   const craftNotice = state.lastCraft
     ? `<section class="synthesis-notice ${state.lastCraft.failed ? 'failed' : ''}"><b>${state.lastCraft.failed ? '製作未完成' : '製作完成'}</b><span>${state.lastCraft.name}</span><small>${state.lastCraft.quality}${state.lastCraft.failed ? '' : `・基礎增幅 +${state.lastCraft.value}`}</small></section>`
     : '';
-  const cards = equipmentTemplates.map(template => {
+  const cards = enhanceNotice + equipmentTemplates.map(template => {
     const item = state.equipment.find(entry => entry.id === template.id);
     const equipped = state.equipped[template.slot] === template.id;
     const controls = item ? `${button(equipped ? '已裝備' : '穿戴', `equip:${template.id}`)}${button(`強化 +${item.level}（${30 + item.level * 28} 材料）`, `enhance:${template.id}`)}${!equipped && !item.locked ? button('分解', `dismantle:${template.id}`) : ''}` : '<em>尚未取得</em>';

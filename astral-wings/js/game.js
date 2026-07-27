@@ -1,11 +1,11 @@
 import { C, balanceConfig } from './config.js?v=20260727-dodge-balance';
-import { player } from './entities/player.js?v=20260727-endless-chests-vitals-v2';
+import { player } from './entities/player.js?v=20260727-boss-routes-hangar-v3';
 import { enemy } from './entities/enemy.js?v=20260727-hitbox';
 import { makeBoss } from './entities/boss.js?v=20260727-hitbox';
 import { bullet } from './entities/bullet.js';
 import { pickup } from './entities/pickup.js';
 import { stage } from './data/stages.js';
-import { render } from './renderer.js?v=20260727-endless-chests-vitals-v2';
+import { render } from './renderer.js?v=20260727-boss-routes-hangar-v3';
 
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const pickupTypes = ['gold', 'power', 'hp', 'shield', 'energy', 'magnet', 'rage', 'double', 'chest'];
@@ -414,7 +414,10 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
   function updatePickups(dt) {
     const p = state.p;
     state.pickups.forEach((entry) => {
-      entry.age += dt; entry.y += entry.vy * dt; entry.x += Math.sin(entry.age * 4 + entry.drift) * 18 * dt;
+      entry.age += dt;
+      entry.vx *= Math.pow(0.22, dt);
+      entry.x += entry.vx * dt + Math.sin(entry.age * entry.driftSpeed + entry.drift) * entry.bob * dt;
+      entry.y += (entry.vy + Math.cos(entry.age * entry.driftSpeed * 0.7 + entry.drift) * 7) * dt;
       const range = entry.type === 'gold' ? 210 : p.magnet > 0 ? 150 : 42;
       const gap = distance(entry, p);
       if (gap < range) {

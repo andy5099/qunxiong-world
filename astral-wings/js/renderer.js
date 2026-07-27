@@ -255,6 +255,10 @@ export function render(ctx, state) {
   pickups.forEach((entry) => {
     const color = pickupColors[entry.type]; const pulse = 1 + Math.sin(entry.age * 6) * 0.12;
     ctx.save(); ctx.translate(entry.x, entry.y); ctx.scale(pulse, pulse); ctx.shadowBlur = 12; ctx.shadowColor = color;
+    if (entry.type !== 'gold' && entry.type !== 'chest') {
+      ctx.strokeStyle = `${color}aa`; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(0, 0, 13 + Math.sin(entry.age * 5) * 2, entry.age * 1.8, entry.age * 1.8 + Math.PI * 1.35); ctx.stroke();
+      ctx.fillStyle = `${color}bb`; ctx.beginPath(); ctx.arc(Math.cos(entry.age * 3) * 12, Math.sin(entry.age * 3) * 12, 2, 0, Math.PI * 2); ctx.fill();
+    }
     // 核心補給使用獨立圖樣；臨時增益亦沿用不同色相的能量標記，避免與玩家彈幕混淆。
     const pickupCells = { gold: 11, hp: 5, shield: 6, energy: 7, power: 8, magnet: 9, rage: 10, double: 11, pierce: 2, crit: 3, barrier: 6, rapid: 1 };
     if (pickupCells[entry.type] !== undefined && drawAiVfx(ctx, pickupCells[entry.type], 0, 0, 32, 32)) { ctx.restore(); return; }
