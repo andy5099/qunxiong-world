@@ -1,8 +1,9 @@
-import { load, save, reset } from './save.js';
+import { load, save, reset } from './save.js?v=20260727-ships';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260727-dodge-balance';
-import { menu, equipmentView, missionsView, fusionView, stageView, codexView } from './ui.js?v=20260727-stages-art';
+import { game } from './game.js?v=20260727-ships';
+import { menu, equipmentView, missionsView, fusionView, stageView, codexView, shipView } from './ui.js?v=20260727-ships';
+import { ships } from './data/ships.js?v=20260727-ships';
 import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-boss-loot';
 import { stages, getStage } from './data/stages.js?v=20260727-stages-art';
 import { C } from './config.js';
@@ -34,6 +35,7 @@ function home() {
 function equipment() { if (run) run.stop(); run = null; app.innerHTML = equipmentView(data); }
 function missions() { if (run) run.stop(); run = null; app.innerHTML = missionsView(data); }
 function fusion() { if (run) run.stop(); run = null; app.innerHTML = fusionView(data); }
+function shipHangar() { if (run) run.stop(); run = null; app.innerHTML = shipView(data); }
 function stagesMenu() { if (run) run.stop(); run = null; app.innerHTML = stageView(data, stages); }
 function codex() { if (run) run.stop(); run = null; app.innerHTML = codexView(data, stages); }
 
@@ -161,6 +163,18 @@ app.addEventListener('click', (event) => {
   if (action === 'equipment') equipment();
   if (action === 'missions') missions();
   if (action === 'fusion') fusion();
+  if (action === 'ships') shipHangar();
+  if (action.startsWith('ship:')) {
+    const id = action.split(':')[1];
+    data.unlockedShips ||= ['dawn'];
+    if (data.unlockedShips.includes(id)) { data.activeShip = id; save(data); shipHangar(); }
+  }
+  if (action.startsWith('shipbuy:')) {
+    const id = action.split(':')[1]; const ship = ships.find(item => item.id === id);
+    data.unlockedShips ||= ['dawn'];
+    if (ship && !data.unlockedShips.includes(id) && data.gold >= ship.unlock) { data.gold -= ship.unlock; data.unlockedShips.push(id); data.activeShip = id; save(data); }
+    shipHangar();
+  }
   if (action === 'pause') run?.pause();
   if (action === 'ult') run?.ultimate();
   if (action === 'upgrade') {

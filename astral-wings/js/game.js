@@ -1,11 +1,11 @@
 import { C, balanceConfig } from './config.js?v=20260727-dodge-balance';
-import { player } from './entities/player.js';
+import { player } from './entities/player.js?v=20260727-ships';
 import { enemy } from './entities/enemy.js?v=20260727-hitbox';
 import { makeBoss } from './entities/boss.js?v=20260727-hitbox';
 import { bullet } from './entities/bullet.js';
 import { pickup } from './entities/pickup.js';
 import { stage } from './data/stages.js';
-import { render } from './renderer.js?v=20260727-hitbox';
+import { render } from './renderer.js?v=20260727-premium-art';
 
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const pickupTypes = ['gold', 'power', 'hp', 'shield', 'energy', 'magnet', 'rage', 'double'];
@@ -188,7 +188,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
 
   function updatePlayer(dt) {
     const p = state.p;
-    const speed = 275 * dt;
+    const speed = p.speed * dt;
     if (controls.drag) {
       // 指標控制使用緩動，手指與滑鼠都更平順、不會因瞬移而穿越彈幕。
       p.x += (controls.x - p.x) * Math.min(1, 14 * dt);

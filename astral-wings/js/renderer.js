@@ -4,7 +4,7 @@ const pickupMarks = { gold: '$', power: 'P', hp: '+', shield: 'S', energy: 'E', 
 // 原創 AI 機體圖集。圖尚未完成載入時，會無縫退回原本的 Canvas 幾何造型。
 const aiCraftRoster = document.querySelector('#ai-craft-roster') || new Image();
 aiCraftRoster.decoding = 'async';
-if (!aiCraftRoster.src) aiCraftRoster.src = new URL('../assets/images/astral-ai-craft-sprites.png', import.meta.url).href;
+if (!aiCraftRoster.src) aiCraftRoster.src = new URL('../assets/images/astral-ai-craft-premium.png', import.meta.url).href;
 const aiCraftClean = document.createElement('canvas');
 let aiCraftReady = false;
 
@@ -83,7 +83,7 @@ export function render(ctx, state) {
     ctx.closePath(); ctx.fill();
   };
   if (p.inv <= 0 || Math.floor(p.inv * 12) % 2) {
-    if (drawAiCraft(ctx, 0, p.x, p.y, 112, 130, 0.96)) {
+    if (drawAiCraft(ctx, p.sprite ?? 0, p.x, p.y, 94, 108, 0.96)) {
       // AI 戰機已繪製，仍保留尾焰讓移動與無敵狀態具有清楚辨識。
       ctx.save(); ctx.fillStyle = '#ffb553'; ctx.shadowBlur = 12; ctx.shadowColor = '#ff9a4c'; ctx.fillRect(p.x - 9, p.y + 27, 5, 9); ctx.fillRect(p.x + 4, p.y + 27, 5, 9); ctx.restore();
     } else {
