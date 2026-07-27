@@ -38,16 +38,26 @@ export const equipmentView = state => {
   const craftNotice = state.lastCraft
     ? `<section class="synthesis-notice ${state.lastCraft.failed ? 'failed' : ''}"><b>${state.lastCraft.failed ? '製作未完成' : '製作完成'}</b><span>${state.lastCraft.name}</span><small>${state.lastCraft.quality}${state.lastCraft.failed ? '' : `・基礎增幅 +${state.lastCraft.value}`}</small></section>`
     : '';
-  const cards = enhanceNotice + equipmentTemplates.map(template => {
+  // 倉庫只顯示實際持有的裝備，並按品質（模板戰力）與強化等級由高至低排列。
+  // 未取得模板統一保留在圖鑑，避免和可穿戴物品混在一起。
+  const orderedTemplates = equipmentTemplates.filter(template => state.equipment.some(entry => entry.id === template.id)).sort((left, right) => {
+    const leftItem = state.equipment.find(entry => entry.id === left.id);
+    const rightItem = state.equipment.find(entry => entry.id === right.id);
+    const leftLevel = leftItem?.level || 0; const rightLevel = rightItem?.level || 0;
+    if (left.value !== right.value) return right.value - left.value;
+    if (leftLevel !== rightLevel) return rightLevel - leftLevel;
+    return left.name.localeCompare(right.name, 'zh-Hant');
+  });
+  const cards = enhanceNotice + orderedTemplates.map(template => {
     const item = state.equipment.find(entry => entry.id === template.id);
     const equipped = state.equipped[template.slot] === template.id;
-    const controls = item ? `${button(equipped ? '已裝備' : '穿戴', `equip:${template.id}`)}${button(`強化 +${item.level}（${30 + item.level * 28} 材料）`, `enhance:${template.id}`)}${!equipped && !item.locked ? button('分解', `dismantle:${template.id}`) : ''}` : '<em>尚未取得</em>';
+    const controls = `${button(equipped ? '已裝備' : '穿戴', `equip:${template.id}`)}${button(`強化 +${item.level}（${30 + item.level * 28} 材料）`, `enhance:${template.id}`)}${!equipped && !item.locked ? button('分解', `dismantle:${template.id}`) : ''}`;
     const change = state.lastEquipmentChange?.id === template.id ? state.lastEquipmentChange : null;
     const changeText = change ? `<small class="equipment-change ${change.delta < 0 ? 'down' : 'up'}">攻擊力 ${change.before} → ${change.after}（${change.delta >= 0 ? '+' : ''}${change.delta}）</small>` : '';
     return `<article class="equip ${item ? '' : 'locked'}">${equipmentPreview(template.slot)}<b>${template.name}</b><small>${slotNames[template.slot]}・${template.quality}</small><span>基礎增幅 +${template.value + (item?.level || 0)}</span>${changeText}${controls}</article>`;
   }).join('');
   const qualities = ['普通','優良','稀有','史詩'];
-  return `<div class="shell panel menu"><h2>裝備庫</h2><p class="note">每個欄位只會套用一件裝備；已裝備或鎖定的物品不會被分解。強化必定成功。</p>${craftNotice}${synthesisNotice}${button('製作隨機裝備（25 材料）','craft')}<h3>三件合成升階</h3>${qualities.map((q, index) => button(`${q} → ${qualities[index + 1] || '傳說'} 合成`, `synth:${q}`, index === qualities.length - 1)).join('')}<div class="equip-grid">${cards}</div>${button('返回主選單','home')}</div>`;
+  return `<div class="shell panel menu"><h2>裝備倉庫</h2><p class="note">只顯示目前持有的裝備，依品質與強化等級排列；未取得的裝備與戰機請至星域圖鑑查看。</p>${craftNotice}${synthesisNotice}${button('製作隨機裝備（25 材料）','craft')}<h3>三件合成升階</h3>${qualities.map((q, index) => button(`${q} → ${qualities[index + 1] || '傳說'} 合成`, `synth:${q}`, index === qualities.length - 1)).join('')}<div class="equip-grid">${cards || '<p class="note">倉庫目前沒有裝備，可從關卡、掃蕩、Boss 或製作取得。</p>'}</div>${button('查看裝備圖鑑','codex')}${button('返回主選單','home')}</div>`;
 };
 
 export const missionsView = state => {
@@ -58,6 +68,20 @@ export const missionsView = state => {
 
 export const fusionView = state => `<div class="shell panel menu"><h2>戰翼工坊</h2><div class="art-preview" aria-label="原創 AI 戰機與敵機設計圖"></div><p class="note">合體僅在持有對應組件時可啟動；覺醒與進化會套用到出戰戰機。</p>${button('戰機庫與機體定位','ships')}<div class="equip-grid">${fusionForms.map(form => { const ready = form.need.every(id => state.equipment.some(item => item.id === id)); return `<article class="equip ${ready ? '' : 'locked'}"><b>${form.name}</b><small>${form.need.join(' + ')}</small><span>${form.effect}</span>${ready ? button(state.fusion === form.id ? '目前啟用' : '啟動合體', `fusion:${form.id}`) : '<em>缺少組件</em>'}</article>`; }).join('')}</div><p>覺醒 ${state.fusionAwaken}/3　進化 ${state.fusionEvolution}/2</p>${button(`覺醒（${16 + state.fusionAwaken * 10} 材料）`,'awaken')}${button(`進化（${4 + state.fusionEvolution * 3} 星核）`,'evolve')}${button('返回主選單','home')}</div>`;
 
-export const shipView = state => `<div class="shell panel menu"><h2>戰機庫</h2><p class="note">每架戰機有不同攻擊、耐久、護盾、速度與暴擊定位；選擇後立刻影響實戰。</p><div class="equip-grid">${ships.map(ship => { const owned = (state.unlockedShips || ['dawn']).includes(ship.id); const active = (state.activeShip || 'dawn') === ship.id; return `<article class="equip ship-card ${owned ? '' : 'locked'}">${shipPreview(ship.sprite)}<b>${ship.name}</b><small>${ship.role}</small><span>攻擊 ×${ship.attack}・生命 ×${ship.hp}<br>護盾 ×${ship.shield}・速度 ×${ship.speed}</span><em>${ship.description}</em>${owned ? button(active ? '目前出戰' : '設為出戰', `ship:${ship.id}`) : button(`解鎖（${ship.unlock} 金幣）`, `shipbuy:${ship.id}`)}</article>`; }).join('')}</div>${button('返回工坊','fusion')}${button('返回主選單','home')}</div>`;
+export const shipView = state => {
+  const ownedShips = ships.filter(ship => (state.unlockedShips || ['dawn']).includes(ship.id));
+  return `<div class="shell panel menu"><h2>戰機庫</h2><p class="note">只顯示目前擁有的戰機；未解鎖機體會收藏在星域圖鑑中，取得後才會出現在此處。</p><div class="equip-grid">${ownedShips.map(ship => { const active = (state.activeShip || 'dawn') === ship.id; return `<article class="equip ship-card">${shipPreview(ship.sprite)}<b>${ship.name}</b><small>${ship.role}</small><span>攻擊 ×${ship.attack}・生命 ×${ship.hp}<br>護盾 ×${ship.shield}・速度 ×${ship.speed}</span><em>${ship.description}</em>${button(active ? '目前出戰' : '設為出戰', `ship:${ship.id}`)}</article>`; }).join('')}</div>${button('查看戰機圖鑑','codex')}${button('返回工坊','fusion')}${button('返回主選單','home')}</div>`;
+};
 
-export const codexView = (state, stages) => `<div class="shell panel menu"><h2>星域圖鑑</h2><div class="art-preview compact" aria-label="原創 AI 星際機體設計圖"></div><h3>航線紀錄</h3>${stages.map(entry => `<article class="mission"><b>${entry.name}</b><span>${state.unlockedStages.includes(entry.id) ? '已發現・Boss：' + entry.boss : '尚未發現'}</span></article>`).join('')}<h3>已取得裝備</h3><p>${state.equipment.length} / ${equipmentTemplates.length} 件</p>${button('返回主選單','home')}</div>`;
+export const codexView = (state, stages) => {
+  const ownedShips = state.unlockedShips || ['dawn'];
+  const equipmentCards = equipmentTemplates.map(template => {
+    const owned = state.equipment.some(item => item.id === template.id);
+    return `<article class="equip ${owned ? '' : 'locked'}">${equipmentPreview(template.slot)}<b>${owned ? template.name : '未發現裝備'}</b><small>${slotNames[template.slot]}・${owned ? template.quality : '???'}</small><span>${owned ? `基礎增幅 +${template.value}` : '完成關卡、Boss 或製作即可取得'}</span></article>`;
+  }).join('');
+  const shipCards = ships.map(ship => {
+    const owned = ownedShips.includes(ship.id);
+    return `<article class="equip ship-card ${owned ? '' : 'locked'}">${shipPreview(ship.sprite)}<b>${owned ? ship.name : '未發現戰機'}</b><small>${owned ? ship.role : '等待解鎖'}</small><span>${owned ? ship.description : `需要 ${ship.unlock} 金幣購買或從關卡獲得`}</span>${owned ? '<em>已收入戰機庫</em>' : button(`購買並收入戰機庫（${ship.unlock} 金幣）`, `shipbuy:${ship.id}`)}</article>`;
+  }).join('');
+  return `<div class="shell panel menu"><h2>星域圖鑑</h2><div class="art-preview compact" aria-label="原創 AI 星際機體設計圖"></div><h3>航線紀錄</h3>${stages.map(entry => `<article class="mission"><b>${entry.name}</b><span>${state.unlockedStages.includes(entry.id) ? '已發現・Boss：' + entry.boss : '尚未發現'}</span></article>`).join('')}<h3>戰機圖鑑・${ownedShips.length} / ${ships.length}</h3><div class="equip-grid">${shipCards}</div><h3>裝備圖鑑・${state.equipment.length} / ${equipmentTemplates.length}</h3><div class="equip-grid">${equipmentCards}</div>${button('返回主選單','home')}</div>`;
+};

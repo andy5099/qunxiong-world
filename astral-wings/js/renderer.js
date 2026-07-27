@@ -180,6 +180,25 @@ function drawSecondaryRig(ctx, p, secondary, elapsed) {
   ctx.restore();
 }
 
+// 引擎欄位同時提供可見的僚機：兩翼維持隊形、實際射擊，且不會遮蔽彈幕。
+function drawWingmanRig(ctx, p, wingman, elapsed) {
+  if (!wingman) return;
+  const colors = { e1: '#62eaff', e2: '#ff9768', e3: '#b7fbff', e4: '#ce94ff', e5: '#75f7c0', e6: '#8ccfff', e7: '#ffd96c', e8: '#ff7aa9' };
+  const color = colors[wingman] || '#72eaff';
+  ctx.save(); ctx.shadowColor = color; ctx.shadowBlur = 12;
+  [-1, 1].forEach((side, index) => {
+    const x = p.x + side * (30 + Math.sin(elapsed * 2.5 + index) * 3);
+    const y = p.y + 8 + Math.cos(elapsed * 3 + index) * 4;
+    ctx.save(); ctx.translate(x, y); ctx.rotate(side * 0.18);
+    ctx.fillStyle = '#15283c'; ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(side * 8, 6); ctx.lineTo(0, 11); ctx.lineTo(-side * 8, 6); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = color; ctx.beginPath(); ctx.arc(0, 1, 3.2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = `${color}99`; ctx.fillRect(-2, 10, 4, 7 + Math.sin(elapsed * 9 + index) * 2);
+    ctx.restore();
+  });
+  ctx.restore();
+}
+
 // 直接顯示在我方戰機上的耐久條，讓玩家不必只看 HUD 也能掌握危險程度。
 function drawPlayerVitalBars(ctx, p) {
   const width = 56; const x = p.x - width / 2; const y = p.y - 60;
@@ -226,6 +245,7 @@ export function render(ctx, state) {
     }
   }
   drawSecondaryRig(ctx, p, state.secondary, state.elapsed || 0);
+  drawWingmanRig(ctx, p, state.wingman, state.elapsed || 0);
   drawPlayerVitalBars(ctx, p);
   enemies.forEach((entry) => { drawEnemy(ctx, entry, triangle); drawEnemyVitalBar(ctx, entry); });
   if (boss) {
@@ -255,13 +275,33 @@ export function render(ctx, state) {
       tide: { cell: 0, color: '#63dfff', width: 15, height: 26, trail: '#83edff99' },
       rime: { cell: 4, color: '#dfffff', width: 20, height: 42, trail: '#aef4ffcc' },
       nova: { cell: 3, color: '#fff093', width: 16, height: 28, trail: '#ffe695aa' },
+      helix: { cell: 1, color: '#ffbd63', width: 18, height: 26, trail: '#ffd38cbb' },
+      aurora: { cell: 4, color: '#9effff', width: 22, height: 48, trail: '#c5ffffdd' },
+      caldera: { cell: 1, color: '#ff7651', width: 28, height: 34, trail: '#ffb27aaa' },
+      seraph: { cell: 3, color: '#fff4ae', width: 17, height: 30, trail: '#fff8c0bb' },
+      voidlance: { cell: 2, color: '#bb83ff', width: 16, height: 40, trail: '#d9b8ffcc' },
+      solaris: { cell: 3, color: '#ffe777', width: 20, height: 36, trail: '#fff3a9cc' },
       'secondary-missile': { cell: 1, color: '#ff875f', width: 19, height: 33, trail: '#ff9a6fbb' },
       'secondary-rail': { cell: 4, color: '#dfffff', width: 20, height: 42, trail: '#b9f5ffcc' },
       'secondary-drone': { cell: 0, color: '#66eeff', width: 13, height: 24, trail: '#60e8ff99' },
       'secondary-pulse': { cell: 2, color: '#ce87ff', width: 21, height: 24, trail: '#d69affaa' },
       'secondary-seeker': { cell: 3, color: '#ffe174', width: 15, height: 29, trail: '#ffe998aa' },
       'secondary-prism': { cell: 2, color: '#a88cff', width: 13, height: 25, trail: '#bda6ff99' },
-      'secondary-burst': { cell: 1, color: '#ff9b58', width: 20, height: 28, trail: '#ffae70aa' }
+      'secondary-burst': { cell: 1, color: '#ff9b58', width: 20, height: 28, trail: '#ffae70aa' },
+      'primary-star': { cell: 3, color: '#ffd76c', width: 18, height: 25, trail: '#ffe69a99' },
+      'primary-rail': { cell: 4, color: '#c8f8ff', width: 18, height: 42, trail: '#c4f6ffbb' },
+      'primary-ember': { cell: 1, color: '#ff7a51', width: 14, height: 24, trail: '#ff9d7e99' },
+      'primary-burst': { cell: 1, color: '#ffb15c', width: 25, height: 33, trail: '#ffcf8a99' },
+      'primary-aurora': { cell: 4, color: '#8cfaff', width: 21, height: 46, trail: '#b7fbffcc' },
+      'primary-arc': { cell: 2, color: '#b99aff', width: 18, height: 28, trail: '#d5bbff99' },
+      'primary-blade': { cell: 2, color: '#73f0dd', width: 24, height: 28, trail: '#9dfff099' },
+      'wing-pulse': { cell: 0, color: '#70ecff', width: 13, height: 21, trail: '#75f1ff88' },
+      'wing-missile': { cell: 1, color: '#ff9a6a', width: 16, height: 27, trail: '#ffad8799' },
+      'wing-rail': { cell: 4, color: '#b8faff', width: 14, height: 34, trail: '#c6fbffbb' },
+      'wing-prism': { cell: 2, color: '#d093ff', width: 16, height: 22, trail: '#dfaaff99' },
+      'wing-heal': { cell: 0, color: '#79f6bd', width: 14, height: 24, trail: '#9bffd099' },
+      'wing-chain': { cell: 3, color: '#ffe071', width: 15, height: 24, trail: '#fff0a099' },
+      'wing-burst': { cell: 1, color: '#ff80ae', width: 18, height: 27, trail: '#ffa1c299' }
     };
     const visual = projectileVisuals[entry.style] || projectileVisuals.dawn;
     if (entry.trail) { ctx.strokeStyle = visual.trail; ctx.lineWidth = entry.laser ? 4 : 2; ctx.beginPath(); ctx.moveTo(entry.x, entry.y + 12); ctx.lineTo(entry.x - entry.vx * 0.032, entry.y - entry.vy * 0.032 + 12); ctx.stroke(); }

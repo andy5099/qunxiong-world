@@ -18,9 +18,9 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     stars: Array.from({ length: 50 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, a: Math.random(), speed: 18 + Math.random() * 42 })),
     nebulae: Array.from({ length: 4 }, () => ({ x: Math.random() * 440 - 40, y: Math.random() * 720 - 40, r: 65 + Math.random() * 85, speed: 5 + Math.random() * 8, color: Math.random() > 0.5 ? '#243f7655' : '#542d6a44' })),
     debris: Array.from({ length: 8 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, r: 2 + Math.random() * 5, speed: 45 + Math.random() * 55, spin: Math.random() * 6 })),
-    mode, stage: selectedStage, fusion: saveData.fusion || null, secondary: saveData.equipped?.secondary || null, wave: 0, left: 0, kind: 'scout', nextId: 1, score: 0, gold: 0, combo: 0, maxCombo: 0,
+    mode, stage: selectedStage, fusion: saveData.fusion || null, primary: saveData.equipped?.weapon || 'w1', secondary: saveData.equipped?.secondary || null, wingman: saveData.equipped?.engine || null, wave: 0, left: 0, kind: 'scout', nextId: 1, score: 0, gold: 0, combo: 0, maxCombo: 0,
     kills: 0, chests: 0, paused: false, over: false, last: 0, shake: 0,
-    message: '', messageTimer: 0, secondaryTimer: 0, elapsed: 0
+    message: '', messageTimer: 0, secondaryTimer: 0, wingTimer: 0, elapsed: 0
   };
   let animationFrame = 0;
 
@@ -86,6 +86,12 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     const damage = p.atk * (1 + (p.fireLevel - 1) * 0.18) * multiplier;
     const entry = bullet(p.x + xOffset, p.y - 18, Math.sin(angle) * speed, -Math.cos(angle) * speed, 'p', damage, pierce + (p.pierceBuff > 0 ? 1 : 0));
     entry.style = style;
+    // 部分機體使用蛇行、潮汐或螺旋軌跡；軌跡本身會隨 delta time 前進。
+    if (style === 'violet' || style === 'tide' || style === 'helix') {
+      entry.wave = style === 'tide' ? 54 : style === 'helix' ? 72 : 38;
+      entry.waveRate = style === 'helix' ? 13 : style === 'tide' ? 7 : 10;
+      entry.wavePhase = angle * 10;
+    }
     if (p.crit > 0 && Math.random() < 0.25 + (p.critBase || 0)) { entry.damage *= 1.65; entry.critical = true; }
     entry.laser = laser;
     entry.trail = p.fireLevel >= 5 || p.rage > 0;
@@ -99,12 +105,29 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     const level = p.fireLevel;
     const speed = (level >= 5 ? 540 : level >= 4 ? 510 : 455) * (p.rage > 0 ? 1.3 : 1);
     p.fire = C.shot / rapid;
-    if (level === 1) [-8, 8].forEach((offset) => emitPlayerShot(offset, 0, speed));
-    if (level === 2) [-12, 0, 12].forEach((offset) => emitPlayerShot(offset, 0, speed));
-    if (level === 3 || level === 4) [-0.22, -0.11, 0, 0.11, 0.22].forEach((angle) => emitPlayerShot(0, angle, speed, level === 4 ? 1 : 0));
-    if (level === 5) {
-      [-0.31, -0.21, -0.11, 0, 0.11, 0.21, 0.31].forEach((angle) => emitPlayerShot(0, angle, speed, 1));
-      emitPlayerShot(0, 0, 650 * (p.rage > 0 ? 1.3 : 1), 2, true);
+    // 主武器在每個火力等級都有可見且不同的彈道，而不是只有數字加成。
+    const count = level === 1 ? 2 : level === 2 ? 3 : level < 5 ? 5 : 7;
+    const spread = count === 2 ? [-0.04, 0.04] : Array.from({ length: count }, (_, index) => (index - (count - 1) / 2) * (level >= 5 ? 0.105 : 0.075));
+    const launch = (angle, shotSpeed = speed, pierce = 0, laser = false, multiplier = 1, style = 'dawn') => emitPlayerShot(0, angle, shotSpeed, pierce, laser, multiplier, style);
+    if (state.primary === 'w2') spread.forEach(angle => launch(angle * 1.65, speed * 0.92, 0, false, 0.82, 'primary-star'));
+    else if (state.primary === 'w3') [-0.025, 0.025].forEach(angle => launch(angle, speed * 1.18, level >= 3 ? 3 : 1, false, 1.16, 'primary-rail'));
+    else if (state.primary === 'w4') {
+      const rapidSpread = level >= 4 ? [-0.12, -0.04, 0.04, 0.12] : [-0.06, 0.06];
+      rapidSpread.forEach(angle => launch(angle, speed * 1.24, 0, false, 0.55, 'primary-ember'));
+    } else if (state.primary === 'w5') {
+      launch(0, speed * 0.72, 0, false, 2.25, 'primary-burst');
+      if (level >= 3) [-0.16, 0.16].forEach(angle => launch(angle, speed * 0.7, 0, false, 0.9, 'primary-burst'));
+    } else if (state.primary === 'w6') {
+      launch(0, 690, level >= 4 ? 4 : 2, true, 1.38, 'primary-aurora');
+      if (level >= 5) [-0.08, 0.08].forEach(angle => launch(angle, 620, 1, true, 0.65, 'primary-aurora'));
+    } else if (state.primary === 'w7') {
+      spread.slice(0, Math.min(3, spread.length)).forEach(angle => launch(angle, speed, 1, false, 0.88, 'primary-arc'));
+    } else if (state.primary === 'w8') {
+      [-0.16, 0.16].forEach(angle => launch(angle, speed * 0.84, 2, false, 1.15, 'primary-blade'));
+      if (level >= 4) launch(0, speed * 0.86, 3, false, 1.05, 'primary-blade');
+    } else {
+      spread.forEach(angle => launch(angle, speed, level >= 4 ? 1 : 0, false, 1, 'dawn'));
+      if (level === 5) launch(0, 650 * (p.rage > 0 ? 1.3 : 1), 2, true, 1.25, 'dawn');
     }
     // 每架戰機的額外主炮：改變射擊節奏與彈道，不只是數值倍率。
     if (p.shipId === 'ember') emitPlayerShot(0, 0, speed * 0.82, 0, true, 1.45, 'ember');
@@ -115,6 +138,12 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     if (p.shipId === 'tide') [-0.42, -0.21, 0, 0.21, 0.42].forEach(angle => emitPlayerShot(0, angle, speed * 0.93, 0, false, 0.5, 'tide'));
     if (p.shipId === 'rime') emitPlayerShot(0, 0, speed * 0.76, 3, true, 1.8, 'rime');
     if (p.shipId === 'nova') [-0.25, 0, 0.25].forEach(angle => emitPlayerShot(0, angle, speed * 1.1, 1, false, 0.85, 'nova'));
+    if (p.shipId === 'helix') [-0.15, 0.15].forEach(angle => emitPlayerShot(0, angle, speed * 1.08, 1, false, 0.92, 'helix'));
+    if (p.shipId === 'aurora') emitPlayerShot(0, 0, 705, 3, true, 1.36, 'aurora');
+    if (p.shipId === 'caldera') emitPlayerShot(0, 0, speed * 0.7, 0, false, 2.35, 'caldera');
+    if (p.shipId === 'seraph') [-0.3, -0.18, -0.06, 0.06, 0.18, 0.3].forEach(angle => emitPlayerShot(0, angle, speed * 1.04, 1, false, 0.7, 'seraph'));
+    if (p.shipId === 'voidlance') [-0.055, 0.055].forEach(angle => emitPlayerShot(0, angle, speed * 1.32, 4, false, 1.18, 'voidlance'));
+    if (p.shipId === 'solaris') [-0.26, -0.13, 0, 0.13, 0.26].forEach(angle => emitPlayerShot(0, angle, speed * 1.18, 2, angle === 0, 0.98, 'solaris'));
   }
 
   function damagePlayer(amount) {
@@ -217,9 +246,27 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     if (controls.keys.arrowdown || controls.keys.s) p.y += speed;
     p.x = Math.max(15, Math.min(345, p.x)); p.y = Math.max(40, Math.min(610, p.y));
     p.inv -= dt; p.fire -= dt; p.magnet = Math.max(0, p.magnet - dt); p.rage = Math.max(0, p.rage - dt); p.doubleGold = Math.max(0, p.doubleGold - dt); p.pierceBuff = Math.max(0, p.pierceBuff - dt); p.crit = Math.max(0, p.crit - dt); p.rapid = Math.max(0, p.rapid - dt);
-    p.secondaryTimer -= dt;
+    p.secondaryTimer -= dt; p.wingTimer -= dt;
     firePlayer();
     fireSecondary(p);
+    fireWingman(p);
+  }
+
+  function fireWingman(p) {
+    const wingman = state.wingman;
+    if (!wingman || p.wingTimer > 0) return;
+    const launch = (x, angle, speed, damage, style, pierce = 0, laser = false) => {
+      const entry = bullet(x, p.y - 20, Math.sin(angle) * speed, -Math.cos(angle) * speed, 'p', p.atk * damage, pierce);
+      entry.style = style; entry.trail = true; entry.laser = laser; state.bullets.push(entry);
+    };
+    if (wingman === 'e1') { [-30, 30].forEach(x => launch(p.x + x, 0, 340, 0.42, 'wing-pulse')); p.wingTimer = 0.74; }
+    else if (wingman === 'e2') { [-32, 32].forEach(x => launch(p.x + x, x < p.x ? -0.12 : 0.12, 300, 0.52, 'wing-missile', 1)); p.wingTimer = 1.3; }
+    else if (wingman === 'e3') { [-31, 31].forEach(x => launch(p.x + x, 0, 560, 0.45, 'wing-rail', 2, true)); p.wingTimer = 1.08; }
+    else if (wingman === 'e4') { [-34, 34].forEach(x => launch(p.x + x, x < p.x ? -0.22 : 0.22, 360, 0.56, 'wing-prism', 1)); p.wingTimer = 0.82; }
+    else if (wingman === 'e5') { [-34, 34].forEach(x => launch(p.x + x, 0, 315, 0.58, 'wing-heal')); p.wingTimer = 0.92; }
+    else if (wingman === 'e6') { [-28, 28].forEach(x => launch(p.x + x, 0, 600, 0.46, 'wing-rail', 3, true)); p.wingTimer = 0.86; }
+    else if (wingman === 'e7') { [-0.26, 0, 0.26].forEach(angle => launch(p.x, angle, 330, 0.43, 'wing-chain', 1)); p.wingTimer = 0.78; }
+    else { [-36, 36].forEach(x => launch(p.x + x, 0, 275, 0.78, 'wing-burst', 2)); p.wingTimer = 1.42; }
   }
 
   function fireSecondary(p) {
@@ -394,7 +441,13 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
   }
 
   function updateProjectiles(dt) {
-    state.bullets.forEach((entry) => { entry.x += entry.vx * dt; entry.y += entry.vy * dt; entry.life -= dt; });
+    state.bullets.forEach((entry) => {
+      entry.age = (entry.age || 0) + dt;
+      entry.x += entry.vx * dt;
+      entry.y += entry.vy * dt;
+      if (entry.wave) entry.x += Math.sin(entry.age * entry.waveRate + entry.wavePhase) * entry.wave * dt;
+      entry.life -= dt;
+    });
     state.bullets = state.bullets.filter((entry) => entry.life > 0 && entry.y > -35 && entry.y < 680 && entry.x > -35 && entry.x < 395);
     state.bullets.filter((entry) => entry.from === 'p').forEach((entry) => {
       state.enemies.forEach((target) => { if (target.hp > 0) hitTarget(entry, target); });
