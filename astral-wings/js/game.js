@@ -5,7 +5,7 @@ import { makeBoss } from './entities/boss.js';
 import { bullet } from './entities/bullet.js';
 import { pickup } from './entities/pickup.js';
 import { stage } from './data/stages.js';
-import { render } from './renderer.js';
+import { render } from './renderer.js?v=20260727-ai-clean';
 
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const pickupTypes = ['gold', 'power', 'hp', 'shield', 'energy', 'magnet', 'rage', 'double'];
