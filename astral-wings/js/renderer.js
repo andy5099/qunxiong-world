@@ -86,6 +86,37 @@ function drawEnemy(ctx, entry, triangle) {
   if (entry.shield > 0) { ctx.strokeStyle = '#78cfff'; ctx.globalAlpha = 0.65; ctx.beginPath(); ctx.arc(entry.x, entry.y, entry.r + 5, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1; }
 }
 
+// 副武器不只影響攻擊資料，也在戰機上繪出可辨識的掛載模組與動態能量核心。
+function drawSecondaryRig(ctx, p, secondary, elapsed) {
+  if (!secondary) return;
+  const pulse = 0.75 + Math.sin(elapsed * 7) * 0.25;
+  const glow = (color, blur = 10) => { ctx.shadowColor = color; ctx.shadowBlur = blur; ctx.fillStyle = color; };
+  ctx.save();
+  if (secondary === 's1') {
+    // 追跡飛彈：雙翼橘紅飛彈莢艙。
+    glow('#ff8a58'); [-31, 31].forEach(x => { ctx.fillRect(p.x + x - 4, p.y + 6, 8, 20); ctx.fillStyle = '#ffe1ba'; ctx.fillRect(p.x + x - 2, p.y + 4, 4, 7); glow('#ff8a58'); });
+  } else if (secondary === 's2' || secondary === 's6') {
+    // 軌道雷射：兩側青白導軌，可看出雷射的發射來源。
+    glow('#9df7ff', 14); [-28, 28].forEach(x => { ctx.fillRect(p.x + x - 3, p.y - 17, 6, 34); ctx.fillStyle = '#ecffff'; ctx.fillRect(p.x + x - 1, p.y - 22, 2, 15); glow('#9df7ff', 14); });
+  } else if (secondary === 's3') {
+    // 爆裂無人機：兩顆伴飛球會環繞機身。
+    [-1, 1].forEach(side => { const angle = elapsed * 2.4 + (side > 0 ? 0 : Math.PI); const x = p.x + Math.cos(angle) * 31; const y = p.y + Math.sin(angle) * 13; glow('#62efff', 12); ctx.beginPath(); ctx.arc(x, y, 7, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#f0ffff'; ctx.fillRect(x - 2, y - 2, 4, 4); });
+  } else if (secondary === 's4') {
+    // 電磁脈衝：紫色核心環。
+    ctx.strokeStyle = '#d398ff'; ctx.shadowColor = '#b772ff'; ctx.shadowBlur = 13; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(p.x, p.y + 4, 24 + pulse * 4, 0, Math.PI * 2); ctx.stroke();
+  } else if (secondary === 's5') {
+    // 導引集束：金色三角鎖定器。
+    glow('#ffe477', 12); [-22, 0, 22].forEach(x => { ctx.beginPath(); ctx.moveTo(p.x + x, p.y - 23); ctx.lineTo(p.x + x - 5, p.y - 11); ctx.lineTo(p.x + x + 5, p.y - 11); ctx.closePath(); ctx.fill(); });
+  } else if (secondary === 's7') {
+    // 稜鏡散射：四枚紫晶節點。
+    [-25, -9, 9, 25].forEach((x, index) => { glow('#ad91ff', 11); ctx.save(); ctx.translate(p.x + x, p.y + 12 + (index % 2) * 5); ctx.rotate(Math.PI / 4); ctx.fillRect(-5, -5, 10, 10); ctx.restore(); });
+  } else if (secondary === 's8') {
+    // 爆裂彈：兩座赤橙短炮塔。
+    glow('#ff9a5a', 12); [-24, 24].forEach(x => { ctx.fillRect(p.x + x - 6, p.y - 9, 12, 15); ctx.fillStyle = '#ffdfb3'; ctx.fillRect(p.x + x - 2, p.y - 22, 4, 15); glow('#ff9a5a', 12); });
+  }
+  ctx.restore();
+}
+
 export function render(ctx, state) {
   const { p, enemies, bullets, pickups, particles, boss, stars, nebulae, debris } = state;
   const shakeX = state.shake ? (Math.random() - 0.5) * state.shake : 0;
@@ -117,6 +148,7 @@ export function render(ctx, state) {
     ctx.fillStyle = '#f3feff'; ctx.fillRect(-2, -14, 4, 18); ctx.fillStyle = '#ffb553'; ctx.fillRect(-9, 15, 5, 8); ctx.fillRect(4, 15, 5, 8); ctx.restore();
     }
   }
+  drawSecondaryRig(ctx, p, state.secondary, state.elapsed || 0);
   enemies.forEach((entry) => drawEnemy(ctx, entry, triangle));
   if (boss) {
     if (!drawAiCraft(ctx, 1, boss.x, boss.y, 220, 190, 0.95)) { ctx.save();
@@ -134,27 +166,42 @@ export function render(ctx, state) {
     }
   }
   bullets.forEach((entry) => {
-    if (entry.trail) { ctx.strokeStyle = entry.laser ? '#cfffff99' : '#ffde8299'; ctx.lineWidth = entry.laser ? 4 : 2; ctx.beginPath(); ctx.moveTo(entry.x, entry.y + 12); ctx.lineTo(entry.x - entry.vx * 0.025, entry.y - entry.vy * 0.025 + 12); ctx.stroke(); }
-    const shipShotColors = { ember: '#ff8a55', violet: '#c98bff', bulwark: '#69dfff', auric: '#ffe078', dawn: '#fff4a0' };
-    const projectileCells = { dawn: 0, ember: 1, violet: 2, auric: 3, bulwark: 0, secondary: 4 };
-    const cell = entry.laser ? 4 : projectileCells[entry.style || 'dawn'];
-    if (entry.from === 'p' && drawAiVfx(ctx, cell, entry.x, entry.y, entry.laser ? 18 : 16, entry.laser ? 35 : 24)) return;
-    ctx.fillStyle = entry.from === 'p' ? (entry.laser ? '#dfffff' : (shipShotColors[entry.style] || '#fff4a0')) : '#ff6e87';
-    ctx.beginPath(); ctx.arc(entry.x, entry.y, entry.laser ? 5 : entry.r, 0, Math.PI * 2); ctx.fill();
+    const projectileVisuals = {
+      dawn: { cell: 0, color: '#66eaff', width: 15, height: 25, trail: '#72efff99' },
+      ember: { cell: 1, color: '#ff8a55', width: 18, height: 30, trail: '#ff9c6399' },
+      violet: { cell: 2, color: '#c98bff', width: 16, height: 27, trail: '#d4a4ff99' },
+      auric: { cell: 3, color: '#ffe078', width: 17, height: 30, trail: '#ffe98a99' },
+      bulwark: { cell: 0, color: '#69dfff', width: 18, height: 27, trail: '#7de9ff99' },
+      'secondary-missile': { cell: 1, color: '#ff875f', width: 19, height: 33, trail: '#ff9a6fbb' },
+      'secondary-rail': { cell: 4, color: '#dfffff', width: 20, height: 42, trail: '#b9f5ffcc' },
+      'secondary-drone': { cell: 0, color: '#66eeff', width: 13, height: 24, trail: '#60e8ff99' },
+      'secondary-pulse': { cell: 2, color: '#ce87ff', width: 21, height: 24, trail: '#d69affaa' },
+      'secondary-seeker': { cell: 3, color: '#ffe174', width: 15, height: 29, trail: '#ffe998aa' },
+      'secondary-prism': { cell: 2, color: '#a88cff', width: 13, height: 25, trail: '#bda6ff99' },
+      'secondary-burst': { cell: 1, color: '#ff9b58', width: 20, height: 28, trail: '#ffae70aa' }
+    };
+    const visual = projectileVisuals[entry.style] || projectileVisuals.dawn;
+    if (entry.trail) { ctx.strokeStyle = visual.trail; ctx.lineWidth = entry.laser ? 4 : 2; ctx.beginPath(); ctx.moveTo(entry.x, entry.y + 12); ctx.lineTo(entry.x - entry.vx * 0.032, entry.y - entry.vy * 0.032 + 12); ctx.stroke(); }
+    if (entry.from === 'p' && drawAiVfx(ctx, visual.cell, entry.x, entry.y, entry.laser ? visual.width : visual.width, entry.laser ? visual.height : visual.height)) return;
+    // 圖集無法載入時仍維持長條、晶片或菱形備援，不退回圓點。
+    ctx.save(); ctx.translate(entry.x, entry.y); ctx.rotate(Math.atan2(entry.vy, entry.vx) + Math.PI / 2); ctx.fillStyle = entry.from === 'p' ? visual.color : '#ff6e87';
+    if (entry.laser) ctx.fillRect(-3, -16, 6, 32);
+    else { ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(6, 7); ctx.lineTo(0, 11); ctx.lineTo(-6, 7); ctx.closePath(); ctx.fill(); }
+    ctx.restore();
   });
   pickups.forEach((entry) => {
     const color = pickupColors[entry.type]; const pulse = 1 + Math.sin(entry.age * 6) * 0.12;
     ctx.save(); ctx.translate(entry.x, entry.y); ctx.scale(pulse, pulse); ctx.shadowBlur = 12; ctx.shadowColor = color;
     // 核心補給使用獨立圖樣；臨時增益亦沿用不同色相的能量標記，避免與玩家彈幕混淆。
-    const pickupCells = { hp: 5, shield: 6, energy: 7, power: 8, magnet: 9, rage: 10, double: 11, pierce: 2, crit: 3, barrier: 6, rapid: 1 };
+    const pickupCells = { gold: 11, hp: 5, shield: 6, energy: 7, power: 8, magnet: 9, rage: 10, double: 11, pierce: 2, crit: 3, barrier: 6, rapid: 1 };
     if (pickupCells[entry.type] !== undefined && drawAiVfx(ctx, pickupCells[entry.type], 0, 0, 32, 32)) { ctx.restore(); return; }
     ctx.fillStyle = color; ctx.rotate(Math.PI / 4); ctx.fillRect(-8, -8, 16, 16); ctx.rotate(-Math.PI / 4);
     ctx.shadowBlur = 0; ctx.fillStyle = '#08111d'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(pickupMarks[entry.type], 0, 1); ctx.restore();
   });
   particles.forEach((entry) => { ctx.globalAlpha = Math.max(0, entry.life * 2); ctx.fillStyle = entry.color; ctx.fillRect(entry.x - entry.size / 2, entry.y - entry.size / 2, entry.size, entry.size); });
   ctx.globalAlpha = 1;
-  if (state.messageTimer > 0 || state.bossEntrance > 0) {
-    ctx.fillStyle = state.bossEntrance > 0 ? '#ff5f7a' : '#fff2a3';
+  if (state.messageTimer > 0) {
+    ctx.fillStyle = '#fff2a3';
     ctx.font = 'bold 19px system-ui'; ctx.textAlign = 'center';
     ctx.fillText(state.message, 180, 300);
   }

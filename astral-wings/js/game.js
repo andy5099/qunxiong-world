@@ -1,11 +1,11 @@
 import { C, balanceConfig } from './config.js?v=20260727-dodge-balance';
-import { player } from './entities/player.js?v=20260727-ai-vfx';
+import { player } from './entities/player.js?v=20260727-ship-rigs';
 import { enemy } from './entities/enemy.js?v=20260727-hitbox';
 import { makeBoss } from './entities/boss.js?v=20260727-hitbox';
 import { bullet } from './entities/bullet.js';
 import { pickup } from './entities/pickup.js';
 import { stage } from './data/stages.js';
-import { render } from './renderer.js?v=20260727-ai-vfx';
+import { render } from './renderer.js?v=20260727-ship-rigs';
 
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const pickupTypes = ['gold', 'power', 'hp', 'shield', 'energy', 'magnet', 'rage', 'double'];
@@ -18,9 +18,9 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     stars: Array.from({ length: 50 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, a: Math.random(), speed: 18 + Math.random() * 42 })),
     nebulae: Array.from({ length: 4 }, () => ({ x: Math.random() * 440 - 40, y: Math.random() * 720 - 40, r: 65 + Math.random() * 85, speed: 5 + Math.random() * 8, color: Math.random() > 0.5 ? '#243f7655' : '#542d6a44' })),
     debris: Array.from({ length: 8 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, r: 2 + Math.random() * 5, speed: 45 + Math.random() * 55, spin: Math.random() * 6 })),
-    mode, stage: selectedStage, fusion: saveData.fusion || null, wave: 0, left: 0, kind: 'scout', nextId: 1, score: 0, gold: 0, combo: 0, maxCombo: 0,
+    mode, stage: selectedStage, fusion: saveData.fusion || null, secondary: saveData.equipped?.secondary || null, wave: 0, left: 0, kind: 'scout', nextId: 1, score: 0, gold: 0, combo: 0, maxCombo: 0,
     kills: 0, paused: false, over: false, last: 0, hitStop: 0, shake: 0,
-    bossEntrance: 0, supplyTimer: 0, victoryTimer: 0, message: '', messageTimer: 0, secondaryTimer: 0
+    supplyTimer: 0, message: '', messageTimer: 0, secondaryTimer: 0, elapsed: 0
   };
   let animationFrame = 0;
 
@@ -49,12 +49,15 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
   }
 
   function spawnNextWave() {
-    if (state.boss || state.enemies.length || state.left || state.bossEntrance > 0 || state.supplyTimer > 0 || state.victoryTimer > 0) return;
+    if (state.boss || state.enemies.length || state.left || state.supplyTimer > 0) return;
     const wave = getNextWave();
     if (!wave) return finish(true);
     if (wave[0] === 'boss') {
-      state.bossEntrance = 2.2;
-      announce('警告：鐵幕吞噬者接近中', 2.2);
+      // Boss 直接進場，保留安全起手時間但不凍結玩家、子彈或背景。
+      state.boss = makeBoss(state.stage.boss);
+      state.boss.id = 'boss';
+      state.shake = 7;
+      announce(`警告：${state.boss.name} 已進場`, 1.1);
       return;
     }
     if (wave[0] === 'supply') {
@@ -153,7 +156,8 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     state.maxCombo = Math.max(state.maxCombo, state.combo);
     state.kills += 1;
     state.p.energy = Math.min(100, state.p.energy + 6);
-    state.hitStop = target.kind === 'elite' || target.isBoss ? 0.045 : 0.018;
+    // Boss 擊破不使用 Hit Stop，避免結算前的停滯感。
+    state.hitStop = target.isBoss ? 0 : (target.kind === 'elite' ? 0.025 : 0.012);
     state.shake = Math.max(state.shake, target.isBoss ? 11 : 2);
     spawnParticle(target.x, target.y, target.color || '#ffb56e', target.isBoss ? 42 : 10, target.isBoss ? 5 : 2);
     if (target.isBoss) dropBoss(target); else dropForEnemy(target);
@@ -214,27 +218,28 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
   function fireSecondary(p) {
     const secondary = saveData.equipped?.secondary;
     if (!secondary || p.secondaryTimer > 0) return;
-    const launch = (entry, style = 'secondary') => { entry.style = style; entry.trail = true; state.bullets.push(entry); };
+    // 每種副武器都帶著獨立 style，渲染器會依此繪出不同彈型、顏色與拖尾。
+    const launch = (entry, style) => { entry.style = style; entry.trail = true; state.bullets.push(entry); };
     if (secondary === 's1') {
       const target = state.boss || state.enemies.reduce((best, item) => !best || distance(item, p) < distance(best, p) ? item : best, null);
-      if (target) { const aim = Math.atan2(target.y - p.y, target.x - p.x); launch(bullet(p.x, p.y - 14, Math.cos(aim) * 285, Math.sin(aim) * 285, 'p', p.atk * 2.1, 0)); }
+      if (target) { const aim = Math.atan2(target.y - p.y, target.x - p.x); launch(bullet(p.x, p.y - 14, Math.cos(aim) * 285, Math.sin(aim) * 285, 'p', p.atk * 2.1, 0), 'secondary-missile'); }
       p.secondaryTimer = 2.1;
     } else if (secondary === 's2') {
-      const beam = bullet(p.x, p.y - 20, 0, -610, 'p', p.atk * 1.65, 3, true); beam.laser = true; launch(beam); p.secondaryTimer = 2.5;
+      const beam = bullet(p.x, p.y - 20, 0, -610, 'p', p.atk * 1.65, 3, true); beam.laser = true; launch(beam, 'secondary-rail'); p.secondaryTimer = 2.5;
     } else if (secondary === 's3') {
-      [-22, 22].forEach(offset => launch(bullet(p.x + offset, p.y - 9, 0, -360, 'p', p.atk * 0.6))); p.secondaryTimer = 0.62;
+      [-22, 22].forEach(offset => launch(bullet(p.x + offset, p.y - 9, 0, -360, 'p', p.atk * 0.6), 'secondary-drone')); p.secondaryTimer = 0.62;
     } else if (secondary === 's4') {
-      [-0.18, 0.18].forEach(angle => launch(bullet(p.x, p.y - 18, Math.sin(angle) * 330, -Math.cos(angle) * 330, 'p', p.atk * 0.8, 1))); p.secondaryTimer = 1.15;
+      [-0.18, 0.18].forEach(angle => launch(bullet(p.x, p.y - 18, Math.sin(angle) * 330, -Math.cos(angle) * 330, 'p', p.atk * 0.8, 1), 'secondary-pulse')); p.secondaryTimer = 1.15;
     } else if (secondary === 's5') {
       const target = state.boss || state.enemies.reduce((best, item) => !best || distance(item, p) < distance(best, p) ? item : best, null);
-      if (target) [-0.18, 0, 0.18].forEach(offset => { const aim = Math.atan2(target.y - p.y, target.x - (p.x + offset * 40)); launch(bullet(p.x + offset * 40, p.y - 16, Math.cos(aim) * 250, Math.sin(aim) * 250, 'p', p.atk * 0.82, 1)); });
+      if (target) [-0.18, 0, 0.18].forEach(offset => { const aim = Math.atan2(target.y - p.y, target.x - (p.x + offset * 40)); launch(bullet(p.x + offset * 40, p.y - 16, Math.cos(aim) * 250, Math.sin(aim) * 250, 'p', p.atk * 0.82, 1), 'secondary-seeker'); });
       p.secondaryTimer = 1.45;
     } else if (secondary === 's6') {
-      [-14, 14].forEach(offset => { const beam = bullet(p.x + offset, p.y - 20, 0, -520, 'p', p.atk * 0.9, 2, true); beam.laser = true; launch(beam); }); p.secondaryTimer = 1.75;
+      [-14, 14].forEach(offset => { const beam = bullet(p.x + offset, p.y - 20, 0, -520, 'p', p.atk * 0.9, 2, true); beam.laser = true; launch(beam, 'secondary-rail'); }); p.secondaryTimer = 1.75;
     } else if (secondary === 's7') {
-      [-0.38, -0.13, 0.13, 0.38].forEach(angle => launch(bullet(p.x, p.y - 16, Math.sin(angle) * 310, -Math.cos(angle) * 310, 'p', p.atk * 0.68, 1))); p.secondaryTimer = 1.05;
+      [-0.38, -0.13, 0.13, 0.38].forEach(angle => launch(bullet(p.x, p.y - 16, Math.sin(angle) * 310, -Math.cos(angle) * 310, 'p', p.atk * 0.68, 1), 'secondary-prism')); p.secondaryTimer = 1.05;
     } else if (secondary === 's8') {
-      [-0.3, 0, 0.3].forEach(angle => { const shell = bullet(p.x, p.y - 18, Math.sin(angle) * 240, -Math.cos(angle) * 240, 'p', p.atk * 1.15, 2); launch(shell); }); p.secondaryTimer = 1.55;
+      [-0.3, 0, 0.3].forEach(angle => { const shell = bullet(p.x, p.y - 18, Math.sin(angle) * 240, -Math.cos(angle) * 240, 'p', p.atk * 1.15, 2); launch(shell, 'secondary-burst'); }); p.secondaryTimer = 1.55;
     }
   }
 
@@ -365,7 +370,8 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     if (target.shield > 0) target.shield = Math.max(0, target.shield - entry.damage);
     else target.hp -= entry.damage;
     state.p.energy = Math.min(100, state.p.energy + 1);
-    state.hitStop = Math.max(state.hitStop, 0.009);
+    // Boss 戰維持完整幀率，避免高射速命中時反覆造成慢動作。
+    if (!target.isBoss) state.hitStop = Math.max(state.hitStop, 0.009);
     spawnParticle(entry.x, entry.y, entry.laser ? '#d6ffff' : '#fff1a0', 3, 1.5);
     if (entry.pierce > 0) entry.pierce -= 1; else entry.life = 0;
   }
@@ -425,7 +431,14 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     state.enemies.filter((entry) => entry.hp <= 0).forEach(defeat);
     state.enemies = state.enemies.filter((entry) => entry.hp > 0);
     if (state.boss && state.boss.hp <= 0) {
-      const defeated = state.boss; defeated.isBoss = true; defeat(defeated); state.boss = null; state.left = 0; state.victoryTimer = 1.1; announce('鐵幕吞噬者已瓦解', 1.1);
+      const defeated = state.boss;
+      defeated.isBoss = true;
+      defeat(defeated);
+      state.boss = null;
+      state.left = 0;
+      announce(`${defeated.name} 已瓦解`, 0.6);
+      // 主線與 Boss 挑戰立刻結算；無盡模式則不中斷地接續下一波。
+      if (mode !== 'endless') finish(true);
     }
   }
 
@@ -438,18 +451,13 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     const dt = Math.min(0.033, (time - state.last || 0) / 1000);
     state.last = time;
     if (!state.paused && !state.over) {
+      state.elapsed += dt;
       state.messageTimer = Math.max(0, state.messageTimer - dt);
       if (state.hitStop > 0) state.hitStop -= dt;
       else {
-        if (state.victoryTimer > 0) {
-          state.victoryTimer -= dt;
-          if (state.victoryTimer <= 0 && mode !== 'endless') finish(true);
-        } else if (state.supplyTimer > 0) {
+        if (state.supplyTimer > 0) {
           state.supplyTimer -= dt;
           updatePlayer(dt); updatePickups(dt);
-        } else if (state.bossEntrance > 0) {
-          state.bossEntrance -= dt;
-          if (state.bossEntrance <= 0) { state.boss = makeBoss(state.stage.boss); state.boss.id = 'boss'; state.shake = 7; announce(`${state.boss.name}・第一階段`, 1.1); }
         } else {
           updatePlayer(dt); updateEnemies(dt, time); updateProjectiles(dt); resolveDefeats(); updatePickups(dt); spawnNextWave();
         }
