@@ -6,6 +6,7 @@ import { bullet } from './entities/bullet.js';
 import { pickup } from './entities/pickup.js';
 import { stage } from './data/stages.js?v=20260727-visual-12stage';
 import { render } from './renderer.js?v=20260727-gamefeel';
+import { createFormation } from './systems/formationManager.js';
 
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const pickupTypes = ['gold', 'power', 'hp', 'shield', 'energy', 'magnet', 'rage', 'double', 'chest'];
@@ -71,8 +72,8 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     state.kind = wave[0];
     state.left = wave[1];
     // 固定波次配合隊形，不再讓同種敵機隨機散落進場。
-    const forms = ['vee', 'column', 'cross', 'pincer', 'wave', 'spiral', 'pass'];
-    state.formation = forms[(state.wave + state.stage.order * 2) % forms.length];
+    const forms = ['vee', 'column', 'row', 'cross', 'pincer', 'wave', 'spiral', 'pass'];
+    state.formation = createFormation(forms[(state.wave + state.stage.order * 2) % forms.length], wave[1], state.elapsed);
     state.formationIndex = 0;
   }
 
@@ -302,17 +303,6 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     }
   }
 
-  function formationX(style, index, count) {
-    const middle = (count - 1) / 2;
-    if (style === 'vee') return 180 + (index - middle) * 34;
-    if (style === 'column') return 180;
-    if (style === 'cross') return 180 + (index % 2 ? -1 : 1) * (34 + Math.floor(index / 2) * 27);
-    if (style === 'pincer') return index % 2 ? 58 + Math.floor(index / 2) * 22 : 302 - Math.floor(index / 2) * 22;
-    if (style === 'wave') return 50 + index * (260 / Math.max(1, count - 1));
-    if (style === 'spiral') return 180 + Math.sin(index * 1.75) * (44 + index * 12);
-    return index % 2 ? 44 : 316;
-  }
-
   function spawnEnemy(kind, x) {
     const entry = enemy(kind, x);
     const stageOrder = Math.max(0, state.stage?.order || 0);
@@ -345,13 +335,18 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
 
   function updateEnemies(dt, time) {
     if (state.left && state.enemies.length < 6) {
-      const total = state.left + state.formationIndex;
-      spawnEnemy(state.kind, formationX(state.formation, state.formationIndex, total));
+      const point = state.formation.point(state.formationIndex, 0);
+      spawnEnemy(state.kind, point.x);
       state.formationIndex += 1;
       state.left -= 1;
     }
     state.enemies.forEach((entry) => {
       entry.age += dt; entry.fireCd -= dt;
+      if (entry.formation && entry.age < entry.formation.hold) {
+        const point = entry.formation.point(entry.formationSlot, entry.age);
+        entry.x += (point.x - entry.x) * Math.min(1, dt * 8);
+        entry.y += (point.y - entry.y) * Math.min(1, dt * 7);
+      } else {
       if (entry.pattern === 'dash') { entry.y += entry.speed * dt; entry.x += Math.sin(entry.age * 8 + entry.phase) * 105 * dt; }
       if (entry.pattern === 'drift') { entry.y += entry.speed * dt; entry.x += Math.sin(entry.age * 2 + entry.phase) * 38 * dt; }
       if (entry.pattern === 'heavy') { entry.y = Math.min(entry.lockedY, entry.y + entry.speed * dt); entry.x += Math.sin(entry.age + entry.phase) * 16 * dt; }
@@ -359,6 +354,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
       if (entry.pattern === 'suicide') { entry.y += entry.speed * dt; entry.x += Math.sign(state.p.x - entry.x) * 38 * dt; }
       if (entry.pattern === 'orbit') { entry.y = Math.min(entry.lockedY, entry.y + entry.speed * dt); entry.x += Math.sin(entry.age * 2.4 + entry.phase) * 62 * dt; }
       if (entry.pattern === 'sweep') { entry.y = Math.min(entry.lockedY, entry.y + entry.speed * dt); entry.x += Math.cos(entry.age * 2 + entry.phase) * 68 * dt; }
+      }
       entry.x = Math.max(18, Math.min(342, entry.x));
       if (entry.fireCd <= 0 && entry.attack !== 'none') fireEnemy(entry);
       if (entry.pattern === 'suicide' && distance(entry, state.p) < entry.r + state.p.r + 8) { damagePlayer(22); entry.hp = 0; }

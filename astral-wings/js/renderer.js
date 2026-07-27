@@ -214,6 +214,16 @@ function drawPlayerVitalBars(ctx, p) {
   ctx.restore();
 }
 
+// 三架首要戰機使用不同的覆蓋式機械輪廓，與共用底圖一起形成可辨識的機頭、翼型與炮位。
+function drawCraftSignature(ctx, p, elapsed) {
+  const color = p.shipId === 'ember' ? '#ff7653' : p.shipId === 'violet' ? '#cb8cff' : '#69eaff';
+  ctx.save(); ctx.translate(p.x, p.y); ctx.strokeStyle = color; ctx.fillStyle = `${color}55`; ctx.lineWidth = 1.6; ctx.shadowColor = color; ctx.shadowBlur = 8;
+  if (p.shipId === 'ember') { ctx.beginPath(); ctx.moveTo(0,-42); ctx.lineTo(-18,16); ctx.lineTo(-7,11); ctx.lineTo(0,28); ctx.lineTo(7,11); ctx.lineTo(18,16); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.fillRect(-4,-31,8,35); }
+  else if (p.shipId === 'violet') { ctx.beginPath(); ctx.moveTo(0,-44); ctx.lineTo(-30,5); ctx.lineTo(-11,13); ctx.lineTo(-18,27); ctx.lineTo(0,19); ctx.lineTo(18,27); ctx.lineTo(11,13); ctx.lineTo(30,5); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.arc(0,0,7+Math.sin(elapsed*7)*2,0,Math.PI*2); ctx.stroke(); }
+  else { ctx.beginPath(); ctx.moveTo(0,-43); ctx.lineTo(-22,-3); ctx.lineTo(-16,24); ctx.lineTo(0,16); ctx.lineTo(16,24); ctx.lineTo(22,-3); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.fillRect(-16,-16,5,17); ctx.fillRect(11,-16,5,17); }
+  ctx.restore();
+}
+
 export function render(ctx, state) {
   const { p, enemies, bullets, pickups, particles, boss, stars, nebulae, debris } = state;
   const shakeX = state.shake ? (Math.random() - 0.5) * state.shake : 0;
@@ -258,6 +268,7 @@ export function render(ctx, state) {
   if (state.upgradePulse > 0) { const progress = 1 - state.upgradePulse / 0.72; ctx.strokeStyle = '#ffe99b'; ctx.lineWidth = 3 * (1 - progress); ctx.globalAlpha = 1 - progress; ctx.beginPath(); ctx.arc(p.x, p.y, 22 + progress * 74, 0, Math.PI * 2); ctx.stroke(); }
   ctx.restore();
   drawSecondaryRig(ctx, p, state.secondary, state.elapsed || 0);
+  drawCraftSignature(ctx, p, state.elapsed || 0);
   drawWingmanRig(ctx, p, state.wingman, state.elapsed || 0);
   drawPlayerVitalBars(ctx, p);
   enemies.forEach((entry) => { drawEnemy(ctx, entry, triangle); drawEnemyVitalBar(ctx, entry); });
