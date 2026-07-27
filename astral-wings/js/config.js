@@ -2,8 +2,8 @@
 export const balanceConfig = {
   player: { collisionRadius: 6, invincibleSeconds: 1.45, shotInterval: 0.18 },
   boss: {
-    phaseTwo: 0.7, phaseThree: 0.35, fanSpeed: 138, aimedSpeed: 155,
-    ringSpeed: 118, laserWarning: 1.05, laserDuration: 0.28, rest: 0.88,
+    phaseTwo: 0.7, phaseThree: 0.35, fanSpeed: 108, aimedSpeed: 118,
+    ringSpeed: 92, laserWarning: 1.15, laserDuration: 0.24, rest: 1.05,
     bossHp: 2650, maxBullets: 74
   },
   drops: { power: 0.15, fragment: 0.02 },

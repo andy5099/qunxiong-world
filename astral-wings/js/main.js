@@ -1,7 +1,7 @@
 import { load, save, reset } from './save.js';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260727-ai-clean';
+import { game } from './game.js?v=20260727-dodge-balance';
 import { menu, equipmentView, missionsView, fusionView, stageView, codexView } from './ui.js?v=20260727-stages-art';
 import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-boss-loot';
 import { stages, getStage } from './data/stages.js?v=20260727-stages-art';

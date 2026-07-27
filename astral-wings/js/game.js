@@ -1,11 +1,11 @@
-import { C, balanceConfig } from './config.js';
+import { C, balanceConfig } from './config.js?v=20260727-dodge-balance';
 import { player } from './entities/player.js';
-import { enemy } from './entities/enemy.js';
-import { makeBoss } from './entities/boss.js';
+import { enemy } from './entities/enemy.js?v=20260727-hitbox';
+import { makeBoss } from './entities/boss.js?v=20260727-hitbox';
 import { bullet } from './entities/bullet.js';
 import { pickup } from './entities/pickup.js';
 import { stage } from './data/stages.js';
-import { render } from './renderer.js?v=20260727-ai-clean';
+import { render } from './renderer.js?v=20260727-hitbox';
 
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const pickupTypes = ['gold', 'power', 'hp', 'shield', 'energy', 'magnet', 'rage', 'double'];
@@ -289,24 +289,24 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     const phasePatterns = boss.phase === 1 ? ['fan', 'lanes'] : boss.phase === 2 ? ['ring', 'aimed'] : ['laser', 'rageFan', 'summon'];
     boss.attack = phasePatterns[boss.sequence++ % phasePatterns.length];
     if (boss.attack === 'fan') {
-      [-0.42, -0.21, 0, 0.21, 0.42].forEach(spread => state.bullets.push(bullet(boss.x, boss.y, spread * 150, balanceConfig.boss.fanSpeed, 'e', 9)));
-      boss.rest = 1.0;
+      [-0.42, -0.21, 0, 0.21, 0.42].forEach(spread => state.bullets.push(bullet(boss.x, boss.y, spread * 128, balanceConfig.boss.fanSpeed, 'e', 9)));
+      boss.rest = 1.25;
     } else if (boss.attack === 'lanes') {
       // 左右交替直線彈，中央保留可讀通道。
       const side = boss.sequence % 2 ? -1 : 1;
-      [-1, 1].forEach(offset => state.bullets.push(bullet(boss.x + side * 26, boss.y, offset * 54, 148, 'e', 10)));
-      boss.rest = 0.9;
+      [-1, 1].forEach(offset => state.bullets.push(bullet(boss.x + side * 26, boss.y, offset * 45, 118, 'e', 10)));
+      boss.rest = 1.12;
     } else if (boss.attack === 'ring') {
       for (let index = 0; index < 8; index += 1) { const angle = Math.PI / 2 + index * Math.PI / 4 + 0.18; state.bullets.push(bullet(boss.x, boss.y, Math.cos(angle) * balanceConfig.boss.ringSpeed, Math.sin(angle) * balanceConfig.boss.ringSpeed, 'e', 10)); }
       boss.rest = 1.05;
     } else if (boss.attack === 'aimed') {
-      boss.telegraph = 0.55; boss.pendingAimed = true; boss.rest = 1.3;
+      boss.telegraph = 0.72; boss.pendingAimed = true; boss.rest = 1.5;
       boss.pendingAim = Math.atan2(state.p.y - boss.y, state.p.x - boss.x);
     } else if (boss.attack === 'laser') {
       boss.laserWarn = balanceConfig.boss.laserWarning; boss.telegraph = balanceConfig.boss.laserWarning; boss.pendingLaser = true; boss.rest = 1.55;
     } else if (boss.attack === 'rageFan') {
-      [-0.5, -0.33, -0.16, 0, 0.16, 0.33, 0.5].forEach(spread => state.bullets.push(bullet(boss.x, boss.y, spread * 135, 150, 'e', 11)));
-      boss.rest = 1.05;
+      [-0.5, -0.33, -0.16, 0, 0.16, 0.33, 0.5].forEach(spread => state.bullets.push(bullet(boss.x, boss.y, spread * 112, 118, 'e', 11)));
+      boss.rest = 1.3;
     } else {
       spawnEnemy('scout', Math.max(35, boss.x - 54)); spawnEnemy('sprinter', Math.min(325, boss.x + 54));
       boss.rest = 1.2;
@@ -316,28 +316,28 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
   function fireEnemy(entry) {
     const aimed = Math.atan2(state.p.y - entry.y, state.p.x - entry.x);
     if (entry.attack === 'needle') {
-      entry.fireCd = 1.35;
-      state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed) * 210, Math.sin(aimed) * 210, 'e', 8));
+      entry.fireCd = 1.6;
+      state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed) * 150, Math.sin(aimed) * 150, 'e', 8));
     }
     if (entry.attack === 'fan') {
-      entry.fireCd = 1.45;
-      [-0.22, 0, 0.22].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed + spread) * 165, Math.sin(aimed + spread) * 165, 'e', 10)));
+      entry.fireCd = 1.7;
+      [-0.24, 0, 0.24].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed + spread) * 120, Math.sin(aimed + spread) * 120, 'e', 10)));
     }
     if (entry.attack === 'aim') {
-      entry.fireCd = 1.7;
-      state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed) * 265, Math.sin(aimed) * 265, 'e', 13));
+      entry.fireCd = 2.05;
+      state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed) * 165, Math.sin(aimed) * 165, 'e', 13));
     }
     if (entry.attack === 'burst') {
-      entry.fireCd = 1.05;
-      [-0.12, 0.12].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed + spread) * 175, Math.sin(aimed + spread) * 175, 'e', 9)));
+      entry.fireCd = 1.35;
+      [-0.14, 0.14].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed + spread) * 128, Math.sin(aimed + spread) * 128, 'e', 9)));
     }
     if (entry.attack === 'ring') {
-      entry.fireCd = 1.65;
-      for (let index = 0; index < 6; index += 1) { const angle = Math.PI / 2 + index * Math.PI / 3; state.bullets.push(bullet(entry.x, entry.y, Math.cos(angle) * 130, Math.sin(angle) * 130, 'e', 8)); }
+      entry.fireCd = 1.9;
+      for (let index = 0; index < 6; index += 1) { const angle = Math.PI / 2 + index * Math.PI / 3; state.bullets.push(bullet(entry.x, entry.y, Math.cos(angle) * 96, Math.sin(angle) * 96, 'e', 8)); }
     }
     if (entry.attack === 'elite') {
-      entry.fireCd = 0.62;
-      [-0.32, -0.16, 0, 0.16, 0.32].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.sin(spread) * 180, Math.cos(spread) * 180, 'e', 11)));
+      entry.fireCd = 0.9;
+      [-0.36, -0.18, 0, 0.18, 0.36].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.sin(spread) * 125, Math.cos(spread) * 125, 'e', 11)));
     }
   }
 

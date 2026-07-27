@@ -45,7 +45,7 @@ const drawAiCraft = (ctx, cell, x, y, width, height, alpha = 1) => {
 // 原創幾何輪廓讓敵機在手機小畫面上仍可一眼辨識職能。
 function drawEnemy(ctx, entry, triangle) {
   const aiCells = { scout: 2, sprinter: 2, armor: 3, sniper: 2, bomber: 3, shield: 4, support: 5, elite: 1 };
-  if (aiCells[entry.kind] !== undefined && drawAiCraft(ctx, aiCells[entry.kind], entry.x, entry.y, entry.kind === 'elite' ? 150 : 110, entry.kind === 'elite' ? 150 : 110, 0.92)) {
+  if (aiCells[entry.kind] !== undefined && drawAiCraft(ctx, aiCells[entry.kind], entry.x, entry.y, entry.kind === 'elite' ? 112 : 82, entry.kind === 'elite' ? 112 : 82, 0.92)) {
     if (entry.shield > 0) { ctx.save(); ctx.strokeStyle = '#78cfff'; ctx.globalAlpha = 0.7; ctx.beginPath(); ctx.arc(entry.x, entry.y, entry.r + 5, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
     return;
   }
@@ -83,7 +83,7 @@ export function render(ctx, state) {
     ctx.closePath(); ctx.fill();
   };
   if (p.inv <= 0 || Math.floor(p.inv * 12) % 2) {
-    if (drawAiCraft(ctx, 0, p.x, p.y, 150, 175, 0.96)) {
+    if (drawAiCraft(ctx, 0, p.x, p.y, 112, 130, 0.96)) {
       // AI 戰機已繪製，仍保留尾焰讓移動與無敵狀態具有清楚辨識。
       ctx.save(); ctx.fillStyle = '#ffb553'; ctx.shadowBlur = 12; ctx.shadowColor = '#ff9a4c'; ctx.fillRect(p.x - 9, p.y + 27, 5, 9); ctx.fillRect(p.x + 4, p.y + 27, 5, 9); ctx.restore();
     } else {
@@ -95,7 +95,7 @@ export function render(ctx, state) {
   }
   enemies.forEach((entry) => drawEnemy(ctx, entry, triangle));
   if (boss) {
-    if (!drawAiCraft(ctx, 1, boss.x, boss.y, 300, 255, 0.95)) { ctx.save();
+    if (!drawAiCraft(ctx, 1, boss.x, boss.y, 220, 190, 0.95)) { ctx.save();
     ctx.shadowBlur = 18; ctx.shadowColor = boss.phase === 3 ? '#ff355f' : '#f98aaf';
     ctx.fillStyle = '#5c1835'; ctx.fillRect(boss.x - 49, boss.y - 24, 98, 51);
     ctx.fillStyle = boss.color; ctx.fillRect(boss.x - 39, boss.y - 30, 78, 48);
