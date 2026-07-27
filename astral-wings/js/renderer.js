@@ -66,6 +66,32 @@ const drawAiVfx = (ctx, cell, x, y, width, height) => {
   return true;
 };
 
+// 敵方彈幕使用另一組原創圖集與紅紫色系，避免與玩家子彈、金幣或補給混淆。
+const aiEnemyVfxRoster = document.querySelector('#ai-enemy-vfx-roster') || new Image();
+if (!aiEnemyVfxRoster.src) aiEnemyVfxRoster.src = new URL('../assets/images/astral-ai-enemy-vfx.png', import.meta.url).href;
+const aiEnemyVfxClean = document.createElement('canvas');
+let aiEnemyVfxReady = false;
+function prepareAiEnemyVfx() {
+  if (!aiEnemyVfxRoster.naturalWidth || aiEnemyVfxReady) return;
+  aiEnemyVfxClean.width = aiEnemyVfxRoster.naturalWidth; aiEnemyVfxClean.height = aiEnemyVfxRoster.naturalHeight;
+  const clean = aiEnemyVfxClean.getContext('2d', { willReadFrequently: true }); clean.drawImage(aiEnemyVfxRoster, 0, 0);
+  const pixels = clean.getImageData(0, 0, aiEnemyVfxClean.width, aiEnemyVfxClean.height);
+  for (let index = 0; index < pixels.data.length; index += 4) {
+    const red = pixels.data[index]; const green = pixels.data[index + 1]; const blue = pixels.data[index + 2];
+    if (green > red * 1.22 && green > blue * 1.22 && green > 120) pixels.data[index + 3] = 0;
+  }
+  clean.putImageData(pixels, 0, 0); aiEnemyVfxReady = true;
+}
+if (aiEnemyVfxRoster.complete) prepareAiEnemyVfx(); else aiEnemyVfxRoster.addEventListener('load', prepareAiEnemyVfx, { once: true });
+const drawEnemyVfx = (ctx, cell, x, y, width, height, rotation) => {
+  if (!aiEnemyVfxReady) return false;
+  const cellWidth = aiEnemyVfxClean.width / 4; const cellHeight = aiEnemyVfxClean.height / 2;
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rotation);
+  ctx.drawImage(aiEnemyVfxClean, (cell % 4) * cellWidth, Math.floor(cell / 4) * cellHeight, cellWidth, cellHeight, -width / 2, -height / 2, width, height);
+  ctx.restore();
+  return true;
+};
+
 // 原創幾何輪廓讓敵機在手機小畫面上仍可一眼辨識職能。
 function drawEnemy(ctx, entry, triangle) {
   const aiCells = { scout: 2, sprinter: 2, armor: 3, sniper: 2, bomber: 3, shield: 4, support: 5, elite: 1 };
@@ -182,7 +208,12 @@ export function render(ctx, state) {
     };
     const visual = projectileVisuals[entry.style] || projectileVisuals.dawn;
     if (entry.trail) { ctx.strokeStyle = visual.trail; ctx.lineWidth = entry.laser ? 4 : 2; ctx.beginPath(); ctx.moveTo(entry.x, entry.y + 12); ctx.lineTo(entry.x - entry.vx * 0.032, entry.y - entry.vy * 0.032 + 12); ctx.stroke(); }
-    if (entry.from === 'p' && drawAiVfx(ctx, visual.cell, entry.x, entry.y, entry.laser ? visual.width : visual.width, entry.laser ? visual.height : visual.height)) return;
+    if (entry.from === 'p' && drawAiVfx(ctx, visual.cell, entry.x, entry.y, visual.width, visual.height)) return;
+    if (entry.from === 'e') {
+      const enemyCell = entry.damage >= 14 ? 7 : entry.damage >= 12 ? 4 : entry.damage >= 10 ? 1 : 3;
+      const enemySize = entry.damage >= 14 ? 29 : entry.damage >= 12 ? 25 : 21;
+      if (drawEnemyVfx(ctx, enemyCell, entry.x, entry.y, enemySize, enemySize + 10, Math.atan2(entry.vy, entry.vx) - Math.PI / 2)) return;
+    }
     // 圖集無法載入時仍維持長條、晶片或菱形備援，不退回圓點。
     ctx.save(); ctx.translate(entry.x, entry.y); ctx.rotate(Math.atan2(entry.vy, entry.vx) + Math.PI / 2); ctx.fillStyle = entry.from === 'p' ? visual.color : '#ff6e87';
     if (entry.laser) ctx.fillRect(-3, -16, 6, 32);

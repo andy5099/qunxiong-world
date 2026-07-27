@@ -1,11 +1,11 @@
 import { C, balanceConfig } from './config.js?v=20260727-dodge-balance';
-import { player } from './entities/player.js?v=20260727-ship-rigs';
+import { player } from './entities/player.js?v=20260727-enemy-vfx-results';
 import { enemy } from './entities/enemy.js?v=20260727-hitbox';
 import { makeBoss } from './entities/boss.js?v=20260727-hitbox';
 import { bullet } from './entities/bullet.js';
 import { pickup } from './entities/pickup.js';
 import { stage } from './data/stages.js';
-import { render } from './renderer.js?v=20260727-ship-rigs';
+import { render } from './renderer.js?v=20260727-enemy-vfx-results';
 
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const pickupTypes = ['gold', 'power', 'hp', 'shield', 'energy', 'magnet', 'rage', 'double'];
@@ -19,8 +19,8 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     nebulae: Array.from({ length: 4 }, () => ({ x: Math.random() * 440 - 40, y: Math.random() * 720 - 40, r: 65 + Math.random() * 85, speed: 5 + Math.random() * 8, color: Math.random() > 0.5 ? '#243f7655' : '#542d6a44' })),
     debris: Array.from({ length: 8 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, r: 2 + Math.random() * 5, speed: 45 + Math.random() * 55, spin: Math.random() * 6 })),
     mode, stage: selectedStage, fusion: saveData.fusion || null, secondary: saveData.equipped?.secondary || null, wave: 0, left: 0, kind: 'scout', nextId: 1, score: 0, gold: 0, combo: 0, maxCombo: 0,
-    kills: 0, paused: false, over: false, last: 0, hitStop: 0, shake: 0,
-    supplyTimer: 0, message: '', messageTimer: 0, secondaryTimer: 0, elapsed: 0
+    kills: 0, paused: false, over: false, last: 0, shake: 0,
+    message: '', messageTimer: 0, secondaryTimer: 0, elapsed: 0
   };
   let animationFrame = 0;
 
@@ -43,13 +43,11 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     onEnd({ win, mode, wave: state.wave, score: state.score, kills: state.kills, combo: state.maxCombo, hp: state.p.hp, shield: state.p.shield, gold: state.gold });
   }
 
-  function announce(message, seconds = 1.3) {
-    state.message = message;
-    state.messageTimer = seconds;
-  }
+  // 所有關鍵狀態已由 HUD 呈現；不再以中央提示打斷關卡閱讀與操作。
+  function announce() {}
 
   function spawnNextWave() {
-    if (state.boss || state.enemies.length || state.left || state.supplyTimer > 0) return;
+    if (state.boss || state.enemies.length || state.left) return;
     const wave = getNextWave();
     if (!wave) return finish(true);
     if (wave[0] === 'boss') {
@@ -57,13 +55,10 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
       state.boss = makeBoss(state.stage.boss);
       state.boss.id = 'boss';
       state.shake = 7;
-      announce(`警告：${state.boss.name} 已進場`, 1.1);
       return;
     }
     if (wave[0] === 'supply') {
       ['power', 'energy', Math.random() < 0.5 ? 'hp' : 'shield', 'gold', 'gold'].forEach((type, index) => addPickup(112 + index * 34, 170, type));
-      state.supplyTimer = 1.8;
-      announce('補給艙已開啟', 1.8);
       return;
     }
     state.kind = wave[0];
@@ -145,6 +140,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
   }
 
   function dropBoss(target) {
+    if (mode !== 'endless') { state.gold += 20; return; }
     // Boss 必掉火力、金幣與星能，並在 HP／護盾中擇一；額外金幣營造大量掉寶感。
     ['power', 'energy', Math.random() < 0.5 ? 'hp' : 'shield'].forEach((type, index) => addPickup(target.x + (index - 1) * 18, target.y, type));
     for (let index = 0; index < 10; index += 1) addPickup(target.x + (Math.random() - 0.5) * 80, target.y + (Math.random() - 0.5) * 35, 'gold', 2);
@@ -156,8 +152,6 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     state.maxCombo = Math.max(state.maxCombo, state.combo);
     state.kills += 1;
     state.p.energy = Math.min(100, state.p.energy + 6);
-    // Boss 擊破不使用 Hit Stop，避免結算前的停滯感。
-    state.hitStop = target.isBoss ? 0 : (target.kind === 'elite' ? 0.025 : 0.012);
     state.shake = Math.max(state.shake, target.isBoss ? 11 : 2);
     spawnParticle(target.x, target.y, target.color || '#ffb56e', target.isBoss ? 42 : 10, target.isBoss ? 5 : 2);
     if (target.isBoss) dropBoss(target); else dropForEnemy(target);
@@ -370,8 +364,6 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     if (target.shield > 0) target.shield = Math.max(0, target.shield - entry.damage);
     else target.hp -= entry.damage;
     state.p.energy = Math.min(100, state.p.energy + 1);
-    // Boss 戰維持完整幀率，避免高射速命中時反覆造成慢動作。
-    if (!target.isBoss) state.hitStop = Math.max(state.hitStop, 0.009);
     spawnParticle(entry.x, entry.y, entry.laser ? '#d6ffff' : '#fff1a0', 3, 1.5);
     if (entry.pierce > 0) entry.pierce -= 1; else entry.life = 0;
   }
@@ -453,18 +445,11 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     if (!state.paused && !state.over) {
       state.elapsed += dt;
       state.messageTimer = Math.max(0, state.messageTimer - dt);
-      if (state.hitStop > 0) state.hitStop -= dt;
-      else {
-        if (state.supplyTimer > 0) {
-          state.supplyTimer -= dt;
-          updatePlayer(dt); updatePickups(dt);
-        } else {
-          updatePlayer(dt); updateEnemies(dt, time); updateProjectiles(dt); resolveDefeats(); updatePickups(dt); spawnNextWave();
-        }
-        state.stars.forEach((star) => { star.y = star.y > 640 ? 0 : star.y + star.speed * dt; });
-        state.nebulae.forEach((cloud) => { cloud.y = cloud.y > 730 ? -cloud.r : cloud.y + cloud.speed * dt; });
-        state.debris.forEach((piece) => { piece.y = piece.y > 660 ? -piece.r : piece.y + piece.speed * dt; piece.spin += dt * 1.5; });
-      }
+      // 戰鬥流程全程用同一個 delta time 更新，不再因命中、補給或 Boss 事件凍結畫面。
+      updatePlayer(dt); updateEnemies(dt, time); updateProjectiles(dt); resolveDefeats(); updatePickups(dt); spawnNextWave();
+      state.stars.forEach((star) => { star.y = star.y > 640 ? 0 : star.y + star.speed * dt; });
+      state.nebulae.forEach((cloud) => { cloud.y = cloud.y > 730 ? -cloud.r : cloud.y + cloud.speed * dt; });
+      state.debris.forEach((piece) => { piece.y = piece.y > 660 ? -piece.r : piece.y + piece.speed * dt; piece.spin += dt * 1.5; });
       updateParticles(dt); state.shake = Math.max(0, state.shake - dt * 18); onHud(state);
     }
     render(ctx, state);

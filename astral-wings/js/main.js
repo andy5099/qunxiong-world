@@ -1,8 +1,8 @@
 import { load, save, reset } from './save.js?v=20260727-ships';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260727-ship-rigs';
-import { menu, equipmentView, missionsView, fusionView, stageView, codexView, shipView } from './ui.js?v=20260727-ship-rigs';
+import { game } from './game.js?v=20260727-enemy-vfx-results';
+import { menu, equipmentView, missionsView, fusionView, stageView, codexView, shipView } from './ui.js?v=20260727-enemy-vfx-results';
 import { ships } from './data/ships.js?v=20260727-ships';
 import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-boss-loot';
 import { stages, getStage } from './data/stages.js?v=20260727-stages-art';
@@ -39,14 +39,15 @@ function shipHangar() { if (run) run.stop(); run = null; app.innerHTML = shipVie
 function stagesMenu() { if (run) run.stop(); run = null; app.innerHTML = stageView(data, stages); }
 function codex() { if (run) run.stop(); run = null; app.innerHTML = codexView(data, stages); }
 
-function showResult(result) {
+function showResult(result, drops = []) {
   const box = app.querySelector('#result');
   if (!box) return;
   box.classList.remove('hidden');
   box.innerHTML = `
     <div class="panel result-card">
       <h2>${result.win ? '關卡完成' : '戰機失聯'}</h2>
-      <p>分數：${result.score}<br>擊殺：${result.kills}<br>最大連擊：${result.combo}<br>獲得金幣：${result.gold}</p>
+      <p>分數：${result.score}<br>擊殺：${result.kills}<br>最大連擊：${result.combo}<br><strong>獲得金幣：${result.gold}</strong></p>
+      ${result.win ? `<section class="result-loot"><h3>本次掉落</h3><ul>${drops.map(drop => `<li>${drop}</li>`).join('')}</ul></section>` : ''}
       <button data-a="retry">重新挑戰</button>
       <button data-a="home">返回主選單</button>
     </div>`;
@@ -90,20 +91,24 @@ function start(mode = 'stage', stageId = 'orbit') {
       if (next && !data.unlockedStages.includes(next.id)) data.unlockedStages.push(next.id);
     }
     if (result.win && result.mode === 'boss') data.missions.bosses += 1;
+    const drops = [`金幣 +${result.gold}`];
     if (result.win) {
       const first = !data.complete;
       data.complete = true;
-      data.materials += 8;
-      if (first && !data.equipment.some(item => item.id === 'w2')) data.equipment.push({ id: 'w2', level: 0, locked: true });
+      data.materials += 8; drops.push('強化材料 +8');
+      if (first && !data.equipment.some(item => item.id === 'w2')) { data.equipment.push({ id: 'w2', level: 0, locked: true }); drops.push('首通裝備：晨弧脈衝槍'); }
       const reward = bossLootTemplate();
-      if (!data.equipment.some(item => item.id === reward.id)) data.equipment.push({ id: reward.id, level: 0, locked: false });
-      data.fragments += result.mode === 'boss' ? 3 : 1;
-      data.blueprints += result.mode === 'boss' ? 2 : 1;
+      if (!data.equipment.some(item => item.id === reward.id)) { data.equipment.push({ id: reward.id, level: 0, locked: false }); drops.push(`裝備掉落：${reward.name}`); }
+      else drops.push(`裝備碎片：${reward.name}`);
+      const fragments = result.mode === 'boss' ? 3 : 1;
+      const blueprints = result.mode === 'boss' ? 2 : 1;
+      data.fragments += fragments; data.blueprints += blueprints;
+      drops.push(`戰機碎片 +${fragments}`, `藍圖 +${blueprints}`);
     }
     if (result.mode === 'endless') data.endlessBest = Math.max(data.endlessBest || 0, result.wave);
     if (result.mode === 'boss') data.bossBest = Math.max(data.bossBest || 0, result.score);
     save(data);
-    showResult(result);
+    showResult(result, drops);
   }, (state) => {
     const hp = app.querySelector('#hp');
     const shield = app.querySelector('#shield');
