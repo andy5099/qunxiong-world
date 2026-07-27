@@ -1,7 +1,7 @@
 import { load, save, reset } from './save.js';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260726-v05-economy';
+import { game } from './game.js?v=20260727-fusion-skill';
 import { menu, equipmentView, missionsView, fusionView } from './ui.js?v=20260726-v05-boss-loot';
 import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-boss-loot';
 import { C } from './config.js';
@@ -58,6 +58,7 @@ function start(mode = 'stage') {
         <span id="score">分數 0・連擊 0・能量 0%</span>
         <span id="progress" class="progress-label">區域進度 0%</span>
         <span id="power" class="power-label">火力 Lv1</span>
+        <span id="fusion-skill" class="fusion-label"></span>
         <span id="buffs" class="buff-label"></span>
         <div id="boss-hud" class="boss-hud hidden"><b>鐵幕吞噬者</b><div class="bar boss-bar"><i id="boss-hp"></i></div></div>
       </div>
@@ -98,6 +99,7 @@ function start(mode = 'stage') {
     const score = app.querySelector('#score');
     const progress = app.querySelector('#progress');
     const power = app.querySelector('#power');
+    const fusionSkill = app.querySelector('#fusion-skill');
     const buffs = app.querySelector('#buffs');
     const bossHud = app.querySelector('#boss-hud');
     const bossHp = app.querySelector('#boss-hp');
@@ -106,6 +108,11 @@ function start(mode = 'stage') {
     if (score) score.textContent = `分數 ${state.score}・連擊 ${state.combo}・能量 ${Math.floor(state.p.energy)}%`;
     if (progress) progress.textContent = state.boss ? '區域進度 100%・Boss 戰' : `區域進度 ${Math.min(99, Math.floor(state.wave / 10 * 100))}%`;
     if (power) power.textContent = `火力 Lv${state.p.fireLevel}`;
+    if (fusionSkill) {
+      const labels = { nova: '新星協調・合體技：新星貫流', aegis: '天穹協調・合體技：天穹壁壘', comet: '彗尾協調・合體技：彗尾超載' };
+      fusionSkill.textContent = labels[state.fusion] || '';
+      fusionSkill.hidden = !state.fusion;
+    }
     if (buffs) {
       const active = [];
       if (state.p.magnet > 0) active.push(`磁力 ${Math.ceil(state.p.magnet).toString().padStart(2, '0')}`);

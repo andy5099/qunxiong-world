@@ -18,7 +18,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage') {
     stars: Array.from({ length: 50 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, a: Math.random(), speed: 18 + Math.random() * 42 })),
     nebulae: Array.from({ length: 4 }, () => ({ x: Math.random() * 440 - 40, y: Math.random() * 720 - 40, r: 65 + Math.random() * 85, speed: 5 + Math.random() * 8, color: Math.random() > 0.5 ? '#243f7655' : '#542d6a44' })),
     debris: Array.from({ length: 8 }, () => ({ x: Math.random() * 360, y: Math.random() * 640, r: 2 + Math.random() * 5, speed: 45 + Math.random() * 55, spin: Math.random() * 6 })),
-    mode, wave: 0, left: 0, kind: 'scout', nextId: 1, score: 0, gold: 0, combo: 0, maxCombo: 0,
+    mode, fusion: saveData.fusion || null, wave: 0, left: 0, kind: 'scout', nextId: 1, score: 0, gold: 0, combo: 0, maxCombo: 0,
     kills: 0, paused: false, over: false, last: 0, hitStop: 0, shake: 0,
     bossEntrance: 0, supplyTimer: 0, victoryTimer: 0, message: '', messageTimer: 0, secondaryTimer: 0
   };
@@ -162,6 +162,28 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage') {
     state.bullets = state.bullets.filter((entry) => entry.from === 'p');
     state.enemies.forEach((entry) => { entry.hp -= 180; });
     if (state.boss) state.boss.hp -= Math.min(400, state.boss.maxHp * 0.16);
+    if (state.fusion === 'nova') {
+      // 新星協調技：集中穿透光束，對 Boss 額外造成固定比例傷害。
+      state.enemies.forEach((entry) => { entry.hp -= 140; });
+      if (state.boss) state.boss.hp -= Math.min(250, state.boss.maxHp * 0.1);
+      for (let index = 0; index < 5; index += 1) { const beam = bullet(state.p.x + (index - 2) * 9, state.p.y - 26, 0, -720, 'p', state.p.atk * 3, 5); beam.laser = true; beam.trail = true; state.bullets.push(beam); }
+      announce('合體技：新星貫流', 1.1);
+    }
+    if (state.fusion === 'aegis') {
+      // 天穹護航技：回復護盾並清理近身彈幕，保留遠方壓力。
+      state.p.shield = state.p.maxShield;
+      state.p.inv = 3;
+      state.bullets = state.bullets.filter(entry => entry.from === 'p' || distance(entry, state.p) > 135);
+      spawnParticle(state.p.x, state.p.y, '#88eaff', 30, 4);
+      announce('合體技：天穹壁壘', 1.1);
+    }
+    if (state.fusion === 'comet') {
+      // 彗尾突進技：短暫超載射擊與全屏小型目標清掃。
+      state.p.rapid = 8; state.p.pierceBuff = 8; state.p.rage = 8;
+      state.enemies.forEach((entry) => { entry.hp -= 220; });
+      spawnParticle(state.p.x, state.p.y, '#ffbd6b', 30, 4);
+      announce('合體技：彗尾超載', 1.1);
+    }
   }
 
   function updatePlayer(dt) {
