@@ -1,8 +1,34 @@
 const pickupColors = { gold: '#ffd568', power: '#ff9b38', hp: '#70ff9c', shield: '#62dfff', energy: '#bb79ff', magnet: '#ffe66b', rage: '#ff5871', double: '#ffd26d', pierce: '#f6a5ff', crit: '#ffdf66', barrier: '#9cefff', rapid: '#ff9c5d' };
 const pickupMarks = { gold: '$', power: 'P', hp: '+', shield: 'S', energy: 'E', magnet: 'M', rage: 'R', double: '2', pierce: 'I', crit: 'C', barrier: 'B', rapid: 'H' };
 
+// 原創 AI 機體圖集。圖尚未完成載入時，會無縫退回原本的 Canvas 幾何造型。
+const aiCraftRoster = new Image();
+aiCraftRoster.decoding = 'async';
+aiCraftRoster.src = new URL('../assets/images/astral-ai-craft-roster.png', import.meta.url).href;
+
+const aiReady = () => aiCraftRoster.complete && aiCraftRoster.naturalWidth > 0;
+const drawAiCraft = (ctx, cell, x, y, width, height, alpha = 1) => {
+  if (!aiReady()) return false;
+  const cellWidth = aiCraftRoster.naturalWidth / 2;
+  const cellHeight = aiCraftRoster.naturalHeight / 3;
+  const sourceX = (cell % 2) * cellWidth;
+  const sourceY = Math.floor(cell / 2) * cellHeight;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  // screen 讓圖集的深色底自然融入星空，而保留發光金屬細節。
+  ctx.globalCompositeOperation = 'screen';
+  ctx.drawImage(aiCraftRoster, sourceX, sourceY, cellWidth, cellHeight, x - width / 2, y - height / 2, width, height);
+  ctx.restore();
+  return true;
+};
+
 // 原創幾何輪廓讓敵機在手機小畫面上仍可一眼辨識職能。
 function drawEnemy(ctx, entry, triangle) {
+  const aiCells = { scout: 2, sprinter: 2, armor: 3, sniper: 2, bomber: 3, shield: 4, support: 5, elite: 1 };
+  if (aiCells[entry.kind] !== undefined && drawAiCraft(ctx, aiCells[entry.kind], entry.x, entry.y, entry.kind === 'elite' ? 76 : 52, entry.kind === 'elite' ? 76 : 52, 0.92)) {
+    if (entry.shield > 0) { ctx.save(); ctx.strokeStyle = '#78cfff'; ctx.globalAlpha = 0.7; ctx.beginPath(); ctx.arc(entry.x, entry.y, entry.r + 5, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
+    return;
+  }
   ctx.save(); ctx.translate(entry.x, entry.y); ctx.shadowBlur = 8; ctx.shadowColor = entry.color;
   ctx.fillStyle = entry.color;
   if (entry.kind === 'sprinter') { ctx.beginPath(); ctx.moveTo(0, 18); ctx.lineTo(-11, -13); ctx.lineTo(0, -6); ctx.lineTo(11, -13); ctx.closePath(); ctx.fill(); }
@@ -37,21 +63,26 @@ export function render(ctx, state) {
     ctx.closePath(); ctx.fill();
   };
   if (p.inv <= 0 || Math.floor(p.inv * 12) % 2) {
+    if (drawAiCraft(ctx, 0, p.x, p.y, 76, 88, 0.96)) {
+      // AI 戰機已繪製，仍保留尾焰讓移動與無敵狀態具有清楚辨識。
+      ctx.save(); ctx.fillStyle = '#ffb553'; ctx.shadowBlur = 12; ctx.shadowColor = '#ff9a4c'; ctx.fillRect(p.x - 9, p.y + 27, 5, 9); ctx.fillRect(p.x + 4, p.y + 27, 5, 9); ctx.restore();
+    } else {
     ctx.save(); ctx.translate(p.x, p.y); ctx.shadowBlur = 14; ctx.shadowColor = '#4ee9ff';
     ctx.fillStyle = '#254f78'; ctx.beginPath(); ctx.moveTo(0, -22); ctx.lineTo(-15, 16); ctx.lineTo(0, 11); ctx.lineTo(15, 16); ctx.closePath(); ctx.fill();
     ctx.fillStyle = '#8ff3ff'; ctx.beginPath(); ctx.moveTo(0, -19); ctx.lineTo(-6, 8); ctx.lineTo(0, 13); ctx.lineTo(6, 8); ctx.closePath(); ctx.fill();
     ctx.fillStyle = '#f3feff'; ctx.fillRect(-2, -14, 4, 18); ctx.fillStyle = '#ffb553'; ctx.fillRect(-9, 15, 5, 8); ctx.fillRect(4, 15, 5, 8); ctx.restore();
+    }
   }
   enemies.forEach((entry) => drawEnemy(ctx, entry, triangle));
   if (boss) {
-    ctx.save();
+    if (!drawAiCraft(ctx, 1, boss.x, boss.y, 172, 145, 0.95)) { ctx.save();
     ctx.shadowBlur = 18; ctx.shadowColor = boss.phase === 3 ? '#ff355f' : '#f98aaf';
     ctx.fillStyle = '#5c1835'; ctx.fillRect(boss.x - 49, boss.y - 24, 98, 51);
     ctx.fillStyle = boss.color; ctx.fillRect(boss.x - 39, boss.y - 30, 78, 48);
     ctx.fillStyle = '#ffc5d4'; ctx.fillRect(boss.x - 6, boss.y - 22, 12, 22);
     ctx.fillStyle = '#2e1024'; ctx.fillRect(boss.x - 68, boss.y - 5, 25, 15); ctx.fillRect(boss.x + 43, boss.y - 5, 25, 15);
     triangle({ x: boss.x, y: boss.y - 38, r: 25 }, '#ff91a7', true);
-    ctx.restore();
+    ctx.restore(); }
     if (boss.laserWarn > 0 || boss.laserActive > 0) {
       ctx.fillStyle = boss.laserActive > 0 ? '#ff4571aa' : '#ff739066';
       ctx.fillRect(boss.x - 10, boss.y + 18, 20, 620 - boss.y);
