@@ -22,14 +22,19 @@ export const stageView = (state, stages) => `<div class="shell panel menu"><h2>�
 }).join('')}</div>${button('返回主選單','home')}</div>`;
 
 export const equipmentView = state => {
+  const synthesisNotice = state.lastSynthesis
+    ? `<section class="synthesis-notice ${state.lastSynthesis.failed ? 'failed' : ''}"><b>${state.lastSynthesis.failed ? '合成未完成' : '合成完成'}</b><span>${state.lastSynthesis.failed ? state.lastSynthesis.name : `${state.lastSynthesis.from} ×3 → ${state.lastSynthesis.name}`}</span><small>${state.lastSynthesis.failed ? state.lastSynthesis.quality : `${state.lastSynthesis.quality}・基礎增幅 +${state.lastSynthesis.value}${state.lastSynthesis.duplicate ? '（重複轉為強化材料 +15）' : ''}`}</small></section>`
+    : '';
   const cards = equipmentTemplates.map(template => {
     const item = state.equipment.find(entry => entry.id === template.id);
     const equipped = state.equipped[template.slot] === template.id;
     const controls = item ? `${button(equipped ? '已裝備' : '穿戴', `equip:${template.id}`)}${button(`強化 +${item.level}（${30 + item.level * 28} 材料）`, `enhance:${template.id}`)}${!equipped && !item.locked ? button('分解', `dismantle:${template.id}`) : ''}` : '<em>尚未取得</em>';
-    return `<article class="equip ${item ? '' : 'locked'}"><b>${template.name}</b><small>${slotNames[template.slot]}・${template.quality}</small><span>基礎增幅 +${template.value + (item?.level || 0)}</span>${controls}</article>`;
+    const change = state.lastEquipmentChange?.id === template.id ? state.lastEquipmentChange : null;
+    const changeText = change ? `<small class="equipment-change ${change.delta < 0 ? 'down' : 'up'}">攻擊力 ${change.before} → ${change.after}（${change.delta >= 0 ? '+' : ''}${change.delta}）</small>` : '';
+    return `<article class="equip ${item ? '' : 'locked'}"><b>${template.name}</b><small>${slotNames[template.slot]}・${template.quality}</small><span>基礎增幅 +${template.value + (item?.level || 0)}</span>${changeText}${controls}</article>`;
   }).join('');
   const qualities = ['普通','優良','稀有','史詩'];
-  return `<div class="shell panel menu"><h2>裝備庫</h2><p class="note">每個欄位只會套用一件裝備；已裝備或鎖定的物品不會被分解。強化必定成功。</p>${button('製作隨機裝備（25 材料）','craft')}<h3>三件合成升階</h3>${qualities.map((q, index) => button(`${q} → ${qualities[index + 1] || '傳說'} 合成`, `synth:${q}`, index === qualities.length - 1)).join('')}<div class="equip-grid">${cards}</div>${button('返回主選單','home')}</div>`;
+  return `<div class="shell panel menu"><h2>裝備庫</h2><p class="note">每個欄位只會套用一件裝備；已裝備或鎖定的物品不會被分解。強化必定成功。</p>${synthesisNotice}${button('製作隨機裝備（25 材料）','craft')}<h3>三件合成升階</h3>${qualities.map((q, index) => button(`${q} → ${qualities[index + 1] || '傳說'} 合成`, `synth:${q}`, index === qualities.length - 1)).join('')}<div class="equip-grid">${cards}</div>${button('返回主選單','home')}</div>`;
 };
 
 export const missionsView = state => {

@@ -1,8 +1,8 @@
 import { load, save, reset } from './save.js?v=20260727-ships';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260727-enemy-vfx-results';
-import { menu, equipmentView, missionsView, fusionView, stageView, codexView, shipView } from './ui.js?v=20260727-enemy-vfx-results';
+import { game } from './game.js?v=20260727-equip-feedback';
+import { menu, equipmentView, missionsView, fusionView, stageView, codexView, shipView } from './ui.js?v=20260727-equip-feedback';
 import { ships } from './data/ships.js?v=20260727-ships';
 import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-boss-loot';
 import { stages, getStage } from './data/stages.js?v=20260727-stages-art';
@@ -12,6 +12,19 @@ import { C } from './config.js';
 let data = load();
 let run = null;
 const app = document.querySelector('#app');
+
+// 與戰鬥角色相同的裝備加總公式，用於在穿戴瞬間顯示真正的攻擊變化。
+function currentAttack(state) {
+  const bonus = Object.values(state.equipped || {}).map(id => {
+    const template = equipmentTemplates.find(entry => entry.id === id);
+    const owned = state.equipment.find(entry => entry.id === id);
+    return template ? template.value + (owned?.level || 0) : 0;
+  }).reduce((total, value) => total + value, 0);
+  const ship = ships.find(entry => entry.id === (state.activeShip || 'dawn')) || ships[0];
+  const form = fusionForms.find(entry => entry.id === state.fusion);
+  const multiplier = 1 + (form?.stat.attack || 0) + (state.fusionAwaken || 0) * 0.06 + (state.fusionEvolution || 0) * 0.1;
+  return Math.floor((10 + state.level * 2 + Math.floor(bonus * 0.4) + (state.star - 1) * 2) * multiplier * ship.attack);
+}
 
 function bossLootTemplate() {
   const roll = Math.random();
@@ -32,7 +45,12 @@ function home() {
   app.innerHTML = menu(data);
 }
 
-function equipment() { if (run) run.stop(); run = null; app.innerHTML = equipmentView(data); }
+function equipment(keepPosition = false) {
+  if (run) run.stop(); run = null;
+  const previousScroll = keepPosition ? (app.querySelector('.menu')?.scrollTop || 0) : 0;
+  app.innerHTML = equipmentView(data);
+  if (keepPosition) requestAnimationFrame(() => { const panel = app.querySelector('.menu'); if (panel) panel.scrollTop = previousScroll; });
+}
 function missions() { if (run) run.stop(); run = null; app.innerHTML = missionsView(data); }
 function fusion() { if (run) run.stop(); run = null; app.innerHTML = fusionView(data); }
 function shipHangar() { if (run) run.stop(); run = null; app.innerHTML = shipView(data); }
@@ -226,17 +244,26 @@ app.addEventListener('click', (event) => {
   if (action.startsWith('equip:')) {
     const id = action.split(':')[1];
     const template = equipmentTemplates.find(item => item.id === id);
-    if (template && data.equipment.some(item => item.id === id)) { data.equipped[template.slot] = id; save(data); equipment(); }
+    if (template && data.equipment.some(item => item.id === id)) {
+      const before = currentAttack(data);
+      const previous = data.equipped[template.slot];
+      data.equipped[template.slot] = id;
+      const after = currentAttack(data);
+      const oldTemplate = equipmentTemplates.find(item => item.id === previous);
+      data.lastEquipmentChange = { id, name: template.name, replaced: oldTemplate?.name || '空欄位', before, after, delta: after - before };
+      save(data);
+      equipment(true);
+    }
   }
   if (action.startsWith('enhance:')) {
     const id = action.split(':')[1]; const item = data.equipment.find(entry => entry.id === id);
-    if (item) { const cost = 30 + item.level * 28; if (data.materials >= cost && item.level < 20) { data.materials -= cost; item.level += 1; save(data); } equipment(); }
+    if (item) { const cost = 30 + item.level * 28; if (data.materials >= cost && item.level < 20) { data.materials -= cost; item.level += 1; save(data); } equipment(true); }
   }
   if (action.startsWith('dismantle:')) {
     const id = action.split(':')[1]; const item = data.equipment.find(entry => entry.id === id);
     const equipped = Object.values(data.equipped).includes(id);
     if (item && !item.locked && !equipped) { data.equipment = data.equipment.filter(entry => entry.id !== id); data.materials += 8 + item.level * 2; save(data); }
-    equipment();
+    equipment(true);
   }
   if (action.startsWith('claim:')) {
     const id = action.split(':')[1];
@@ -249,7 +276,7 @@ app.addEventListener('click', (event) => {
   }
   if (action === 'craft') {
     if (data.materials >= 25) { data.materials -= 25; const missing = equipmentTemplates.filter(template => !data.equipment.some(item => item.id === template.id)); if (missing.length) data.equipment.push({ id: missing[Math.floor(Math.random() * missing.length)].id, level: 0, locked: false }); save(data); }
-    equipment();
+    equipment(true);
   }
   if (action.startsWith('synth:')) {
     const quality = action.split(':')[1];
@@ -261,9 +288,14 @@ app.addEventListener('click', (event) => {
       data.equipment = data.equipment.filter(item => !consumed.includes(item.id));
       const pool = equipmentTemplates.filter(item => item.quality === next);
       const reward = pool[Math.floor(Math.random() * pool.length)];
-      if (!data.equipment.some(item => item.id === reward.id)) data.equipment.push({ id: reward.id, level: 0, locked: false });
+      const duplicate = data.equipment.some(item => item.id === reward.id);
+      if (!duplicate) data.equipment.push({ id: reward.id, level: 0, locked: false });
       else data.materials += 15;
+      // 合成後立即留下可閱讀的結果卡，包含實際產物與品質。
+      data.lastSynthesis = { from: quality, name: reward.name, quality: reward.quality, value: reward.value, duplicate };
       save(data);
+    } else {
+      data.lastSynthesis = { from: quality, name: '合成材料不足', quality: '請先準備三件未鎖定、未裝備的同品質裝備', value: 0, duplicate: false, failed: true };
     }
     equipment();
   }
