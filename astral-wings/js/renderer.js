@@ -68,7 +68,7 @@ const drawAiCraft = (ctx, cell, x, y, width, height, alpha = 1) => {
 // 可選戰機，避免在高細節插畫上再疊加粗重的舊幾何外框。
 const refinedCraftRoster = document.querySelector('#ai-craft-refined') || new Image();
 refinedCraftRoster.decoding = 'async';
-if (!refinedCraftRoster.src) refinedCraftRoster.src = new URL('../assets/images/astral-ai-craft-refined.png', import.meta.url).href;
+if (!refinedCraftRoster.src) refinedCraftRoster.src = new URL('../assets/images/astral-ai-craft-premium-v2.png', import.meta.url).href;
 const refinedCraftCells = { dawn: 0, ember: 1, violet: 2, bulwark: 3, auric: 4, specter: 5, tide: 0, rime: 3, nova: 4, helix: 1, aurora: 0, caldera: 1, seraph: 4, voidlance: 5, solaris: 4 };
 const drawRefinedCraft = (ctx, shipId, x, y, width, height, alpha = 1) => {
   if (!refinedCraftRoster.complete || !refinedCraftRoster.naturalWidth) return false;
@@ -101,6 +101,25 @@ const drawRefinedEnemy = (ctx, kind, x, y, width, height, rotation = 0) => {
   ctx.translate(x, y);
   ctx.rotate(rotation);
   ctx.drawImage(refinedEnemyRoster, (cell % 3) * cellWidth, Math.floor(cell / 3) * cellHeight, cellWidth, cellHeight, -width / 2, -height / 2, width, height);
+  ctx.restore();
+  return true;
+};
+
+// 補給圖集：4×3 格，讓火力、護盾與各種短暫增益在彈幕中仍然一眼可辨。
+const refinedPickupRoster = document.querySelector('#ai-pickups-refined') || new Image();
+refinedPickupRoster.decoding = 'async';
+if (!refinedPickupRoster.src) refinedPickupRoster.src = new URL('../assets/images/astral-ai-pickups-refined.png', import.meta.url).href;
+const refinedPickupCells = { power: 0, hp: 1, shield: 2, energy: 3, magnet: 4, rage: 5, double: 6, pierce: 7, crit: 8, barrier: 9, rapid: 10, chest: 11, gold: 6 };
+const drawRefinedPickup = (ctx, type, x, y, width, height, rotation = 0) => {
+  if (!refinedPickupRoster.complete || !refinedPickupRoster.naturalWidth) return false;
+  const cell = refinedPickupCells[type];
+  if (cell === undefined) return false;
+  const cellWidth = refinedPickupRoster.naturalWidth / 4;
+  const cellHeight = refinedPickupRoster.naturalHeight / 3;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rotation);
+  ctx.drawImage(refinedPickupRoster, (cell % 4) * cellWidth, Math.floor(cell / 4) * cellHeight, cellWidth, cellHeight, -width / 2, -height / 2, width, height);
   ctx.restore();
   return true;
 };
@@ -266,6 +285,49 @@ function drawCraftSignature(ctx, p, elapsed) {
   ctx.restore();
 }
 
+// 玩家彈藥不共用圓點圖樣：依武器類型畫出不同的機械投射體與短拖尾。
+function drawPlayerProjectile(ctx, entry, visual) {
+  const style = entry.style || 'dawn';
+  const angle = Math.atan2(entry.vy, entry.vx) + Math.PI / 2;
+  const form = style.includes('rail') || style.includes('aurora') ? 'rail'
+    : style.includes('missile') || style.includes('seeker') ? 'missile'
+    : style.includes('burst') || style.includes('ember') || style.includes('caldera') ? 'burst'
+    : style.includes('blade') ? 'blade'
+    : style.includes('arc') || style.includes('prism') || style.includes('violet') ? 'arc'
+    : style.includes('star') || style.includes('auric') || style.includes('solaris') ? 'star' : 'pulse';
+  ctx.save();
+  ctx.translate(entry.x, entry.y);
+  ctx.rotate(angle);
+  ctx.shadowColor = visual.color;
+  ctx.shadowBlur = form === 'rail' ? 16 : 10;
+  ctx.fillStyle = visual.color;
+  ctx.strokeStyle = '#efffff';
+  ctx.lineWidth = 1;
+  if (form === 'rail') {
+    const beamLength = Math.max(30, visual.height * 1.15);
+    const gradient = ctx.createLinearGradient(0, beamLength / 2, 0, -beamLength / 2);
+    gradient.addColorStop(0, `${visual.color}22`); gradient.addColorStop(0.42, visual.color); gradient.addColorStop(0.62, '#ffffff'); gradient.addColorStop(1, `${visual.color}22`);
+    ctx.fillStyle = gradient; ctx.fillRect(-visual.width / 4, -beamLength / 2, visual.width / 2, beamLength);
+    ctx.strokeRect(-visual.width / 4, -beamLength / 2, visual.width / 2, beamLength);
+  } else if (form === 'missile') {
+    ctx.beginPath(); ctx.moveTo(0, -visual.height / 2); ctx.lineTo(visual.width / 2, visual.height / 4); ctx.lineTo(visual.width / 4, visual.height / 2); ctx.lineTo(0, visual.height / 3); ctx.lineTo(-visual.width / 4, visual.height / 2); ctx.lineTo(-visual.width / 2, visual.height / 4); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#fff2dc'; ctx.fillRect(-1.5, -visual.height / 2 + 5, 3, visual.height * .43);
+  } else if (form === 'burst') {
+    ctx.beginPath(); for (let point = 0; point < 8; point += 1) { const radius = point % 2 ? visual.width * .25 : visual.width * .58; const a = point * Math.PI / 4 - Math.PI / 2; const x = Math.cos(a) * radius; const y = Math.sin(a) * radius; point ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); ctx.fill(); ctx.stroke();
+  } else if (form === 'blade') {
+    ctx.rotate(entry.age * 13); ctx.beginPath(); ctx.moveTo(0, -visual.height / 2); ctx.quadraticCurveTo(visual.width / 1.5, 0, 0, visual.height / 2); ctx.quadraticCurveTo(-visual.width / 1.5, 0, 0, -visual.height / 2); ctx.fill(); ctx.stroke();
+  } else if (form === 'arc') {
+    ctx.beginPath(); ctx.moveTo(0, -visual.height / 2); ctx.lineTo(visual.width / 2, -visual.height * .05); ctx.lineTo(visual.width * .18, visual.height / 2); ctx.lineTo(-visual.width / 2, visual.height * .1); ctx.closePath(); ctx.fill(); ctx.stroke();
+  } else if (form === 'star') {
+    ctx.beginPath(); for (let point = 0; point < 10; point += 1) { const radius = point % 2 ? visual.width * .22 : visual.width * .56; const a = point * Math.PI / 5 - Math.PI / 2; const x = Math.cos(a) * radius; const y = Math.sin(a) * radius; point ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); ctx.fill();
+  } else {
+    const half = visual.width * .28; const radius = Math.min(half, visual.height * .22);
+    ctx.beginPath(); ctx.moveTo(-half + radius, -visual.height / 2); ctx.lineTo(half - radius, -visual.height / 2); ctx.quadraticCurveTo(half, -visual.height / 2, half, -visual.height / 2 + radius); ctx.lineTo(half, visual.height / 2 - radius); ctx.quadraticCurveTo(half, visual.height / 2, half - radius, visual.height / 2); ctx.lineTo(-half + radius, visual.height / 2); ctx.quadraticCurveTo(-half, visual.height / 2, -half, visual.height / 2 - radius); ctx.lineTo(-half, -visual.height / 2 + radius); ctx.quadraticCurveTo(-half, -visual.height / 2, -half + radius, -visual.height / 2); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#f6ffff'; ctx.fillRect(-1, -visual.height * .28, 2, visual.height * .42);
+  }
+  ctx.restore();
+  return true;
+}
+
 export function render(ctx, state) {
   const { p, enemies, bullets, pickups, particles, boss, stars, nebulae, debris } = state;
   const shakeX = state.shake ? (Math.random() - 0.5) * state.shake : 0;
@@ -373,7 +435,7 @@ export function render(ctx, state) {
     };
     const visual = projectileVisuals[entry.style] || projectileVisuals.dawn;
     if (entry.trail) { ctx.strokeStyle = visual.trail; ctx.lineWidth = entry.laser ? 4 : 2; ctx.beginPath(); ctx.moveTo(entry.x, entry.y + 12); ctx.lineTo(entry.x - entry.vx * 0.032, entry.y - entry.vy * 0.032 + 12); ctx.stroke(); }
-    if (entry.from === 'p' && drawAiVfx(ctx, visual.cell, entry.x, entry.y, visual.width, visual.height)) return;
+    if (entry.from === 'p' && drawPlayerProjectile(ctx, entry, visual)) return;
     if (entry.from === 'e') {
       const enemyCell = entry.damage >= 14 ? 7 : entry.damage >= 12 ? 4 : entry.damage >= 10 ? 1 : 3;
       const enemySize = entry.damage >= 14 ? 29 : entry.damage >= 12 ? 25 : 21;
@@ -393,6 +455,7 @@ export function render(ctx, state) {
       ctx.fillStyle = `${color}bb`; ctx.beginPath(); ctx.arc(Math.cos(entry.age * 3) * 12, Math.sin(entry.age * 3) * 12, 2, 0, Math.PI * 2); ctx.fill();
     }
     // 核心補給使用獨立圖樣；臨時增益亦沿用不同色相的能量標記，避免與玩家彈幕混淆。
+    if (drawRefinedPickup(ctx, entry.type, 0, 0, entry.type === 'gold' ? 28 : 38, entry.type === 'gold' ? 28 : 38, entry.age * 1.9)) { ctx.restore(); return; }
     const pickupArt = combatPickupCells[entry.type];
     if (drawCombatArt(ctx, pickupArt, 0, 0, 34, 34, entry.age * 1.9)) { ctx.restore(); return; }
     const pickupCells = { gold: 11, hp: 5, shield: 6, energy: 7, power: 8, magnet: 9, rage: 10, double: 11, pierce: 2, crit: 3, barrier: 6, rapid: 1 };
