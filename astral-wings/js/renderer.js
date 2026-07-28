@@ -64,6 +64,47 @@ const drawAiCraft = (ctx, cell, x, y, width, height, alpha = 1) => {
   return true;
 };
 
+// 第二代圖集已經是透明背景，直接以 3×2 角色格繪製。這套圖用於目前
+// 可選戰機，避免在高細節插畫上再疊加粗重的舊幾何外框。
+const refinedCraftRoster = document.querySelector('#ai-craft-refined') || new Image();
+refinedCraftRoster.decoding = 'async';
+if (!refinedCraftRoster.src) refinedCraftRoster.src = new URL('../assets/images/astral-ai-craft-refined.png', import.meta.url).href;
+const refinedCraftCells = { dawn: 0, ember: 1, violet: 2, bulwark: 3, auric: 4, specter: 5, tide: 0, rime: 3, nova: 4, helix: 1, aurora: 0, caldera: 1, seraph: 4, voidlance: 5, solaris: 4 };
+const drawRefinedCraft = (ctx, shipId, x, y, width, height, alpha = 1) => {
+  if (!refinedCraftRoster.complete || !refinedCraftRoster.naturalWidth) return false;
+  const cell = refinedCraftCells[shipId] ?? 0;
+  const cellWidth = refinedCraftRoster.naturalWidth / 3;
+  const cellHeight = refinedCraftRoster.naturalHeight / 2;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.drawImage(refinedCraftRoster, (cell % 3) * cellWidth, Math.floor(cell / 3) * cellHeight, cellWidth, cellHeight, x - width / 2, y - height / 2, width, height);
+  ctx.restore();
+  return true;
+};
+
+// 敵方圖集同樣以 3×2 格排列。保留舊圖集作為載入失敗時的安全後備。
+const refinedEnemyRoster = document.querySelector('#ai-enemies-refined') || new Image();
+refinedEnemyRoster.decoding = 'async';
+if (!refinedEnemyRoster.src) refinedEnemyRoster.src = new URL('../assets/images/astral-ai-enemies-refined.png', import.meta.url).href;
+const refinedEnemyCells = {
+  scout: 0, sprinter: 1, sniper: 3, shield: 4, armor: 2, bomber: 1, support: 4, elite: 5,
+  flare: 0, formation: 1, thresher: 2, reaper: 3, bastion: 2, medic: 4, laser: 3, phantom: 1,
+  miner: 2, warder: 4, beacon: 5, splitter: 0
+};
+const drawRefinedEnemy = (ctx, kind, x, y, width, height, rotation = 0) => {
+  if (!refinedEnemyRoster.complete || !refinedEnemyRoster.naturalWidth) return false;
+  const cell = refinedEnemyCells[kind];
+  if (cell === undefined) return false;
+  const cellWidth = refinedEnemyRoster.naturalWidth / 3;
+  const cellHeight = refinedEnemyRoster.naturalHeight / 2;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rotation);
+  ctx.drawImage(refinedEnemyRoster, (cell % 3) * cellWidth, Math.floor(cell / 3) * cellHeight, cellWidth, cellHeight, -width / 2, -height / 2, width, height);
+  ctx.restore();
+  return true;
+};
+
 // 子彈與補給專用 AI 圖集；移除生成圖的淺色底後以小精靈形式繪製。
 const aiVfxRoster = document.querySelector('#ai-vfx-roster') || new Image();
 if (!aiVfxRoster.src) aiVfxRoster.src = new URL('../assets/images/astral-ai-vfx-sprites.png', import.meta.url).href;
@@ -119,7 +160,7 @@ function drawEnemy(ctx, entry, triangle) {
   const combatCell = combatEnemyCells[entry.kind];
   // 機體外觀縮小至可閃避比例，保留高解析原創圖集的裝甲細節與輪廓。
   const visualSize = entry.kind === 'elite' ? 78 : entry.r >= 32 ? 62 : entry.r >= 28 ? 56 : 48;
-  if (drawCombatArt(ctx, combatCell, entry.x, entry.y, visualSize, visualSize + 8, Math.sin(entry.age * 1.7) * 0.025)) {
+  if (drawRefinedEnemy(ctx, entry.kind, entry.x, entry.y, visualSize, visualSize + 8, Math.sin(entry.age * 1.7) * 0.025)) {
     if (entry.shield > 0) { ctx.save(); ctx.strokeStyle = '#78cfff'; ctx.globalAlpha = 0.7; ctx.beginPath(); ctx.arc(entry.x, entry.y, entry.r + 5, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
     return;
   }
@@ -246,7 +287,8 @@ export function render(ctx, state) {
     ctx.closePath(); ctx.fill();
   };
   if (p.inv <= 0 || Math.floor(p.inv * 12) % 2) {
-    if (drawAiCraft(ctx, p.sprite ?? 0, p.x, p.y, 66, 76, 0.96)) {
+    const usingRefinedCraft = drawRefinedCraft(ctx, p.shipId, p.x, p.y, 62, 74, 0.98);
+    if (usingRefinedCraft || drawAiCraft(ctx, p.sprite ?? 0, p.x, p.y, 62, 74, 0.96)) {
       // AI 戰機已繪製，仍保留尾焰讓移動與無敵狀態具有清楚辨識。
       const engineColors = { dawn: '#ffb553', ember: '#ff704f', violet: '#d488ff', bulwark: '#70dcff', auric: '#ffe27c', specter: '#ff90ef', tide: '#71e7ff', rime: '#a7f4ff', nova: '#fff0a5' };
       const engineColor = engineColors[p.shipId] || '#ffb553';
@@ -269,7 +311,8 @@ export function render(ctx, state) {
   if (state.upgradePulse > 0) { const progress = 1 - state.upgradePulse / 0.72; ctx.strokeStyle = '#ffe99b'; ctx.lineWidth = 3 * (1 - progress); ctx.globalAlpha = 1 - progress; ctx.beginPath(); ctx.arc(p.x, p.y, 22 + progress * 74, 0, Math.PI * 2); ctx.stroke(); }
   ctx.restore();
   drawSecondaryRig(ctx, p, state.secondary, state.elapsed || 0);
-  drawCraftSignature(ctx, p, state.elapsed || 0);
+  // 舊線條輪廓僅在新版圖集還沒載入時顯示，避免壓住精細機體美術。
+  if (!refinedCraftRoster.complete || !refinedCraftRoster.naturalWidth) drawCraftSignature(ctx, p, state.elapsed || 0);
   drawWingmanRig(ctx, p, state.wingman, state.elapsed || 0);
   drawPlayerVitalBars(ctx, p);
   enemies.forEach((entry) => { drawEnemy(ctx, entry, triangle); drawEnemyVitalBar(ctx, entry); });

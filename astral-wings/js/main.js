@@ -1,7 +1,7 @@
 import { load, save, reset } from './save.js?v=20260727-ships';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260728-fine-art';
+import { game } from './game.js?v=20260728-refined-craft-art';
 import { menu, equipmentView, missionsView, fusionView, stageView, bossView, codexView, shipView } from './ui.js?v=20260727-visual-12stage';
 import { fusionStatusView, homeDashboard, upgradedShipView } from './uiEnhancements.js?v=20260727-visual-12stage';
 import { ships } from './data/ships.js?v=20260727-boss-routes-hangar-v3';
