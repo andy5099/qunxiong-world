@@ -117,8 +117,9 @@ const drawEnemyVfx = (ctx, cell, x, y, width, height, rotation) => {
 // 原創幾何輪廓讓敵機在手機小畫面上仍可一眼辨識職能。
 function drawEnemy(ctx, entry, triangle) {
   const combatCell = combatEnemyCells[entry.kind];
-  const visualSize = entry.kind === 'elite' ? 104 : entry.r >= 32 ? 82 : entry.r >= 28 ? 74 : 66;
-  if (drawCombatArt(ctx, combatCell, entry.x, entry.y, visualSize, visualSize + 10, Math.sin(entry.age * 1.7) * 0.035)) {
+  // 機體外觀縮小至可閃避比例，保留高解析原創圖集的裝甲細節與輪廓。
+  const visualSize = entry.kind === 'elite' ? 78 : entry.r >= 32 ? 62 : entry.r >= 28 ? 56 : 48;
+  if (drawCombatArt(ctx, combatCell, entry.x, entry.y, visualSize, visualSize + 8, Math.sin(entry.age * 1.7) * 0.025)) {
     if (entry.shield > 0) { ctx.save(); ctx.strokeStyle = '#78cfff'; ctx.globalAlpha = 0.7; ctx.beginPath(); ctx.arc(entry.x, entry.y, entry.r + 5, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
     return;
   }
@@ -217,7 +218,7 @@ function drawPlayerVitalBars(ctx, p) {
 // 三架首要戰機使用不同的覆蓋式機械輪廓，與共用底圖一起形成可辨識的機頭、翼型與炮位。
 function drawCraftSignature(ctx, p, elapsed) {
   const color = p.shipId === 'ember' ? '#ff7653' : p.shipId === 'violet' ? '#cb8cff' : '#69eaff';
-  ctx.save(); ctx.translate(p.x, p.y); ctx.strokeStyle = color; ctx.fillStyle = `${color}55`; ctx.lineWidth = 1.6; ctx.shadowColor = color; ctx.shadowBlur = 8;
+  ctx.save(); ctx.translate(p.x, p.y); ctx.scale(0.72, 0.72); ctx.strokeStyle = color; ctx.fillStyle = `${color}44`; ctx.lineWidth = 1.25; ctx.shadowColor = color; ctx.shadowBlur = 5;
   if (p.shipId === 'ember') { ctx.beginPath(); ctx.moveTo(0,-42); ctx.lineTo(-18,16); ctx.lineTo(-7,11); ctx.lineTo(0,28); ctx.lineTo(7,11); ctx.lineTo(18,16); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.fillRect(-4,-31,8,35); }
   else if (p.shipId === 'violet') { ctx.beginPath(); ctx.moveTo(0,-44); ctx.lineTo(-30,5); ctx.lineTo(-11,13); ctx.lineTo(-18,27); ctx.lineTo(0,19); ctx.lineTo(18,27); ctx.lineTo(11,13); ctx.lineTo(30,5); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.arc(0,0,7+Math.sin(elapsed*7)*2,0,Math.PI*2); ctx.stroke(); }
   else { ctx.beginPath(); ctx.moveTo(0,-43); ctx.lineTo(-22,-3); ctx.lineTo(-16,24); ctx.lineTo(0,16); ctx.lineTo(16,24); ctx.lineTo(22,-3); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.fillRect(-16,-16,5,17); ctx.fillRect(11,-16,5,17); }
@@ -245,11 +246,11 @@ export function render(ctx, state) {
     ctx.closePath(); ctx.fill();
   };
   if (p.inv <= 0 || Math.floor(p.inv * 12) % 2) {
-    if (drawAiCraft(ctx, p.sprite ?? 0, p.x, p.y, 94, 108, 0.96)) {
+    if (drawAiCraft(ctx, p.sprite ?? 0, p.x, p.y, 66, 76, 0.96)) {
       // AI 戰機已繪製，仍保留尾焰讓移動與無敵狀態具有清楚辨識。
       const engineColors = { dawn: '#ffb553', ember: '#ff704f', violet: '#d488ff', bulwark: '#70dcff', auric: '#ffe27c', specter: '#ff90ef', tide: '#71e7ff', rime: '#a7f4ff', nova: '#fff0a5' };
       const engineColor = engineColors[p.shipId] || '#ffb553';
-      ctx.save(); ctx.fillStyle = engineColor; ctx.shadowBlur = 12; ctx.shadowColor = engineColor; ctx.fillRect(p.x - 9, p.y + 27, 5, 9); ctx.fillRect(p.x + 4, p.y + 27, 5, 9); ctx.restore();
+      ctx.save(); ctx.fillStyle = engineColor; ctx.shadowBlur = 8; ctx.shadowColor = engineColor; ctx.fillRect(p.x - 7, p.y + 20, 4, 7); ctx.fillRect(p.x + 3, p.y + 20, 4, 7); ctx.restore();
     } else {
     ctx.save(); ctx.translate(p.x, p.y); ctx.shadowBlur = 14; ctx.shadowColor = '#4ee9ff';
     ctx.fillStyle = '#254f78'; ctx.beginPath(); ctx.moveTo(0, -22); ctx.lineTo(-15, 16); ctx.lineTo(0, 11); ctx.lineTo(15, 16); ctx.closePath(); ctx.fill();
