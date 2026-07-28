@@ -19,6 +19,17 @@ const migrate = raw => {
   return { ...defaults, ...data, version: 8, shipLevels, unlockedShips, unlockedStages: Array.isArray(data.unlockedStages) && data.unlockedStages.length ? data.unlockedStages : defaults.unlockedStages, stageProgress: data.stageProgress && typeof data.stageProgress === 'object' ? data.stageProgress : {}, settings: { ...defaults.settings, ...(data.settings || {}) }, equipped: { ...defaults.equipped, ...(data.equipped || {}) }, equipment: Array.isArray(data.equipment) ? data.equipment : [], missions: { ...defaults.missions, ...(data.missions || {}), claimed: { ...defaults.missions.claimed, ...(data.missions?.claimed || {}) } }, achievements: { ...defaults.achievements, ...(data.achievements || {}), claimed: { ...defaults.achievements.claimed, ...(data.achievements?.claimed || {}) } } };
 };
 
-export const load = () => { try { return migrate(JSON.parse(localStorage.getItem(C.save) || '{}')); } catch { return base(); } };
+export const load = () => {
+  try { return migrate(JSON.parse(localStorage.getItem(C.save) || '{}')); }
+  catch {
+    // Preserve malformed payloads for recovery instead of silently erasing a
+    // player's progress. The game still starts with a safe default.
+    try {
+      const raw = localStorage.getItem(C.save);
+      if (raw) localStorage.setItem(`${C.save}:corrupt:${Date.now()}`, raw);
+    } catch {}
+    return base();
+  }
+};
 export const save = state => { try { localStorage.setItem(C.save, JSON.stringify(migrate(state))); } catch {} };
 export const reset = () => { localStorage.removeItem(C.save); return load(); };

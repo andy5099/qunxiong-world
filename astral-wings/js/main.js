@@ -1,7 +1,10 @@
-import { load, save, reset } from './save.js?v=20260727-ships';
+import { createSaveService } from './services/saveService.js';
+import { createScreenRouter } from './core/router.js';
+import { createStore } from './core/store.js';
+import { createBattleEngine } from './battle/battleEngine.js';
+import { mountDebugPanel } from './ui/debugPanel.js';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
-import { game } from './game.js?v=20260728-arcade-craft-bolts';
 import { menu, equipmentView, missionsView, fusionView, stageView, bossView, codexView, shipView } from './ui.js?v=20260728-visual-stage-rewards';
 import { fusionStatusView, mobileHomeHub, upgradedShipView, battleReadyView } from './uiEnhancements.js?v=20260728-mobile-home-hub';
 import { ships } from './data/ships.js?v=20260727-boss-routes-hangar-v3';
@@ -11,15 +14,25 @@ import { getBoss } from './data/bosses.js?v=20260728-mobile-home-hub';
 import { C } from './config.js';
 
 // 此檔案只負責頁面切換、遊戲實例與存檔的銜接。
+const app = document.querySelector('#app');
+const saveService = createSaveService();
+const load = () => saveService.load();
+const save = state => saveService.save(state);
+const reset = () => saveService.reset();
 let data = load();
 let run = null;
-// Single UI state boundary: battle code owns the canvas, while this object owns screen transitions.
-const uiState = { screen: 'home', ready: null };
-const app = document.querySelector('#app');
+const router = createScreenRouter(app);
+// Single UI state boundary: battle code owns the canvas, while this store owns screen transitions.
+const uiStore = createStore({ screen: 'home', ready: null });
 
 function setScreen(name, ready = null) {
-  uiState.screen = name;
-  uiState.ready = ready;
+  uiStore.patch({ screen: name, ready });
+  router.setState(name, ready);
+}
+
+function renderScreen(name, markup, ready = null) {
+  setScreen(name, ready);
+  router.show(name, markup, ready);
 }
 
 // 與戰鬥角色相同的裝備加總公式，用於在穿戴瞬間顯示真正的攻擊變化。
@@ -52,8 +65,7 @@ refreshDaily();
 function home() {
   if (run) run.stop();
   run = null;
-  setScreen('home');
-  app.innerHTML = mobileHomeHub(data);
+  renderScreen('home', mobileHomeHub(data));
 }
 
 function recommendedStage() {
@@ -76,23 +88,22 @@ function battleReady(mode = 'stage', stageId = 'orbit', back = 'home') {
     { kind: 'crate', icon: '▣', name: mode === 'boss' ? 'Boss 裝備箱' : '裝備掉落機率', detail: mode === 'boss' ? '必定獲得一份獎勵' : '品質隨關卡提升' }
   ];
   const ready = { mode, back, level, power, recommendation, boss, drops };
-  setScreen('ready', { mode, stageId, back });
-  app.innerHTML = battleReadyView(data, selectedStage, ready);
+  renderScreen('ready', battleReadyView(data, selectedStage, ready), { mode, stageId, back });
 }
 
 function equipment(keepPosition = false) {
   if (run) run.stop(); run = null;
   setScreen('equipment');
   const previousScroll = keepPosition ? (app.querySelector('.menu')?.scrollTop || 0) : 0;
-  app.innerHTML = equipmentView(data);
+  router.show('equipment', equipmentView(data));
   if (keepPosition) requestAnimationFrame(() => { const panel = app.querySelector('.menu'); if (panel) panel.scrollTop = previousScroll; });
 }
-function missions() { if (run) run.stop(); run = null; setScreen('missions'); app.innerHTML = missionsView(data); }
-function fusion() { if (run) run.stop(); run = null; setScreen('fusion'); app.innerHTML = fusionStatusView(data); }
-function shipHangar() { if (run) run.stop(); run = null; setScreen('ships'); app.innerHTML = upgradedShipView(data); }
-function stagesMenu() { if (run) run.stop(); run = null; setScreen('stages'); app.innerHTML = stageView(data, stages); }
-function bossMenu() { if (run) run.stop(); run = null; setScreen('boss'); app.innerHTML = bossView(data, stages); }
-function codex() { if (run) run.stop(); run = null; setScreen('codex'); app.innerHTML = codexView(data, stages); }
+function missions() { if (run) run.stop(); run = null; renderScreen('missions', missionsView(data)); }
+function fusion() { if (run) run.stop(); run = null; renderScreen('fusion', fusionStatusView(data)); }
+function shipHangar() { if (run) run.stop(); run = null; renderScreen('ships', upgradedShipView(data)); }
+function stagesMenu() { if (run) run.stop(); run = null; renderScreen('stages', stageView(data, stages)); }
+function bossMenu() { if (run) run.stop(); run = null; renderScreen('boss', bossView(data, stages)); }
+function codex() { if (run) run.stop(); run = null; renderScreen('codex', codexView(data, stages)); }
 
 function showResult(result, drops = []) {
   const box = app.querySelector('#result');
@@ -111,7 +122,7 @@ function showResult(result, drops = []) {
 function start(mode = 'stage', stageId = 'orbit') {
   setScreen('battle', { mode, stageId });
   const selectedStage = getStage(stageId);
-  app.innerHTML = `
+  router.show('battle', `
     <div class="shell game">
       <canvas width="360" height="640" aria-label="星界戰翼遊戲畫面"></canvas>
       <div class="hud">
@@ -133,11 +144,11 @@ function start(mode = 'stage', stageId = 'orbit') {
         ${mode === 'endless' ? '<button class="ui-button action-endless-claim" data-a="endless-claim"><i aria-hidden="true"></i><span>結算並領取</span></button>' : '<button class="ui-button action-home" data-a="home"><i aria-hidden="true"></i><span>返回</span></button>'}
       </div>
       <div id="result" class="modal hidden"></div>
-    </div>`;
+    </div>`, { mode, stageId });
 
   const canvas = app.querySelector('canvas');
   const controls = input(canvas);
-  run = game(canvas, data, controls, (result) => {
+  run = createBattleEngine({ canvas, saveData: data, controls, onEnd: (result) => {
     data.gold += result.gold;
     data.high = Math.max(data.high, result.score);
     data.maxCombo = Math.max(data.maxCombo, result.combo);
@@ -185,7 +196,7 @@ function start(mode = 'stage', stageId = 'orbit') {
     if (result.mode === 'boss') data.bossBest = Math.max(data.bossBest || 0, result.score);
     save(data);
     showResult(result, drops);
-  }, (state) => {
+  }, onHud: (state) => {
     const hp = app.querySelector('#hp');
     const shield = app.querySelector('#shield');
     const hpText = app.querySelector('#hp-text');
@@ -229,7 +240,7 @@ function start(mode = 'stage', stageId = 'orbit') {
         if (label) label.textContent = `${state.boss.name}・第 ${state.boss.phase} 階段`;
       }
     }
-  }, mode, selectedStage);
+  }, mode, stage: selectedStage }).start();
 }
 
 app.addEventListener('click', (event) => {
@@ -450,6 +461,7 @@ document.addEventListener('visibilitychange', () => {
 
 // 存檔損壞或其他初始化例外時，至少保留可恢復的畫面。
 try {
+  mountDebugPanel({ getScreen: () => router.current, getData: () => data, getBattle: () => run });
   home();
 } catch {
   app.innerHTML = '<div class="shell panel menu"><h1>星界戰翼</h1><p>遊戲初始化失敗，請重新整理頁面後再試一次。</p><button onclick="location.reload()">重新載入</button></div>';
