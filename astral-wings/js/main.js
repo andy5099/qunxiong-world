@@ -3,15 +3,17 @@ import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
 import { game } from './game.js?v=20260728-arcade-craft-bolts';
 import { menu, equipmentView, missionsView, fusionView, stageView, bossView, codexView, shipView } from './ui.js?v=20260728-visual-stage-rewards';
-import { fusionStatusView, homeDashboard, upgradedShipView } from './uiEnhancements.js?v=20260728-visual-stage-rewards';
+import { fusionStatusView, mobileHomeHub, upgradedShipView, battleReadyView } from './uiEnhancements.js?v=20260728-mobile-home-hub';
 import { ships } from './data/ships.js?v=20260727-boss-routes-hangar-v3';
 import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-boss-loot';
 import { stages, getStage } from './data/stages.js?v=20260727-visual-12stage';
+import { getBoss } from './data/bosses.js?v=20260728-mobile-home-hub';
 import { C } from './config.js';
 
 // 此檔案只負責頁面切換、遊戲實例與存檔的銜接。
 let data = load();
 let run = null;
+let screen = 'home';
 const app = document.querySelector('#app');
 
 // 與戰鬥角色相同的裝備加總公式，用於在穿戴瞬間顯示真正的攻擊變化。
@@ -44,21 +46,46 @@ refreshDaily();
 function home() {
   if (run) run.stop();
   run = null;
-  app.innerHTML = homeDashboard(data);
+  screen = 'home';
+  app.innerHTML = mobileHomeHub(data);
+}
+
+function recommendedStage() {
+  const available = stages.filter(stage => data.unlockedStages?.includes(stage.id));
+  return available[available.length - 1] || stages[0];
+}
+
+function battleReady(mode = 'stage', stageId = 'orbit', back = 'home') {
+  if (run) run.stop();
+  run = null;
+  const selectedStage = getStage(stageId);
+  const activeShip = ships.find(ship => ship.id === (data.activeShip || 'dawn')) || ships[0];
+  const level = Math.max(1, data.shipLevels?.[activeShip.id] || data.level || 1);
+  const power = Math.max(1, Math.floor(currentAttack(data) * 140 + activeShip.hp * 5 + activeShip.shield * 6 + level * 35));
+  const recommendation = Math.floor((850 + selectedStage.order * 980) * (mode === 'boss' ? 1.12 : 1));
+  const boss = getBoss(selectedStage.boss);
+  const drops = [
+    { kind: 'gold', icon: '◈', name: `金幣 ${40 + selectedStage.order * 24}～${90 + selectedStage.order * 42}`, detail: '戰鬥結算' },
+    { kind: 'material', icon: '✧', name: `強化材料 +${4 + Math.floor(selectedStage.order / 2)}`, detail: '通關獎勵' },
+    { kind: 'crate', icon: '▣', name: mode === 'boss' ? 'Boss 裝備箱' : '裝備掉落機率', detail: mode === 'boss' ? '必定獲得一份獎勵' : '品質隨關卡提升' }
+  ];
+  screen = 'ready';
+  app.innerHTML = battleReadyView(data, selectedStage, { mode, back, level, power, recommendation, boss, drops });
 }
 
 function equipment(keepPosition = false) {
   if (run) run.stop(); run = null;
+  screen = 'equipment';
   const previousScroll = keepPosition ? (app.querySelector('.menu')?.scrollTop || 0) : 0;
   app.innerHTML = equipmentView(data);
   if (keepPosition) requestAnimationFrame(() => { const panel = app.querySelector('.menu'); if (panel) panel.scrollTop = previousScroll; });
 }
-function missions() { if (run) run.stop(); run = null; app.innerHTML = missionsView(data); }
-function fusion() { if (run) run.stop(); run = null; app.innerHTML = fusionStatusView(data); }
-function shipHangar() { if (run) run.stop(); run = null; app.innerHTML = upgradedShipView(data); }
-function stagesMenu() { if (run) run.stop(); run = null; app.innerHTML = stageView(data, stages); }
-function bossMenu() { if (run) run.stop(); run = null; app.innerHTML = bossView(data, stages); }
-function codex() { if (run) run.stop(); run = null; app.innerHTML = codexView(data, stages); }
+function missions() { if (run) run.stop(); run = null; screen = 'missions'; app.innerHTML = missionsView(data); }
+function fusion() { if (run) run.stop(); run = null; screen = 'fusion'; app.innerHTML = fusionStatusView(data); }
+function shipHangar() { if (run) run.stop(); run = null; screen = 'ships'; app.innerHTML = upgradedShipView(data); }
+function stagesMenu() { if (run) run.stop(); run = null; screen = 'stages'; app.innerHTML = stageView(data, stages); }
+function bossMenu() { if (run) run.stop(); run = null; screen = 'boss'; app.innerHTML = bossView(data, stages); }
+function codex() { if (run) run.stop(); run = null; screen = 'codex'; app.innerHTML = codexView(data, stages); }
 
 function showResult(result, drops = []) {
   const box = app.querySelector('#result');
@@ -75,6 +102,7 @@ function showResult(result, drops = []) {
 }
 
 function start(mode = 'stage', stageId = 'orbit') {
+  screen = 'battle';
   const selectedStage = getStage(stageId);
   app.innerHTML = `
     <div class="shell game">
@@ -200,7 +228,8 @@ function start(mode = 'stage', stageId = 'orbit') {
 app.addEventListener('click', (event) => {
   const action = event.target.closest('[data-a]')?.dataset.a;
   if (!action) return;
-  if (action === 'start' || action === 'retry') start();
+  if (action === 'start') battleReady('stage', recommendedStage().id);
+  if (action === 'retry') start();
   if (action === 'stages') stagesMenu();
   if (action === 'codex') codex();
   if (action.startsWith('sweep:')) {
@@ -222,16 +251,31 @@ app.addEventListener('click', (event) => {
     }
     stagesMenu();
   }
+  if (action.startsWith('battle-ready:')) {
+    const [, mode, stageId, requestedBack] = action.split(':');
+    const back = requestedBack || (mode === 'boss' ? 'boss' : 'stages');
+    if (data.unlockedStages.includes(stageId)) battleReady(mode, stageId, back);
+  }
+  if (action.startsWith('ready-launch:')) {
+    const [, mode, stageId] = action.split(':');
+    start(mode, stageId);
+  }
+  if (action.startsWith('ready-back:')) {
+    const target = action.split(':')[1];
+    if (target === 'stages') stagesMenu();
+    else if (target === 'boss') bossMenu();
+    else home();
+  }
   if (action.startsWith('stage:')) {
     const stageId = action.split(':')[1];
-    if (data.unlockedStages.includes(stageId)) start('stage', stageId);
+    if (data.unlockedStages.includes(stageId)) battleReady('stage', stageId, 'stages');
   }
   if (action === 'endless') start('endless');
   if (action === 'endless-claim') run?.claim();
   if (action === 'boss') bossMenu();
   if (action.startsWith('bossstage:')) {
     const stageId = action.split(':')[1];
-    if (data.unlockedStages.includes(stageId)) start('boss', stageId);
+    if (data.unlockedStages.includes(stageId)) battleReady('boss', stageId, 'boss');
   }
   if (action === 'home') home();
   if (action === 'equipment') equipment();

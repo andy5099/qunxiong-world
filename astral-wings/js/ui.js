@@ -22,12 +22,12 @@ export const menu = state => `<div class="shell panel menu">
 export const stageView = (state, stages) => `<div class="shell panel menu"><h2>主線星域</h2><p class="note">通關目前區域即可解鎖下一個星域；每關都有固定波次、補給與三階段原創 Boss。</p>${state.lastSweep ? `<section class="sweep-result"><b>掃蕩結算：${state.lastSweep.stage} ×${state.lastSweep.count}</b><span>金幣 +${state.lastSweep.gold}・強化材料 +${state.lastSweep.materials}・擊殺 +${state.lastSweep.kills}</span><div class="sweep-loot-icons"><i class="coin-icon"></i><i class="material-icon"></i>${state.lastSweep.equipment ? '<i class="crate-icon"></i>' : ''}</div><small>${state.lastSweep.equipment ? `額外獲得：${state.lastSweep.equipment}` : '固定獎勵已入庫'}</small></section>` : ''}<div class="stage-grid stage-route">${stages.map(stage => {
   const open = state.unlockedStages.includes(stage.id); const done = Boolean(state.stageProgress?.[stage.id]);
   const sweep = done ? `<div class="sweep-actions">${button('掃蕩 ×10', `sweep:${stage.id}:10`)}${button('×50', `sweep:${stage.id}:50`)}${button('×100', `sweep:${stage.id}:100`)}</div>` : '';
-  return `<article class="stage-card stage-card-${stage.order % 6} ${open ? '' : 'locked'}">${stageBadge(stage, done, open)}<div class="stage-copy"><b>${stage.name}</b><small>${stage.subtitle}</small><span>${done ? '已通關・可掃蕩' : open ? '可出擊' : `解鎖：${stage.unlock}`}</span>${rewardPreview(stage)}</div>${button(open ? '進入關卡' : '尚未解鎖', `stage:${stage.id}`, !open)}${sweep}</article>`;
+  return `<article class="stage-card stage-card-${stage.order % 6} ${open ? '' : 'locked'}">${stageBadge(stage, done, open)}<div class="stage-copy"><b>${stage.name}</b><small>${stage.subtitle}</small><span>${done ? '已通關・可掃蕩' : open ? '可出擊' : `解鎖：${stage.unlock}`}</span>${rewardPreview(stage)}</div>${button(open ? '戰前整備' : '尚未解鎖', `battle-ready:stage:${stage.id}`, !open)}${sweep}</article>`;
 }).join('')}</div>${button('返回主選單','home')}</div>`;
 
 export const bossView = (state, stages) => `<div class="shell panel menu"><h2>Boss 挑戰</h2><p class="note">選擇已解鎖星域的 Boss 直接挑戰。越後段的 Boss 生命更高，掉落的裝備與碎片獎勵也更豐富。</p><div class="stage-grid">${stages.map(stage => {
   const open = state.unlockedStages.includes(stage.id);
-  return `<article class="stage-card ${open ? '' : 'locked'}"><div class="boss-card-art boss-${stage.order}" aria-hidden="true"></div><b>${stage.name}・${stage.boss}</b><small>${stage.subtitle}</small><span>${open ? '可挑戰・Boss 三階段' : `解鎖：${stage.unlock}`}</span>${button(open ? '挑戰 Boss' : '尚未解鎖', `bossstage:${stage.id}`, !open)}</article>`;
+  return `<article class="stage-card ${open ? '' : 'locked'}"><div class="boss-card-art boss-${stage.order}" aria-hidden="true"></div><b>${stage.name}・${stage.boss}</b><small>${stage.subtitle}</small><span>${open ? '可挑戰・Boss 三階段' : `解鎖：${stage.unlock}`}</span>${button(open ? '戰前整備' : '尚未解鎖', `battle-ready:boss:${stage.id}`, !open)}</article>`;
 }).join('')}</div>${button('返回主選單','home')}</div>`;
 
 export const equipmentView = state => {
