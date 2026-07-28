@@ -1,11 +1,13 @@
 import { equipmentTemplates, slotNames, fusionForms } from './data/equipment.js';
 import { ships } from './data/ships.js?v=20260727-visual-hangar-sweep';
 
-const button = (label, action, disabled = false) => `<button data-a="${action}" ${disabled ? 'disabled' : ''}>${label}</button>`;
+const button = (label, action, disabled = false) => `<button class="ui-button action-${action.split(':')[0]}" data-a="${action}" ${disabled ? 'disabled' : ''}><i aria-hidden="true"></i><span>${label}</span></button>`;
 const stars = count => '★'.repeat(count || 0);
 const equippedIds = state => Object.values(state.equipped || {});
 const shipPreview = sprite => `<div class="ship-preview sprite-${sprite}" aria-hidden="true"></div>`;
 const equipmentPreview = slot => `<div class="equipment-preview ${slot}" aria-hidden="true"></div>`;
+const stageBadge = (stage, done, open) => `<div class="stage-badge stage-badge-${stage.order % 6} ${done ? 'cleared' : ''} ${open ? '' : 'sealed'}" aria-hidden="true"><i></i><b>${String(stage.order + 1).padStart(2, '0')}</b><span></span></div>`;
+const rewardPreview = stage => `<div class="reward-preview" aria-label="關卡獎勵預覽"><span class="reward-coin">${18 + stage.order * 8}</span><span class="reward-mat">${1 + Math.floor(stage.order / 2)}</span><span class="reward-crate"></span></div>`;
 
 export const menu = state => `<div class="shell panel menu">
   <div class="art-banner"><div><h1>星界戰翼</h1><p>原創直向星際射擊</p></div></div>
@@ -17,10 +19,10 @@ export const menu = state => `<div class="shell panel menu">
   <h3>其他</h3>${button('操作說明','help')}${button('重置存檔','reset')}
 </div>`;
 
-export const stageView = (state, stages) => `<div class="shell panel menu"><h2>主線星域</h2><p class="note">通關目前區域即可解鎖下一個星域；每關都有固定波次、補給與三階段原創 Boss。</p>${state.lastSweep ? `<section class="sweep-result"><b>掃蕩結算：${state.lastSweep.stage} ×${state.lastSweep.count}</b><span>金幣 +${state.lastSweep.gold}・強化材料 +${state.lastSweep.materials}・擊殺 +${state.lastSweep.kills}</span></section>` : ''}<div class="stage-grid">${stages.map(stage => {
+export const stageView = (state, stages) => `<div class="shell panel menu"><h2>主線星域</h2><p class="note">通關目前區域即可解鎖下一個星域；每關都有固定波次、補給與三階段原創 Boss。</p>${state.lastSweep ? `<section class="sweep-result"><b>掃蕩結算：${state.lastSweep.stage} ×${state.lastSweep.count}</b><span>金幣 +${state.lastSweep.gold}・強化材料 +${state.lastSweep.materials}・擊殺 +${state.lastSweep.kills}</span><div class="sweep-loot-icons"><i class="coin-icon"></i><i class="material-icon"></i>${state.lastSweep.equipment ? '<i class="crate-icon"></i>' : ''}</div><small>${state.lastSweep.equipment ? `額外獲得：${state.lastSweep.equipment}` : '固定獎勵已入庫'}</small></section>` : ''}<div class="stage-grid stage-route">${stages.map(stage => {
   const open = state.unlockedStages.includes(stage.id); const done = Boolean(state.stageProgress?.[stage.id]);
   const sweep = done ? `<div class="sweep-actions">${button('掃蕩 ×10', `sweep:${stage.id}:10`)}${button('×50', `sweep:${stage.id}:50`)}${button('×100', `sweep:${stage.id}:100`)}</div>` : '';
-  return `<article class="stage-card ${open ? '' : 'locked'}"><b>${stage.name}</b><small>${stage.subtitle}</small><span>${done ? '已通關・可掃蕩' : open ? '可出擊' : `解鎖：${stage.unlock}`}</span>${button(open ? '進入關卡' : '尚未解鎖', `stage:${stage.id}`, !open)}${sweep}</article>`;
+  return `<article class="stage-card stage-card-${stage.order % 6} ${open ? '' : 'locked'}">${stageBadge(stage, done, open)}<div class="stage-copy"><b>${stage.name}</b><small>${stage.subtitle}</small><span>${done ? '已通關・可掃蕩' : open ? '可出擊' : `解鎖：${stage.unlock}`}</span>${rewardPreview(stage)}</div>${button(open ? '進入關卡' : '尚未解鎖', `stage:${stage.id}`, !open)}${sweep}</article>`;
 }).join('')}</div>${button('返回主選單','home')}</div>`;
 
 export const bossView = (state, stages) => `<div class="shell panel menu"><h2>Boss 挑戰</h2><p class="note">選擇已解鎖星域的 Boss 直接挑戰。越後段的 Boss 生命更高，掉落的裝備與碎片獎勵也更豐富。</p><div class="stage-grid">${stages.map(stage => {

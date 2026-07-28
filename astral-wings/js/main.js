@@ -2,8 +2,8 @@ import { load, save, reset } from './save.js?v=20260727-ships';
 import { input } from './input.js';
 // 以版本參數避開先前 Service Worker 快取的損壞戰鬥模組。
 import { game } from './game.js?v=20260728-arcade-craft-bolts';
-import { menu, equipmentView, missionsView, fusionView, stageView, bossView, codexView, shipView } from './ui.js?v=20260727-visual-12stage';
-import { fusionStatusView, homeDashboard, upgradedShipView } from './uiEnhancements.js?v=20260727-visual-12stage';
+import { menu, equipmentView, missionsView, fusionView, stageView, bossView, codexView, shipView } from './ui.js?v=20260728-visual-stage-rewards';
+import { fusionStatusView, homeDashboard, upgradedShipView } from './uiEnhancements.js?v=20260728-visual-stage-rewards';
 import { ships } from './data/ships.js?v=20260727-boss-routes-hangar-v3';
 import { equipmentTemplates, fusionForms } from './data/equipment.js?v=20260726-v05-boss-loot';
 import { stages, getStage } from './data/stages.js?v=20260727-visual-12stage';
@@ -67,10 +67,10 @@ function showResult(result, drops = []) {
   box.innerHTML = `
     <div class="panel result-card">
       <h2>${result.win ? '關卡完成' : '戰機失聯'}</h2>
-      <p>分數：${result.score}<br>擊殺：${result.kills}<br>最大連擊：${result.combo}<br><strong>獲得金幣：${result.gold}</strong></p>
-      ${result.win ? `<section class="result-loot"><h3>本次掉落</h3><ul>${drops.map(drop => `<li>${drop}</li>`).join('')}</ul></section>` : ''}
-      <button data-a="retry">重新挑戰</button>
-      <button data-a="home">返回主選單</button>
+      <div class="result-summary"><span class="result-score">${result.score}</span><small>擊殺 ${result.kills}・最高連擊 ${result.combo}</small></div>
+      <section class="result-loot"><h3>本次獎勵</h3><ul><li>金幣 +${result.gold}</li>${result.win ? drops.filter(drop => !drop.startsWith('金幣 +')).map(drop => `<li>${drop}</li>`).join('') : '<li>挑戰失敗仍保留本場獲得金幣</li>'}</ul></section>
+      <button class="ui-button action-retry" data-a="retry"><i aria-hidden="true"></i><span>重新挑戰</span></button>
+      <button class="ui-button action-home" data-a="home"><i aria-hidden="true"></i><span>返回主選單</span></button>
     </div>`;
 }
 
@@ -93,9 +93,9 @@ function start(mode = 'stage', stageId = 'orbit') {
         <div id="boss-hud" class="boss-hud hidden"><b>鐵幕吞噬者</b><div class="bar boss-bar"><i id="boss-hp"></i></div></div>
       </div>
       <div class="actions">
-        <button data-a="pause">暫停</button>
-        <button data-a="ult">星能爆發</button>
-        ${mode === 'endless' ? '<button data-a="endless-claim">結算並領取</button>' : '<button data-a="home">返回</button>'}
+        <button class="ui-button action-pause" data-a="pause"><i aria-hidden="true"></i><span>暫停</span></button>
+        <button class="ui-button action-ult" data-a="ult"><i aria-hidden="true"></i><span>星能爆發</span></button>
+        ${mode === 'endless' ? '<button class="ui-button action-endless-claim" data-a="endless-claim"><i aria-hidden="true"></i><span>結算並領取</span></button>' : '<button class="ui-button action-home" data-a="home"><i aria-hidden="true"></i><span>返回</span></button>'}
       </div>
       <div id="result" class="modal hidden"></div>
     </div>`;
@@ -211,7 +211,13 @@ app.addEventListener('click', (event) => {
       const materials = count * (1 + Math.floor(selected.order / 2));
       data.gold += gold; data.materials += materials; data.missions.kills += count * 3;
       data.stageProgress[stageId] = Math.max(data.stageProgress[stageId], data.stageProgress[stageId] + count);
-      data.lastSweep = { stage: selected.name, count, gold, materials, kills: count * 3 };
+      let equipment = '';
+      if (count >= 50 || Math.random() < count / 160) {
+        const candidates = equipmentTemplates.filter(item => !data.equipment.some(owned => owned.id === item.id));
+        const reward = candidates[Math.floor(Math.random() * candidates.length)];
+        if (reward) { data.equipment.push({ id: reward.id, level: 0, locked: false }); equipment = `${reward.quality} 裝備【${reward.name}】`; }
+      }
+      data.lastSweep = { stage: selected.name, count, gold, materials, kills: count * 3, equipment };
       save(data);
     }
     stagesMenu();

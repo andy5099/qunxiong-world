@@ -6,8 +6,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>星界戰翼</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/style.css?v=20260728-visual-stage-rewards">
+  <link rel="stylesheet" href="css/responsive.css?v=20260728-visual-stage-rewards">
 </head>
 <body>
   <main id="app"></main>
@@ -20,7 +20,7 @@
   <img id="ai-enemy-pickups-v2" src="assets/images/astral-ai-enemy-pickups-v2.png" alt="" aria-hidden="true" hidden>
   <!-- 版本參數可避開舊版 Service Worker 的失敗快取；失敗時顯示可理解訊息，避免空白畫面。 -->
   <script type="module">
-    import('./js/main.js?v=20260728-arcade-craft-bolts').catch((error) => {
+    import('./js/main.js?v=20260728-visual-stage-rewards').catch((error) => {
       document.querySelector('#app').innerHTML = `<section class="shell panel menu"><h1>星界戰翼</h1><p>載入遊戲核心時發生錯誤：${error.message}</p><button onclick="location.reload()">重新載入</button></section>`;
     });
   </script>

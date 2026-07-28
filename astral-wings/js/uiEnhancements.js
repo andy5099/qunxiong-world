@@ -1,7 +1,7 @@
 import { ships } from './data/ships.js?v=20260727-boss-routes-hangar-v3';
 import { equipmentTemplates, fusionForms } from './data/equipment.js';
 
-const button = (label, action, disabled = false) => `<button data-a="${action}" ${disabled ? 'disabled' : ''}>${label}</button>`;
+const button = (label, action, disabled = false) => `<button class="ui-button action-${action.split(':')[0]}" data-a="${action}" ${disabled ? 'disabled' : ''}><i aria-hidden="true"></i><span>${label}</span></button>`;
 const preview = sprite => `<div class="ship-preview sprite-${sprite}" aria-hidden="true"></div>`;
 
 // 基地首頁將最常用的戰機庫與背包倉庫直接放在首屏，所有入口皆連到已實作功能。
