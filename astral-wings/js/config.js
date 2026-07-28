@@ -6,6 +6,7 @@ export const balanceConfig = {
     ringSpeed: 92, laserWarning: 1.15, laserDuration: 0.24, rest: 1.05,
     bossHp: 2650, maxBullets: 74
   },
+  performance: { maxPlayerBullets: 180, maxEnemyBullets: 82, maxEnemies: 18, maxPickups: 40, maxParticles: 110 },
   drops: { power: 0.15, fragment: 0.02 },
   buffs: { magnet: 10, rage: 8, double: 20, pierce: 10, crit: 10, barrier: 8, rapid: 8 },
   equipment: { maxLevel: 20, upgradeCost: level => 30 + level * 28 }

@@ -26,8 +26,25 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
   };
   let animationFrame = 0;
 
+  // Centralized projectile budget prevents late-game bullet storms from growing
+  // without bound on mobile devices. Player fire evicts only its oldest shots;
+  // enemy fire is simply skipped so visual safety lanes remain intact.
+  function addBullet(entry) {
+    const isEnemy = entry.from === 'e';
+    const limit = isEnemy ? balanceConfig.performance.maxEnemyBullets : balanceConfig.performance.maxPlayerBullets;
+    let total = 0;
+    for (const current of state.bullets) if ((current.from === 'e') === isEnemy) total += 1;
+    if (total >= limit) {
+      if (isEnemy) return false;
+      const oldest = state.bullets.findIndex(current => current.from !== 'e');
+      if (oldest >= 0) state.bullets.splice(oldest, 1);
+    }
+    state.bullets.push(entry);
+    return true;
+  }
+
   function spawnParticle(x, y, color, count = 7, size = 3) {
-    for (let index = 0; index < count && state.particles.length < 90; index += 1) {
+    for (let index = 0; index < count && state.particles.length < balanceConfig.performance.maxParticles; index += 1) {
       const angle = Math.random() * Math.PI * 2;
       const speed = 35 + Math.random() * 120;
       state.particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, color, life: 0.28 + Math.random() * 0.35, size });
@@ -35,13 +52,14 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
   }
 
   function addPickup(x, y, type, value = 1) {
-    if (state.pickups.length < 35) state.pickups.push(pickup(x, y, type, value));
+    if (state.pickups.length < balanceConfig.performance.maxPickups) state.pickups.push(pickup(x, y, type, value));
   }
 
   function finish(win) {
     if (state.over) return;
     state.over = true;
     cancelAnimationFrame(animationFrame);
+    controls.destroy?.();
     onEnd({ win, mode, wave: state.wave, score: state.score, kills: state.kills, combo: state.maxCombo, hp: state.p.hp, shield: state.p.shield, gold: state.gold, chests: state.chests });
   }
 
@@ -101,7 +119,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     if (p.crit > 0 && Math.random() < 0.25 + (p.critBase || 0)) { entry.damage *= 1.65; entry.critical = true; }
     entry.laser = laser;
     entry.trail = p.fireLevel >= 5 || p.rage > 0;
-    state.bullets.push(entry);
+    addBullet(entry);
   }
 
   function firePlayer() {
@@ -218,7 +236,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
       // 新星協調技：集中穿透光束，對 Boss 額外造成固定比例傷害。
       state.enemies.forEach((entry) => { entry.hp -= 140; });
       if (state.boss) state.boss.hp -= Math.min(250, state.boss.maxHp * 0.1);
-      for (let index = 0; index < 5; index += 1) { const beam = bullet(state.p.x + (index - 2) * 9, state.p.y - 26, 0, -720, 'p', state.p.atk * 3, 5); beam.laser = true; beam.trail = true; state.bullets.push(beam); }
+      for (let index = 0; index < 5; index += 1) { const beam = bullet(state.p.x + (index - 2) * 9, state.p.y - 26, 0, -720, 'p', state.p.atk * 3, 5); beam.laser = true; beam.trail = true; addBullet(beam); }
       announce('合體技：新星貫流', 1.1);
     }
     if (state.fusion === 'aegis') {
@@ -263,7 +281,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     if (!wingman || p.wingTimer > 0) return;
     const launch = (x, angle, speed, damage, style, pierce = 0, laser = false) => {
       const entry = bullet(x, p.y - 20, Math.sin(angle) * speed, -Math.cos(angle) * speed, 'p', p.atk * damage, pierce);
-      entry.style = style; entry.trail = true; entry.laser = laser; state.bullets.push(entry);
+      entry.style = style; entry.trail = true; entry.laser = laser; addBullet(entry);
     };
     if (wingman === 'e1') { [-30, 30].forEach(x => launch(p.x + x, 0, 340, 0.42, 'wing-pulse')); p.wingTimer = 0.74; }
     else if (wingman === 'e2') { [-32, 32].forEach(x => launch(p.x + x, x < p.x ? -0.12 : 0.12, 300, 0.52, 'wing-missile', 1)); p.wingTimer = 1.3; }
@@ -279,7 +297,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     const secondary = saveData.equipped?.secondary;
     if (!secondary || p.secondaryTimer > 0) return;
     // 每種副武器都帶著獨立 style，渲染器會依此繪出不同彈型、顏色與拖尾。
-    const launch = (entry, style) => { entry.style = style; entry.trail = true; state.bullets.push(entry); };
+    const launch = (entry, style) => { entry.style = style; entry.trail = true; addBullet(entry); };
     if (secondary === 's1') {
       const target = state.boss || state.enemies.reduce((best, item) => !best || distance(item, p) < distance(best, p) ? item : best, null);
       if (target) { const aim = Math.atan2(target.y - p.y, target.x - p.x); launch(bullet(p.x, p.y - 14, Math.cos(aim) * 285, Math.sin(aim) * 285, 'p', p.atk * 2.1, 0), 'secondary-missile'); }
@@ -323,18 +341,18 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     const phase = boss.phase;
     boss.fireCd = phase === 1 ? 1.0 : phase === 2 ? 0.62 : 0.42;
     if (phase === 1) {
-      [-0.32, -0.16, 0, 0.16, 0.32].forEach((spread) => state.bullets.push(bullet(boss.x, boss.y, spread * 270, 175, 'e', 10)));
+      [-0.32, -0.16, 0, 0.16, 0.32].forEach((spread) => addBullet(bullet(boss.x, boss.y, spread * 270, 175, 'e', 10)));
     } else if (phase === 2) {
-      [-0.45, -0.28, -0.12, 0.12, 0.28, 0.45].forEach((spread) => state.bullets.push(bullet(boss.x, boss.y, spread * 300, 190, 'e', 12)));
-      [-1, 1].forEach((side) => state.bullets.push(bullet(boss.x + side * 34, boss.y, side * 95, 220, 'e', 12)));
+      [-0.45, -0.28, -0.12, 0.12, 0.28, 0.45].forEach((spread) => addBullet(bullet(boss.x, boss.y, spread * 300, 190, 'e', 12)));
+      [-1, 1].forEach((side) => addBullet(bullet(boss.x + side * 34, boss.y, side * 95, 220, 'e', 12)));
     } else {
-      [-0.55, -0.36, -0.18, 0, 0.18, 0.36, 0.55].forEach((spread) => state.bullets.push(bullet(boss.x, boss.y, spread * 320, 210, 'e', 14)));
+      [-0.55, -0.36, -0.18, 0, 0.18, 0.36, 0.55].forEach((spread) => addBullet(bullet(boss.x, boss.y, spread * 320, 210, 'e', 14)));
       if (boss.laserWarn <= 0 && boss.laserActive <= 0) boss.laserWarn = 0.75;
     }
   }
 
   function updateEnemies(dt, time) {
-    if (state.left && state.enemies.length < 6) {
+    if (state.left && state.enemies.length < Math.min(6, balanceConfig.performance.maxEnemies)) {
       const point = state.formation.point(state.formationIndex, 0);
       spawnEnemy(state.kind, point.x);
       state.formationIndex += 1;
@@ -376,7 +394,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     if (boss.pendingAimed) {
       boss.pendingAimed = false;
       const damage = Math.round(11 * (boss.damageScale || 1));
-      for (let index = 0; index < 3; index += 1) state.bullets.push(bullet(boss.x, boss.y, Math.cos(boss.pendingAim) * balanceConfig.boss.aimedSpeed, Math.sin(boss.pendingAim) * balanceConfig.boss.aimedSpeed, 'e', damage));
+      for (let index = 0; index < 3; index += 1) addBullet(bullet(boss.x, boss.y, Math.cos(boss.pendingAim) * balanceConfig.boss.aimedSpeed, Math.sin(boss.pendingAim) * balanceConfig.boss.aimedSpeed, 'e', damage));
       return;
     }
     if (boss.pendingLaser) { boss.pendingLaser = false; boss.laserActive = balanceConfig.boss.laserDuration; return; }
@@ -394,15 +412,15 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     const damage = value => Math.round(value * (boss.damageScale || 1));
     boss.attack = phasePatterns[boss.sequence++ % phasePatterns.length];
     if (boss.attack === 'fan') {
-      [-0.42, -0.21, 0, 0.21, 0.42].forEach(spread => state.bullets.push(bullet(boss.x, boss.y, spread * 128, balanceConfig.boss.fanSpeed, 'e', damage(9))));
+      [-0.42, -0.21, 0, 0.21, 0.42].forEach(spread => addBullet(bullet(boss.x, boss.y, spread * 128, balanceConfig.boss.fanSpeed, 'e', damage(9))));
       boss.rest = 1.25;
     } else if (boss.attack === 'lanes') {
       // 左右交替直線彈，中央保留可讀通道。
       const side = boss.sequence % 2 ? -1 : 1;
-      [-1, 1].forEach(offset => state.bullets.push(bullet(boss.x + side * 26, boss.y, offset * 45, 118, 'e', damage(10))));
+      [-1, 1].forEach(offset => addBullet(bullet(boss.x + side * 26, boss.y, offset * 45, 118, 'e', damage(10))));
       boss.rest = 1.12;
     } else if (boss.attack === 'ring') {
-      for (let index = 0; index < 8; index += 1) { const angle = Math.PI / 2 + index * Math.PI / 4 + 0.18; state.bullets.push(bullet(boss.x, boss.y, Math.cos(angle) * balanceConfig.boss.ringSpeed, Math.sin(angle) * balanceConfig.boss.ringSpeed, 'e', damage(10))); }
+      for (let index = 0; index < 8; index += 1) { const angle = Math.PI / 2 + index * Math.PI / 4 + 0.18; addBullet(bullet(boss.x, boss.y, Math.cos(angle) * balanceConfig.boss.ringSpeed, Math.sin(angle) * balanceConfig.boss.ringSpeed, 'e', damage(10))); }
       boss.rest = 1.05;
     } else if (boss.attack === 'aimed') {
       boss.telegraph = 0.72; boss.pendingAimed = true; boss.rest = 1.5;
@@ -410,7 +428,7 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     } else if (boss.attack === 'laser') {
       boss.laserWarn = balanceConfig.boss.laserWarning; boss.telegraph = balanceConfig.boss.laserWarning; boss.pendingLaser = true; boss.rest = 1.55;
     } else if (boss.attack === 'rageFan') {
-      [-0.5, -0.33, -0.16, 0, 0.16, 0.33, 0.5].forEach(spread => state.bullets.push(bullet(boss.x, boss.y, spread * 112, 118, 'e', damage(11))));
+      [-0.5, -0.33, -0.16, 0, 0.16, 0.33, 0.5].forEach(spread => addBullet(bullet(boss.x, boss.y, spread * 112, 118, 'e', damage(11))));
       boss.rest = 1.3;
     } else {
       spawnEnemy('scout', Math.max(35, boss.x - 54)); spawnEnemy('sprinter', Math.min(325, boss.x + 54));
@@ -424,27 +442,27 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
     const cooldown = value => value * (entry.fireRateScale || 1);
     if (entry.attack === 'needle') {
       entry.fireCd = cooldown(1.6);
-      state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed) * 150, Math.sin(aimed) * 150, 'e', damage(8)));
+      addBullet(bullet(entry.x, entry.y, Math.cos(aimed) * 150, Math.sin(aimed) * 150, 'e', damage(8)));
     }
     if (entry.attack === 'fan') {
       entry.fireCd = cooldown(1.7);
-      [-0.24, 0, 0.24].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed + spread) * 120, Math.sin(aimed + spread) * 120, 'e', damage(10))));
+      [-0.24, 0, 0.24].forEach((spread) => addBullet(bullet(entry.x, entry.y, Math.cos(aimed + spread) * 120, Math.sin(aimed + spread) * 120, 'e', damage(10))));
     }
     if (entry.attack === 'aim') {
       entry.fireCd = cooldown(2.05);
-      state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed) * 165, Math.sin(aimed) * 165, 'e', damage(13)));
+      addBullet(bullet(entry.x, entry.y, Math.cos(aimed) * 165, Math.sin(aimed) * 165, 'e', damage(13)));
     }
     if (entry.attack === 'burst') {
       entry.fireCd = cooldown(1.35);
-      [-0.14, 0.14].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.cos(aimed + spread) * 128, Math.sin(aimed + spread) * 128, 'e', damage(9))));
+      [-0.14, 0.14].forEach((spread) => addBullet(bullet(entry.x, entry.y, Math.cos(aimed + spread) * 128, Math.sin(aimed + spread) * 128, 'e', damage(9))));
     }
     if (entry.attack === 'ring') {
       entry.fireCd = cooldown(1.9);
-      for (let index = 0; index < 6; index += 1) { const angle = Math.PI / 2 + index * Math.PI / 3; state.bullets.push(bullet(entry.x, entry.y, Math.cos(angle) * 96, Math.sin(angle) * 96, 'e', damage(8))); }
+      for (let index = 0; index < 6; index += 1) { const angle = Math.PI / 2 + index * Math.PI / 3; addBullet(bullet(entry.x, entry.y, Math.cos(angle) * 96, Math.sin(angle) * 96, 'e', damage(8))); }
     }
     if (entry.attack === 'elite') {
       entry.fireCd = cooldown(0.9);
-      [-0.36, -0.18, 0, 0.18, 0.36].forEach((spread) => state.bullets.push(bullet(entry.x, entry.y, Math.sin(spread) * 125, Math.cos(spread) * 125, 'e', damage(11))));
+      [-0.36, -0.18, 0, 0.18, 0.36].forEach((spread) => addBullet(bullet(entry.x, entry.y, Math.sin(spread) * 125, Math.cos(spread) * 125, 'e', damage(11))));
     }
   }
 
@@ -570,5 +588,10 @@ export function game(canvas, saveData, controls, onEnd, onHud, mode = 'stage', s
   }
 
   animationFrame = requestAnimationFrame(frame);
-  return { pause: () => { state.paused = !state.paused; }, ultimate, claim: () => { if (state.chests > 0) finish(true); }, stop: () => cancelAnimationFrame(animationFrame) };
+  return {
+    pause: () => { state.paused = !state.paused; },
+    ultimate,
+    claim: () => { if (state.chests > 0) finish(true); },
+    stop: () => { cancelAnimationFrame(animationFrame); controls.destroy?.(); }
+  };
 }
