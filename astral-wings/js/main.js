@@ -13,8 +13,14 @@ import { C } from './config.js';
 // 此檔案只負責頁面切換、遊戲實例與存檔的銜接。
 let data = load();
 let run = null;
-let screen = 'home';
+// Single UI state boundary: battle code owns the canvas, while this object owns screen transitions.
+const uiState = { screen: 'home', ready: null };
 const app = document.querySelector('#app');
+
+function setScreen(name, ready = null) {
+  uiState.screen = name;
+  uiState.ready = ready;
+}
 
 // 與戰鬥角色相同的裝備加總公式，用於在穿戴瞬間顯示真正的攻擊變化。
 function currentAttack(state) {
@@ -46,7 +52,7 @@ refreshDaily();
 function home() {
   if (run) run.stop();
   run = null;
-  screen = 'home';
+  setScreen('home');
   app.innerHTML = mobileHomeHub(data);
 }
 
@@ -69,23 +75,24 @@ function battleReady(mode = 'stage', stageId = 'orbit', back = 'home') {
     { kind: 'material', icon: '✧', name: `強化材料 +${4 + Math.floor(selectedStage.order / 2)}`, detail: '通關獎勵' },
     { kind: 'crate', icon: '▣', name: mode === 'boss' ? 'Boss 裝備箱' : '裝備掉落機率', detail: mode === 'boss' ? '必定獲得一份獎勵' : '品質隨關卡提升' }
   ];
-  screen = 'ready';
-  app.innerHTML = battleReadyView(data, selectedStage, { mode, back, level, power, recommendation, boss, drops });
+  const ready = { mode, back, level, power, recommendation, boss, drops };
+  setScreen('ready', { mode, stageId, back });
+  app.innerHTML = battleReadyView(data, selectedStage, ready);
 }
 
 function equipment(keepPosition = false) {
   if (run) run.stop(); run = null;
-  screen = 'equipment';
+  setScreen('equipment');
   const previousScroll = keepPosition ? (app.querySelector('.menu')?.scrollTop || 0) : 0;
   app.innerHTML = equipmentView(data);
   if (keepPosition) requestAnimationFrame(() => { const panel = app.querySelector('.menu'); if (panel) panel.scrollTop = previousScroll; });
 }
-function missions() { if (run) run.stop(); run = null; screen = 'missions'; app.innerHTML = missionsView(data); }
-function fusion() { if (run) run.stop(); run = null; screen = 'fusion'; app.innerHTML = fusionStatusView(data); }
-function shipHangar() { if (run) run.stop(); run = null; screen = 'ships'; app.innerHTML = upgradedShipView(data); }
-function stagesMenu() { if (run) run.stop(); run = null; screen = 'stages'; app.innerHTML = stageView(data, stages); }
-function bossMenu() { if (run) run.stop(); run = null; screen = 'boss'; app.innerHTML = bossView(data, stages); }
-function codex() { if (run) run.stop(); run = null; screen = 'codex'; app.innerHTML = codexView(data, stages); }
+function missions() { if (run) run.stop(); run = null; setScreen('missions'); app.innerHTML = missionsView(data); }
+function fusion() { if (run) run.stop(); run = null; setScreen('fusion'); app.innerHTML = fusionStatusView(data); }
+function shipHangar() { if (run) run.stop(); run = null; setScreen('ships'); app.innerHTML = upgradedShipView(data); }
+function stagesMenu() { if (run) run.stop(); run = null; setScreen('stages'); app.innerHTML = stageView(data, stages); }
+function bossMenu() { if (run) run.stop(); run = null; setScreen('boss'); app.innerHTML = bossView(data, stages); }
+function codex() { if (run) run.stop(); run = null; setScreen('codex'); app.innerHTML = codexView(data, stages); }
 
 function showResult(result, drops = []) {
   const box = app.querySelector('#result');
@@ -102,7 +109,7 @@ function showResult(result, drops = []) {
 }
 
 function start(mode = 'stage', stageId = 'orbit') {
-  screen = 'battle';
+  setScreen('battle', { mode, stageId });
   const selectedStage = getStage(stageId);
   app.innerHTML = `
     <div class="shell game">
