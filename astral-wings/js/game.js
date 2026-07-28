@@ -5,7 +5,7 @@ import { makeBoss } from './entities/boss.js?v=20260727-visual-12stage';
 import { bullet } from './entities/bullet.js';
 import { pickup } from './entities/pickup.js';
 import { stage } from './data/stages.js?v=20260727-visual-12stage';
-import { render } from './renderer.js?v=20260728-premium-pickups-projectiles';
+import { render } from './renderer.js?v=20260728-arcade-craft-bolts';
 import { createFormation } from './systems/formationManager.js';
 
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);

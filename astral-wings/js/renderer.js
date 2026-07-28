@@ -68,7 +68,7 @@ const drawAiCraft = (ctx, cell, x, y, width, height, alpha = 1) => {
 // 可選戰機，避免在高細節插畫上再疊加粗重的舊幾何外框。
 const refinedCraftRoster = document.querySelector('#ai-craft-refined') || new Image();
 refinedCraftRoster.decoding = 'async';
-if (!refinedCraftRoster.src) refinedCraftRoster.src = new URL('../assets/images/astral-ai-craft-premium-v2.png', import.meta.url).href;
+if (!refinedCraftRoster.src) refinedCraftRoster.src = new URL('../assets/images/astral-ai-craft-arcade-v3.png', import.meta.url).href;
 const refinedCraftCells = { dawn: 0, ember: 1, violet: 2, bulwark: 3, auric: 4, specter: 5, tide: 0, rime: 3, nova: 4, helix: 1, aurora: 0, caldera: 1, seraph: 4, voidlance: 5, solaris: 4 };
 const drawRefinedCraft = (ctx, shipId, x, y, width, height, alpha = 1) => {
   if (!refinedCraftRoster.complete || !refinedCraftRoster.naturalWidth) return false;
@@ -294,7 +294,7 @@ function drawPlayerProjectile(ctx, entry, visual) {
     : style.includes('burst') || style.includes('ember') || style.includes('caldera') ? 'burst'
     : style.includes('blade') ? 'blade'
     : style.includes('arc') || style.includes('prism') || style.includes('violet') ? 'arc'
-    : style.includes('star') || style.includes('auric') || style.includes('solaris') ? 'star' : 'pulse';
+    : style.includes('star') || style.includes('auric') || style.includes('solaris') ? 'comet' : 'pulse';
   ctx.save();
   ctx.translate(entry.x, entry.y);
   ctx.rotate(angle);
@@ -318,8 +318,10 @@ function drawPlayerProjectile(ctx, entry, visual) {
     ctx.rotate(entry.age * 13); ctx.beginPath(); ctx.moveTo(0, -visual.height / 2); ctx.quadraticCurveTo(visual.width / 1.5, 0, 0, visual.height / 2); ctx.quadraticCurveTo(-visual.width / 1.5, 0, 0, -visual.height / 2); ctx.fill(); ctx.stroke();
   } else if (form === 'arc') {
     ctx.beginPath(); ctx.moveTo(0, -visual.height / 2); ctx.lineTo(visual.width / 2, -visual.height * .05); ctx.lineTo(visual.width * .18, visual.height / 2); ctx.lineTo(-visual.width / 2, visual.height * .1); ctx.closePath(); ctx.fill(); ctx.stroke();
-  } else if (form === 'star') {
-    ctx.beginPath(); for (let point = 0; point < 10; point += 1) { const radius = point % 2 ? visual.width * .22 : visual.width * .56; const a = point * Math.PI / 5 - Math.PI / 2; const x = Math.cos(a) * radius; const y = Math.sin(a) * radius; point ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.closePath(); ctx.fill();
+  } else if (form === 'comet') {
+    const gradient = ctx.createLinearGradient(0, visual.height / 2, 0, -visual.height / 2);
+    gradient.addColorStop(0, `${visual.color}18`); gradient.addColorStop(.5, visual.color); gradient.addColorStop(1, '#fff8d4');
+    ctx.fillStyle = gradient; ctx.beginPath(); ctx.moveTo(0, -visual.height / 2); ctx.lineTo(visual.width * .25, visual.height * .2); ctx.lineTo(0, visual.height / 2); ctx.lineTo(-visual.width * .25, visual.height * .2); ctx.closePath(); ctx.fill(); ctx.stroke();
   } else {
     const half = visual.width * .28; const radius = Math.min(half, visual.height * .22);
     ctx.beginPath(); ctx.moveTo(-half + radius, -visual.height / 2); ctx.lineTo(half - radius, -visual.height / 2); ctx.quadraticCurveTo(half, -visual.height / 2, half, -visual.height / 2 + radius); ctx.lineTo(half, visual.height / 2 - radius); ctx.quadraticCurveTo(half, visual.height / 2, half - radius, visual.height / 2); ctx.lineTo(-half + radius, visual.height / 2); ctx.quadraticCurveTo(-half, visual.height / 2, -half, visual.height / 2 - radius); ctx.lineTo(-half, -visual.height / 2 + radius); ctx.quadraticCurveTo(-half, -visual.height / 2, -half + radius, -visual.height / 2); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#f6ffff'; ctx.fillRect(-1, -visual.height * .28, 2, visual.height * .42);
@@ -354,7 +356,8 @@ export function render(ctx, state) {
       // AI 戰機已繪製，仍保留尾焰讓移動與無敵狀態具有清楚辨識。
       const engineColors = { dawn: '#ffb553', ember: '#ff704f', violet: '#d488ff', bulwark: '#70dcff', auric: '#ffe27c', specter: '#ff90ef', tide: '#71e7ff', rime: '#a7f4ff', nova: '#fff0a5' };
       const engineColor = engineColors[p.shipId] || '#ffb553';
-      ctx.save(); ctx.fillStyle = engineColor; ctx.shadowBlur = 8; ctx.shadowColor = engineColor; ctx.fillRect(p.x - 7, p.y + 20, 4, 7); ctx.fillRect(p.x + 3, p.y + 20, 4, 7); ctx.restore();
+      ctx.save(); ctx.shadowBlur = 10; ctx.shadowColor = engineColor;
+      [-7, 7].forEach((offset) => { const flame = ctx.createLinearGradient(p.x + offset, p.y + 18, p.x + offset, p.y + 34); flame.addColorStop(0, '#efffff'); flame.addColorStop(.38, engineColor); flame.addColorStop(1, `${engineColor}10`); ctx.fillStyle = flame; ctx.beginPath(); ctx.moveTo(p.x + offset - 3, p.y + 18); ctx.lineTo(p.x + offset + 3, p.y + 18); ctx.lineTo(p.x + offset, p.y + 34); ctx.closePath(); ctx.fill(); }); ctx.restore();
     } else {
     ctx.save(); ctx.translate(p.x, p.y); ctx.shadowBlur = 14; ctx.shadowColor = '#4ee9ff';
     ctx.fillStyle = '#254f78'; ctx.beginPath(); ctx.moveTo(0, -22); ctx.lineTo(-15, 16); ctx.lineTo(0, 11); ctx.lineTo(15, 16); ctx.closePath(); ctx.fill();
@@ -368,7 +371,7 @@ export function render(ctx, state) {
   const fireSpread = fireCount === 2 ? [-11, 11] : Array.from({ length: fireCount }, (_, i) => (i - (fireCount - 1) / 2) * (p.fireLevel >= 5 ? 7 : 5));
   ctx.globalAlpha = 0.62 + Math.sin((state.elapsed || 0) * 12) * 0.18;
   ctx.fillStyle = p.fireLevel >= 5 ? '#fff0a0' : '#88eeff'; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 10 + p.fireLevel * 2;
-  fireSpread.forEach(offset => ctx.fillRect(p.x + offset - 2, p.y - 43 - Math.abs(offset) * 0.06, 4, 10 + p.fireLevel * 1.5));
+  fireSpread.forEach((offset) => { ctx.beginPath(); ctx.moveTo(p.x + offset, p.y - 40); ctx.lineTo(p.x + offset + 3, p.y - 30); ctx.lineTo(p.x + offset - 3, p.y - 30); ctx.closePath(); ctx.fill(); });
   if (p.fireLevel >= 4) { ctx.strokeStyle = '#8cf6ff99'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(p.x, p.y, 37 + Math.sin((state.elapsed || 0) * 5) * 3, 0, Math.PI * 2); ctx.stroke(); }
   if (state.upgradePulse > 0) { const progress = 1 - state.upgradePulse / 0.72; ctx.strokeStyle = '#ffe99b'; ctx.lineWidth = 3 * (1 - progress); ctx.globalAlpha = 1 - progress; ctx.beginPath(); ctx.arc(p.x, p.y, 22 + progress * 74, 0, Math.PI * 2); ctx.stroke(); }
   ctx.restore();
@@ -418,7 +421,7 @@ export function render(ctx, state) {
       'secondary-seeker': { cell: 3, color: '#ffe174', width: 15, height: 29, trail: '#ffe998aa' },
       'secondary-prism': { cell: 2, color: '#a88cff', width: 13, height: 25, trail: '#bda6ff99' },
       'secondary-burst': { cell: 1, color: '#ff9b58', width: 20, height: 28, trail: '#ffae70aa' },
-      'primary-star': { cell: 3, color: '#ffd76c', width: 18, height: 25, trail: '#ffe69a99' },
+      'primary-star': { cell: 3, color: '#ffd76c', width: 11, height: 31, trail: '#ffe69a99' },
       'primary-rail': { cell: 4, color: '#c8f8ff', width: 18, height: 42, trail: '#c4f6ffbb' },
       'primary-ember': { cell: 1, color: '#ff7a51', width: 14, height: 24, trail: '#ff9d7e99' },
       'primary-burst': { cell: 1, color: '#ffb15c', width: 25, height: 33, trail: '#ffcf8a99' },
