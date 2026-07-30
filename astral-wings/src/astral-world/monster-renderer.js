@@ -1,3 +1,5 @@
+import { drawBoss } from './boss-renderer.js';
+
 const TAU = Math.PI * 2;
 
 function circle(ctx, x, y, radius, fill, stroke = null) {
@@ -159,34 +161,23 @@ function drawEliteDetails(ctx, enemy, state) {
   ctx.restore();
 }
 
-function drawBossLegacy(ctx, type, time, rage) {
-  const base = { crownBeast:['#8c6240','#ffd66a'], ancientTree:['#485c36','#aaf08b'], coreTyrant:['#7d3438','#ff9d55'], frostWarden:['#4c7aa2','#c7fbff'], astralJudge:['#522d78','#f0a5ff'] }[type] || ['#49345f','#ffcf7b'];
-  const pulse = 1 + Math.sin(time * 4) * .04; ctx.scale(pulse, pulse);
-  if (type === 'ancientTree') { line(ctx, -18, 16, -53, -40, '#5c432d', 10); line(ctx, 18, 16, 53, -40, '#5c432d', 10); for (const x of [-46, 0, 46]) circle(ctx, x, -45, 17, '#78b95e'); }
-  else if (type === 'coreTyrant') { shape(ctx, [[-60,28],[-82,12],[-55,-2],[-30,18]], '#6b3036','#ff895b'); shape(ctx, [[60,28],[82,12],[55,-2],[30,18]], '#6b3036','#ff895b'); }
-  else if (type === 'frostWarden') for (const side of [-1, 1]) shape(ctx, [[side*30,-10],[side*74,-62],[side*58,17]], '#7ccce9','#e3ffff');
-  else if (type === 'astralJudge') for (const side of [-1, 1]) line(ctx, side * 28, -20, side * 72, -42, '#ecacff', 5);
-  shape(ctx, [[-55,22],[-68,-5],[-46,-32],[-21,-22],[0,-54],[22,-22],[49,-32],[67,-4],[53,25],[22,36],[0,49],[-22,36]], base[0], base[1]);
-  circle(ctx, 0, -2, 31, base[0]); circle(ctx, 0, 0, 13, base[1]); eyes(ctx, -9, 13);
-  for (const side of [-1, 1]) { shape(ctx, [[side*33,-15],[side*63,-31],[side*55,2],[side*35,12]], base[0], base[1]); circle(ctx, side*45, -6, 5, base[1]); }
-  if (type === 'crownBeast') { for (const side of [-1, 1]) shape(ctx, [[side*15,-35],[side*32,-68],[side*39,-32]], '#e6a64a','#fff0a6'); }
-  if (rage) { ctx.strokeStyle='#ff4d74'; ctx.lineWidth=3; ctx.globalAlpha=.75; for(let i=0;i<3;i+=1){ctx.beginPath();ctx.arc(0,0,47+i*9+Math.sin(time*5+i)*4,0,TAU);ctx.stroke();} }
-}
-
 export function drawMonster(ctx, enemy, { time = 0, x = 278, y = 267, attackIn = 1, powerSave = false } = {}) {
   const action = enemy.action || 'idle';
-  const spawnProgress = enemy.spawnIn ? Math.max(.08, 1 - enemy.spawnIn / .36) : 1;
-  const dying = action === 'death'; const deathProgress = enemy.deathIn ? Math.max(0, enemy.deathIn / .46) : (dying ? 0 : 1);
-  const state = { time, attack: action === 'attack' || attackIn < .23, hurt: action === 'hurt' || enemy.hit > 0, powerSave };
-  const floating = ['hawk', 'fiend', 'floater', 'spirit'].includes(enemy.visualType);
-  const size = (enemy.bodyScale || 1) * (enemy.elite ? 1.2 : 1) * (enemy.boss ? 1.55 : 1);
+  const spawnDuration = enemy.spawnDuration || .36;
+  const deathDuration = enemy.deathDuration || .46;
+  const spawnProgress = enemy.spawnIn ? Math.max(.08, 1 - enemy.spawnIn / spawnDuration) : 1;
+  const dying = action === 'death'; const deathProgress = enemy.deathIn ? Math.max(0, enemy.deathIn / deathDuration) : (dying ? 0 : 1);
+  const rage = enemy.boss && enemy.hp / enemy.maxHp < .4;
+  const state = { time, attack: action === 'attack' || attackIn < .23, hurt: action === 'hurt' || enemy.hit > 0, powerSave, spawn: spawnProgress, death: deathProgress, dying, rage, attackStyle: enemy.attackStyle };
+  const floating = enemy.boss ? ['frostWarden', 'astralJudge'].includes(enemy.visualType) : ['hawk', 'fiend', 'floater', 'spirit'].includes(enemy.visualType);
+  const size = (enemy.bodyScale || 1) * (enemy.elite ? 1.2 : 1);
   const knock = state.hurt ? -7 : 0; const bob = floating ? Math.sin(time * 3) * 3 : Math.sin(time * 2) * 1.4;
   ctx.save(); ctx.translate(x + knock, y + bob + (dying ? (1 - deathProgress) * 20 : 0)); ctx.globalAlpha = dying ? deathProgress : spawnProgress;
   ctx.scale(size * (dying ? .65 + deathProgress * .35 : spawnProgress), size * (dying ? .65 + deathProgress * .35 : spawnProgress));
   softShadow(ctx, 35, floating); ctx.shadowColor = enemy.accentColor || '#cf96ff'; ctx.shadowBlur = state.hurt ? 18 : (powerSave ? 4 : 9);
-  if (enemy.boss) drawBossLegacy(ctx, enemy.visualType, time, enemy.hp / enemy.maxHp < .4);
+  if (enemy.boss) drawBoss(ctx, enemy, state);
   else { drawEliteDetails(ctx, enemy, state); (MONSTER_DRAWERS[enemy.visualType] || drawSentinel)(ctx, enemy, state); }
-  if (state.hurt) { ctx.globalAlpha = .34; circle(ctx, 0, -2, 38, '#fff'); }
+  if (state.hurt && !enemy.boss) { ctx.globalAlpha = .34; circle(ctx, 0, -2, 38, '#fff'); }
   ctx.restore();
-  return { x:x + knock, y:y + bob, scale:size, rage:enemy.boss && enemy.hp / enemy.maxHp < .4, alpha:dying ? deathProgress : spawnProgress };
+  return { x:x + knock, y:y + bob, scale:size, rage, alpha:dying ? deathProgress : spawnProgress };
 }

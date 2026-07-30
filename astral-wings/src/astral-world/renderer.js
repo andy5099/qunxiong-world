@@ -162,10 +162,12 @@ export class BattleRenderer {
 
   drawMonster(ctx, enemy, battle, powerSave = false) {
     const pose = drawMonster(ctx, enemy, { time:this.time, attackIn:battle.enemyAttackIn, powerSave });
-    if (!enemy.alive) return;
     const boss = enemy.boss;
-    this.bar(ctx, pose.x - (boss ? 76 : 34), pose.y + (boss ? 83 : 42), boss ? 152 : 68, boss ? 8 : 7, enemy.hp / enemy.maxHp, boss ? (pose.rage ? '#ff5578' : '#ff8269') : '#dc80ff');
-    if (boss) { ctx.save(); ctx.textAlign='center'; ctx.font='700 11px system-ui'; ctx.fillStyle=pose.rage?'#ff8a9c':'#ffe2a8'; ctx.fillText(`${enemy.name}${pose.rage?' · 狂暴':''}`,pose.x,pose.y-88); ctx.restore(); }
+    if (!enemy.alive && !boss) return;
+    ctx.save(); ctx.globalAlpha = enemy.alive ? 1 : Math.max(.12, pose.alpha);
+    this.bar(ctx, pose.x - (boss ? 76 : 34), pose.y + (boss ? 108 : 42), boss ? 152 : 68, boss ? 8 : 7, enemy.hp / enemy.maxHp, boss ? (pose.rage ? '#ff5578' : '#ff8269') : '#dc80ff');
+    if (boss) { ctx.textAlign='center'; ctx.font='700 11px system-ui'; ctx.fillStyle=pose.rage?'#ff8a9c':'#ffe2a8'; ctx.fillText(`${enemy.name}${pose.rage?' · 狂暴':''}`,pose.x,Math.max(22, pose.y - 148)); }
+    ctx.restore();
   }
 
   bar(ctx, x, y, width, height, ratio, color) {

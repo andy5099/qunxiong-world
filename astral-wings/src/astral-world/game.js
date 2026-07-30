@@ -69,6 +69,7 @@ export class IdleGame {
     const map = MAPS[this.state.mapId - 1];
     const source = isBoss ? map.boss : pick(map.mobs);
     this.battle.enemy = enemyFor(source, map.id, this.state.stage, isBoss);
+    if (isBoss) { this.battle.enemy.spawnDuration = .68; this.battle.enemy.spawnIn = .68; }
     if (!isBoss && this.state.stage >= 2 && Math.random() < .16) {
       const enemy = this.battle.enemy;
       enemy.elite = true; enemy.maxHp = Math.floor(enemy.maxHp * 1.2); enemy.hp = enemy.maxHp;
@@ -151,7 +152,7 @@ export class IdleGame {
     if (needTutorialPet || Math.random() < (enemy.boss ? .12 : enemy.captureRate)) this.capture(enemy);
     if (enemy.boss) this.finishBoss(); else this.finishNormal();
     this.event(`擊敗 ${enemy.name}`, `+${Math.floor(enemy.exp * mult)} 經驗、+${Math.floor(enemy.gold * mult)} 金幣`);
-    enemy.action = 'death'; enemy.actionIn = 0; enemy.deathIn = .46;
+    enemy.action = 'death'; enemy.actionIn = 0; enemy.deathDuration = enemy.boss ? .82 : .46; enemy.deathIn = enemy.deathDuration;
   }
 
   finishNormal() {
