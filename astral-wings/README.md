@@ -1,5 +1,7 @@
 # Astral World：星界冒險
 
+開發狀態請見 [PROGRESS.md](PROGRESS.md)。
+
 原創、單機、手機直式的 Canvas 放置 RPG。玩家會在星界地圖中自動戰鬥、升級、獲得隨機裝備、挑戰區域 Boss、收服怪物並派出寵物協助戰鬥。
 
 ## 可立即遊玩內容
