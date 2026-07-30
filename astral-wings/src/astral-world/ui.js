@@ -33,7 +33,7 @@ export class AstralUI {
     if (action === 'page') this.show(button.dataset.page);
     else if (action === 'boss') { if (!this.game.challengeBoss()) this.toast('擊殺 10 隻普通怪物後才能挑戰 Boss。'); }
     else if (action === 'skill') { const index=Number(button.dataset.index); if(this.game.castSkill(index)){this.state.tutorial.manualSkills=(this.state.tutorial.manualSkills||0)+1;this.toast('手動施放成功：技能會在冷卻結束後繼續自動施放。');}else this.game.toggleSkill(index); this.renderSkills(); }
-    else if (action === 'skillUp') { if (!this.game.upgradeSkill(Number(button.dataset.index))) this.toast('金幣不足。'); this.renderAll(); }
+    else if (action === 'skillUp') { if(this.state.player.level<15)this.toast('技能升級將在 Lv.15 解鎖。'); else if (!this.game.upgradeSkill(Number(button.dataset.index))) this.toast('金幣不足。'); this.renderAll(); }
     else if (action === 'equip') { this.game.equip(button.dataset.id); this.renderAll(); }
     else if (action === 'inspect') { this.state.tutorial.inspected=(this.state.tutorial.inspected||0)+1; this.inspect(button.dataset.id); }
     else if (action === 'enhance') { const result=this.game.enhance(button.dataset.id); this.toast(result.ok?`強化成功：+${result.item.enhance}`:result.reason==='gold'?'金幣不足。':'強化失敗，裝備仍保留。'); this.renderAll(); }
@@ -55,18 +55,19 @@ export class AstralUI {
     else if (action === 'tutorialSkip') { skipTutorial(this.state); saveState(this.state); this.renderAll(); }
     else if (action === 'tutorialRestart') { restartTutorial(this.state); saveState(this.state); this.show('battle'); this.renderAll(); }
     else if (action === 'help') this.openHelp();
-    else if (action === 'toggle') { this.state.settings[button.dataset.key] = !this.state.settings[button.dataset.key]; this.renderSettings(); saveState(this.state); }
+    else if (action === 'toggle') { if(button.dataset.key==='autoBoss'&&this.state.player.level<10){this.toast('自動挑戰 Boss 將在 Lv.10 解鎖。');return;} this.state.settings[button.dataset.key] = !this.state.settings[button.dataset.key]; this.renderSettings(); this.appendSettingsTools(); saveState(this.state); }
   }
 
   show(page) {
     this.active = page;
     document.querySelectorAll('.screen').forEach(section => section.classList.toggle('active', section.dataset.screen === page));
     document.querySelectorAll('.bottom-nav button').forEach(button => button.classList.toggle('active', button.dataset.page === page));
-    if (page === 'character') this.renderCharacter(); if (page === 'equipment') this.renderEquipment(); if (page === 'pets') this.renderPets(); if (page === 'maps') this.renderMaps(); if (page === 'inventory') this.renderInventory(); if (page === 'quests') this.renderQuests(); if (page === 'settings') { this.renderSettings(); this.appendSettingsTools(); } this.renderTutorial();
+    if (page === 'character') this.renderCharacter(); if (page === 'equipment') this.renderEquipment(); if (page === 'pets') this.renderPets(); if (page === 'maps') this.renderMaps(); if (page === 'inventory') this.renderInventory(); if (page === 'quests') this.renderQuests(); if (page === 'settings') { this.renderSettings(); this.appendSettingsTools(); } this.applyLockStates(); this.renderTutorial();
   }
 
   renderAll() { this.skillSignature = ''; this.renderTop(); this.renderHud(); this.renderSkills(); this.renderLog(); this.renderTutorial(); ['character','equipment','pets','maps','inventory','quests','settings'].forEach(name => { if (this.active === name) this.show(name); }); }
   appendSettingsTools() { const page=this.$('settingsPage'); if(!page||page.querySelector('.onboarding-tools'))return; const tools=document.createElement('section'); tools.className='panel onboarding-tools'; tools.innerHTML='<h3>新手與說明</h3><p>隨時可重新查看引導；已領取的新手獎勵不會重複發放。</p><button class="action" data-action="help">遊戲說明</button> <button class="action" data-action="tutorialRestart">重新開始新手教學</button>'; page.append(tools); }
+  applyLockStates() { const autoBoss=document.querySelector('[data-action="toggle"][data-key="autoBoss"]'); if(autoBoss&&this.state.player.level<10){autoBoss.disabled=true;autoBoss.textContent='Lv.10 解鎖';} document.querySelectorAll('[data-action="skillUp"]').forEach(button=>{if(this.state.player.level<15){button.disabled=true;button.title='Lv.15 解鎖技能升級';}}); }
   renderTop() { const p = this.state.player; this.$('level').textContent = p.level; this.$('power').textContent = format(p.power); this.$('gold').textContent = format(p.gold); this.$('xpFill').style.width = `${Math.min(100, p.exp / p.nextExp * 100)}%`; }
   renderHud() { const p = this.state.player; const b = this.battle; this.$('mapName').textContent = MAPS[this.state.mapId - 1].name; this.$('stageLabel').textContent = `${this.state.mapId}-${this.state.stage}`; this.$('playerHp').style.width = `${p.hp / p.maxHp * 100}%`; this.$('playerHpText').textContent = `${Math.floor(p.hp)} / ${Math.floor(p.maxHp)}`; this.$('playerShield').style.width = `${Math.min(100, p.shield / (p.maxHp * .65) * 100)}%`; this.$('playerShieldText').textContent = Math.floor(p.shield); this.$('killProgress').textContent = `${this.state.killsInStage} / 10`; this.$('battleState').textContent = b?.enemy?.boss ? `Boss：${b.enemy.name}` : b?.reviveIn > 0 ? `復甦 ${Math.ceil(b.reviveIn)} 秒` : '自動探索'; const boss = this.$('bossButton'); boss.disabled = Boolean(b?.enemy) || this.state.killsInStage < 10; boss.textContent = b?.enemy?.boss ? b.enemy.name : '挑戰 Boss'; this.renderObjective(); }
   renderObjective() { const objective=currentObjective(this.state), value=Math.min(objective.target,progress(this.state,objective)); this.$('objectiveText').textContent=`${objective.title}（${value} / ${objective.target}）`; this.$('unlockHint').textContent=`${objective.description}　獎勵：${objective.reward.gold} 金幣`; const card=this.$('objectiveCard'); card.dataset.action='objective'; card.setAttribute('role','button'); card.setAttribute('tabindex','0'); }

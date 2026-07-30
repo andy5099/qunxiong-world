@@ -22,7 +22,7 @@ export function defaultState() {
     skills: [1, 1, 1, 1],
     skillAuto: [true, true, true, true],
     settings: {
-      autoBoss: true,
+      autoBoss: false,
       autoAdvance: true,
       autoEquip: true,
       autoSell: 'none',
