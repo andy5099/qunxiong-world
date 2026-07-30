@@ -1,8 +1,9 @@
-const CACHE = 'astral-world-idle-v3';
+const CACHE = 'astral-world-idle-v4';
 const CORE = [
   './', './index.html', './styles.css', './manifest.webmanifest',
   './src/astral-world/main.js', './src/astral-world/data.js', './src/astral-world/core.js',
   './src/astral-world/save.js', './src/astral-world/renderer.js', './src/astral-world/game.js', './src/astral-world/ui.js',
+  './src/astral-world/tutorial-system.js', './src/astral-world/objective-system.js', './css/alpha-v02.css',
 ];
 
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE))));

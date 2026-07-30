@@ -70,7 +70,7 @@ export class IdleGame {
     this.damageEnemy(this.state.player.attack * (critical ? this.state.player.critDamage : 1), '星刃普攻', critical ? '#ffe38b' : '#8cdfff', critical);
   }
 
-  autoSkills() { for (let i = 0; i < SKILLS.length; i += 1) if (this.state.skillAuto[i] && this.battle.cooldowns[i] <= 0) this.castSkill(i); }
+  autoSkills() { for (let i = 0; i < SKILLS.length; i += 1) { if (['kill_first','manual_skill'].includes(this.state.objectives?.currentId) && i === 0) continue; if (this.state.skillAuto[i] && this.battle.cooldowns[i] <= 0) this.castSkill(i); } }
   castSkill(index) {
     const skill = SKILLS[index];
     if (!skill || !this.battle.enemy || this.battle.cooldowns[index] > 0) return false;
@@ -128,8 +128,10 @@ export class IdleGame {
     this.quest('kills', 1); this.quest('bosses', enemy.boss ? 1 : 0);
     if (enemy.boss) state.stats.bosses += 1;
     if (expResult.levels > 0) { this.event('等級提升', `已升至 Lv.${state.player.level}，生命、攻擊與防禦提升。`); this.renderer.pulse('burst', 110, 298, '#ffdd71', 52); }
-    if (Math.random() < (enemy.boss ? 1 : .23)) this.grantEquipment(enemy.boss);
-    if (Math.random() < (enemy.boss ? .12 : enemy.captureRate)) this.capture(enemy);
+    const needTutorialGear = state.objectives?.currentId === 'first_gear' && state.inventory.length === 0;
+    const needTutorialPet = state.objectives?.currentId === 'first_pet' && !state.activePetId;
+    if (needTutorialGear || Math.random() < (enemy.boss ? 1 : .23)) this.grantEquipment(enemy.boss);
+    if (needTutorialPet || Math.random() < (enemy.boss ? .12 : enemy.captureRate)) this.capture(enemy);
     if (enemy.boss) this.finishBoss(); else this.finishNormal();
     this.event(`擊敗 ${enemy.name}`, `+${Math.floor(enemy.exp * mult)} 經驗、+${Math.floor(enemy.gold * mult)} 金幣`);
     battle.enemy = null; battle.killing = false;

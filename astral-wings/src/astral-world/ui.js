@@ -1,6 +1,8 @@
 import { MAPS, QUALITY, SKILLS, SLOTS } from './data.js';
 import { compareEquipment, dailyQuests, enhanceChance, enhanceCost, equipmentPower, format } from './core.js';
 import { claimOffline, exportSave, importSave, resetSave, saveState } from './save.js';
+import { currentObjective, progress } from './objective-system.js';
+import { TUTORIAL_STEPS, restartTutorial, skipTutorial, syncTutorialStep } from './tutorial-system.js';
 
 const iconFor = slot => ({ weapon: '⚔', helmet: '◉', armor: '✦', gloves: '✧', boots: '⌁', necklace: '◈', ring: '◌', wings: '❈' }[slot] || '◇');
 const qualityRank = { common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5, mythic: 6, astral: 7 };
@@ -19,7 +21,7 @@ export class AstralUI {
     this.state = state; this.battle = battle;
     const now = performance.now();
     if (now >= this.nextBattlePaint) {
-      this.renderTop(); this.renderHud(); this.renderSkills();
+      this.renderTop(); this.renderHud(); this.renderSkills(); this.renderTutorial();
       this.nextBattlePaint = now + 110;
     }
   }
@@ -30,10 +32,10 @@ export class AstralUI {
     const action = button.dataset.action;
     if (action === 'page') this.show(button.dataset.page);
     else if (action === 'boss') { if (!this.game.challengeBoss()) this.toast('擊殺 10 隻普通怪物後才能挑戰 Boss。'); }
-    else if (action === 'skill') { this.game.toggleSkill(Number(button.dataset.index)); this.renderSkills(); }
+    else if (action === 'skill') { const index=Number(button.dataset.index); if(this.game.castSkill(index)){this.state.tutorial.manualSkills=(this.state.tutorial.manualSkills||0)+1;this.toast('手動施放成功：技能會在冷卻結束後繼續自動施放。');}else this.game.toggleSkill(index); this.renderSkills(); }
     else if (action === 'skillUp') { if (!this.game.upgradeSkill(Number(button.dataset.index))) this.toast('金幣不足。'); this.renderAll(); }
     else if (action === 'equip') { this.game.equip(button.dataset.id); this.renderAll(); }
-    else if (action === 'inspect') this.inspect(button.dataset.id);
+    else if (action === 'inspect') { this.state.tutorial.inspected=(this.state.tutorial.inspected||0)+1; this.inspect(button.dataset.id); }
     else if (action === 'enhance') { const result=this.game.enhance(button.dataset.id); this.toast(result.ok?`強化成功：+${result.item.enhance}`:result.reason==='gold'?'金幣不足。':'強化失敗，裝備仍保留。'); this.renderAll(); }
     else if (action === 'bestEquip') { const count=this.game.equipBest(); this.toast(count?`已穿戴 ${count} 件最佳裝備。`:'目前已是最佳配置。'); this.renderAll(); }
     else if (action === 'sell') { this.game.sell(button.dataset.id) ? this.renderAll() : this.toast('已裝備或鎖定的裝備不能出售。'); }
@@ -49,6 +51,10 @@ export class AstralUI {
     else if (action === 'import') this.import();
     else if (action === 'sellSetting') { const order=['none','common','uncommon','rare']; const index=order.indexOf(this.state.settings.autoSell); this.state.settings.autoSell=order[(index+1)%order.length]; this.renderSettings(); saveState(this.state); }
     else if (action === 'reset') this.reset();
+    else if (action === 'objective') { const objective=currentObjective(this.state); this.show(objective.page||'battle'); }
+    else if (action === 'tutorialSkip') { skipTutorial(this.state); saveState(this.state); this.renderAll(); }
+    else if (action === 'tutorialRestart') { restartTutorial(this.state); saveState(this.state); this.show('battle'); this.renderAll(); }
+    else if (action === 'help') this.openHelp();
     else if (action === 'toggle') { this.state.settings[button.dataset.key] = !this.state.settings[button.dataset.key]; this.renderSettings(); saveState(this.state); }
   }
 
@@ -56,13 +62,17 @@ export class AstralUI {
     this.active = page;
     document.querySelectorAll('.screen').forEach(section => section.classList.toggle('active', section.dataset.screen === page));
     document.querySelectorAll('.bottom-nav button').forEach(button => button.classList.toggle('active', button.dataset.page === page));
-    if (page === 'character') this.renderCharacter(); if (page === 'equipment') this.renderEquipment(); if (page === 'pets') this.renderPets(); if (page === 'maps') this.renderMaps(); if (page === 'inventory') this.renderInventory(); if (page === 'quests') this.renderQuests(); if (page === 'settings') this.renderSettings();
+    if (page === 'character') this.renderCharacter(); if (page === 'equipment') this.renderEquipment(); if (page === 'pets') this.renderPets(); if (page === 'maps') this.renderMaps(); if (page === 'inventory') this.renderInventory(); if (page === 'quests') this.renderQuests(); if (page === 'settings') { this.renderSettings(); this.appendSettingsTools(); } this.renderTutorial();
   }
 
-  renderAll() { this.skillSignature = ''; this.renderTop(); this.renderHud(); this.renderSkills(); this.renderLog(); ['character','equipment','pets','maps','inventory','quests','settings'].forEach(name => { if (this.active === name) this.show(name); }); }
+  renderAll() { this.skillSignature = ''; this.renderTop(); this.renderHud(); this.renderSkills(); this.renderLog(); this.renderTutorial(); ['character','equipment','pets','maps','inventory','quests','settings'].forEach(name => { if (this.active === name) this.show(name); }); }
+  appendSettingsTools() { const page=this.$('settingsPage'); if(!page||page.querySelector('.onboarding-tools'))return; const tools=document.createElement('section'); tools.className='panel onboarding-tools'; tools.innerHTML='<h3>新手與說明</h3><p>隨時可重新查看引導；已領取的新手獎勵不會重複發放。</p><button class="action" data-action="help">遊戲說明</button> <button class="action" data-action="tutorialRestart">重新開始新手教學</button>'; page.append(tools); }
   renderTop() { const p = this.state.player; this.$('level').textContent = p.level; this.$('power').textContent = format(p.power); this.$('gold').textContent = format(p.gold); this.$('xpFill').style.width = `${Math.min(100, p.exp / p.nextExp * 100)}%`; }
   renderHud() { const p = this.state.player; const b = this.battle; this.$('mapName').textContent = MAPS[this.state.mapId - 1].name; this.$('stageLabel').textContent = `${this.state.mapId}-${this.state.stage}`; this.$('playerHp').style.width = `${p.hp / p.maxHp * 100}%`; this.$('playerHpText').textContent = `${Math.floor(p.hp)} / ${Math.floor(p.maxHp)}`; this.$('playerShield').style.width = `${Math.min(100, p.shield / (p.maxHp * .65) * 100)}%`; this.$('playerShieldText').textContent = Math.floor(p.shield); this.$('killProgress').textContent = `${this.state.killsInStage} / 10`; this.$('battleState').textContent = b?.enemy?.boss ? `Boss：${b.enemy.name}` : b?.reviveIn > 0 ? `復甦 ${Math.ceil(b.reviveIn)} 秒` : '自動探索'; const boss = this.$('bossButton'); boss.disabled = Boolean(b?.enemy) || this.state.killsInStage < 10; boss.textContent = b?.enemy?.boss ? b.enemy.name : '挑戰 Boss'; this.renderObjective(); }
-  renderObjective() { const p=this.state.player, kills=this.state.stats.kills||0, equipped=Object.keys(this.state.equipped||{}).length; let text='',hint=''; if(kills<5){text=`擊敗 5 隻星芽史萊姆（${kills}/5）`;hint='完成後可取得第一批探索獎勵';}else if(!equipped){text='從背包裝備第一件戰利品';hint='裝備會立即提高戰力';}else if(p.level<3){text=`將角色提升至 Lv.3（目前 Lv.${p.level}）`;hint='Lv.3 解鎖第二個技能節奏';}else if(this.state.stats.bosses<1){text=`累積擊殺並挑戰星光草原 Boss（${this.state.killsInStage}/10）`;hint='Boss 必定掉落裝備';}else if(!this.state.activePetId){text='收服並派出第一隻寵物';hint='寵物會自動協同攻擊';}else{text=`推進至下一張地圖（目前 ${this.state.mapId}-${this.state.stage}）`;hint=p.level<5?'Lv.5 將解鎖裝備強化':'持續強化裝備與寵物';} this.$('objectiveText').textContent=text; this.$('unlockHint').textContent=hint; }
+  renderObjective() { const objective=currentObjective(this.state), value=Math.min(objective.target,progress(this.state,objective)); this.$('objectiveText').textContent=`${objective.title}（${value} / ${objective.target}）`; this.$('unlockHint').textContent=`${objective.description}　獎勵：${objective.reward.gold} 金幣`; const card=this.$('objectiveCard'); card.dataset.action='objective'; card.setAttribute('role','button'); card.setAttribute('tabindex','0'); }
+  objectiveComplete(objective) { this.toast(`目標完成：${objective.title}　+${objective.reward.gold} 金幣`); syncTutorialStep(this.state); saveState(this.state); this.renderAll(); }
+  unlockNotice(unlock) { this.toast(`功能解鎖：${unlock.name}　${unlock.description}`); saveState(this.state); }
+  renderTutorial() { const overlay=this.$('tutorialOverlay'); if(!overlay)return; const tutorial=this.state.tutorial||{}; document.querySelectorAll('.tutorial-target').forEach(node=>node.classList.remove('tutorial-target')); if(!tutorial.active||tutorial.completed||this.active!=='battle'){overlay.hidden=true;return;} const objective=currentObjective(this.state); syncTutorialStep(this.state); const step=TUTORIAL_STEPS[tutorial.step]||TUTORIAL_STEPS[0]; const selector={battle:'#battleCanvas',inventory:'.bottom-nav [data-page="inventory"]',pets:'.bottom-nav [data-page="pets"]',maps:'.bottom-nav [data-page="maps"]'}[objective.page]||'#battleCanvas'; const target=document.querySelector(objective.id==='manual_skill'?'#skills .skill-card:first-child':objective.id==='first_boss'?'#bossButton':selector); target?.classList.add('tutorial-target'); overlay.hidden=false; overlay.innerHTML=`<section class="tutorial-popover"><small>新手引導 ${tutorial.step+1} / ${TUTORIAL_STEPS.length}</small><h2>${step.title}</h2><p>${step.text}</p><p class="tutorial-goal">目標：${objective.title}</p><div><button class="action ghost" data-action="tutorialSkip">跳過</button><button class="action" data-action="objective">前往目標</button></div><small>跳過後仍可從「設定 → 新手教學」重新查看。</small></section>`; }
   renderSkills() { const wrap = this.$('skills'); const cd = this.battle?.cooldowns || [0,0,0,0]; const signature = `${this.state.skills.join(',')}|${this.state.skillAuto.join(',')}|${cd.map(value=>value.toFixed(1)).join(',')}`; if (signature === this.skillSignature) return; this.skillSignature = signature; wrap.innerHTML = SKILLS.map((skill, index) => `<button class="skill-card ${this.state.skillAuto[index] ? '' : 'off'}" data-action="skill" data-index="${index}"><i>${['⌁','✦','◌','✹'][index]}</i><b>${skill.name}</b><small>Lv.${this.state.skills[index]} ${this.state.skillAuto[index] ? '自動' : '關閉'}</small>${cd[index] > 0 ? `<span class="cool">${cd[index].toFixed(1)}</span>` : ''}</button>`).join(''); }
   renderLog() { this.$('eventLog').innerHTML = this.logs.map(item => `<p><b>${item.title}</b>　${item.message}</p>`).join(''); }
 
@@ -80,6 +90,7 @@ export class AstralUI {
   openOffline() { const pending=this.state.offlinePending; const description=pending?`離線 ${Math.floor(pending.seconds/3600)} 小時 ${Math.floor(pending.seconds%3600/60)} 分鐘<br>經驗 ${format(pending.exp)}、金幣 ${format(pending.gold)}、裝備 ${pending.equipment} 件、碎片 ${pending.fragments} 個。`:'目前沒有可領取的離線收益。'; this.openModal('離線星界收益',description,pending?`<button data-action="modalClose" data-claim="1">領取收益</button>`:'<button data-action="modalClose">確定</button>'); }
   openModal(title, text, actionHtml) { this.$('modalCard').innerHTML=`<h2>${title}</h2><p>${text}</p>${actionHtml}`; const modal=this.$('modal'); modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); const close=this.$('modalCard').querySelector('[data-action="modalClose"]'); close?.addEventListener('click',()=>{if(close.dataset.claim==='1'){const reward=claimOffline(this.state,this.makeItem);if(reward)this.toast('離線收益已加入帳戶與背包。');}this.closeModal();this.renderAll();}); }
   closeModal(){const modal=this.$('modal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true');}
+  openHelp(){this.openModal('遊戲說明','<b>自動戰鬥</b><br>角色會持續攻擊怪物；點技能卡可手動施放或切換自動。<br><br><b>Boss 與地圖</b><br>每關擊敗 10 隻怪物即可挑戰 Boss；勝利會解鎖後續關卡與地圖。<br><br><b>裝備</b><br>品質越高詞綴越多；詳情中的綠色數字代表提升。可強化、穿戴或出售未鎖定裝備。<br><br><b>寵物與任務</b><br>收服怪物後可派出協同攻擊；每日任務依本機日期重置。<br><br><b>離線與存檔</b><br>離線最長累積 8 小時收益；設定頁可匯出、匯入與手動儲存。','<button data-action="modalClose">知道了</button>');}
   export(){const blob=new Blob([exportSave(this.state)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='astral-world-save.json';a.click();URL.revokeObjectURL(a.href);}
   import(){const input=document.createElement('input');input.type='file';input.accept='application/json';input.onchange=async()=>{try{this.setState(importSave(await input.files[0].text()));this.toast('存檔已匯入。');}catch{this.toast('匯入失敗：檔案格式不正確。');}};input.click();}
   reset(){if(!confirm('確定要重置《Astral World》存檔嗎？此動作無法復原。'))return;if(!confirm('再次確認：所有本遊戲進度都會清除。'))return;this.setState(resetSave());this.game.battle=this.game.newBattle();this.toast('已重置 Astral World 存檔。');}

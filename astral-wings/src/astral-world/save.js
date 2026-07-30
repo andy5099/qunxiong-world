@@ -1,5 +1,7 @@
 import { SAVE_KEY, SAVE_VERSION, MAPS } from './data.js';
 import { addExp, basePlayer, dailyQuests, recompute } from './core.js';
+import { ensureTutorial } from './tutorial-system.js';
+import { ensureObjectives, ensureUnlocks } from './objective-system.js';
 
 const now = () => Date.now();
 const dayKey = () => new Date().toISOString().slice(0, 10);
@@ -32,9 +34,15 @@ export function defaultState() {
     },
     quests: { date: dayKey(), progress: {}, claimed: {} },
     stats: { kills: 0, bosses: 0, equipment: 0, captures: 0, battleSeconds: 0 },
+    tutorial: { active: true, step: 0, completed: false, skipped: false, rewardsClaimed: [], manualSkills: 0, inspected: 0 },
+    objectives: { currentId: 'kill_first', completed: [], claimed: [] },
+    unlocks: { claimed: [] },
     lastSeen: now(),
     offlinePending: null,
   };
+  ensureTutorial(state);
+  ensureObjectives(state);
+  ensureUnlocks(state);
   recompute(state);
   return state;
 }
@@ -53,6 +61,9 @@ function merge(base, raw) {
   while (state.skillAuto.length < 4) state.skillAuto.push(true);
   state.settings = { ...base.settings, ...(raw?.settings || {}) };
   state.stats = { ...base.stats, ...(raw?.stats || {}) };
+  state.tutorial = { ...base.tutorial, ...(raw?.tutorial || {}) };
+  state.objectives = { ...base.objectives, ...(raw?.objectives || {}) };
+  state.unlocks = { ...base.unlocks, ...(raw?.unlocks || {}) };
   state.quests = { ...base.quests, ...(raw?.quests || {}) };
   state.quests.progress = { ...(raw?.quests?.progress || {}) };
   state.quests.claimed = { ...(raw?.quests?.claimed || {}) };
@@ -61,6 +72,9 @@ function merge(base, raw) {
   state.stage = Math.min(5, Math.max(1, Number(state.stage) || 1));
   state.killsInStage = Math.max(0, Number(state.killsInStage) || 0);
   state.lastSeen = Number(state.lastSeen) || now();
+  ensureTutorial(state);
+  ensureObjectives(state);
+  ensureUnlocks(state);
   recompute(state);
   return state;
 }
