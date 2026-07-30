@@ -1,5 +1,5 @@
 import { MAPS, SKILLS, SLOTS } from './data.js';
-import { addExp, createEquipment, enemyFor, petFromEnemy, recompute } from './core.js';
+import { addExp, createEquipment, enhanceChance, enhanceCost, enemyFor, petFromEnemy, recompute } from './core.js';
 import { saveState } from './save.js';
 
 const pick = list => list[Math.floor(Math.random() * list.length)];
@@ -29,6 +29,7 @@ export class IdleGame {
   update(dt) {
     const { state, battle } = this;
     state.stats.battleSeconds += dt;
+    if (state.player.hp > 0 && state.player.regen) state.player.hp = Math.min(state.player.maxHp, state.player.hp + state.player.regen * dt);
     this.saveIn -= dt;
     this.renderer.setScene({ state, battle });
     this.renderer.update(dt);
@@ -98,6 +99,8 @@ export class IdleGame {
   damageEnemy(raw, label, color, forcedCritical = false) {
     const enemy = this.battle.enemy;
     if (!enemy?.alive) return;
+    if (label !== '星刃普攻') raw *= 1 + (this.state.player.skillDamage || 0);
+    if (enemy.boss) raw *= 1 + (this.state.player.bossDamage || 0);
     const reduced = Math.max(1, raw * (100 / (100 + enemy.defense)));
     enemy.hp = Math.max(0, enemy.hp - reduced); enemy.hit = .12;
     this.renderer.damage(reduced, 278, 242, forcedCritical, color); this.renderer.pulse('hit', 278, 268, color, forcedCritical ? 38 : 20);
@@ -113,15 +116,15 @@ export class IdleGame {
     if (player.hp <= 0) { this.battle.enemy = null; this.battle.reviveIn = 3; this.event('戰鬥失利', '3 秒後將在目前關卡重新集結。'); }
   }
 
-  petAttack() { const pet = this.state.pets.find(item => item.id === this.state.activePetId); if (pet && this.battle.enemy) this.damageEnemy(pet.attack * (1 + (pet.stars - 1) * .13), `${pet.name} 協同攻擊`, '#ffd979'); }
+  petAttack() { const pet = this.state.pets.find(item => item.id === this.state.activePetId); if (pet && this.battle.enemy) this.damageEnemy(pet.attack * (1 + (pet.stars - 1) * .13) * (1 + (this.state.player.petDamage || 0)), `${pet.name} 協同攻擊`, '#ffd979'); }
 
   killEnemy() {
     const { state, battle } = this; const enemy = battle.enemy;
     if (!enemy || battle.killing) return;
     battle.killing = true; enemy.alive = false;
     this.renderer.pulse('burst', 278, 270, enemy.boss ? '#ffad72' : '#cf8aff', enemy.boss ? 68 : 36);
-    const mult = enemy.boss ? 4 : 1; const expResult = addExp(state, enemy.exp * mult);
-    state.player.gold += enemy.gold * mult; state.stats.kills += 1;
+    const mult = enemy.boss ? 4 : 1; const expResult = addExp(state, enemy.exp * mult * (1 + (state.player.expBonus || 0)));
+    state.player.gold += enemy.gold * mult * (1 + (state.player.goldBonus || 0)); state.stats.kills += 1;
     this.quest('kills', 1); this.quest('bosses', enemy.boss ? 1 : 0);
     if (enemy.boss) state.stats.bosses += 1;
     if (expResult.levels > 0) { this.event('等級提升', `已升至 Lv.${state.player.level}，生命、攻擊與防禦提升。`); this.renderer.pulse('burst', 110, 298, '#ffdd71', 52); }
@@ -176,6 +179,8 @@ export class IdleGame {
   equip(itemId) { const item = this.state.inventory.find(entry => entry.id === itemId); if (!item) return false; this.state.equipped[item.slot] = item; recompute(this.state); this.event('裝備變更', `${item.name} 已裝備至 ${SLOTS[item.slot].label}`); return true; }
   sell(itemId) { const item = this.state.inventory.find(entry => entry.id === itemId); if (!item || item.locked || this.state.equipped[item.slot]?.id === item.id) return false; this.state.inventory = this.state.inventory.filter(entry => entry.id !== itemId); this.state.player.gold += Math.floor(item.power * 2.4); this.event('出售裝備', `${item.name} 已換成金幣。`); return true; }
   toggleLock(itemId) { const item = this.state.inventory.find(entry => entry.id === itemId); if (!item) return false; item.locked = !item.locked; return true; }
+  enhance(itemId) { const item=this.state.inventory.find(entry=>entry.id===itemId); if(!item)return {ok:false,reason:'missing'}; item.enhance=item.enhance||0; const cost=enhanceCost(item); if(this.state.player.gold<cost)return {ok:false,reason:'gold',cost}; this.state.player.gold-=cost; const chance=enhanceChance(item); if(Math.random()<=chance){item.enhance+=1; recompute(this.state); this.renderer.pulse('burst',235,260,item.color,52); this.event('強化成功',`${item.name} +${item.enhance}`);return {ok:true,cost,chance,item};} const down=item.enhance>=10&&Math.random()<.18; if(down)item.enhance-=1; recompute(this.state);this.event('強化失敗',down?'強化等級下降 1 級。':'僅消耗金幣，裝備未損失。');return {ok:false,reason:'fail',cost,chance,down,item}; }
+  equipBest() { let changed=0; for(const item of this.state.inventory){const current=this.state.equipped[item.slot];const score=(entry)=>(entry?.power||0)*(1+(entry?.enhance||0)*.08);if(!current||score(item)>score(current)){this.state.equipped[item.slot]=item;changed+=1;}}if(changed){recompute(this.state);this.event('最佳裝備',`已穿戴 ${changed} 件更強裝備。`);}return changed; }
   toggleSkill(index) { this.state.skillAuto[index] = !this.state.skillAuto[index]; return this.state.skillAuto[index]; }
   upgradeSkill(index) { const price = 100 * (this.state.skills[index] || 1); if (this.state.player.gold < price) return false; this.state.player.gold -= price; this.state.skills[index] += 1; recompute(this.state); return true; }
   setActivePet(id) { if (!this.state.pets.some(pet => pet.id === id)) return false; this.state.activePetId = id; recompute(this.state); return true; }

@@ -33,6 +33,11 @@ export const SKILLS = [
 
 export const SLOTS = { weapon:{label:'武器'}, helmet:{label:'頭盔'}, armor:{label:'鎧甲'}, gloves:{label:'手套'}, boots:{label:'鞋子'}, necklace:{label:'項鍊'}, ring:{label:'戒指'}, wings:{label:'翅膀'} };
 export const QUALITY = Object.fromEntries(BALANCE.quality.map(entry => [entry.id, entry]));
+export const AFFIXES = [
+  {id:'attackPercent',label:'攻擊力',key:'attack',mode:'percent',min:.03,max:.12}, {id:'defensePercent',label:'防禦力',key:'defense',mode:'percent',min:.04,max:.14}, {id:'hpPercent',label:'最大生命',key:'maxHp',mode:'percent',min:.04,max:.16},
+  {id:'crit',label:'暴擊率',key:'crit',mode:'flat',min:.01,max:.04}, {id:'critDamage',label:'暴擊傷害',key:'critDamage',mode:'flat',min:.04,max:.15}, {id:'attackSpeed',label:'攻擊速度',key:'attackSpeed',mode:'flat',min:-.08,max:-.02},
+  {id:'skillDamage',label:'技能傷害',key:'skillDamage',mode:'flat',min:.03,max:.12}, {id:'bossDamage',label:'Boss 傷害',key:'bossDamage',mode:'flat',min:.03,max:.12}, {id:'expBonus',label:'經驗獲得',key:'expBonus',mode:'flat',min:.03,max:.12}, {id:'goldBonus',label:'金幣獲得',key:'goldBonus',mode:'flat',min:.03,max:.12}, {id:'petDamage',label:'寵物傷害',key:'petDamage',mode:'flat',min:.04,max:.14}, {id:'regen',label:'生命恢復',key:'regen',mode:'flat',min:1,max:6},
+];
 
 export const MONSTER_VISUALS = {
   slime:{visualType:'starSlime',bodyScale:1,accentColor:'#a7eeff',attackStyle:'bounce'}, rabbit:{visualType:'moonRabbit',bodyScale:1,accentColor:'#f5d4ff',attackStyle:'leap'}, beetle:{visualType:'sproutBeetle',bodyScale:1,accentColor:'#d9f5a8',attackStyle:'melee'},
