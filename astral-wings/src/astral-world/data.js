@@ -1,5 +1,5 @@
 export const SAVE_KEY = 'astralWorldIdleV1';
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 
 export const BALANCE = {
   attackInterval: 1.2,
@@ -59,4 +59,11 @@ export const PET_VISUALS = {
   ruin:{visualType:'sentinelPet',species:'construct',palette:'ruin'}, orb:{visualType:'orbPet',species:'flying',palette:'astral'}, mech:{visualType:'astralDrone',species:'construct',palette:'astral'},
   horn:{visualType:'crownCub',species:'bossBeast',palette:'crown'}, guardian:{visualType:'treeSprite',species:'bossPlant',palette:'grove'}, dragon:{visualType:'lavaWhelp',species:'bossDragon',palette:'magma'},
   queen:{visualType:'frostSprite',species:'bossSpirit',palette:'frost'}, destroyer:{visualType:'astralDrone',species:'bossConstruct',palette:'astral'},
+};
+
+export const PET_STAR_BALANCE = {
+  maxStars: 6,
+  starStep: .18,
+  costs: { 1: 10, 2: 20, 3: 35, 4: 55, 5: 80 },
+  duplicateFragments: { normal: 5, elite: 8, boss: 15 },
 };

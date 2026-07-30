@@ -1,6 +1,7 @@
 import { MAPS, SKILLS, SLOTS } from './data.js';
 import { addExp, createEquipment, enhanceChance, enhanceCost, enemyFor, petFromEnemy, recompute } from './core.js';
 import { saveState } from './save.js';
+import { applyPetCapture, getPetEffectiveAttack, starPet as applyPetStar } from './pet-system.js';
 
 const pick = list => list[Math.floor(Math.random() * list.length)];
 const qualityRank = { common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5, mythic: 6, astral: 7 };
@@ -14,6 +15,7 @@ export class IdleGame {
     this.last = 0;
     this.frame = 0;
     this.saveIn = 4;
+    this.petStarLockedUntil = 0;
     this.battle = this.newBattle();
     this._bound = time => this.loop(time);
   }
@@ -41,6 +43,7 @@ export class IdleGame {
     if (!battle.enemy) { battle.spawnIn -= dt; if (battle.spawnIn <= 0) this.spawn(battle.bossMode); this.flush(); return; }
     const enemy = battle.enemy;
     if (!enemy.alive) {
+      battle.queuedHits.length = 0;
       enemy.deathIn = Math.max(0, (enemy.deathIn || .46) - dt);
       if (enemy.deathIn <= 0) { battle.enemy = null; battle.killing = false; }
       this.flush(); return;
@@ -143,7 +146,7 @@ export class IdleGame {
     if (!pet || !enemy?.alive) return false;
     this.battle.petAction = 'attack'; this.battle.petActionIn = .36; this.battle.petReturnIn = .26;
     this.renderer.pulse('slash', 190, 280, '#ffd979', 22);
-    this.damageEnemy(pet.attack * (1 + (pet.stars - 1) * .13) * (1 + (this.state.player.petDamage || 0)), `${pet.name} 協同攻擊`, '#ffd979');
+    this.battle.queuedHits.push({ in:.19, damage:getPetEffectiveAttack(pet) * (1 + (this.state.player.petDamage || 0)), label:`${pet.name} 協同攻擊`, color:'#ffd979' });
     return true;
   }
 
@@ -200,10 +203,10 @@ export class IdleGame {
   }
 
   capture(enemy) {
-    const existing = this.state.pets.find(item => item.source === enemy.name);
-    if (existing) { this.state.petFragments[existing.id] = (this.state.petFragments[existing.id] || 0) + 2; this.event('獲得寵物碎片', `${enemy.name} 碎片 +2`); return; }
-    const pet = petFromEnemy(enemy); this.state.pets.push(pet); if (!this.state.activePetId) this.state.activePetId = pet.id;
-    this.state.stats.captures += 1; this.quest('captures', 1); this.renderer.pulse('burst', 180, 250, '#ffe17d', 60); this.event('收服成功', `成功收服 ${pet.name}！`);
+    const result = applyPetCapture(this.state, petFromEnemy(enemy));
+    if (result.kind === 'duplicate') { this.renderer.pulse('burst', 180, 250, '#aeeaff', 38); this.event('重複獲得寵物', `${result.pet.name} 轉換為 ${result.amount} 碎片，目前 ${result.fragments}。`); return result; }
+    const pet = result.pet; if (!this.state.activePetId) this.state.activePetId = pet.id;
+    this.state.stats.captures += 1; this.quest('captures', 1); this.renderer.pulse('burst', 180, 250, '#ffe17d', 60); this.event('收服成功', `獲得新寵物：${pet.name}！`); return result;
   }
 
   challengeBoss() { if (this.battle.enemy || this.state.killsInStage < 10) return false; this.battle.bossMode = true; this.battle.spawnIn = .15; return true; }
@@ -216,7 +219,15 @@ export class IdleGame {
   toggleSkill(index) { this.state.skillAuto[index] = !this.state.skillAuto[index]; return this.state.skillAuto[index]; }
   upgradeSkill(index) { const price = 100 * (this.state.skills[index] || 1); if (this.state.player.gold < price) return false; this.state.player.gold -= price; this.state.skills[index] += 1; recompute(this.state); return true; }
   setActivePet(id) { if (!this.state.pets.some(pet => pet.id === id)) return false; this.state.activePetId = id; this.battle.petAction = 'summon'; this.battle.petSummonIn = .52; this.battle.petActionIn = .52; this.battle.petReturnIn = 0; recompute(this.state); return true; }
-  starPet(id) { const pet = this.state.pets.find(entry => entry.id === id); if (!pet || pet.stars >= 6) return false; const cost = pet.stars * 5; if ((this.state.petFragments[id] || 0) < cost) return false; this.state.petFragments[id] -= cost; pet.stars += 1; pet.attack += Math.max(1, Math.floor(pet.attack * .18)); recompute(this.state); return true; }
+  starPet(id) {
+    if (Date.now() < this.petStarLockedUntil) return { ok:false, reason:'busy' };
+    const result = applyPetStar(this.state, id);
+    if (!result.ok) return result;
+    this.petStarLockedUntil = Date.now() + 180;
+    recompute(this.state); saveState(this.state); this.renderer.pulse('burst', 142, 300, '#ffe17d', 36);
+    this.event('寵物升星', `${result.pet.name} 升至 ${result.after.stars}★。`);
+    return result;
+  }
   quest(type, amount) { const key = ({ kills: 'kill50', bosses: 'boss3', equipment: 'gear10', captures: 'capture1' })[type]; if (key) this.state.quests.progress[key] = (this.state.quests.progress[key] || 0) + amount; }
   event(title, message) { this.callbacks.onEvent?.({ title, message }); }
   flush() { this.callbacks.onUpdate?.(this.state, this.battle); if (this.saveIn <= 0) { saveState(this.state); this.saveIn = 4; } }
