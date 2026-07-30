@@ -71,7 +71,7 @@ export class BattleRenderer {
     if (!scene?.battle) return;
     this.drawFloor(ctx, map);
     const enemy = scene.battle.enemy;
-    if (enemy?.alive) this.drawMonster(ctx, enemy, scene.battle);
+    if (enemy) this.drawMonster(ctx, enemy, scene.battle, scene.state.settings?.powerSave);
     this.drawPet(ctx, scene.state, 132, 290);
     drawPlayer(ctx, scene.state, scene.battle, 110, 315, this.time);
     this.drawEffects(ctx);
@@ -160,8 +160,9 @@ export class BattleRenderer {
     this.bar(ctx, x - (enemy.boss ? 64 : 34), y + (enemy.boss ? 68 : 42), enemy.boss ? 128 : 68, 7, enemy.hp / enemy.maxHp, enemy.boss ? '#ff8269' : '#dc80ff');
   }
 
-  drawMonster(ctx, enemy, battle) {
-    const pose = drawMonster(ctx, enemy, { time:this.time, attackIn:battle.enemyAttackIn });
+  drawMonster(ctx, enemy, battle, powerSave = false) {
+    const pose = drawMonster(ctx, enemy, { time:this.time, attackIn:battle.enemyAttackIn, powerSave });
+    if (!enemy.alive) return;
     const boss = enemy.boss;
     this.bar(ctx, pose.x - (boss ? 76 : 34), pose.y + (boss ? 83 : 42), boss ? 152 : 68, boss ? 8 : 7, enemy.hp / enemy.maxHp, boss ? (pose.rage ? '#ff5578' : '#ff8269') : '#dc80ff');
     if (boss) { ctx.save(); ctx.textAlign='center'; ctx.font='700 11px system-ui'; ctx.fillStyle=pose.rage?'#ff8a9c':'#ffe2a8'; ctx.fillText(`${enemy.name}${pose.rage?' · 狂暴':''}`,pose.x,pose.y-88); ctx.restore(); }

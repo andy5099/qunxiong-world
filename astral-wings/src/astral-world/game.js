@@ -40,6 +40,15 @@ export class IdleGame {
     }
     if (!battle.enemy) { battle.spawnIn -= dt; if (battle.spawnIn <= 0) this.spawn(battle.bossMode); this.flush(); return; }
     const enemy = battle.enemy;
+    if (!enemy.alive) {
+      enemy.deathIn = Math.max(0, (enemy.deathIn || .46) - dt);
+      if (enemy.deathIn <= 0) { battle.enemy = null; battle.killing = false; }
+      this.flush(); return;
+    }
+    enemy.spawnIn = Math.max(0, (enemy.spawnIn || 0) - dt);
+    enemy.actionIn = Math.max(0, (enemy.actionIn || 0) - dt);
+    if (enemy.action === 'spawn' && enemy.spawnIn <= 0) enemy.action = 'idle';
+    else if (enemy.actionIn <= 0 && enemy.action !== 'spawn') enemy.action = 'idle';
     enemy.hit = Math.max(0, enemy.hit - dt); battle.playerActionIn = Math.max(0, battle.playerActionIn - dt); if (battle.playerActionIn <= 0 && battle.playerAction !== 'downed') battle.playerAction = 'idle';
     battle.playerFlash = Math.max(0, battle.playerFlash - dt);
     battle.attackIn -= dt; battle.enemyAttackIn -= dt; battle.petIn -= dt;
@@ -51,6 +60,7 @@ export class IdleGame {
     if (battle.attackIn <= 0) { this.basicAttack(); battle.attackIn += Math.max(.34, state.player.attackSpeed); }
     this.autoSkills();
     if (battle.petIn <= 0) { this.petAttack(); battle.petIn += 2.1; }
+    if (enemy.alive && battle.enemyAttackIn <= .28 && enemy.action === 'idle') { enemy.action = 'attack'; enemy.actionIn = .32; }
     if (enemy.alive && battle.enemyAttackIn <= 0) { this.damagePlayer(enemy.attack); battle.enemyAttackIn += enemy.attackSpeed; }
     this.flush();
   }
@@ -59,10 +69,15 @@ export class IdleGame {
     const map = MAPS[this.state.mapId - 1];
     const source = isBoss ? map.boss : pick(map.mobs);
     this.battle.enemy = enemyFor(source, map.id, this.state.stage, isBoss);
+    if (!isBoss && this.state.stage >= 2 && Math.random() < .16) {
+      const enemy = this.battle.enemy;
+      enemy.elite = true; enemy.maxHp = Math.floor(enemy.maxHp * 1.2); enemy.hp = enemy.maxHp;
+      enemy.attack = Math.floor(enemy.attack * 1.1); enemy.exp = Math.floor(enemy.exp * 1.25); enemy.gold = Math.floor(enemy.gold * 1.25);
+    }
     this.battle.enemy.alive = true;
     this.battle.enemyAttackIn = isBoss ? 1.25 : .85;
     this.battle.bossMode = isBoss;
-    this.event(isBoss ? '區域 Boss 降臨' : '遭遇怪物', this.battle.enemy.name);
+    this.event(isBoss ? '區域 Boss 降臨' : this.battle.enemy.elite ? '菁英怪物出現' : '遭遇怪物', this.battle.enemy.name);
   }
 
   basicAttack() {
@@ -104,7 +119,7 @@ export class IdleGame {
     if (label !== '星刃普攻') raw *= 1 + (this.state.player.skillDamage || 0);
     if (enemy.boss) raw *= 1 + (this.state.player.bossDamage || 0);
     const reduced = Math.max(1, raw * (100 / (100 + enemy.defense)));
-    enemy.hp = Math.max(0, enemy.hp - reduced); enemy.hit = .12;
+    enemy.hp = Math.max(0, enemy.hp - reduced); enemy.hit = .12; enemy.action = 'hurt'; enemy.actionIn = .14;
     this.renderer.damage(reduced, 278, 242, forcedCritical, color); this.renderer.pulse('hit', 278, 268, color, forcedCritical ? 38 : 20);
     if (enemy.hp <= 0) this.killEnemy();
   }
@@ -136,7 +151,7 @@ export class IdleGame {
     if (needTutorialPet || Math.random() < (enemy.boss ? .12 : enemy.captureRate)) this.capture(enemy);
     if (enemy.boss) this.finishBoss(); else this.finishNormal();
     this.event(`擊敗 ${enemy.name}`, `+${Math.floor(enemy.exp * mult)} 經驗、+${Math.floor(enemy.gold * mult)} 金幣`);
-    battle.enemy = null; battle.killing = false;
+    enemy.action = 'death'; enemy.actionIn = 0; enemy.deathIn = .46;
   }
 
   finishNormal() {
