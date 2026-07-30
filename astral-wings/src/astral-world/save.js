@@ -20,6 +20,7 @@ export function defaultState() {
     pets: [],
     activePetId: null,
     petFragments: {},
+    evolutionCores: 0,
     skills: [1, 1, 1, 1],
     skillAuto: [true, true, true, true],
     settings: {
@@ -57,6 +58,7 @@ function merge(base, raw) {
   const petMigration = migratePets(Array.isArray(raw?.pets) ? raw.pets : [], raw?.petFragments && typeof raw.petFragments === 'object' ? raw.petFragments : {}, raw?.activePetId || null);
   state.pets = petMigration.pets;
   state.petFragments = petMigration.fragments;
+  state.evolutionCores = Math.max(0, Math.floor(Number(raw?.evolutionCores) || 0));
   if (petMigration.activePetId && state.pets.some(pet => pet.id === petMigration.activePetId)) state.activePetId = petMigration.activePetId;
   state.skills = Array.isArray(raw?.skills) ? raw.skills.slice(0, 4).map(n => Math.max(1, Number(n) || 1)) : base.skills;
   while (state.skills.length < 4) state.skills.push(1);

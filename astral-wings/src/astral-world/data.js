@@ -1,5 +1,5 @@
 export const SAVE_KEY = 'astralWorldIdleV1';
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
 
 export const BALANCE = {
   attackInterval: 1.2,
@@ -67,3 +67,43 @@ export const PET_STAR_BALANCE = {
   costs: { 1: 10, 2: 20, 3: 35, 4: 55, 5: 80 },
   duplicateFragments: { normal: 5, elite: 8, boss: 15 },
 };
+
+export const PET_EVOLUTION_COST = {
+  0: { level:30, fragments:50, gold:50000, core:1 },
+  1: { level:50, fragments:100, gold:150000, core:2 },
+  2: { level:70, fragments:180, gold:400000, core:3 },
+  3: { level:90, fragments:300, gold:1000000, core:5 },
+};
+
+const evolutionFamilies = {
+  slime: { names:['星芽史萊姆','晶核史萊姆','皇家史萊姆','星界史萊姆','星界史萊姆王'], abilities:[['gel_haste','晶核律動','haste',.10],['gel_splash','晶液濺射','power',.18],['gel_split','分裂衝擊','extraHit',.32],['gel_astral','星界凝膠','bossDamage',.25]] },
+  beast: { names:['幼獸','森林獵獸','月影巨獸','星痕獸王','神域獸皇'], abilities:[['beast_crit','獵手本能','crit',.08],['beast_chase','追獵','extraHit',.28],['beast_rend','裂傷利爪','power',.18],['beast_soul','獸魂咆哮','bossDamage',.28]] },
+  plant: { names:['嫩芽靈','花冠精靈','古樹守衛','星藤靈王','森羅之心'], abilities:[['plant_guard','綠蔭護體','shield',.035],['plant_spore','孢子爆發','power',.16],['plant_vine','藤蔓追擊','extraHit',.25],['plant_root','星根束縛','bossDamage',.24]] },
+  fiend: { names:['火苗魔靈','熾翼魔靈','炎核惡魔','鳳焰領主','焚星魔王'], abilities:[['fiend_burn','灼熱脈動','power',.14],['fiend_fireball','火球連發','extraHit',.26],['fiend_blast','熔爆','power',.20],['fiend_phoenix','鳳凰烈焰','bossDamage',.30]] },
+  construct: { names:['機械核心','符文機偶','水晶重裝','星界機神','永恆審判機'], abilities:[['construct_guard','能量屏障','shield',.05],['construct_beam','聚焦光束','power',.16],['construct_overclock','超頻連擊','haste',.12],['construct_judge','審判協定','bossDamage',.30]] },
+  flying: { names:['浮游幼體','流光翼獸','星羽領航者','虛空翼王','天穹神翼'], abilities:[['flying_haste','疾風振翼','haste',.12],['flying_dive','俯衝追擊','extraHit',.27],['flying_nova','星羽爆發','power',.18],['flying_comet','彗星俯衝','bossDamage',.27]] },
+  boss: { names:['王冠幼獸','王冠巨獸','王獸皇','星冠霸主','星界獸神'], abilities:[['boss_guard','王者護壁','shield',.06],['boss_smash','冠冕重擊','power',.20],['boss_roar','皇者追擊','extraHit',.35],['boss_reign','星冠威壓','bossDamage',.35]] },
+};
+
+const petFamilyFor = kind => {
+  if (['horn','guardian','dragon','queen','destroyer'].includes(kind)) return 'boss';
+  const species = PET_VISUALS[kind]?.species;
+  if (species === 'slime') return 'slime';
+  if (species === 'construct') return 'construct';
+  if (species === 'plant' || species === 'spirit') return 'plant';
+  if (species === 'fiend' || kind === 'lava') return 'fiend';
+  if (species === 'flying') return 'flying';
+  return 'beast';
+};
+
+export const PET_EVOLUTION_DATA = Object.fromEntries(Object.keys(PET_VISUALS).map(kind => {
+  const family = petFamilyFor(kind); const definition = evolutionFamilies[family];
+  return [kind, {
+    family,
+    stages: definition.names.map((name, rank) => ({
+      rank, name, appearance:`${kind}-e${rank}`,
+      glow:['#76e8ff','#8fffb3','#ffd977','#bc9aff','#ff8ee3'][rank],
+      ability: rank ? { id:definition.abilities[rank - 1][0], label:definition.abilities[rank - 1][1], effect:definition.abilities[rank - 1][2], value:definition.abilities[rank - 1][3] } : null,
+    })),
+  }];
+}));

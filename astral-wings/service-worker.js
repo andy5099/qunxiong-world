@@ -1,4 +1,4 @@
-const CACHE = 'astral-world-idle-v9';
+const CACHE = 'astral-world-idle-v10';
 const CORE = [
   './', './index.html', './styles.css', './manifest.webmanifest',
   './src/astral-world/main.js', './src/astral-world/data.js', './src/astral-world/core.js',

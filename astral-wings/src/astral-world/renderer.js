@@ -37,7 +37,8 @@ export class BattleRenderer {
   setScene(scene) { this.scene = scene; }
 
   pulse(type, x, y, color = '#7fd9ff', size = 28) {
-    this.effects.push({ type, x, y, color, size, life: 0.52, max: 0.52 });
+    const duration = type === 'evolution' ? 2 : 0.52;
+    this.effects.push({ type, x, y, color, size, life: duration, max: duration });
     if (this.effects.length > 38) this.effects.shift();
   }
 
@@ -178,6 +179,7 @@ export class BattleRenderer {
       ctx.save(); ctx.globalAlpha = ratio; ctx.strokeStyle = effect.color; ctx.fillStyle = effect.color; ctx.lineWidth = 2;
       if (effect.type === 'slash') { ctx.beginPath(); ctx.arc(effect.x, effect.y, effect.size * (1.35 - ratio), -.8, 1.7); ctx.stroke(); }
       else if (effect.type === 'burst') { ctx.beginPath(); ctx.arc(effect.x, effect.y, effect.size * (1.2 - ratio), 0, Math.PI * 2); ctx.stroke(); for (let i = 0; i < 7; i += 1) { const a = i * .9 + this.time; ctx.fillRect(effect.x + Math.cos(a) * effect.size * (1 - ratio), effect.y + Math.sin(a) * effect.size * (1 - ratio), 3, 3); } }
+      else if (effect.type === 'evolution') { ctx.globalAlpha = Math.min(1, ratio * 1.7); ctx.fillStyle = rgba(effect.color, .16); ctx.fillRect(effect.x - effect.size * .22, effect.y - effect.size * 1.1, effect.size * .44, effect.size * 1.45); for (let i = 0; i < 3; i += 1) { ctx.beginPath(); ctx.arc(effect.x, effect.y + 18, effect.size * (.22 + i * .16) * (1 - ratio * .35), 0, Math.PI * 2); ctx.stroke(); } for (let i = 0; i < 8; i += 1) { const a = this.time * 2.8 + i * Math.PI / 4; ctx.fillRect(effect.x + Math.cos(a) * effect.size * .5, effect.y - 20 + Math.sin(a) * effect.size * .42, 3, 3); } }
       else { ctx.beginPath(); ctx.arc(effect.x, effect.y, effect.size * (1.1 - ratio), 0, Math.PI * 2); ctx.stroke(); }
       ctx.restore();
     }
