@@ -69,13 +69,14 @@ function makeOffline(state, elapsedMs) {
   const seconds = Math.min(8 * 60 * 60, Math.max(0, Math.floor(elapsedMs / 1000)));
   if (seconds < 60) return null;
   const map = MAPS[state.highestMap - 1] || MAPS[0];
+  const baseline = map.base || { exp: map.mobs?.[0]?.[5] || 12, gold: map.mobs?.[0]?.[6] || 6 };
   const cycle = 4.5;
   const battles = Math.floor(seconds / cycle);
   const multiplier = 0.35;
   return {
     seconds,
-    exp: Math.floor(map.base.exp * battles * multiplier),
-    gold: Math.floor(map.base.gold * battles * multiplier),
+    exp: Math.floor(baseline.exp * battles * multiplier),
+    gold: Math.floor(baseline.gold * battles * multiplier),
     equipment: Math.min(8, Math.floor(battles / 42)),
     fragments: Math.min(12, Math.floor(battles / 70)),
     claimed: false,

@@ -33,3 +33,12 @@ export const SKILLS = [
 
 export const SLOTS = { weapon:{label:'武器'}, helmet:{label:'頭盔'}, armor:{label:'鎧甲'}, gloves:{label:'手套'}, boots:{label:'鞋子'}, necklace:{label:'項鍊'}, ring:{label:'戒指'}, wings:{label:'翅膀'} };
 export const QUALITY = Object.fromEntries(BALANCE.quality.map(entry => [entry.id, entry]));
+
+export const MONSTER_VISUALS = {
+  slime:{visualType:'starSlime',bodyScale:1,accentColor:'#a7eeff',attackStyle:'bounce'}, rabbit:{visualType:'moonRabbit',bodyScale:1,accentColor:'#f5d4ff',attackStyle:'leap'}, beetle:{visualType:'sproutBeetle',bodyScale:1,accentColor:'#d9f5a8',attackStyle:'melee'},
+  wolf:{visualType:'glowMushroom',bodyScale:1,accentColor:'#79ffd5',attackStyle:'ranged'}, flower:{visualType:'forestTreant',bodyScale:1,accentColor:'#8df08c',attackStyle:'melee'}, spirit:{visualType:'glowMushroom',bodyScale:.92,accentColor:'#96eaff',attackStyle:'ranged'},
+  lizard:{visualType:'lavaLizard',bodyScale:1,accentColor:'#ff9a5b',attackStyle:'melee'}, lava:{visualType:'flameImp',bodyScale:1,accentColor:'#ffce68',attackStyle:'ranged'}, hawk:{visualType:'flameImp',bodyScale:.94,accentColor:'#ffc36a',attackStyle:'ranged'},
+  ice:{visualType:'snowballGuard',bodyScale:1,accentColor:'#bff7ff',attackStyle:'melee'}, snowwolf:{visualType:'iceWolf',bodyScale:1,accentColor:'#a6ecff',attackStyle:'leap'}, golem:{visualType:'snowballGuard',bodyScale:1.12,accentColor:'#d5fbff',attackStyle:'melee'},
+  ruin:{visualType:'crystalGuard',bodyScale:1,accentColor:'#b996ff',attackStyle:'melee'}, orb:{visualType:'astralFloater',bodyScale:1,accentColor:'#e2afff',attackStyle:'ranged'}, mech:{visualType:'crystalGuard',bodyScale:1.08,accentColor:'#fb9dff',attackStyle:'ranged'},
+  horn:{visualType:'crownBeast',bodyScale:1.85,accentColor:'#ffd878',attackStyle:'charge'}, guardian:{visualType:'ancientTree',bodyScale:1.85,accentColor:'#8bffbd',attackStyle:'root'}, dragon:{visualType:'coreTyrant',bodyScale:1.9,accentColor:'#ff835c',attackStyle:'fire'}, queen:{visualType:'frostWarden',bodyScale:1.9,accentColor:'#aaf3ff',attackStyle:'ice'}, destroyer:{visualType:'astralJudge',bodyScale:1.95,accentColor:'#ed91ff',attackStyle:'beam'},
+};

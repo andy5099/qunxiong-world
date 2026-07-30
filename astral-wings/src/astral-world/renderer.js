@@ -1,5 +1,6 @@
 import { MAPS, QUALITY, SLOTS } from './data.js';
 import { clamp } from './core.js';
+import { drawMonster } from './monster-renderer.js';
 
 const W = 390;
 const H = 430;
@@ -69,7 +70,7 @@ export class BattleRenderer {
     if (!scene?.battle) return;
     this.drawFloor(ctx, map);
     const enemy = scene.battle.enemy;
-    if (enemy?.alive) this.drawEnemy(ctx, enemy, map);
+    if (enemy?.alive) this.drawMonster(ctx, enemy, scene.battle);
     this.drawPet(ctx, scene.state, 132, 290);
     this.drawHero(ctx, scene.state, 110, 315, scene.battle.playerFlash || 0);
     this.drawEffects(ctx);
@@ -185,6 +186,13 @@ export class BattleRenderer {
     if (enemy.hit > 0) { ctx.globalAlpha = .65; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(0, 0, 32, 0, Math.PI * 2); ctx.fill(); }
     ctx.restore();
     this.bar(ctx, x - (enemy.boss ? 64 : 34), y + (enemy.boss ? 68 : 42), enemy.boss ? 128 : 68, 7, enemy.hp / enemy.maxHp, enemy.boss ? '#ff8269' : '#dc80ff');
+  }
+
+  drawMonster(ctx, enemy, battle) {
+    const pose = drawMonster(ctx, enemy, { time:this.time, attackIn:battle.enemyAttackIn });
+    const boss = enemy.boss;
+    this.bar(ctx, pose.x - (boss ? 76 : 34), pose.y + (boss ? 83 : 42), boss ? 152 : 68, boss ? 8 : 7, enemy.hp / enemy.maxHp, boss ? (pose.rage ? '#ff5578' : '#ff8269') : '#dc80ff');
+    if (boss) { ctx.save(); ctx.textAlign='center'; ctx.font='700 11px system-ui'; ctx.fillStyle=pose.rage?'#ff8a9c':'#ffe2a8'; ctx.fillText(`${enemy.name}${pose.rage?' · 狂暴':''}`,pose.x,pose.y-88); ctx.restore(); }
   }
 
   bar(ctx, x, y, width, height, ratio, color) {
