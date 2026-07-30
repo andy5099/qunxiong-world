@@ -1,6 +1,7 @@
 import { MAPS, QUALITY, SLOTS } from './data.js';
 import { clamp } from './core.js';
 import { drawMonster } from './monster-renderer.js';
+import { drawPlayer } from './player-renderer.js';
 
 const W = 390;
 const H = 430;
@@ -72,7 +73,7 @@ export class BattleRenderer {
     const enemy = scene.battle.enemy;
     if (enemy?.alive) this.drawMonster(ctx, enemy, scene.battle);
     this.drawPet(ctx, scene.state, 132, 290);
-    this.drawHero(ctx, scene.state, 110, 315, scene.battle.playerFlash || 0);
+    drawPlayer(ctx, scene.state, scene.battle, 110, 315, this.time);
     this.drawEffects(ctx);
     this.drawNumbers(ctx);
   }
@@ -120,35 +121,6 @@ export class BattleRenderer {
     ctx.fillStyle = floor; ctx.fillRect(0, 240, W, H - 240);
     ctx.strokeStyle = rgba('#b8deff', 0.16); ctx.lineWidth = 1;
     for (let y = 280; y < H; y += 32) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y - 26); ctx.stroke(); }
-  }
-
-  drawHero(ctx, state, x, y, flash) {
-    const t = this.time;
-    const bob = Math.sin(t * 2.6) * 3;
-    const low = state.player.hp / state.player.maxHp < 0.3;
-    ctx.save(); ctx.translate(x, y + bob);
-    if (flash > 0 && Math.floor(t * 17) % 2 === 0) ctx.globalAlpha = 0.42;
-    ctx.shadowColor = '#6dcaff'; ctx.shadowBlur = 18;
-    // cape / wing blades
-    ctx.fillStyle = '#172f6a'; ctx.beginPath(); ctx.moveTo(-27, 14); ctx.lineTo(-47, 34); ctx.lineTo(-22, 30); ctx.lineTo(-5, 4); ctx.fill();
-    ctx.fillStyle = '#253b86'; ctx.beginPath(); ctx.moveTo(24, 14); ctx.lineTo(47, 34); ctx.lineTo(20, 30); ctx.lineTo(5, 4); ctx.fill();
-    // legs and coat silhouette
-    ctx.fillStyle = '#111b46'; ctx.beginPath(); ctx.moveTo(-13, 15); ctx.lineTo(-22, 43); ctx.lineTo(-5, 43); ctx.lineTo(0, 25); ctx.lineTo(7, 43); ctx.lineTo(24, 43); ctx.lineTo(13, 14); ctx.fill();
-    // armor body
-    const body = ctx.createLinearGradient(0, -25, 0, 28); body.addColorStop(0, '#b7e7ff'); body.addColorStop(.35, '#3d77bc'); body.addColorStop(1, '#151f5b');
-    ctx.fillStyle = body; ctx.beginPath(); ctx.moveTo(0, -29); ctx.lineTo(18, -12); ctx.lineTo(14, 18); ctx.lineTo(0, 29); ctx.lineTo(-14, 18); ctx.lineTo(-18, -12); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = '#caefff'; ctx.lineWidth = 1.5; ctx.stroke();
-    // shoulders
-    ctx.fillStyle = '#294a95'; ctx.beginPath(); ctx.moveTo(-17, -12); ctx.lineTo(-35, 0); ctx.lineTo(-22, 10); ctx.lineTo(-8, 3); ctx.fill(); ctx.beginPath(); ctx.moveTo(17, -12); ctx.lineTo(35, 0); ctx.lineTo(22, 10); ctx.lineTo(8, 3); ctx.fill();
-    // sword
-    ctx.strokeStyle = '#a8f2ff'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(19, 4); ctx.lineTo(39, -35); ctx.stroke(); ctx.strokeStyle = '#3851a4'; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(18, 6); ctx.lineTo(34, -25); ctx.stroke();
-    // head, hair and core
-    ctx.fillStyle = '#f3d5bf'; ctx.beginPath(); ctx.arc(0, -37, 10, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#25316e'; ctx.beginPath(); ctx.moveTo(-11, -39); ctx.quadraticCurveTo(0, -55, 12, -41); ctx.lineTo(7, -50); ctx.lineTo(-8, -49); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#73e9ff'; ctx.beginPath(); ctx.arc(0, 0, 4.7 + Math.sin(t * 6) * .7, 0, Math.PI * 2); ctx.fill();
-    ctx.shadowBlur = 0; ctx.strokeStyle = '#80baff'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(-10, -4); ctx.lineTo(10, -4); ctx.moveTo(-8, 9); ctx.lineTo(8, 9); ctx.stroke();
-    if (low) { ctx.strokeStyle = '#ff6b79'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(-10, 13); ctx.lineTo(-2, 7); ctx.moveTo(10, 16); ctx.lineTo(4, 10); ctx.stroke(); }
-    ctx.restore();
   }
 
   drawPet(ctx, state, x, y) {

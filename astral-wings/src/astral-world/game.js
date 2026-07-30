@@ -19,7 +19,7 @@ export class IdleGame {
   }
 
   newBattle() {
-    return { enemy: null, spawnIn: 0.45, attackIn: 0.35, enemyAttackIn: 0.7, petIn: 1.2, cooldowns: [0, 0, 0, 0], queuedHits: [], playerFlash: 0, reviveIn: 0, bossMode: false, killing: false };
+    return { enemy: null, spawnIn: 0.45, attackIn: 0.35, enemyAttackIn: 0.7, petIn: 1.2, cooldowns: [0, 0, 0, 0], queuedHits: [], playerFlash: 0, playerAction: 'idle', playerActionIn: 0, reviveIn: 0, bossMode: false, killing: false };
   }
 
   start() { if (!this.running) { this.running = true; this.last = performance.now(); this.frame = requestAnimationFrame(this._bound); } }
@@ -35,12 +35,12 @@ export class IdleGame {
     this.renderer.update(dt);
     if (battle.reviveIn > 0) {
       battle.reviveIn -= dt;
-      if (battle.reviveIn <= 0) { state.player.hp = state.player.maxHp; state.player.shield = 0; battle.spawnIn = .65; this.event('重新集結', '星界能量讓你恢復滿生命，繼續探索。'); }
+      if (battle.reviveIn <= 0) { state.player.hp = state.player.maxHp; state.player.shield = 0; battle.playerAction = 'revive'; battle.playerActionIn = .72; battle.spawnIn = .65; this.event('重新集結', '星界能量讓你恢復滿生命，繼續探索。'); }
       this.flush(); return;
     }
     if (!battle.enemy) { battle.spawnIn -= dt; if (battle.spawnIn <= 0) this.spawn(battle.bossMode); this.flush(); return; }
     const enemy = battle.enemy;
-    enemy.hit = Math.max(0, enemy.hit - dt);
+    enemy.hit = Math.max(0, enemy.hit - dt); battle.playerActionIn = Math.max(0, battle.playerActionIn - dt); if (battle.playerActionIn <= 0 && battle.playerAction !== 'downed') battle.playerAction = 'idle';
     battle.playerFlash = Math.max(0, battle.playerFlash - dt);
     battle.attackIn -= dt; battle.enemyAttackIn -= dt; battle.petIn -= dt;
     for (let i = 0; i < battle.cooldowns.length; i += 1) battle.cooldowns[i] = Math.max(0, battle.cooldowns[i] - dt);
@@ -66,6 +66,7 @@ export class IdleGame {
   }
 
   basicAttack() {
+    this.battle.playerAction = 'attack'; this.battle.playerActionIn = .24;
     const critical = Math.random() < this.state.player.crit;
     this.damageEnemy(this.state.player.attack * (critical ? this.state.player.critDamage : 1), '星刃普攻', critical ? '#ffe38b' : '#8cdfff', critical);
   }
@@ -77,6 +78,7 @@ export class IdleGame {
     const level = this.state.skills[index] || 1;
     const power = skill.power + (level - 1) * skill.perLevel;
     this.battle.cooldowns[index] = skill.cooldown;
+    this.battle.playerAction = `skill${index + 1}`; this.battle.playerActionIn = index === 3 ? .52 : .36;
     if (index === 2) {
       const shield = this.state.player.maxHp * power;
       this.state.player.shield = Math.min(this.state.player.maxHp * .65, this.state.player.shield + shield);
@@ -112,8 +114,8 @@ export class IdleGame {
     let amount = Math.max(1, raw * (100 / (100 + player.defense)));
     const shieldDamage = Math.min(player.shield, amount);
     player.shield -= shieldDamage; amount -= shieldDamage; player.hp = Math.max(0, player.hp - amount);
-    this.battle.playerFlash = .38; this.renderer.damage(shieldDamage + amount, 110, 275, false, '#ff8f9d'); this.renderer.pulse('hit', 110, 305, '#ff859b', 26);
-    if (player.hp <= 0) { this.battle.enemy = null; this.battle.reviveIn = 3; this.event('戰鬥失利', '3 秒後將在目前關卡重新集結。'); }
+    this.battle.playerFlash = .38; this.battle.playerAction = 'hurt'; this.battle.playerActionIn = .28; this.renderer.damage(shieldDamage + amount, 110, 275, false, '#ff8f9d'); this.renderer.pulse('hit', 110, 305, '#ff859b', 26);
+    if (player.hp <= 0) { this.battle.playerAction = 'downed'; this.battle.enemy = null; this.battle.reviveIn = 3; this.event('戰鬥失利', '3 秒後將在目前關卡重新集結。'); }
   }
 
   petAttack() { const pet = this.state.pets.find(item => item.id === this.state.activePetId); if (pet && this.battle.enemy) this.damageEnemy(pet.attack * (1 + (pet.stars - 1) * .13) * (1 + (this.state.player.petDamage || 0)), `${pet.name} 協同攻擊`, '#ffd979'); }

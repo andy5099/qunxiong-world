@@ -1,8 +1,8 @@
-const CACHE = 'astral-world-idle-v4';
+const CACHE = 'astral-world-idle-v5';
 const CORE = [
   './', './index.html', './styles.css', './manifest.webmanifest',
   './src/astral-world/main.js', './src/astral-world/data.js', './src/astral-world/core.js',
-  './src/astral-world/save.js', './src/astral-world/renderer.js', './src/astral-world/game.js', './src/astral-world/ui.js',
+  './src/astral-world/save.js', './src/astral-world/renderer.js', './src/astral-world/game.js', './src/astral-world/ui.js', './src/astral-world/player-renderer.js',
   './src/astral-world/tutorial-system.js', './src/astral-world/objective-system.js', './css/alpha-v02.css',
 ];
 
