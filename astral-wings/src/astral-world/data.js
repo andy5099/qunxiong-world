@@ -1,5 +1,5 @@
 export const SAVE_KEY = 'astralWorldIdleV1';
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 export const BALANCE = {
   attackInterval: 1.2,
@@ -23,6 +23,7 @@ export const MAPS = [
   { id: 4, name: '冰晶高原', description: '極光照亮永不融化的高原。', colors: ['#122c52', '#2c6282', '#8eeaff'], mobs: [mob('冰晶史萊姆','ice',18,1750,118,125,130),mob('雪原狼','snowwolf',19,1940,128,136,140),mob('寒霜魔像','golem',20,2160,139,147,150,false)], boss: mob('冰霜女王','queen',22,14200,205,1200,1420) },
   { id: 5, name: '星界遺跡', description: '失控古代機甲守護著遺跡核心。', colors: ['#211744', '#35266c', '#d88cff'], mobs: [mob('遺跡守衛','ruin',24,3700,210,210,230,false),mob('星核浮游體','orb',25,4100,228,228,248),mob('失控機甲','mech',26,4550,247,245,268,false)], boss: mob('星界毀滅者','destroyer',28,29800,365,2100,3150) },
 ];
+export const PET_SOURCE_KINDS = Object.fromEntries(MAPS.flatMap(map => [...map.mobs, map.boss].map(([name, kind]) => [name, kind])));
 
 export const SKILLS = [
   { id:'slash', name:'星刃斬', cooldown:4, power:1.6, perLevel:.08, description:'對單一敵人造成高額斬擊。' },
@@ -46,4 +47,16 @@ export const MONSTER_VISUALS = {
   ice:{visualType:'iceSlime',species:'slime',palette:'frost',bodyScale:1,accentColor:'#bff7ff',attackStyle:'bounce',eliteVariant:'prism'}, snowwolf:{visualType:'frostWolf',species:'beast',palette:'frost',bodyScale:1,accentColor:'#a6ecff',attackStyle:'leap',eliteVariant:'crystal'}, golem:{visualType:'golem',species:'construct',palette:'frost',bodyScale:1.12,accentColor:'#d5fbff',attackStyle:'melee',eliteVariant:'ancient'},
   ruin:{visualType:'sentinel',species:'construct',palette:'ruin',bodyScale:1,accentColor:'#b996ff',attackStyle:'melee',eliteVariant:'warded'}, orb:{visualType:'floater',species:'flying',palette:'astral',bodyScale:1,accentColor:'#e2afff',attackStyle:'ranged',eliteVariant:'nova'}, mech:{visualType:'mech',species:'construct',palette:'astral',bodyScale:1.08,accentColor:'#fb9dff',attackStyle:'beam',eliteVariant:'overclock'},
   horn:{visualType:'crownBeast',bodyScale:1.85,accentColor:'#ffd878',attackStyle:'charge'}, guardian:{visualType:'ancientTree',bodyScale:1.85,accentColor:'#8bffbd',attackStyle:'root'}, dragon:{visualType:'coreTyrant',bodyScale:1.9,accentColor:'#ff835c',attackStyle:'fire'}, queen:{visualType:'frostWarden',bodyScale:1.9,accentColor:'#aaf3ff',attackStyle:'ice'}, destroyer:{visualType:'astralJudge',bodyScale:1.95,accentColor:'#ed91ff',attackStyle:'beam'},
+};
+
+// Pet visuals remain static data: combat captures only store the source kind and these fields
+// are also re-applied to older saves during load.
+export const PET_VISUALS = {
+  slime:{visualType:'slimePet',species:'slime',palette:'meadow'}, rabbit:{visualType:'rabbitPet',species:'beast',palette:'moon'}, beetle:{visualType:'beetlePet',species:'beast',palette:'sprout'},
+  wolf:{visualType:'wolfPet',species:'beast',palette:'forest'}, flower:{visualType:'bloomPet',species:'plant',palette:'crystal'}, spirit:{visualType:'spiritPet',species:'spirit',palette:'mist'},
+  lizard:{visualType:'lizardPet',species:'beast',palette:'lava'}, lava:{visualType:'fiendPet',species:'fiend',palette:'ember'}, hawk:{visualType:'hawkPet',species:'flying',palette:'ember'},
+  ice:{visualType:'iceSlimePet',species:'slime',palette:'frost'}, snowwolf:{visualType:'frostWolfPet',species:'beast',palette:'frost'}, golem:{visualType:'golemPet',species:'construct',palette:'frost'},
+  ruin:{visualType:'sentinelPet',species:'construct',palette:'ruin'}, orb:{visualType:'orbPet',species:'flying',palette:'astral'}, mech:{visualType:'astralDrone',species:'construct',palette:'astral'},
+  horn:{visualType:'crownCub',species:'bossBeast',palette:'crown'}, guardian:{visualType:'treeSprite',species:'bossPlant',palette:'grove'}, dragon:{visualType:'lavaWhelp',species:'bossDragon',palette:'magma'},
+  queen:{visualType:'frostSprite',species:'bossSpirit',palette:'frost'}, destroyer:{visualType:'astralDrone',species:'bossConstruct',palette:'astral'},
 };

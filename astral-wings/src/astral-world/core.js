@@ -1,4 +1,4 @@
-import { AFFIXES, BALANCE, MONSTER_VISUALS, QUALITY, SLOTS } from './data.js';
+import { AFFIXES, BALANCE, MONSTER_VISUALS, PET_SOURCE_KINDS, PET_VISUALS, QUALITY, SLOTS } from './data.js';
 
 export const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 export const format = value => value >= 1e9 ? `${(value/1e9).toFixed(1)}B` : value >= 1e6 ? `${(value/1e6).toFixed(1)}M` : value >= 1000 ? `${(value/1000).toFixed(1)}K` : Math.floor(value).toLocaleString();
@@ -47,5 +47,14 @@ export function enhanceChance(item){const n=item.enhance||0;if(n<3)return 1;if(n
 
 export function enemyFor(source, mapId, stage, boss=false) { const [name,kind,level,hp,attack,exp,gold,capturable]=source; const factor=1+(stage-1)*.12; const visual=MONSTER_VISUALS[kind]||MONSTER_VISUALS.slime; return {id:`${kind}_${Date.now()}`,name,kind,level:level+stage-1,maxHp:Math.floor(hp*factor),hp:Math.floor(hp*factor),attack:Math.floor(attack*factor),defense:Math.floor(level*.7),exp:Math.floor(exp*factor),gold:Math.floor(gold*factor),capturable,captureRate:boss?.015:.035,boss,attackSpeed:boss?1.7:2.05,hit:0,alive:true,action:'spawn',actionIn:.36,spawnIn:.36,deathIn:0,elite:false,...visual}; }
 export function addExp(state,amount) { state.player.exp += Math.floor(amount); let levels=0; while(state.player.exp>=expFor(state.player.level)){state.player.exp-=expFor(state.player.level);state.player.level+=1;levels+=1;} if(levels){recompute(state);state.player.hp=state.player.maxHp;} return {levels}; }
-export function petFromEnemy(enemy) { return {id:`pet_${enemy.kind}`,source:enemy.name,name:enemy.name,quality:enemy.boss?'epic':'rare',level:1,exp:0,stars:1,attack:Math.max(4,Math.floor(enemy.attack*(enemy.boss?.3:.18))),hpBonus:Math.floor(enemy.maxHp*.05)}; }
+export function normalizePet(pet = {}) {
+  const sourceKind = pet.sourceKind || (typeof pet.id === 'string' && pet.id.startsWith('pet_') ? pet.id.slice(4) : null) || PET_SOURCE_KINDS[pet.source] || PET_SOURCE_KINDS[pet.name] || 'slime';
+  const visual = PET_VISUALS[sourceKind] || { visualType:'fallbackPet', species:'unknown', palette:'astral' };
+  return { ...pet, sourceKind, visualType:pet.visualType || visual.visualType, species:pet.species || visual.species, palette:pet.palette || visual.palette, evolutionStage:Math.max(1, Number(pet.evolutionStage) || 1) };
+}
+
+export function petFromEnemy(enemy) {
+  const visual = PET_VISUALS[enemy.kind] || PET_VISUALS.slime;
+  return normalizePet({ id:`pet_${enemy.kind}`, source:enemy.name, name:enemy.name, sourceKind:enemy.kind, quality:enemy.boss?'epic':'rare', level:1, exp:0, stars:1, attack:Math.max(4,Math.floor(enemy.attack*(enemy.boss?.3:.18))), hpBonus:Math.floor(enemy.maxHp*.05), ...visual });
+}
 export function dailyQuests(){return[{id:'kill50',name:'擊敗 50 隻怪物',target:50,reward:{gold:1200}},{id:'boss3',name:'擊敗 3 隻 Boss',target:3,reward:{gold:2500}},{id:'gear10',name:'獲得 10 件裝備',target:10,reward:{gold:1800}},{id:'capture1',name:'收服 1 隻怪物',target:1,reward:{gold:1600}}];}

@@ -1,5 +1,5 @@
 import { SAVE_KEY, SAVE_VERSION, MAPS } from './data.js';
-import { addExp, basePlayer, dailyQuests, recompute } from './core.js';
+import { addExp, basePlayer, dailyQuests, normalizePet, recompute } from './core.js';
 import { ensureTutorial } from './tutorial-system.js';
 import { ensureObjectives, ensureUnlocks } from './objective-system.js';
 
@@ -53,7 +53,7 @@ function merge(base, raw) {
   state.player = { ...base.player, ...(raw?.player || {}) };
   state.inventory = Array.isArray(raw?.inventory) ? raw.inventory : [];
   state.equipped = raw?.equipped && typeof raw.equipped === 'object' ? raw.equipped : {};
-  state.pets = Array.isArray(raw?.pets) ? raw.pets : [];
+  state.pets = Array.isArray(raw?.pets) ? raw.pets.map(normalizePet) : [];
   state.petFragments = raw?.petFragments && typeof raw.petFragments === 'object' ? raw.petFragments : {};
   state.skills = Array.isArray(raw?.skills) ? raw.skills.slice(0, 4).map(n => Math.max(1, Number(n) || 1)) : base.skills;
   while (state.skills.length < 4) state.skills.push(1);

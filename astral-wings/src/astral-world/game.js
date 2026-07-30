@@ -19,7 +19,7 @@ export class IdleGame {
   }
 
   newBattle() {
-    return { enemy: null, spawnIn: 0.45, attackIn: 0.35, enemyAttackIn: 0.7, petIn: 1.2, cooldowns: [0, 0, 0, 0], queuedHits: [], playerFlash: 0, playerAction: 'idle', playerActionIn: 0, reviveIn: 0, bossMode: false, killing: false };
+    return { enemy: null, spawnIn: 0.45, attackIn: 0.35, enemyAttackIn: 0.7, petIn: 1.2, petAction:'summon', petActionIn:.52, petReturnIn:0, petSummonIn:.52, cooldowns: [0, 0, 0, 0], queuedHits: [], playerFlash: 0, playerAction: 'idle', playerActionIn: 0, reviveIn: 0, bossMode: false, killing: false };
   }
 
   start() { if (!this.running) { this.running = true; this.last = performance.now(); this.frame = requestAnimationFrame(this._bound); } }
@@ -52,6 +52,9 @@ export class IdleGame {
     enemy.hit = Math.max(0, enemy.hit - dt); battle.playerActionIn = Math.max(0, battle.playerActionIn - dt); if (battle.playerActionIn <= 0 && battle.playerAction !== 'downed') battle.playerAction = 'idle';
     battle.playerFlash = Math.max(0, battle.playerFlash - dt);
     battle.attackIn -= dt; battle.enemyAttackIn -= dt; battle.petIn -= dt;
+    battle.petActionIn = Math.max(0, (battle.petActionIn || 0) - dt); battle.petReturnIn = Math.max(0, (battle.petReturnIn || 0) - dt); battle.petSummonIn = Math.max(0, (battle.petSummonIn || 0) - dt);
+    if (battle.petAction === 'attack' && battle.petActionIn <= 0) { battle.petAction = 'return'; battle.petReturnIn = .26; }
+    else if ((battle.petAction === 'return' && battle.petReturnIn <= 0) || (battle.petAction === 'celebrate' && battle.petActionIn <= 0) || (battle.petAction === 'summon' && battle.petSummonIn <= 0)) battle.petAction = 'idle';
     for (let i = 0; i < battle.cooldowns.length; i += 1) battle.cooldowns[i] = Math.max(0, battle.cooldowns[i] - dt);
     for (let i = battle.queuedHits.length - 1; i >= 0; i -= 1) {
       const hit = battle.queuedHits[i]; hit.in -= dt;
@@ -134,12 +137,21 @@ export class IdleGame {
     if (player.hp <= 0) { this.battle.playerAction = 'downed'; this.battle.enemy = null; this.battle.reviveIn = 3; this.event('戰鬥失利', '3 秒後將在目前關卡重新集結。'); }
   }
 
-  petAttack() { const pet = this.state.pets.find(item => item.id === this.state.activePetId); if (pet && this.battle.enemy) this.damageEnemy(pet.attack * (1 + (pet.stars - 1) * .13) * (1 + (this.state.player.petDamage || 0)), `${pet.name} 協同攻擊`, '#ffd979'); }
+  petAttack() {
+    const pet = this.state.pets.find(item => item.id === this.state.activePetId);
+    const enemy = this.battle.enemy;
+    if (!pet || !enemy?.alive) return false;
+    this.battle.petAction = 'attack'; this.battle.petActionIn = .36; this.battle.petReturnIn = .26;
+    this.renderer.pulse('slash', 190, 280, '#ffd979', 22);
+    this.damageEnemy(pet.attack * (1 + (pet.stars - 1) * .13) * (1 + (this.state.player.petDamage || 0)), `${pet.name} 協同攻擊`, '#ffd979');
+    return true;
+  }
 
   killEnemy() {
     const { state, battle } = this; const enemy = battle.enemy;
     if (!enemy || battle.killing) return;
     battle.killing = true; enemy.alive = false;
+    if (state.activePetId) { battle.petAction = 'celebrate'; battle.petActionIn = .5; battle.petReturnIn = 0; }
     this.renderer.pulse('burst', 278, 270, enemy.boss ? '#ffad72' : '#cf8aff', enemy.boss ? 68 : 36);
     const mult = enemy.boss ? 4 : 1; const expResult = addExp(state, enemy.exp * mult * (1 + (state.player.expBonus || 0)));
     state.player.gold += enemy.gold * mult * (1 + (state.player.goldBonus || 0)); state.stats.kills += 1;
@@ -203,7 +215,7 @@ export class IdleGame {
   equipBest() { let changed=0; for(const item of this.state.inventory){const current=this.state.equipped[item.slot];const score=(entry)=>(entry?.power||0)*(1+(entry?.enhance||0)*.08);if(!current||score(item)>score(current)){this.state.equipped[item.slot]=item;changed+=1;}}if(changed){recompute(this.state);this.event('最佳裝備',`已穿戴 ${changed} 件更強裝備。`);}return changed; }
   toggleSkill(index) { this.state.skillAuto[index] = !this.state.skillAuto[index]; return this.state.skillAuto[index]; }
   upgradeSkill(index) { const price = 100 * (this.state.skills[index] || 1); if (this.state.player.gold < price) return false; this.state.player.gold -= price; this.state.skills[index] += 1; recompute(this.state); return true; }
-  setActivePet(id) { if (!this.state.pets.some(pet => pet.id === id)) return false; this.state.activePetId = id; recompute(this.state); return true; }
+  setActivePet(id) { if (!this.state.pets.some(pet => pet.id === id)) return false; this.state.activePetId = id; this.battle.petAction = 'summon'; this.battle.petSummonIn = .52; this.battle.petActionIn = .52; this.battle.petReturnIn = 0; recompute(this.state); return true; }
   starPet(id) { const pet = this.state.pets.find(entry => entry.id === id); if (!pet || pet.stars >= 6) return false; const cost = pet.stars * 5; if ((this.state.petFragments[id] || 0) < cost) return false; this.state.petFragments[id] -= cost; pet.stars += 1; pet.attack += Math.max(1, Math.floor(pet.attack * .18)); recompute(this.state); return true; }
   quest(type, amount) { const key = ({ kills: 'kill50', bosses: 'boss3', equipment: 'gear10', captures: 'capture1' })[type]; if (key) this.state.quests.progress[key] = (this.state.quests.progress[key] || 0) + amount; }
   event(title, message) { this.callbacks.onEvent?.({ title, message }); }

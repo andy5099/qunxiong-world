@@ -2,6 +2,7 @@ import { MAPS, QUALITY, SLOTS } from './data.js';
 import { clamp } from './core.js';
 import { drawMonster } from './monster-renderer.js';
 import { drawPlayer } from './player-renderer.js';
+import { drawPet as drawBattlePet } from './pet-renderer.js';
 
 const W = 390;
 const H = 430;
@@ -72,7 +73,7 @@ export class BattleRenderer {
     this.drawFloor(ctx, map);
     const enemy = scene.battle.enemy;
     if (enemy) this.drawMonster(ctx, enemy, scene.battle, scene.state.settings?.powerSave);
-    this.drawPet(ctx, scene.state, 132, 290);
+    this.drawPet(ctx, scene.state, scene.battle, 142, 300);
     drawPlayer(ctx, scene.state, scene.battle, 110, 315, this.time);
     this.drawEffects(ctx);
     this.drawNumbers(ctx);
@@ -123,13 +124,10 @@ export class BattleRenderer {
     for (let y = 280; y < H; y += 32) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y - 26); ctx.stroke(); }
   }
 
-  drawPet(ctx, state, x, y) {
+  drawPet(ctx, state, battle, x, y) {
     const pet = state.pets.find(item => item.id === state.activePetId);
     if (!pet) return;
-    const yBob = y + Math.sin(this.time * 4.2) * 5;
-    ctx.save(); ctx.translate(x, yBob); ctx.shadowColor = '#f6d66b'; ctx.shadowBlur = 12;
-    ctx.fillStyle = '#f3bd58'; ctx.beginPath(); ctx.moveTo(0, -14); ctx.lineTo(13, -5); ctx.lineTo(10, 10); ctx.lineTo(0, 16); ctx.lineTo(-10, 10); ctx.lineTo(-13, -5); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#fff4bf'; ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    drawBattlePet(ctx, pet, { time:this.time, action:battle?.petAction, actionIn:battle?.petActionIn, returnIn:battle?.petReturnIn, summonIn:battle?.petSummonIn, powerSave:state.settings?.powerSave }, x, y);
   }
 
   drawEnemy(ctx, enemy, map) {
