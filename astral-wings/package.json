@@ -1,0 +1,6 @@
+{
+  "name": "astral-world-idle",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node scripts/astral-world-smoke.mjs" }
+}

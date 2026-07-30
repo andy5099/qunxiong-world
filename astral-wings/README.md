@@ -1,36 +1,53 @@
-# 星界戰翼（Astral Wings）
+# Astral World：星界冒險
 
-原創單機直向星際射擊網頁遊戲。以 HTML5 Canvas、Vanilla JavaScript 與 LocalStorage 製作，不需要帳號、伺服器或外部套件。
+原創、單機、手機直式的 Canvas 放置 RPG。玩家會在星界地圖中自動戰鬥、升級、獲得隨機裝備、挑戰區域 Boss、收服怪物並派出寵物協助戰鬥。
 
-## 功能
+## 可立即遊玩內容
 
-- 六個順序解鎖的主線星域與六隻原創三階段 Boss。
-- 固定波次、精英、補給、火力 Lv1～Lv5、必殺技與暫時 Buff。
-- 戰機等級、星級、裝備、強化、分解、合成、合體、覺醒與進化。
-- 無盡航線、Boss 挑戰、每日任務、成就與星域圖鑑。
-- 原創 AI 機體視覺圖：`assets/images/astral-ai-craft-roster.png`。
+- 自動普攻、四種自動技能、護盾、死亡後三秒復甦。
+- 五張可解鎖地圖；每張包含三種普通怪物與一隻區域 Boss。
+- 十隻怪物後自動或手動挑戰 Boss；勝利後推進關卡並解鎖下一區域。
+- 七階品質隨機裝備、八個裝備欄位、背包排序、鎖定、出售與自動裝備。
+- 怪物收服、主戰寵物、寵物升星與協同攻擊。
+- 每日任務、離線收益（上限八小時）、手動匯出／匯入與安全重置。
+- 手機直式 UI、Canvas 戰鬥動畫、傷害數字、技能光效、掉落提示。
 
 ## 操作
 
-- 手機：按住並拖曳遊戲區任意位置。
-- 電腦：滑鼠拖曳、方向鍵或 WASD。
-- 空白鍵：星能爆發；Esc：暫停。
+遊戲進入後自動開始探索。底部導覽可開啟角色、裝備、寵物、地圖、背包、任務與設定。技能卡可獨立切換自動施放；Boss 可以手動挑戰；設定可控制自動 Boss、自動推進、自動裝備與自動出售品質。
+
+## 專案結構
+
+```text
+src/astral-world/
+  data.js       地圖、怪物、技能、品質與平衡資料
+  core.js       屬性重算、裝備生成、等級與寵物規則
+  save.js       版本化 localStorage、離線收益、匯入匯出
+  renderer.js   Canvas 2D 戰鬥與特效繪製
+  game.js       單一 requestAnimationFrame 戰鬥循環
+  ui.js         手機 UI、背包、地圖、任務與設定
+  main.js       啟動與頁面生命週期
+```
 
 ## 本機啟動
 
+請透過 HTTP Server 開啟，避免 ES Modules 被瀏覽器限制：
+
 ```powershell
-cd astral-wings
+cd AstralWings_CODEX_WORKSPACE_V3
 python -m http.server 8000
 ```
 
-開啟 `http://localhost:8000`。
+開啟 `http://localhost:8000/`。
 
 ## GitHub Pages
 
-所有路徑均為相對路徑。部署 repository 根目錄後，使用：
-
-`https://<帳號>.github.io/<repository>/astral-wings/`
+這是純靜態專案，將本資料夾內容推送到 GitHub repository 後，在 GitHub Pages 設定中選擇該分支根目錄即可。所有載入路徑均使用相對路徑。首次更新後若瀏覽器仍顯示舊頁面，請重新整理一次，新的 `service-worker.js` 會清除舊快取。
 
 ## 存檔
 
-使用 `astralWingsSaveV1`。讀取舊版存檔時會補上關卡解鎖與通關紀錄欄位，且保留既有金幣、最高分、戰機等級、星級與裝備。
+本遊戲資料只寫入 `astralWorldIdleV1`。既有 Astral Wings 的 localStorage key 不會被刪除或覆寫。損壞的 Astral World 存檔會安全回到預設狀態；設定頁提供匯出、匯入與二次確認的重置。
+
+## 已知限制與後續方向
+
+這是可遊玩的第一版核心，尚未包含多人、帳號、交易、付費內容或伺服器功能。後續可在 `data.js` 增加地圖、怪物、技能、裝備詞綴與寵物，不必重寫戰鬥循環。

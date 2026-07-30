@@ -2,28 +2,52 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>星界戰翼</title>
-  <link rel="stylesheet" href="css/style.css?v=20260728-mobile-home-hub">
-  <link rel="stylesheet" href="css/mobile-hub.css?v=20260728-mobile-home-hub">
-  <link rel="stylesheet" href="css/responsive.css?v=20260728-mobile-home-hub">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0a0c23">
+  <link rel="manifest" href="manifest.webmanifest">
+  <title>Astral World：星界冒險</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main id="app"></main>
-  <img id="ai-craft-roster" src="assets/images/astral-ai-craft-premium.png" alt="" aria-hidden="true" hidden>
-  <img id="ai-craft-refined" src="assets/images/astral-ai-craft-arcade-v3.png" alt="" aria-hidden="true" hidden>
-  <img id="ai-enemies-refined" src="assets/images/astral-ai-enemies-refined.png" alt="" aria-hidden="true" hidden>
-  <img id="ai-pickups-refined" src="assets/images/astral-ai-pickups-refined.png" alt="" aria-hidden="true" hidden>
-  <img id="ai-vfx-roster" src="assets/images/astral-ai-vfx-sprites.png" alt="" aria-hidden="true" hidden>
-  <img id="ai-enemy-vfx-roster" src="assets/images/astral-ai-enemy-vfx.png" alt="" aria-hidden="true" hidden>
-  <img id="ai-enemy-pickups-v2" src="assets/images/astral-ai-enemy-pickups-v2.png" alt="" aria-hidden="true" hidden>
-  <!-- 版本參數可避開舊版 Service Worker 的失敗快取；失敗時顯示可理解訊息，避免空白畫面。 -->
-  <script type="module">
-    import('./js/main.js?v=20260728-mobile-home-hub').catch((error) => {
-      document.querySelector('#app').innerHTML = `<section class="shell panel menu"><h1>星界戰翼</h1><p>載入遊戲核心時發生錯誤：${error.message}</p><button onclick="location.reload()">重新載入</button></section>`;
-    });
-  </script>
+  <main class="phone-shell" id="app">
+    <header class="top-panel">
+      <button class="portrait" data-action="page" data-page="character" aria-label="角色資訊"><span>星</span></button>
+      <div class="level-block"><strong id="playerName">星界冒險者</strong><small>Lv.<b id="level">1</b> 星刃使</small><div class="xp-bar"><i id="xpFill"></i></div></div>
+      <div class="currency"><b>✦ <span id="power">0</span></b><b>◈ <span id="gold">0</span></b></div><button class="settings-button" data-action="page" data-page="settings" aria-label="設定">⚙</button>
+    </header>
+
+    <section class="screen active" data-screen="battle">
+      <div class="battle-meta"><span id="mapName">星光草原</span><span id="stageLabel">1-1</span><button class="boss-button" id="bossButton" data-action="boss">挑戰 Boss</button></div>
+      <canvas id="battleCanvas" aria-label="星界冒險自動戰鬥畫面"></canvas>
+      <section class="combat-readout">
+        <div class="life-row"><span>HP</span><div class="meter hp"><i id="playerHp"></i></div><b id="playerHpText">150 / 150</b></div>
+        <div class="life-row shield-row"><span>盾</span><div class="meter shield"><i id="playerShield"></i></div><b id="playerShieldText">0</b></div>
+        <div class="stage-progress"><span>擊殺 <b id="killProgress">0 / 10</b></span><span id="battleState">自動探索</span></div>
+      </section>
+      <section class="skills" id="skills"></section>
+      <section class="event-log" id="eventLog" aria-live="polite"></section>
+    </section>
+
+    <section class="screen" data-screen="character"><div id="characterPage"></div></section>
+    <section class="screen" data-screen="equipment"><div id="equipmentPage"></div></section>
+    <section class="screen" data-screen="pets"><div id="petsPage"></div></section>
+    <section class="screen" data-screen="maps"><div id="mapsPage"></div></section>
+    <section class="screen" data-screen="inventory"><div id="inventoryPage"></div></section>
+    <section class="screen" data-screen="quests"><div id="questsPage"></div></section>
+    <section class="screen" data-screen="settings"><div id="settingsPage"></div></section>
+
+    <nav class="bottom-nav" aria-label="主要導覽">
+      <button class="active" data-action="page" data-page="battle"><span>⚔</span>戰鬥</button>
+      <button data-action="page" data-page="character"><span>◇</span>角色</button>
+      <button data-action="page" data-page="equipment"><span>⬡</span>裝備</button>
+      <button data-action="page" data-page="pets"><span>✧</span>寵物</button>
+      <button data-action="page" data-page="maps"><span>⌁</span>地圖</button>
+      <button data-action="page" data-page="inventory"><span>▣</span>背包</button>
+      <button data-action="page" data-page="quests"><span>✓</span>任務</button>
+    </nav>
+    <div class="toast" id="toast" role="status"></div>
+    <div class="modal" id="modal" aria-hidden="true"><div class="modal-card" id="modalCard"></div></div>
+  </main>
+  <script type="module" src="src/astral-world/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import { MAPS } from '../src/astral-world/data.js';
+import { addExp, basePlayer, createEquipment, enemyFor, recompute } from '../src/astral-world/core.js';
+
+const state = { player: basePlayer(), equipped: {}, pets: [], activePetId: null };
+recompute(state);
+assert.equal(MAPS.length, 5, 'five maps must be available');
+assert.equal(state.player.level, 1);
+const sword = createEquipment(1, false, () => .4);
+assert.ok(sword.id && sword.stats && sword.power > 0, 'equipment generator must create usable gear');
+state.equipped[sword.slot] = sword;
+const before = state.player.power;
+recompute(state);
+assert.ok(state.player.power > before, 'equipping gear must increase power');
+const monster = enemyFor(MAPS[0].mobs[0], 1, 1, false);
+const boss = enemyFor(MAPS[0].boss, 1, 1, true);
+assert.ok(monster.maxHp > 0 && boss.maxHp > monster.maxHp, 'boss must be stronger than a normal enemy');
+const result = addExp(state, 9999);
+assert.ok(result.levels > 0 && state.player.level > 1, 'experience must level the player');
+console.log('Astral World smoke: PASS');

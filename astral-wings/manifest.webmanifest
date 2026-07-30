@@ -1,0 +1,10 @@
+{
+  "name": "Astral World：星界冒險",
+  "short_name": "Astral World",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0c23",
+  "theme_color": "#0a0c23",
+  "description": "原創手機直式單機放置 RPG。",
+  "icons": []
+}
