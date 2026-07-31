@@ -1,4 +1,4 @@
-import { PET_EVOLUTION_DATA } from './data.js';
+import { PET_EVOLUTION_DATA, PET_VISUALS } from './data.js';
 import { getPetEvolutionStage, normalizePet } from './pet-system.js';
 
 export const PET_CODEX_BALANCE = Object.freeze({
@@ -42,7 +42,7 @@ export const PET_CODEX_REWARDS = Object.freeze([
   { id:'discover_5', type:'discoveries', target:5, gold:10000, label:'收錄 5 種：10,000 金幣' },
   { id:'discover_10', type:'discoveries', target:10, gold:50000, label:'收錄 10 種：50,000 金幣' },
   { id:'discover_15', type:'discoveries', target:15, gold:150000, label:'收錄 15 種：150,000 金幣' },
-  { id:'discover_20', type:'discoveries', target:20, gold:500000, title:'星界馴獸師', label:'全收錄：500,000 金幣與稱號' },
+  { id:'discover_20', type:'discoveries', target:20, gold:500000, title:'星靈收藏家', label:'全收錄：500,000 金幣與稱號' },
   { id:'stars_25', type:'stars', target:25, cores:2, label:'總星級 25：2 進化核心' },
   { id:'stars_50', type:'stars', target:50, cores:5, label:'總星級 50：5 進化核心' },
   { id:'stars_75', type:'stars', target:75, cores:8, label:'總星級 75：8 進化核心' },
@@ -59,6 +59,7 @@ export function ensurePetCodex(state) {
     const current = state.petCodex.species[kind] || emptyEntry();
     state.petCodex.species[kind] = { ...emptyEntry(), ...current, discovered:Boolean(current.discovered), firstCapturedAt:finite(current.firstCapturedAt), highestLevel:finite(current.highestLevel), highestStars:finite(current.highestStars), highestEvolutionRank:Math.min(4, finite(current.highestEvolutionRank)) };
   }
+  if (state.playerTitle === '星界馴獸師') state.playerTitle = '星靈收藏家';
   return state.petCodex;
 }
 
@@ -118,3 +119,13 @@ export function getPetCodexDisplay(kind, record) {
 }
 
 export function getPetCodexStage(pet) { return getPetEvolutionStage(pet); }
+
+export function validatePetCodexData() {
+  const issues=[]; const kinds=Object.keys(PET_CODEX_DATA); const visualKinds=Object.keys(PET_VISUALS);
+  if(kinds.length!==20)issues.push(`expected 20 records, got ${kinds.length}`);
+  for(const kind of kinds){const data=PET_CODEX_DATA[kind], evo=PET_EVOLUTION_DATA[kind];if(!visualKinds.includes(kind))issues.push(`${kind}: missing visual`);if(!evo)issues.push(`${kind}: missing evolution`);if(!Number.isInteger(data.region)||data.region<1||data.region>5)issues.push(`${kind}: invalid region`);if(!['normal','uncommon','rare','epic','boss'].includes(data.rarity))issues.push(`${kind}: invalid rarity`);if(!data.sourceHint?.trim())issues.push(`${kind}: missing source hint`);}
+  if(kinds.filter(kind=>PET_CODEX_DATA[kind].rarity==='boss').length!==5)issues.push('expected 5 boss species');
+  if(kinds.filter(kind=>PET_CODEX_DATA[kind].rarity!=='boss').length!==15)issues.push('expected 15 regular species');
+  const ids=PET_CODEX_REWARDS.map(item=>item.id);if(new Set(ids).size!==ids.length)issues.push('duplicate reward id');if(PET_CODEX_REWARDS.some(item=>!Number.isInteger(item.target)||item.target<1))issues.push('invalid reward target');
+  if(issues.length)console.warn('[Astral World] Pet Codex data validation:',issues);return issues;
+}

@@ -96,7 +96,10 @@ function makeOffline(state, elapsedMs) {
   const baseline = map.base || { exp: map.mobs?.[0]?.[5] || 12, gold: map.mobs?.[0]?.[6] || 6 };
   const cycle = 4.5;
   const battles = Math.floor(seconds / cycle);
-  const multiplier = 0.35;
+  // Offline encounters are ordinary map fights: discovery attack applies, half of the
+  // pet-output bonus is represented in the estimate, and Boss damage is deliberately excluded.
+  const codexCombat = 1 + Math.min(.12, (state.player?.codexAttackBonus || 0) + (state.player?.codexPetDamageBonus || 0) * .5);
+  const multiplier = 0.35 * codexCombat;
   return {
     seconds,
     exp: Math.floor(baseline.exp * battles * multiplier),

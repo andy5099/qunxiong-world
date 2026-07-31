@@ -228,6 +228,8 @@ export class IdleGame {
     const mult = enemy.boss ? 4 : 1; const expResult = addExp(state, enemy.exp * mult * (1 + (state.player.expBonus || 0)));
     state.player.gold += enemy.gold * mult * (1 + (state.player.goldBonus || 0)); state.stats.kills += 1;
     const petExp = grantPetExperience(state, enemy.exp * mult);
+    // Pet levels are collection milestones too; rebuild derived codex bonuses immediately.
+    if (petExp.levels > 0) recompute(state);
     if (petExp.levels > 0) this.event('寵物升級', `${getPetDisplayName(petExp.pet)} 升至 Lv.${petExp.pet.level}。`);
     this.quest('kills', 1); this.quest('bosses', enemy.boss ? 1 : 0);
     if (enemy.boss) { state.stats.bosses += 1; state.evolutionCores = (state.evolutionCores || 0) + 1; this.event('進化核心', 'Boss 掉落了 1 個進化核心。'); }
@@ -275,8 +277,11 @@ export class IdleGame {
 
   capture(enemy) {
     const result = applyPetCapture(this.state, petFromEnemy(enemy));
+    // Capture and duplicate-fragment conversions must update codex state without a page refresh.
+    recompute(this.state);
     if (result.kind === 'duplicate') { this.renderer.pulse('burst', 180, 250, '#aeeaff', 38); this.event('重複獲得寵物', `${result.pet.name} 轉換為 ${result.amount} 碎片，目前 ${result.fragments}。`); return result; }
     const pet = result.pet; if (!this.state.activePetId) this.state.activePetId = pet.id;
+    recompute(this.state);
     this.state.stats.captures += 1; this.quest('captures', 1); this.renderer.pulse('burst', 180, 250, '#ffe17d', 60); this.event('收服成功', `獲得新寵物：${pet.name}！`); return result;
   }
 
