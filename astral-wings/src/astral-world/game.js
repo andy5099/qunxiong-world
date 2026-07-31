@@ -1,7 +1,7 @@
-import { MAPS, SKILLS, SLOTS } from './data.js';
+import { MAPS, PET_SKILL_BALANCE, SKILLS, SLOTS } from './data.js';
 import { addExp, createEquipment, enhanceChance, enhanceCost, enemyFor, petFromEnemy, recompute } from './core.js';
 import { saveState } from './save.js';
-import { applyPetCapture, evolvePet as applyPetEvolution, getPetCombatModifiers, getPetDisplayName, getPetEffectiveAttack, grantPetExperience, starPet as applyPetStar } from './pet-system.js';
+import { applyPetCapture, canCastPetSkill, evolvePet as applyPetEvolution, getPetCombatModifiers, getPetDisplayName, getPetEffectiveAttack, getPetSkillDefinition, getPetSkillPower, grantPetExperience, starPet as applyPetStar } from './pet-system.js';
 
 const pick = list => list[Math.floor(Math.random() * list.length)];
 const qualityRank = { common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5, mythic: 6, astral: 7 };
@@ -22,7 +22,7 @@ export class IdleGame {
   }
 
   newBattle() {
-    return { enemy: null, spawnIn: 0.45, attackIn: 0.35, enemyAttackIn: 0.7, petIn: 1.2, petAction:'summon', petActionIn:.52, petReturnIn:0, petSummonIn:.52, cooldowns: [0, 0, 0, 0], queuedHits: [], playerFlash: 0, playerAction: 'idle', playerActionIn: 0, reviveIn: 0, bossMode: false, killing: false };
+    return { enemy: null, spawnIn: 0.45, attackIn: 0.35, enemyAttackIn: 0.7, petIn: 1.2, petSkillIn:0, petAction:'summon', petActionIn:.52, petReturnIn:0, petSummonIn:.52, cooldowns: [0, 0, 0, 0], queuedHits: [], playerFlash: 0, playerAction: 'idle', playerActionIn: 0, reviveIn: 0, bossMode: false, killing: false };
   }
 
   start() { if (!this.running) { this.running = true; this.last = performance.now(); this.frame = requestAnimationFrame(this._bound); } }
@@ -50,25 +50,26 @@ export class IdleGame {
       this.flush(); return;
     }
     enemy.spawnIn = Math.max(0, (enemy.spawnIn || 0) - dt);
+    this.updateEnemyEffects(enemy, dt);
     enemy.actionIn = Math.max(0, (enemy.actionIn || 0) - dt);
     if (enemy.action === 'spawn' && enemy.spawnIn <= 0) enemy.action = 'idle';
     else if (enemy.actionIn <= 0 && enemy.action !== 'spawn') enemy.action = 'idle';
     enemy.hit = Math.max(0, enemy.hit - dt); battle.playerActionIn = Math.max(0, battle.playerActionIn - dt); if (battle.playerActionIn <= 0 && battle.playerAction !== 'downed') battle.playerAction = 'idle';
     battle.playerFlash = Math.max(0, battle.playerFlash - dt);
-    battle.attackIn -= dt; battle.enemyAttackIn -= dt; battle.petIn -= dt;
+    battle.attackIn -= dt; battle.enemyAttackIn -= dt; battle.petIn -= dt; battle.petSkillIn=Math.max(0,(battle.petSkillIn||0)-dt);
     battle.petActionIn = Math.max(0, (battle.petActionIn || 0) - dt); battle.petReturnIn = Math.max(0, (battle.petReturnIn || 0) - dt); battle.petSummonIn = Math.max(0, (battle.petSummonIn || 0) - dt);
-    if (battle.petAction === 'attack' && battle.petActionIn <= 0) { battle.petAction = 'return'; battle.petReturnIn = .26; }
+    if ((battle.petAction === 'attack' || battle.petAction === 'skill') && battle.petActionIn <= 0) { battle.petAction = 'return'; battle.petReturnIn = .26; }
     else if ((battle.petAction === 'return' && battle.petReturnIn <= 0) || (battle.petAction === 'celebrate' && battle.petActionIn <= 0) || (battle.petAction === 'summon' && battle.petSummonIn <= 0)) battle.petAction = 'idle';
     for (let i = 0; i < battle.cooldowns.length; i += 1) battle.cooldowns[i] = Math.max(0, battle.cooldowns[i] - dt);
     for (let i = battle.queuedHits.length - 1; i >= 0; i -= 1) {
       const hit = battle.queuedHits[i]; hit.in -= dt;
-      if (hit.in <= 0) { this.damageEnemy(hit.damage, hit.label, hit.color, hit.critical); battle.queuedHits.splice(i, 1); }
+      if (hit.in <= 0) { if (battle.enemy?.id === hit.enemyId && battle.enemy.alive) this.damageEnemy(hit.damage, hit.label, hit.color, hit.critical, hit.source); battle.queuedHits.splice(i, 1); }
     }
     if (battle.attackIn <= 0) { this.basicAttack(); battle.attackIn += Math.max(.34, state.player.attackSpeed); }
     this.autoSkills();
-    if (battle.petIn <= 0) { const pet = state.pets.find(item => item.id === state.activePetId); this.petAttack(); battle.petIn += 2.1 * getPetCombatModifiers(pet).intervalMultiplier; }
+    if (battle.petIn <= 0 && battle.petAction !== 'skill') { const pet = state.pets.find(item => item.id === state.activePetId); this.petAttack(); battle.petIn += 2.1 * getPetCombatModifiers(pet).intervalMultiplier; }
     if (enemy.alive && battle.enemyAttackIn <= .28 && enemy.action === 'idle') { enemy.action = 'attack'; enemy.actionIn = .32; }
-    if (enemy.alive && battle.enemyAttackIn <= 0) { this.damagePlayer(enemy.attack); battle.enemyAttackIn += enemy.attackSpeed; }
+    if (enemy.alive && battle.enemyAttackIn <= 0) { const slow=enemy.effects?.attackSlow?.value||0; const reduction=enemy.effects?.damageReduction?.value||0; this.damagePlayer(enemy.attack*(1-reduction)); battle.enemyAttackIn += enemy.attackSpeed * (1 + slow); }
     this.flush();
   }
 
@@ -108,24 +109,51 @@ export class IdleGame {
       this.renderer.pulse('shield', 110, 315, '#a4d8ff', 44);
       this.event(skill.name, `獲得 ${Math.floor(shield)} 點星光護盾。`);
     } else if (index === 1) {
-      for (let hit = 0; hit < 3; hit += 1) this.battle.queuedHits.push({ in: .1 + hit * .18, damage: this.state.player.attack * power, label: skill.name, color: '#9a8cff' });
+      for (let hit = 0; hit < 3; hit += 1) this.battle.queuedHits.push({ in: .1 + hit * .18, damage: this.state.player.attack * power, label: skill.name, color: '#9a8cff', enemyId:this.battle.enemy.id, source:'playerSkill' });
       this.renderer.pulse('slash', 267, 270, '#a998ff', 46);
       this.event(skill.name, '三段星光斬擊依序命中。');
     } else {
       let damage = this.state.player.attack * power;
       if (index === 3 && this.battle.enemy.hp / this.battle.enemy.maxHp < .25) damage *= 1.5;
-      this.damageEnemy(damage, skill.name, index === 3 ? '#ffd06f' : '#75dcff', index === 3);
+      this.damageEnemy(damage, skill.name, index === 3 ? '#ffd06f' : '#75dcff', index === 3, 'playerSkill');
       this.renderer.pulse(index === 3 ? 'burst' : 'slash', 275, 265, index === 3 ? '#ffd16a' : '#67d8ff', index === 3 ? 65 : 42);
       this.event(skill.name, `Lv.${level} 技能已施放。`);
     }
     return true;
   }
 
-  damageEnemy(raw, label, color, forcedCritical = false) {
+  queuePetHit(pet, delay, damage, label, color, critical = false, source = 'petSkill') {
     const enemy = this.battle.enemy;
     if (!enemy?.alive) return;
-    if (label !== '星刃普攻') raw *= 1 + (this.state.player.skillDamage || 0);
+    this.battle.queuedHits.push({ in:delay, damage, label, color, critical, enemyId:enemy.id, source });
+  }
+
+  updateEnemyEffects(enemy, dt) {
+    if (!enemy.effects) return;
+    for (const [key, effect] of Object.entries(enemy.effects)) {
+      effect.remaining -= dt;
+      if (key === 'burn') {
+        effect.tickIn -= dt;
+        if (effect.tickIn <= 0 && enemy.alive) { effect.tickIn += 1; this.damageEnemy(effect.damage, '灼燒', '#ff855d', false, 'petDot'); }
+      }
+      if (effect.remaining <= 0) delete enemy.effects[key];
+    }
+  }
+
+  applyEnemyEffect(key, value, duration, source, extra = {}) {
+    const enemy=this.battle.enemy; if (!enemy?.alive) return;
+    enemy.effects ||= {}; const prior=enemy.effects[key];
+    const bounded = key==='vulnerability' ? Math.min(PET_SKILL_BALANCE.vulnerabilityCap,value) : key==='attackSlow' ? Math.min(PET_SKILL_BALANCE.slowCap,value) : value;
+    // Effects refresh instead of stacking, and slow/reduction retain only their strongest value.
+    enemy.effects[key]={ value:(key==='attackSlow'||key==='damageReduction') ? Math.max(prior?.value||0,bounded) : bounded, remaining:Math.max(prior?.remaining||0,duration), source, ...extra };
+  }
+
+  damageEnemy(raw, label, color, forcedCritical = false, source = 'player') {
+    const enemy = this.battle.enemy;
+    if (!enemy?.alive) return;
+    if (source === 'playerSkill') raw *= 1 + (this.state.player.skillDamage || 0);
     if (enemy.boss) raw *= 1 + (this.state.player.bossDamage || 0);
+    if (enemy.effects?.vulnerability) raw *= 1 + enemy.effects.vulnerability.value;
     const reduced = Math.max(1, raw * (100 / (100 + enemy.defense)));
     enemy.hp = Math.max(0, enemy.hp - reduced); enemy.hit = .12; enemy.action = 'hurt'; enemy.actionIn = .14;
     this.renderer.damage(reduced, 278, 242, forcedCritical, color); this.renderer.pulse('hit', 278, 268, color, forcedCritical ? 38 : 20);
@@ -151,10 +179,39 @@ export class IdleGame {
     if (critical) damage *= 1.5;
     this.battle.petAction = 'attack'; this.battle.petActionIn = .36; this.battle.petReturnIn = .26;
     this.renderer.pulse('slash', 190, 280, '#ffd979', 22 + pet.evolutionRank * 4);
-    this.battle.queuedHits.push({ in:.19, damage, label:`${getPetDisplayName(pet)} 協同攻擊`, color:critical ? '#ffdf7d' : '#ffd979', critical });
-    if (modifiers.extraHit) this.battle.queuedHits.push({ in:.31, damage:damage * modifiers.extraHit, label:'進化追擊', color:'#bd9cff', critical:false });
-    if (modifiers.shieldRatio) this.state.player.shield = Math.min(this.state.player.maxHp * .65, this.state.player.shield + this.state.player.maxHp * modifiers.shieldRatio);
+    this.queuePetHit(pet,.19,damage,`${getPetDisplayName(pet)} 協同攻擊`,critical ? '#ffdf7d' : '#ffd979',critical,'petBasic');
+    if (modifiers.extraHit) this.queuePetHit(pet,.31,damage * modifiers.extraHit,'進化追擊','#bd9cff',false,'petPassive');
+    if (modifiers.shieldRatio) this.state.player.shield = Math.min(this.state.player.maxHp * PET_SKILL_BALANCE.shieldCap, this.state.player.shield + this.state.player.maxHp * modifiers.shieldRatio);
+    pet.skillEnergy = Math.min(PET_SKILL_BALANCE.maxEnergy, (pet.skillEnergy || 0) + PET_SKILL_BALANCE.energyPerAttack);
+    const index=this.state.pets.findIndex(item=>item.id===pet.id); if(index>=0)this.state.pets[index]=pet;
+    if (canCastPetSkill(pet) && this.battle.petSkillIn <= 0) this.castPetSkill(pet);
     return true;
+  }
+
+  castPetSkill(pet) {
+    const enemy=this.battle.enemy; const skill=getPetSkillDefinition(pet); const rank=pet.evolutionRank||0;
+    if (!enemy?.alive || rank < skill.unlockRank || (pet.skillEnergy||0) < skill.energy || this.battle.petSkillIn > 0) return false;
+    pet.skillEnergy=0; this.battle.petSkillIn=skill.cooldown; this.battle.petAction='skill'; this.battle.petActionIn=Math.max(.42, skill.delay || .42); this.battle.petReturnIn=.26;
+    const index=this.state.pets.findIndex(item=>item.id===pet.id); if(index>=0)this.state.pets[index]=pet;
+    const modifiers=getPetCombatModifiers(pet); let damage=getPetEffectiveAttack(pet)*(1+(this.state.player.petDamage||0))*modifiers.damageMultiplier*getPetSkillPower(pet);
+    if(enemy.boss) damage*=1+modifiers.bossDamage+(skill.bossBonus||0);
+    const extra = 1 + Math.max(0,rank-1)*.08;
+    const queue=(delay, amount, suffix='', critical=false)=>this.queuePetHit(pet,delay,amount*extra,`${getPetDisplayName(pet)}・${skill.name}${suffix}`,skill.visual==='fire'?'#ff8e62':skill.visual==='frost'?'#bdf6ff':skill.visual==='beam'?'#e3b5ff':'#ffe18a',critical,'petSkill');
+    this.renderer.pulse(skill.visual,190,280,skill.visual==='fire'?'#ff825f':skill.visual==='frost'?'#b7efff':skill.visual==='beam'?'#d8b7ff':'#ffe18a',46+rank*6);
+    if(skill.effect==='multiStrike'){const hits=skill.hits||3;for(let i=0;i<hits;i+=1)queue(.16+i*.15,damage*(i===hits-1?(skill.secondMultiplier||1):1),` ${i+1}/${hits}`);}
+    else if(skill.effect==='splash'){queue(.18,damage);queue(.34,damage*(skill.followUp||.35),' 追擊');}
+    else if(skill.effect==='critStrike'||skill.effect==='critFollowUp'){const critical=Math.random()<Math.min(.5,modifiers.crit+(skill.critBonus||0));queue(.18,damage,'',critical);if(critical&&skill.followUp)queue(.36,damage*skill.followUp,' 冰霜追擊');}
+    else if(skill.effect==='shieldStrike'){queue(.18,damage);this.state.player.shield=Math.min(this.state.player.maxHp*PET_SKILL_BALANCE.shieldCap,this.state.player.shield+this.state.player.maxHp*(skill.shield||0));}
+    else if(skill.effect==='healStrike'){queue(.18,damage);this.state.player.hp=Math.min(this.state.player.maxHp,this.state.player.hp+this.state.player.maxHp*(skill.heal||0));}
+    else if(skill.effect==='healShield'){queue(.18,damage);this.state.player.hp=Math.min(this.state.player.maxHp,this.state.player.hp+this.state.player.maxHp*(skill.heal||0));this.state.player.shield=Math.min(this.state.player.maxHp*PET_SKILL_BALANCE.shieldCap,this.state.player.shield+this.state.player.maxHp*(skill.shield||0));}
+    else if(skill.effect==='vulnerabilityStrike'){queue(.18,damage);this.applyEnemyEffect('vulnerability',skill.vulnerability,skill.duration,pet.id);}
+    else if(skill.effect==='burnStrike'||skill.effect==='bossBurnStrike'){queue(.18,damage);this.applyEnemyEffect('burn',0,skill.duration,pet.id,{damage:damage*(skill.burn||.3),tickIn:1});}
+    else if(skill.effect==='hasteStrike'){for(let i=0;i<(skill.hits||2);i+=1)queue(.14+i*.15,damage,` ${i+1}/${skill.hits||2}`);this.battle.petIn=Math.min(this.battle.petIn,.5);}
+    else if(skill.effect==='slowStrike'){queue(.18,damage);this.applyEnemyEffect('attackSlow',skill.slow,skill.duration,pet.id);}
+    else if(skill.effect==='controlStrike'){queue(.18,damage);this.applyEnemyEffect('attackSlow',skill.slow,skill.duration,pet.id);this.applyEnemyEffect('damageReduction',skill.damageReduction,skill.duration,pet.id);}
+    else if(skill.effect==='delayedBeam'||skill.effect==='delayedBossBeam'){queue(skill.delay||.5,damage);}
+    else if(skill.effect==='bossStrike'){queue(.18,damage);}
+    this.event('寵物技能',`${getPetDisplayName(pet)} 施放「${skill.name}」。`); return true;
   }
 
   killEnemy() {

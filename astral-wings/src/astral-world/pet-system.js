@@ -1,4 +1,4 @@
-import { PET_EVOLUTION_COST, PET_EVOLUTION_DATA, PET_SOURCE_KINDS, PET_STAR_BALANCE, PET_VISUALS } from './data.js';
+import { PET_EVOLUTION_COST, PET_EVOLUTION_DATA, PET_SKILL_BALANCE, PET_SKILL_DATA, PET_SOURCE_KINDS, PET_STAR_BALANCE, PET_VISUALS } from './data.js';
 
 const bossKinds = new Set(['horn', 'guardian', 'dragon', 'queen', 'destroyer']);
 const clampStars = value => Math.max(1, Math.min(PET_STAR_BALANCE.maxStars, Math.floor(Number(value) || 1)));
@@ -24,6 +24,15 @@ export function getPetEvolutionStage(pet = {}) {
 }
 
 export function getPetDisplayName(pet = {}) { return getPetEvolutionStage(pet).name; }
+export function getPetSkillRank(pet = {}) { return Math.max(0, clampEvolution(pet.evolutionRank)); }
+export function getPetSkillDefinition(pet = {}) { return PET_SKILL_DATA[pet.sourceKind] || PET_SKILL_DATA.slime; }
+export function getPetSkillPower(pet = {}) {
+  const rank = getPetSkillRank(pet);
+  const skill = getPetSkillDefinition(pet);
+  // E1 is a normal cast; every later evolution strengthens the same skill.
+  return rank < skill.unlockRank ? 0 : skill.power * (1 + (rank - skill.unlockRank) * .28);
+}
+export function canCastPetSkill(pet = {}) { const skill=getPetSkillDefinition(pet); return getPetSkillRank(pet) >= skill.unlockRank && (Number(pet.skillEnergy) || 0) >= skill.energy; }
 
 export function getPetEvolutionAbilities(pet = {}) {
   const data = PET_EVOLUTION_DATA[pet.sourceKind] || PET_EVOLUTION_DATA.slime;
@@ -53,7 +62,7 @@ export function normalizePet(pet = {}) {
   const baseHpBonus = round(pet.baseHpBonus ?? (pet.hpBonus || 0) / multiplier);
   const captureTier = pet.captureTier || (bossKinds.has(sourceKind) ? 'boss' : 'normal');
   const evolutionRank = clampEvolution(pet.evolutionRank);
-  const normalized = { ...pet, id:pet.id || speciesId, speciesId, sourceKind, captureTier, visualType:pet.visualType || visual.visualType, species:pet.species || visual.species, palette:pet.palette || visual.palette, visualTheme:PET_EVOLUTION_DATA[sourceKind]?.visualTheme || 'astral', evolutionRank, evolutionStage:evolutionRank, evolutionAppearance:evolutionRank, evolutionSkills:getPetEvolutionAbilities({ ...pet, sourceKind, evolutionRank }).map(ability => ability.id), stars, baseAttack, baseHpBonus };
+  const normalized = { ...pet, id:pet.id || speciesId, speciesId, sourceKind, captureTier, visualType:pet.visualType || visual.visualType, species:pet.species || visual.species, palette:pet.palette || visual.palette, visualTheme:PET_EVOLUTION_DATA[sourceKind]?.visualTheme || 'astral', evolutionRank, evolutionStage:evolutionRank, evolutionAppearance:evolutionRank, evolutionSkills:getPetEvolutionAbilities({ ...pet, sourceKind, evolutionRank }).map(ability => ability.id), skillEnergy:Math.min(PET_SKILL_BALANCE.maxEnergy, Math.max(0, Number(pet.skillEnergy) || 0)), skillVersion:1, stars, baseAttack, baseHpBonus };
   normalized.attack = getPetEffectiveAttack(normalized);
   normalized.hpBonus = getPetEffectiveHpBonus(normalized);
   return normalized;

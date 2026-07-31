@@ -128,7 +128,7 @@ export class BattleRenderer {
   drawPet(ctx, state, battle, x, y) {
     const pet = state.pets.find(item => item.id === state.activePetId);
     if (!pet) return;
-    drawBattlePet(ctx, pet, { time:this.time, action:battle?.petAction, actionIn:battle?.petActionIn, returnIn:battle?.petReturnIn, summonIn:battle?.petSummonIn, powerSave:state.settings?.powerSave }, x, y);
+    drawBattlePet(ctx, pet, { time:this.time, action:battle?.petAction, actionIn:battle?.petActionIn, returnIn:battle?.petReturnIn, summonIn:battle?.petSummonIn, skillType:battle?.petAction==='skill' ? 'active' : null, skillProgress:battle?.petActionIn, powerSave:state.settings?.powerSave }, x, y);
   }
 
   drawEnemy(ctx, enemy, map) {
@@ -179,6 +179,10 @@ export class BattleRenderer {
       ctx.save(); ctx.globalAlpha = ratio; ctx.strokeStyle = effect.color; ctx.fillStyle = effect.color; ctx.lineWidth = 2;
       if (effect.type === 'slash') { ctx.beginPath(); ctx.arc(effect.x, effect.y, effect.size * (1.35 - ratio), -.8, 1.7); ctx.stroke(); }
       else if (effect.type === 'burst') { ctx.beginPath(); ctx.arc(effect.x, effect.y, effect.size * (1.2 - ratio), 0, Math.PI * 2); ctx.stroke(); for (let i = 0; i < 7; i += 1) { const a = i * .9 + this.time; ctx.fillRect(effect.x + Math.cos(a) * effect.size * (1 - ratio), effect.y + Math.sin(a) * effect.size * (1 - ratio), 3, 3); } }
+      else if (effect.type === 'beam') { ctx.lineWidth=5;ctx.globalAlpha=ratio*.75;ctx.beginPath();ctx.moveTo(effect.x-4,effect.y);ctx.lineTo(278,effect.y-18);ctx.stroke();ctx.lineWidth=1;ctx.strokeStyle='#fff';ctx.stroke(); }
+      else if (effect.type === 'fire') { for(let i=0;i<(this.scene?.state?.settings?.powerSave?3:7);i+=1){const a=i*.9+this.time*4;ctx.fillRect(effect.x+Math.cos(a)*effect.size*(1-ratio),effect.y+Math.sin(a)*effect.size*.45,4,7);} }
+      else if (effect.type === 'frost') { for(let i=0;i<6;i+=1){const a=i*Math.PI/3;ctx.beginPath();ctx.moveTo(effect.x,effect.y);ctx.lineTo(effect.x+Math.cos(a)*effect.size*(1-ratio),effect.y+Math.sin(a)*effect.size*(1-ratio));ctx.stroke();} }
+      else if (effect.type === 'shield' || effect.type === 'heal') { ctx.beginPath();ctx.arc(effect.x,effect.y,effect.size*(1.15-ratio*.35),0,Math.PI*2);ctx.stroke();if(effect.type==='heal'){ctx.globalAlpha*=.7;ctx.fillText?.('✦',effect.x,effect.y-effect.size*(1-ratio));} }
       else if (effect.type === 'evolution') { ctx.globalAlpha = Math.min(1, ratio * 1.7); ctx.fillStyle = rgba(effect.color, .16); ctx.fillRect(effect.x - effect.size * .22, effect.y - effect.size * 1.1, effect.size * .44, effect.size * 1.45); for (let i = 0; i < 3; i += 1) { ctx.beginPath(); ctx.arc(effect.x, effect.y + 18, effect.size * (.22 + i * .16) * (1 - ratio * .35), 0, Math.PI * 2); ctx.stroke(); } for (let i = 0; i < 8; i += 1) { const a = this.time * 2.8 + i * Math.PI / 4; ctx.fillRect(effect.x + Math.cos(a) * effect.size * .5, effect.y - 20 + Math.sin(a) * effect.size * .42, 3, 3); } }
       else { ctx.beginPath(); ctx.arc(effect.x, effect.y, effect.size * (1.1 - ratio), 0, Math.PI * 2); ctx.stroke(); }
       ctx.restore();

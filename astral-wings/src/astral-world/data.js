@@ -1,5 +1,5 @@
 export const SAVE_KEY = 'astralWorldIdleV1';
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 
 export const BALANCE = {
   attackInterval: 1.2,
@@ -111,3 +111,38 @@ export const PET_EVOLUTION_DATA = Object.fromEntries(Object.entries(PET_EVOLUTIO
     ability: rank ? definition.abilities[rank - 1] : null,
   })),
 }]));
+
+// Active pet skills are intentionally data-only. The combat system switches on `effect`,
+// never translated UI names, so new species can be added without touching the renderer.
+export const PET_SKILL_BALANCE = {
+  maxEnergy: 100,
+  energyPerAttack: 25,
+  minimumCastInterval: 1,
+  shieldCap: .65,
+  vulnerabilityCap: .25,
+  slowCap: .35,
+};
+
+const petSkill = (id, name, description, effect, power, visual, extra = {}) => ({ id, name, description, effect, power, visual, unlockRank:1, energy:PET_SKILL_BALANCE.maxEnergy, cooldown:PET_SKILL_BALANCE.minimumCastInterval, ...extra });
+export const PET_SKILL_DATA = {
+  slime:petSkill('slime_burst','晶液爆發','範圍衝擊後追加晶液追擊。','splash',1.6,'burst',{followUp:.35}),
+  rabbit:petSkill('rabbit_kick','月隕飛踢','高暴擊率的月光飛踢。','critStrike',1.8,'slash',{critBonus:.35}),
+  beetle:petSkill('beetle_fortress','甲殼堡壘','重擊並展開甲殼護盾。','shieldStrike',.9,'shield',{shield:.16}),
+  wolf:petSkill('wolf_claws','狼群連爪','三段連續爪擊。','multiStrike',.62,'slash',{hits:3}),
+  flower:petSkill('flower_bloom','星庭綻放','花光攻擊並治療冒險者。','healStrike',.65,'heal',{heal:.12}),
+  spirit:petSkill('spirit_ring','秘法星環','兩段秘法星光追擊。','multiStrike',.72,'orbit',{hits:2,secondMultiplier:1.25}),
+  lizard:petSkill('lizard_break','熔核破甲','熔核衝擊並施加易傷。','vulnerabilityStrike',1.2,'impact',{vulnerability:.14,duration:4}),
+  lava:petSkill('lava_burn','焚星灼燒','火球命中後留下燃燒。','burnStrike',1.05,'fire',{burn:.32,ticks:3,duration:3}),
+  hawk:petSkill('hawk_dive','流火俯衝','高速俯衝兩次，短暫加速。','hasteStrike',.85,'charge',{hits:2,haste:.26,duration:3}),
+  ice:petSkill('ice_burst','寒晶爆裂','冰晶爆裂並降低敵人攻速。','slowStrike',1.05,'frost',{slow:.22,duration:4}),
+  snowwolf:petSkill('snowwolf_hunt','永冬獵殺','高暴擊冰霜獵殺，暴擊追加追擊。','critFollowUp',1.45,'frost',{critBonus:.30,followUp:.42}),
+  golem:petSkill('golem_bastion','冰岩壁壘','冰岩護盾配合沉重一擊。','shieldStrike',1.1,'shield',{shield:.24}),
+  ruin:petSkill('ruin_beam','古代裁決光束','短暫充能後的裁決光束。','delayedBeam',1.75,'beam',{delay:.5}),
+  orb:petSkill('orb_pulse','奇點脈衝','主脈衝後追加兩次星核命中。','multiStrike',1.15,'orbit',{hits:3,followUp:.36}),
+  mech:petSkill('mech_barrage','超頻彈幕','超頻後的四段彈幕。','multiStrike',.55,'charge',{hits:4}),
+  horn:petSkill('horn_smash','星冠重擊','對 Boss 特別有效的震地重擊。','bossStrike',2.0,'impact',{bossBonus:.32}),
+  guardian:petSkill('guardian_blessing','世界樹庇護','回復生命並生成世界樹護盾。','healShield',.45,'heal',{heal:.14,shield:.16}),
+  dragon:petSkill('dragon_breath','滅世龍息','高額龍息並附加燃燒。','bossBurnStrike',1.85,'fire',{burn:.36,ticks:3,duration:3,bossBonus:.22}),
+  queen:petSkill('queen_judgement','永冬裁決','冰霜裁決，降低攻速與傷害。','controlStrike',1.35,'frost',{slow:.25,damageReduction:.18,duration:4}),
+  destroyer:petSkill('destroyer_beam','星界毀滅光束','充能後施放的高傷害 Boss 光束。','delayedBossBeam',2.25,'beam',{delay:.72,bossBonus:.35}),
+};
