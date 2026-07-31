@@ -2,6 +2,7 @@ import { MAPS, PET_SKILL_BALANCE, SKILLS, SLOTS } from './data.js';
 import { addExp, createEquipment, enhanceChance, enhanceCost, enemyFor, petFromEnemy, recompute } from './core.js';
 import { saveState } from './save.js';
 import { applyPetCapture, canCastPetSkill, evolvePet as applyPetEvolution, getPetCombatModifiers, getPetDisplayName, getPetEffectiveAttack, getPetSkillDefinition, getPetSkillProfile, grantPetExperience, starPet as applyPetStar } from './pet-system.js';
+import { ensurePetTeam, setPetTeamSlot as assignPetTeamSlot } from './pet-team-system.js';
 
 const pick = list => list[Math.floor(Math.random() * list.length)];
 const qualityRank = { common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5, mythic: 6, astral: 7 };
@@ -9,6 +10,7 @@ const qualityRank = { common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5, my
 export class IdleGame {
   constructor(state, renderer, callbacks = {}) {
     this.state = state;
+    ensurePetTeam(this.state);
     this.renderer = renderer;
     this.callbacks = callbacks;
     this.running = false;
@@ -88,6 +90,10 @@ export class IdleGame {
     this.battle.enemy.alive = true;
     this.battle.enemyAttackIn = isBoss ? 1.25 : .85;
     this.battle.bossMode = isBoss;
+    if (this.state.player.petSupportShieldRatio) {
+      const shieldCap = this.state.player.maxHp * PET_SKILL_BALANCE.shieldCap;
+      this.state.player.shield = Math.min(shieldCap, this.state.player.shield + this.state.player.maxHp * this.state.player.petSupportShieldRatio);
+    }
     this.event(isBoss ? '區域 Boss 降臨' : this.battle.enemy.elite ? '菁英怪物出現' : '遭遇怪物', this.battle.enemy.name);
   }
 
@@ -95,6 +101,9 @@ export class IdleGame {
     this.battle.playerAction = 'attack'; this.battle.playerActionIn = .24;
     const critical = Math.random() < this.state.player.crit;
     this.damageEnemy(this.state.player.attack * (critical ? this.state.player.critDamage : 1), '星刃普攻', critical ? '#ffe38b' : '#8cdfff', critical);
+    if (this.battle.enemy?.alive && this.state.player.petSupportExtraHit) {
+      this.damageEnemy(this.state.player.attack * this.state.player.petSupportExtraHit, '支援追擊', '#c7a8ff', false, 'petSupport');
+    }
   }
 
   autoSkills() { for (let i = 0; i < SKILLS.length; i += 1) { if (['kill_first','manual_skill'].includes(this.state.objectives?.currentId) && i === 0) continue; if (this.state.skillAuto[i] && this.battle.cooldowns[i] <= 0) this.castSkill(i); } }
@@ -278,9 +287,9 @@ export class IdleGame {
   capture(enemy) {
     const result = applyPetCapture(this.state, petFromEnemy(enemy));
     // Capture and duplicate-fragment conversions must update codex state without a page refresh.
-    recompute(this.state);
-    if (result.kind === 'duplicate') { this.renderer.pulse('burst', 180, 250, '#aeeaff', 38); this.event('重複獲得寵物', `${result.pet.name} 轉換為 ${result.amount} 碎片，目前 ${result.fragments}。`); return result; }
-    const pet = result.pet; if (!this.state.activePetId) this.state.activePetId = pet.id;
+    if (result.kind === 'duplicate') { recompute(this.state); this.renderer.pulse('burst', 180, 250, '#aeeaff', 38); this.event('重複獲得寵物', `${result.pet.name} 轉換為 ${result.amount} 碎片，目前 ${result.fragments}。`); return result; }
+    const pet = result.pet;
+    if (!this.state.petTeam?.main) assignPetTeamSlot(this.state, pet.id, 'main');
     recompute(this.state);
     this.state.stats.captures += 1; this.quest('captures', 1); this.renderer.pulse('burst', 180, 250, '#ffe17d', 60); this.event('收服成功', `獲得新寵物：${pet.name}！`); return result;
   }
@@ -294,7 +303,17 @@ export class IdleGame {
   equipBest() { let changed=0; for(const item of this.state.inventory){const current=this.state.equipped[item.slot];const score=(entry)=>(entry?.power||0)*(1+(entry?.enhance||0)*.08);if(!current||score(item)>score(current)){this.state.equipped[item.slot]=item;changed+=1;}}if(changed){recompute(this.state);this.event('最佳裝備',`已穿戴 ${changed} 件更強裝備。`);}return changed; }
   toggleSkill(index) { this.state.skillAuto[index] = !this.state.skillAuto[index]; return this.state.skillAuto[index]; }
   upgradeSkill(index) { const price = 100 * (this.state.skills[index] || 1); if (this.state.player.gold < price) return false; this.state.player.gold -= price; this.state.skills[index] += 1; recompute(this.state); return true; }
-  setActivePet(id) { if (!this.state.pets.some(pet => pet.id === id)) return false; this.state.activePetId = id; this.battle.petBuffs={}; this.battle.queuedHits=this.battle.queuedHits.filter(hit=>!String(hit.source||'').startsWith('pet')); this.battle.petAction = 'summon'; this.battle.petSummonIn = .52; this.battle.petActionIn = .52; this.battle.petReturnIn = 0; recompute(this.state); return true; }
+  setActivePet(id) { return this.setPetTeamSlot(id, 'main'); }
+  setPetTeamSlot(id, slot) {
+    const result = assignPetTeamSlot(this.state, id, slot);
+    if (!result.ok) return false;
+    this.battle.petBuffs = {};
+    this.battle.queuedHits = this.battle.queuedHits.filter(hit => !String(hit.source || '').startsWith('pet'));
+    this.battle.petAction = this.state.petTeam.main ? 'summon' : 'idle';
+    this.battle.petSummonIn = .52; this.battle.petActionIn = .52; this.battle.petReturnIn = 0;
+    recompute(this.state); saveState(this.state);
+    return true;
+  }
   starPet(id) {
     if (Date.now() < this.petStarLockedUntil) return { ok:false, reason:'busy' };
     const result = applyPetStar(this.state, id);

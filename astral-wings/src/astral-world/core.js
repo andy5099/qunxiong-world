@@ -1,6 +1,7 @@
 import { AFFIXES, BALANCE, MONSTER_VISUALS, QUALITY, SLOTS } from './data.js';
 import { createPetFromEnemy, getPetEffectiveAttack, getPetEffectiveHpBonus, normalizePet } from './pet-system.js';
 import { getPetCodexBonuses, syncPetCodex } from './pet-codex-system.js';
+import { ensurePetTeam, getPetSupportBonuses } from './pet-team-system.js';
 
 export { getPetEffectiveAttack, getPetEffectiveHpBonus, normalizePet } from './pet-system.js';
 
@@ -13,6 +14,7 @@ export function basePlayer(level = 1) {
 }
 
 export function recompute(state) {
+  ensurePetTeam(state);
   syncPetCodex(state);
   const prior = state.player || basePlayer();
   const player = basePlayer(prior.level || 1);
@@ -24,8 +26,20 @@ export function recompute(state) {
     for (const affix of item?.affixes || []) { if(affix.mode==='percent') percent[affix.key]=(percent[affix.key]||0)+affix.value; else player[affix.key]=(player[affix.key]||0)+affix.value; }
   }
   for(const [key,value] of Object.entries(percent)) player[key]*=1+value;
-  const pet = state.pets?.find(entry => entry.id === state.activePetId);
+  const pet = state.pets?.find(entry => entry.id === state.petTeam.main);
+  const team = getPetSupportBonuses(state);
   if (pet) { player.attack += getPetEffectiveAttack(pet); player.maxHp += getPetEffectiveHpBonus(pet); }
+  player.petSupportAttack = team.attack;
+  player.petSupportHp = team.hp;
+  player.attack += team.attack;
+  player.maxHp += team.hp;
+  player.attack *= team.attackMultiplier;
+  player.attackSpeed *= team.intervalMultiplier;
+  player.crit += team.crit;
+  player.bossDamage = (player.bossDamage || 0) + team.bossDamage;
+  player.petSupportExtraHit = team.extraHit;
+  player.petSupportShieldRatio = team.shieldRatio;
+  player.regen = (player.regen || 0) + player.maxHp * team.regenRatio;
   const codex = getPetCodexBonuses(state);
   player.codexAttackBonus = codex.attack;
   player.codexHpBonus = codex.hp;
