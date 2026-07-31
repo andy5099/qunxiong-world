@@ -31,12 +31,33 @@ function drawSlimeE4(ctx, pet, state) { drawSlimeE3(ctx,pet,state); ctx.save();c
 function drawSlimeEvolution(ctx, pet, state) { [drawSlimeE0,drawSlimeE1,drawSlimeE2,drawSlimeE3,drawSlimeE4][Math.max(0,Math.min(4,pet.evolutionRank||0))](ctx,pet,state); }
 
 function drawEvolutionForm(ctx, pet, state) {
-  const rank=Math.max(0,Math.min(4,pet.evolutionRank||0)); if(!rank || pet.visualType==='slimePet'||pet.visualType==='iceSlimePet')return;
-  const glow=['#8fffd0','#ffe070','#c29aff','#ff91dc'][rank-1];ctx.save();ctx.globalAlpha=state.powerSave ? .2 : .55;
-  if(rank>=1){for(const side of[-1,1])poly(ctx,[[side*11,-7],[side*20,-26],[side*26,-5]],glow,'#f8fbff');}
-  if(rank>=2){poly(ctx,[[-12,-20],[-7,-34],[-1,-25],[5,-38],[10,-24],[16,-32],[17,-16]],'#ffd86f','#fff0b0');}
-  if(rank>=3){for(const side of[-1,1])poly(ctx,[[side*12,1],[side*39,-16],[side*31,17],[side*13,13]],'#ba9cff','#f0dfff');}
-  if(rank>=4){ctx.strokeStyle='#ff8dde';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,1,33+Math.sin(state.time*3)*3,0,TAU);ctx.stroke();disc(ctx,0,-42,4,'#fff3a6');}
+  const rank=Math.max(0,Math.min(4,pet.evolutionRank||0)); if(!rank || pet.visualType==='slimePet')return;
+  const theme=pet.visualTheme||'astral'; const colors={moonRabbit:'#f3b4ff',thornBeetle:'#b8ff9b',forestWolf:'#8fffc7',crystalBloom:'#94ffd0',runeSpirit:'#d7a5ff',magmaLizard:'#ff9a62',emberFiend:'#ff825f',solarHawk:'#ffd56f',frostSlime:'#a9efff',frostWolf:'#b8f7ff',frostGolem:'#cdf6ff',ruinSentinel:'#cdb1ff',astralOrb:'#d6a5ff',astralMech:'#ffadf0',crownBeast:'#ffdc75',worldTree:'#9cf2a6',infernoDragon:'#ff864f',frostQueen:'#b7ecff',voidDestroyer:'#e2a7ff'};
+  const glow=colors[theme]||'#c29aff';ctx.save();ctx.globalAlpha=state.powerSave ? .2 : .58;
+  const beast=['moonRabbit','forestWolf','frostWolf'].includes(theme); const shell=theme==='thornBeetle'; const plant=['crystalBloom','worldTree'].includes(theme); const flame=['magmaLizard','emberFiend','solarHawk','infernoDragon'].includes(theme); const machine=['frostGolem','ruinSentinel','astralMech','voidDestroyer'].includes(theme); const mystic=['runeSpirit','astralOrb','frostQueen','frostSlime'].includes(theme);
+  if(rank>=1){
+    if(beast)for(const side of[-1,1])poly(ctx,[[side*8,-11],[side*16,-29],[side*23,-9]],glow,'#f8fbff');
+    else if(shell)for(const side of[-1,1])line(ctx,side*10,-6,side*22,-22,glow,3);
+    else if(plant)for(const side of[-1,1])poly(ctx,[[side*7,-7],[side*23,-21],[side*18,3]],glow,'#e8ffe4');
+    else if(flame)for(const side of[-1,1])poly(ctx,[[side*8,-5],[side*20,-27],[side*24,4]],glow,'#ffe3a3');
+    else if(machine)for(const side of[-1,1])poly(ctx,[[side*11,-8],[side*25,-17],[side*23,6]],'#8694bb',glow);
+    else {ctx.strokeStyle=glow;ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,26,0,TAU);ctx.stroke();}
+  }
+  if(rank>=2){
+    if(beast)poly(ctx,[[-12,-19],[-7,-34],[-1,-25],[5,-38],[10,-24],[16,-32],[17,-16]],'#ffd86f','#fff0b0');
+    else if(shell)for(const side of[-1,1])poly(ctx,[[side*7,-12],[side*18,-25],[side*17,8],[side*8,12]],glow,'#efffff');
+    else if(plant)for(let i=0;i<5;i+=1){ctx.save();ctx.rotate(i*TAU/5);poly(ctx,[[-4,-22],[0,-35],[4,-22]],glow,'#f0ffe2');ctx.restore();}
+    else if(flame)for(const side of[-1,1])line(ctx,side*12,7,side*31,14,glow,4);
+    else if(machine){disc(ctx,0,-22,7,glow,'#fff');for(const side of[-1,1])disc(ctx,side*27,2,4,glow);}
+    else {for(const side of[-1,1])poly(ctx,[[side*9,-3],[side*28,-20],[side*23,13]],glow,'#f2dfff');}
+  }
+  if(rank>=3){
+    if(beast||flame)for(const side of[-1,1])poly(ctx,[[side*12,1],[side*39,-16],[side*31,17],[side*13,13]],glow,'#f8e4ff');
+    else if(shell||machine)for(const side of[-1,1])poly(ctx,[[side*13,-3],[side*40,-10],[side*32,16],[side*12,12]],glow,'#edfaff');
+    else if(plant)for(const side of[-1,1])line(ctx,side*8,10,side*35,-9,glow,4);
+    else {ctx.strokeStyle=glow;ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,34,0,TAU);ctx.stroke();}
+  }
+  if(rank>=4){ctx.strokeStyle=glow;ctx.lineWidth=2.2;ctx.beginPath();ctx.arc(0,1,35+Math.sin(state.time*3)*3,0,TAU);ctx.stroke();disc(ctx,0,-43,4,'#fff3a6');for(const side of[-1,1])disc(ctx,side*31,4,3,glow);}
   ctx.restore();
 }
 

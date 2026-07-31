@@ -1,5 +1,5 @@
 export const SAVE_KEY = 'astralWorldIdleV1';
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 
 export const BALANCE = {
   attackInterval: 1.2,
@@ -75,35 +75,39 @@ export const PET_EVOLUTION_COST = {
   3: { level:90, fragments:300, gold:1000000, core:5 },
 };
 
-const evolutionFamilies = {
-  slime: { names:['星芽史萊姆','晶核史萊姆','皇家史萊姆','星界史萊姆','星界史萊姆王'], abilities:[['gel_haste','晶核律動','haste',.10],['gel_splash','晶液濺射','power',.18],['gel_split','分裂衝擊','extraHit',.32],['gel_astral','星界凝膠','bossDamage',.25]] },
-  beast: { names:['幼獸','森林獵獸','月影巨獸','星痕獸王','神域獸皇'], abilities:[['beast_crit','獵手本能','crit',.08],['beast_chase','追獵','extraHit',.28],['beast_rend','裂傷利爪','power',.18],['beast_soul','獸魂咆哮','bossDamage',.28]] },
-  plant: { names:['嫩芽靈','花冠精靈','古樹守衛','星藤靈王','森羅之心'], abilities:[['plant_guard','綠蔭護體','shield',.035],['plant_spore','孢子爆發','power',.16],['plant_vine','藤蔓追擊','extraHit',.25],['plant_root','星根束縛','bossDamage',.24]] },
-  fiend: { names:['火苗魔靈','熾翼魔靈','炎核惡魔','鳳焰領主','焚星魔王'], abilities:[['fiend_burn','灼熱脈動','power',.14],['fiend_fireball','火球連發','extraHit',.26],['fiend_blast','熔爆','power',.20],['fiend_phoenix','鳳凰烈焰','bossDamage',.30]] },
-  construct: { names:['機械核心','符文機偶','水晶重裝','星界機神','永恆審判機'], abilities:[['construct_guard','能量屏障','shield',.05],['construct_beam','聚焦光束','power',.16],['construct_overclock','超頻連擊','haste',.12],['construct_judge','審判協定','bossDamage',.30]] },
-  flying: { names:['浮游幼體','流光翼獸','星羽領航者','虛空翼王','天穹神翼'], abilities:[['flying_haste','疾風振翼','haste',.12],['flying_dive','俯衝追擊','extraHit',.27],['flying_nova','星羽爆發','power',.18],['flying_comet','彗星俯衝','bossDamage',.27]] },
-  boss: { names:['王冠幼獸','王冠巨獸','王獸皇','星冠霸主','星界獸神'], abilities:[['boss_guard','王者護壁','shield',.06],['boss_smash','冠冕重擊','power',.20],['boss_roar','皇者追擊','extraHit',.35],['boss_reign','星冠威壓','bossDamage',.35]] },
+const ability = (id, label, effect, value) => ({ id, label, effect, value });
+const identity = (names, role, visualTheme, abilities) => ({ names, role, visualTheme, abilities });
+
+// Every source kind owns its identity. IDs and fragment keys remain pet_<sourceKind>.
+const PET_EVOLUTION_IDENTITIES = {
+  slime: identity(['星芽史萊姆','晶核史萊姆','皇家史萊姆','星界史萊姆','星界史萊姆王'],'快速協同／泛用','crystalSlime',[ability('slime_haste','晶核律動','haste',.10),ability('slime_splash','晶液濺射','power',.18),ability('slime_split','分裂衝擊','extraHit',.32),ability('slime_astral','星界凝膠','bossDamage',.25)]),
+  rabbit: identity(['月耳兔','星耳獵兔','月影躍兔','虹月兔王','星月神兔'],'高暴擊','moonRabbit',[ability('rabbit_crit','月耳直覺','crit',.10),ability('rabbit_dash','月躍追擊','extraHit',.25),ability('rabbit_lucky','幸運飛踢','power',.16),ability('rabbit_comet','月隕踢擊','bossDamage',.24)]),
+  beetle: identity(['微光甲蟲','晶甲甲蟲','棘盾甲蟲','星殼衛士','天穹甲皇'],'護盾／防禦','thornBeetle',[ability('beetle_guard','甲殼護幕','shield',.045),ability('beetle_ram','棘刺衝撞','power',.15),ability('beetle_shell','星殼反擊','extraHit',.22),ability('beetle_bastion','甲皇守望','bossDamage',.20)]),
+  wolf: identity(['幽影幼狼','森林狼','白月獵狼','月痕狼王','星界神狼'],'連擊','forestWolf',[ability('wolf_chase','獵群追擊','extraHit',.25),ability('wolf_crit','月牙撕咬','crit',.08),ability('wolf_rend','裂傷連爪','power',.18),ability('wolf_soul','狼魂咆哮','bossDamage',.27)]),
+  flower: identity(['藍晶花妖','花冠靈','月藤花靈','聖花守望者','星庭花神'],'治療／護盾','crystalBloom',[ability('flower_guard','花瓣護盾','shield',.05),ability('flower_pulse','花粉脈衝','power',.14),ability('flower_vine','藤蔓追擊','extraHit',.22),ability('flower_bloom','星庭綻放','bossDamage',.22)]),
+  spirit: identity(['森林小魔靈','符葉精靈','秘語靈使','星環法靈','森羅星靈'],'魔法追擊','runeSpirit',[ability('spirit_haste','靈光加速','haste',.10),ability('spirit_arc','秘法追擊','extraHit',.27),ability('spirit_power','星術增幅','power',.18),ability('spirit_nova','靈界爆發','bossDamage',.25)]),
+  lizard: identity(['火岩蜥蜴','赤脊蜥獸','熔甲獵蜥','炎脈巨蜥','星熔龍蜥'],'破防','magmaLizard',[ability('lizard_rend','碎甲咬擊','power',.16),ability('lizard_haste','灼地疾行','haste',.08),ability('lizard_chase','尾擊追襲','extraHit',.24),ability('lizard_break','熔核破陣','bossDamage',.26)]),
+  lava: identity(['熔岩魔','炎核魔靈','灼燄術士','熔爆領主','焚星魔神'],'燃燒持續傷害','emberFiend',[ability('lava_burn','熔火灼燒','power',.15),ability('lava_orb','火球連發','extraHit',.26),ability('lava_blast','熔爆術','power',.20),ability('lava_inferno','焚星烈焰','bossDamage',.30)]),
+  hawk: identity(['赤焰鷹','燄羽迅鷹','流火獵鷹','日耀鷹王','星焰神鷹'],'高速攻擊','solarHawk',[ability('hawk_haste','疾風振翼','haste',.13),ability('hawk_dive','流火俯衝','extraHit',.25),ability('hawk_power','日耀爪擊','power',.17),ability('hawk_comet','星焰墜擊','bossDamage',.25)]),
+  ice: identity(['冰晶史萊姆','霜核史萊姆','寒晶王冠','極冰星膠','永霜史萊姆王'],'冰晶增傷','frostSlime',[ability('ice_haste','冰晶律動','haste',.09),ability('ice_power','寒霜碎裂','power',.18),ability('ice_split','霜棱追擊','extraHit',.26),ability('ice_boss','極冰星爆','bossDamage',.24)]),
+  snowwolf: identity(['雪原狼','霜牙獵狼','冰月白狼','永冬狼王','星霜神狼'],'暴擊加冰霜追擊','frostWolf',[ability('snowwolf_crit','霜牙暴擊','crit',.10),ability('snowwolf_chase','冰月追擊','extraHit',.30),ability('snowwolf_power','寒痕撕裂','power',.17),ability('snowwolf_boss','永冬獵殺','bossDamage',.27)]),
+  golem: identity(['寒霜魔像','冰岩守衛','霜晶堡壘','極地巨像','永凍泰坦'],'高護盾','frostGolem',[ability('golem_guard','冰岩護壁','shield',.06),ability('golem_power','重拳震擊','power',.16),ability('golem_haste','符文驅動','haste',.08),ability('golem_boss','泰坦重壓','bossDamage',.24)]),
+  ruin: identity(['遺跡守衛','符文衛兵','古代光衛','星殿裁決者','遺跡終端'],'防禦與光束','ruinSentinel',[ability('ruin_guard','遺跡護壁','shield',.05),ability('ruin_beam','符文光束','power',.17),ability('ruin_arc','裁決追擊','extraHit',.23),ability('ruin_boss','古代裁決','bossDamage',.28)]),
+  orb: identity(['星核浮游體','星環浮游體','重力星核','虛空星體','天體奇點'],'範圍／額外命中','astralOrb',[ability('orb_haste','軌道加速','haste',.10),ability('orb_nova','星環爆裂','extraHit',.28),ability('orb_power','重力脈衝','power',.18),ability('orb_boss','奇點壓縮','bossDamage',.26)]),
+  mech: identity(['失控機甲','超頻機甲','星核戰機','虛空機神','終焉戰術核心'],'超頻連擊','astralMech',[ability('mech_guard','能量隔板','shield',.04),ability('mech_haste','超頻連射','haste',.13),ability('mech_combo','導彈追擊','extraHit',.30),ability('mech_boss','終焉光束','bossDamage',.30)]),
+  horn: identity(['王冠幼獸','王冠巨獸','王獸皇','星冠霸主','星界獸神'],'Boss 對抗與重擊','crownBeast',[ability('horn_guard','王冠護壁','shield',.06),ability('horn_smash','冠冕重擊','power',.20),ability('horn_roar','王獸追擊','extraHit',.35),ability('horn_reign','星冠威壓','bossDamage',.35)]),
+  guardian: identity(['樹王幼靈','古木守衛','世界樹使','森羅聖王','永恆世界樹'],'護盾與恢復','worldTree',[ability('guardian_guard','世界樹護盾','shield',.07),ability('guardian_haste','根鬚律動','haste',.08),ability('guardian_vine','聖藤追擊','extraHit',.22),ability('guardian_boss','森羅庇護','bossDamage',.22)]),
+  dragon: identity(['熔岩幼龍','炎脈飛龍','煉獄龍王','焚天魔龍','星火滅世龍'],'燃燒與爆發','infernoDragon',[ability('dragon_burn','炎脈灼燒','power',.19),ability('dragon_blast','龍息爆發','extraHit',.28),ability('dragon_power','煉獄增幅','power',.20),ability('dragon_boss','滅世吐息','bossDamage',.34)]),
+  queen: identity(['冰霜精靈','寒晶女巫','極冰女王','永冬聖后','星霜女神'],'冰霜控制','frostQueen',[ability('queen_haste','寒晶咒印','haste',.09),ability('queen_crit','冰冠暴擊','crit',.08),ability('queen_arc','霜環追擊','extraHit',.26),ability('queen_boss','永冬裁決','bossDamage',.28)]),
+  destroyer: identity(['星界無人機','遺跡戰機','星核機神','虛空審判者','星界毀滅神'],'Boss 傷害與光束','voidDestroyer',[ability('destroyer_guard','虛空屏障','shield',.05),ability('destroyer_beam','審判光束','power',.20),ability('destroyer_overclock','毀滅追擊','extraHit',.32),ability('destroyer_boss','星界毀滅','bossDamage',.36)]),
 };
 
-const petFamilyFor = kind => {
-  if (['horn','guardian','dragon','queen','destroyer'].includes(kind)) return 'boss';
-  const species = PET_VISUALS[kind]?.species;
-  if (species === 'slime') return 'slime';
-  if (species === 'construct') return 'construct';
-  if (species === 'plant' || species === 'spirit') return 'plant';
-  if (species === 'fiend' || kind === 'lava') return 'fiend';
-  if (species === 'flying') return 'flying';
-  return 'beast';
-};
-
-export const PET_EVOLUTION_DATA = Object.fromEntries(Object.keys(PET_VISUALS).map(kind => {
-  const family = petFamilyFor(kind); const definition = evolutionFamilies[family];
-  return [kind, {
-    family,
-    stages: definition.names.map((name, rank) => ({
-      rank, name, appearance:`${kind}-e${rank}`,
-      glow:['#76e8ff','#8fffb3','#ffd977','#bc9aff','#ff8ee3'][rank],
-      ability: rank ? { id:definition.abilities[rank - 1][0], label:definition.abilities[rank - 1][1], effect:definition.abilities[rank - 1][2], value:definition.abilities[rank - 1][3] } : null,
-    })),
-  }];
-}));
+export const PET_EVOLUTION_DATA = Object.fromEntries(Object.entries(PET_EVOLUTION_IDENTITIES).map(([kind, definition]) => [kind, {
+  role:definition.role,
+  visualTheme:definition.visualTheme,
+  stages: definition.names.map((name, rank) => ({
+    rank, name, appearance:`${kind}-e${rank}`,
+    glow:['#76e8ff','#8fffb3','#ffd977','#bc9aff','#ff8ee3'][rank],
+    ability: rank ? definition.abilities[rank - 1] : null,
+  })),
+}]));

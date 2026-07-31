@@ -19,8 +19,11 @@ export function getPetEffectiveHpBonus(pet = {}) { return round((pet.baseHpBonus
 
 export function getPetEvolutionStage(pet = {}) {
   const kind = pet.sourceKind || 'slime'; const rank = clampEvolution(pet.evolutionRank);
-  return PET_EVOLUTION_DATA[kind]?.stages?.[rank] || PET_EVOLUTION_DATA.slime.stages[rank];
+  const data = PET_EVOLUTION_DATA[kind] || PET_EVOLUTION_DATA.slime;
+  return { ...data.stages[rank], role:data.role, visualTheme:data.visualTheme };
 }
+
+export function getPetDisplayName(pet = {}) { return getPetEvolutionStage(pet).name; }
 
 export function getPetEvolutionAbilities(pet = {}) {
   const data = PET_EVOLUTION_DATA[pet.sourceKind] || PET_EVOLUTION_DATA.slime;
@@ -50,7 +53,7 @@ export function normalizePet(pet = {}) {
   const baseHpBonus = round(pet.baseHpBonus ?? (pet.hpBonus || 0) / multiplier);
   const captureTier = pet.captureTier || (bossKinds.has(sourceKind) ? 'boss' : 'normal');
   const evolutionRank = clampEvolution(pet.evolutionRank);
-  const normalized = { ...pet, id:pet.id || speciesId, speciesId, sourceKind, captureTier, visualType:pet.visualType || visual.visualType, species:pet.species || visual.species, palette:pet.palette || visual.palette, evolutionRank, evolutionStage:evolutionRank, evolutionAppearance:evolutionRank, evolutionSkills:Array.isArray(pet.evolutionSkills) ? pet.evolutionSkills : getPetEvolutionAbilities({ ...pet, sourceKind, evolutionRank }).map(ability => ability.id), stars, baseAttack, baseHpBonus };
+  const normalized = { ...pet, id:pet.id || speciesId, speciesId, sourceKind, captureTier, visualType:pet.visualType || visual.visualType, species:pet.species || visual.species, palette:pet.palette || visual.palette, visualTheme:PET_EVOLUTION_DATA[sourceKind]?.visualTheme || 'astral', evolutionRank, evolutionStage:evolutionRank, evolutionAppearance:evolutionRank, evolutionSkills:getPetEvolutionAbilities({ ...pet, sourceKind, evolutionRank }).map(ability => ability.id), stars, baseAttack, baseHpBonus };
   normalized.attack = getPetEffectiveAttack(normalized);
   normalized.hpBonus = getPetEffectiveHpBonus(normalized);
   return normalized;
