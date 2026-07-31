@@ -1,5 +1,6 @@
 import { AFFIXES, BALANCE, MONSTER_VISUALS, QUALITY, SLOTS } from './data.js';
 import { createPetFromEnemy, getPetEffectiveAttack, getPetEffectiveHpBonus, normalizePet } from './pet-system.js';
+import { getPetCodexBonuses, syncPetCodex } from './pet-codex-system.js';
 
 export { getPetEffectiveAttack, getPetEffectiveHpBonus, normalizePet } from './pet-system.js';
 
@@ -12,6 +13,7 @@ export function basePlayer(level = 1) {
 }
 
 export function recompute(state) {
+  syncPetCodex(state);
   const prior = state.player || basePlayer();
   const player = basePlayer(prior.level || 1);
   player.name = prior.name || player.name; player.exp = prior.exp || 0; player.gold = prior.gold || 0; player.diamonds = prior.diamonds || 0;
@@ -24,6 +26,14 @@ export function recompute(state) {
   for(const [key,value] of Object.entries(percent)) player[key]*=1+value;
   const pet = state.pets?.find(entry => entry.id === state.activePetId);
   if (pet) { player.attack += getPetEffectiveAttack(pet); player.maxHp += getPetEffectiveHpBonus(pet); }
+  const codex = getPetCodexBonuses(state);
+  player.codexAttackBonus = codex.attack;
+  player.codexHpBonus = codex.hp;
+  player.codexPetDamageBonus = codex.petDamage;
+  player.codexBossDamageBonus = codex.bossDamage;
+  player.attack *= 1 + codex.attack;
+  player.maxHp *= 1 + codex.hp;
+  player.bossDamage = (player.bossDamage || 0) + codex.bossDamage;
   player.attackSpeed = clamp(player.attackSpeed, .34, 2.4); player.hp = clamp(prior.hp ?? player.maxHp, 0, player.maxHp); player.shield = clamp(prior.shield || 0, 0, player.maxHp*.65); player.nextExp = expFor(player.level);
   player.power = Math.floor(player.attack*8 + player.maxHp*.42 + player.defense*5 + player.crit*220 + (1/player.attackSpeed)*50 + (getPetEffectiveAttack(pet)||0)*4);
   state.player = player; return player;

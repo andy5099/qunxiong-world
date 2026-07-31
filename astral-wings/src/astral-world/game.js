@@ -181,7 +181,7 @@ export class IdleGame {
     const enemy = this.battle.enemy;
     if (!pet || !enemy?.alive) return false;
     const modifiers = getPetCombatModifiers(pet); const critical = Math.random() < modifiers.crit;
-    let damage = getPetEffectiveAttack(pet) * (1 + (this.state.player.petDamage || 0)) * modifiers.damageMultiplier;
+    let damage = getPetEffectiveAttack(pet) * (1 + (this.state.player.petDamage || 0) + (this.state.player.codexPetDamageBonus || 0)) * modifiers.damageMultiplier;
     if (enemy.boss) damage *= 1 + modifiers.bossDamage;
     this.battle.petAction = 'attack'; this.battle.petActionIn = .36; this.battle.petReturnIn = .26;
     this.renderer.pulse('slash', 190, 280, '#ffd979', 22 + pet.evolutionRank * 4);
@@ -199,7 +199,7 @@ export class IdleGame {
     if (!enemy?.alive || rank < skill.unlockRank || (pet.skillEnergy||0) < skill.energy || this.battle.petSkillIn > 0) return false;
     pet.skillEnergy=0; this.battle.petSkillIn=skill.cooldown; this.battle.petAction='skill'; this.battle.petActionIn=Math.max(.42, skill.delay || .42); this.battle.petReturnIn=.26;
     const index=this.state.pets.findIndex(item=>item.id===pet.id); if(index>=0)this.state.pets[index]=pet;
-    const modifiers=getPetCombatModifiers(pet); let damage=getPetEffectiveAttack(pet)*(1+(this.state.player.petDamage||0))*modifiers.damageMultiplier*skill.power;
+    const modifiers=getPetCombatModifiers(pet); let damage=getPetEffectiveAttack(pet)*(1+(this.state.player.petDamage||0)+(this.state.player.codexPetDamageBonus||0))*modifiers.damageMultiplier*skill.power;
     if(enemy.boss) damage*=1+modifiers.bossDamage+(skill.bossBonus||0);
     const queue=(delay, amount, suffix='', critical=false, effect=null, multiplier=PET_SKILL_BALANCE.criticalMultiplier, playerEffects=[])=>this.queuePetHit(pet,delay,amount,`${getPetDisplayName(pet)}・${skill.name}${suffix}`,skill.visual==='fire'?'#ff8e62':skill.visual==='frost'?'#bdf6ff':skill.visual==='beam'?'#e3b5ff':'#ffe18a',critical,'petSkill',effect,multiplier,playerEffects);
     this.renderer.pulse(skill.visual,190,280,skill.visual==='fire'?'#ff825f':skill.visual==='frost'?'#b7efff':skill.visual==='beam'?'#d8b7ff':'#ffe18a',46+rank*6);

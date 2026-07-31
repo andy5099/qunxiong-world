@@ -1,5 +1,5 @@
 export const SAVE_KEY = 'astralWorldIdleV1';
-export const SAVE_VERSION = 7;
+export const SAVE_VERSION = 8;
 
 export const BALANCE = {
   attackInterval: 1.2,

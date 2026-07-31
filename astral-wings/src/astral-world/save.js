@@ -3,6 +3,7 @@ import { addExp, basePlayer, dailyQuests, recompute } from './core.js';
 import { migratePets } from './pet-system.js';
 import { ensureTutorial } from './tutorial-system.js';
 import { ensureObjectives, ensureUnlocks } from './objective-system.js';
+import { ensurePetCodex, syncPetCodex } from './pet-codex-system.js';
 
 const now = () => Date.now();
 const dayKey = () => new Date().toISOString().slice(0, 10);
@@ -21,6 +22,7 @@ export function defaultState() {
     activePetId: null,
     petFragments: {},
     evolutionCores: 0,
+    petCodex: { version:1, species:{}, claimedRewards:[] },
     skills: [1, 1, 1, 1],
     skillAuto: [true, true, true, true],
     settings: {
@@ -45,6 +47,7 @@ export function defaultState() {
   ensureTutorial(state);
   ensureObjectives(state);
   ensureUnlocks(state);
+  ensurePetCodex(state);
   recompute(state);
   return state;
 }
@@ -59,6 +62,7 @@ function merge(base, raw) {
   state.pets = petMigration.pets;
   state.petFragments = petMigration.fragments;
   state.evolutionCores = Math.max(0, Math.floor(Number(raw?.evolutionCores) || 0));
+  state.petCodex = raw?.petCodex && typeof raw.petCodex === 'object' ? raw.petCodex : { version:1, species:{}, claimedRewards:[] };
   if (petMigration.activePetId && state.pets.some(pet => pet.id === petMigration.activePetId)) state.activePetId = petMigration.activePetId;
   state.skills = Array.isArray(raw?.skills) ? raw.skills.slice(0, 4).map(n => Math.max(1, Number(n) || 1)) : base.skills;
   while (state.skills.length < 4) state.skills.push(1);
@@ -80,6 +84,7 @@ function merge(base, raw) {
   ensureTutorial(state);
   ensureObjectives(state);
   ensureUnlocks(state);
+  syncPetCodex(state);
   recompute(state);
   return state;
 }

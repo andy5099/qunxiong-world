@@ -99,7 +99,7 @@ function drawAstralDrone(ctx, pet, state) { const bob=Math.sin(state.time*3.5)*3
 function drawFallbackPet(ctx, pet, state) { ctx.save();shadow(ctx,true);poly(ctx,[[-12,10],[-17,-8],[0,-19],[17,-8],[12,10],[0,17]],'#6a6992','#def1ff');disc(ctx,0,0,state.attack?7:4,'#9eeaff');eyes(ctx,-7);ctx.restore(); }
 const PET_DRAWERS={slimePet:drawSlimeEvolution,iceSlimePet:drawSlimeEvolution,rabbitPet:drawRabbitPet,beetlePet:drawBeetlePet,wolfPet:drawWolfPet,frostWolfPet:drawWolfPet,bloomPet:drawBloomPet,spiritPet:drawBloomPet,lizardPet:drawLizardPet,fiendPet:drawFiendPet,hawkPet:drawHawkPet,golemPet:drawGolemPet,sentinelPet:drawSentinelPet,orbPet:drawAstralDrone,crownCub:drawCrownCub,treeSprite:drawTreeSprite,lavaWhelp:drawLavaWhelp,frostSprite:drawFrostSprite,astralDrone:drawAstralDrone};
 
-export function drawPet(ctx, pet, { time=0, action='idle', actionIn=0, returnIn=0, summonIn=0, skillType=null, skillProgress=0, powerSave=false } = {}, x=142, y=300) {
+export function drawPet(ctx, pet, { time=0, action='idle', actionIn=0, returnIn=0, summonIn=0, skillType=null, skillProgress=0, powerSave=false, silhouette=false } = {}, x=142, y=300) {
   if (!pet) return;
   const skill=action==='skill'; const attacking=action==='attack'||skill; const returning=action==='return'; const celebrating=action==='celebrate';
   const attackProgress=attacking ? Math.max(0, 1-actionIn/.36) : 0;
@@ -110,5 +110,5 @@ export function drawPet(ctx, pet, { time=0, action='idle', actionIn=0, returnIn=
   const bossScale = pet.species?.startsWith('boss') ? .1 : 0;
   ctx.save();ctx.translate(x+travel,y-cheer);ctx.globalAlpha=summon;ctx.scale((.82+bossScale)*summon,(.82+bossScale)*summon);
   if(summonIn>0&&!powerSave){ctx.globalAlpha*=.42;ctx.strokeStyle='#b7e9ff';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,18,28*summon,0,TAU);ctx.stroke();ctx.globalAlpha=summon;}
-  if(skill&&!powerSave){ctx.strokeStyle='#fff1ae';ctx.globalAlpha*=.5;ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,30+Math.sin(time*10)*4,0,TAU);ctx.stroke();ctx.globalAlpha=summon;} qualityAdornment(ctx,pet,state);drawer(ctx,pet,state);drawEvolutionForm(ctx,pet,state);ctx.restore();
+  if(skill&&!powerSave){ctx.strokeStyle='#fff1ae';ctx.globalAlpha*=.5;ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,30+Math.sin(time*10)*4,0,TAU);ctx.stroke();ctx.globalAlpha=summon;} if(!silhouette)qualityAdornment(ctx,pet,state);drawer(ctx,pet,state);if(!silhouette)drawEvolutionForm(ctx,pet,state);if(silhouette){ctx.globalCompositeOperation='source-atop';ctx.fillStyle='#17223b';ctx.fillRect(-54,-58,108,116);}ctx.restore();
 }
