@@ -121,6 +121,7 @@ export const PET_SKILL_BALANCE = {
   shieldCap: .65,
   vulnerabilityCap: .25,
   slowCap: .35,
+  criticalMultiplier: 1.5,
 };
 
 const petSkill = (id, name, description, effect, power, visual, extra = {}) => ({ id, name, description, effect, power, visual, unlockRank:1, energy:PET_SKILL_BALANCE.maxEnergy, cooldown:PET_SKILL_BALANCE.minimumCastInterval, ...extra });
@@ -145,4 +146,11 @@ export const PET_SKILL_DATA = {
   dragon:petSkill('dragon_breath','滅世龍息','高額龍息並附加燃燒。','bossBurnStrike',1.85,'fire',{burn:.36,ticks:3,duration:3,bossBonus:.22}),
   queen:petSkill('queen_judgement','永冬裁決','冰霜裁決，降低攻速與傷害。','controlStrike',1.35,'frost',{slow:.25,damageReduction:.18,duration:4}),
   destroyer:petSkill('destroyer_beam','星界毀滅光束','充能後施放的高傷害 Boss 光束。','delayedBossBeam',2.25,'beam',{delay:.72,bossBonus:.35}),
+};
+
+// Every species has deliberate E1-E4 growth. `effects` only alters existing
+// combat primitives; it does not create a second skill implementation.
+const ranks = (two, three, four) => ({1:{power:1},2:two,3:three,4:four});
+export const PET_SKILL_RANK_SCALING = {
+ slime:ranks({power:1.18,followUp:.48},{power:1.35,hits:3},{power:1.55,bossBonus:.18}), rabbit:ranks({power:1.16,critBonus:.42},{power:1.32,critMultiplier:1.7},{power:1.5,followUp:.42}), beetle:ranks({power:1.14,shield:.21},{power:1.28,shieldDamage:.16},{power:1.42,shield:.26}), wolf:ranks({power:1.16},{power:1.3,lastCrit:.3},{power:1.45,hits:4}), flower:ranks({power:1.12,heal:.16},{power:1.25,shield:.08},{power:1.36,lowHpHeal:1.5}), spirit:ranks({power:1.16,secondMultiplier:1.42},{power:1.3,hits:3},{power:1.45,bossBonus:.18}), lizard:ranks({power:1.14,vulnerability:.18},{power:1.26,duration:6},{power:1.4,bossBonus:.16}), lava:ranks({power:1.16,burn:.4},{power:1.28,ticks:4},{power:1.45}), hawk:ranks({power:1.15,haste:.3},{power:1.28,duration:5},{power:1.42,hits:3}), ice:ranks({power:1.14,slow:.27},{power:1.25,duration:6},{power:1.38,followUp:.3}), snowwolf:ranks({power:1.15,critBonus:.4},{power:1.28,followUp:.56},{power:1.42,hits:2}), golem:ranks({power:1.14,shield:.3},{power:1.28},{power:1.4,shield:.34}), ruin:ranks({power:1.18},{power:1.3,delay:.38},{power:1.45,bossBonus:.2}), orb:ranks({power:1.14,followUp:.46},{power:1.26,hits:4},{power:1.4,lastMultiplier:1.45}), mech:ranks({power:1.14},{power:1.28,lastMultiplier:1.5},{power:1.42,hits:5}), horn:ranks({power:1.14,bossBonus:.42},{power:1.26,followUp:.35},{power:1.4,followUp:.45}), guardian:ranks({power:1.12,shield:.22},{power:1.24,heal:.2},{power:1.35,lowHpHeal:1.5}), dragon:ranks({power:1.18},{power:1.3,ticks:4},{power:1.46,bossBonus:.34}), queen:ranks({power:1.14,slow:.3},{power:1.26,damageReduction:.25},{power:1.4,followUp:.3}), destroyer:ranks({power:1.18},{power:1.32,delay:.5},{power:1.5,bossBonus:.5,followUp:.25}),
 };

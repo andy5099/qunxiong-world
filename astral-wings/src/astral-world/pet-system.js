@@ -1,4 +1,4 @@
-import { PET_EVOLUTION_COST, PET_EVOLUTION_DATA, PET_SKILL_BALANCE, PET_SKILL_DATA, PET_SOURCE_KINDS, PET_STAR_BALANCE, PET_VISUALS } from './data.js';
+import { PET_EVOLUTION_COST, PET_EVOLUTION_DATA, PET_SKILL_BALANCE, PET_SKILL_DATA, PET_SKILL_RANK_SCALING, PET_SOURCE_KINDS, PET_STAR_BALANCE, PET_VISUALS } from './data.js';
 
 const bossKinds = new Set(['horn', 'guardian', 'dragon', 'queen', 'destroyer']);
 const clampStars = value => Math.max(1, Math.min(PET_STAR_BALANCE.maxStars, Math.floor(Number(value) || 1)));
@@ -30,8 +30,9 @@ export function getPetSkillPower(pet = {}) {
   const rank = getPetSkillRank(pet);
   const skill = getPetSkillDefinition(pet);
   // E1 is a normal cast; every later evolution strengthens the same skill.
-  return rank < skill.unlockRank ? 0 : skill.power * (1 + (rank - skill.unlockRank) * .28);
+  return rank < skill.unlockRank ? 0 : skill.power * (PET_SKILL_RANK_SCALING[pet.sourceKind]?.[rank]?.power || 1);
 }
+export function getPetSkillProfile(pet = {}) { const skill=getPetSkillDefinition(pet); const rank=getPetSkillRank(pet); const scaling=PET_SKILL_RANK_SCALING[pet.sourceKind]||{}; const upgrades=Object.assign({},...Array.from({length:rank},(_,i)=>scaling[i+1]||{})); return { ...skill, ...upgrades, rank, power:getPetSkillPower(pet) }; }
 export function canCastPetSkill(pet = {}) { const skill=getPetSkillDefinition(pet); return getPetSkillRank(pet) >= skill.unlockRank && (Number(pet.skillEnergy) || 0) >= skill.energy; }
 
 export function getPetEvolutionAbilities(pet = {}) {
