@@ -63,7 +63,7 @@ export class IdleGame {
     for (let i = 0; i < battle.cooldowns.length; i += 1) battle.cooldowns[i] = Math.max(0, battle.cooldowns[i] - dt);
     for (let i = battle.queuedHits.length - 1; i >= 0; i -= 1) {
       const hit = battle.queuedHits[i]; hit.in -= dt;
-      if (hit.in <= 0) { if (battle.enemy?.id === hit.enemyId && battle.enemy.alive) { this.damageEnemy(hit.damage, hit.label, hit.color, hit.critical, hit.source, hit.criticalMultiplier); if (battle.enemy?.alive && hit.onHitEffect) this.applyEnemyEffect(hit.onHitEffect.type, hit.onHitEffect.value, hit.onHitEffect.duration, hit.onHitEffect.source, hit.onHitEffect.extra); } battle.queuedHits.splice(i, 1); }
+      if (hit.in <= 0) { if (battle.enemy?.id === hit.enemyId && battle.enemy.alive) { this.damageEnemy(hit.damage, hit.label, hit.color, hit.critical, hit.source, hit.criticalMultiplier); this.applyPlayerHitEffects(hit.onHitPlayerEffects); if (battle.enemy?.alive && hit.onHitEffect) this.applyEnemyEffect(hit.onHitEffect.type, hit.onHitEffect.value, hit.onHitEffect.duration, hit.onHitEffect.source, hit.onHitEffect.extra); } battle.queuedHits.splice(i, 1); }
     }
     if (battle.attackIn <= 0) { this.basicAttack(); battle.attackIn += Math.max(.34, state.player.attackSpeed); }
     this.autoSkills();
@@ -124,11 +124,13 @@ export class IdleGame {
     return true;
   }
 
-  queuePetHit(pet, delay, damage, label, color, critical = false, source = 'petSkill', onHitEffect = null, criticalMultiplier = PET_SKILL_BALANCE.criticalMultiplier) {
+  queuePetHit(pet, delay, damage, label, color, critical = false, source = 'petSkill', onHitEffect = null, criticalMultiplier = PET_SKILL_BALANCE.criticalMultiplier, onHitPlayerEffects = []) {
     const enemy = this.battle.enemy;
     if (!enemy?.alive) return;
-    this.battle.queuedHits.push({ in:delay, damage, label, color, critical, criticalMultiplier, enemyId:enemy.id, source, onHitEffect });
+    this.battle.queuedHits.push({ in:delay, damage, label, color, critical, criticalMultiplier, enemyId:enemy.id, source, onHitEffect, onHitPlayerEffects });
   }
+
+  applyPlayerHitEffects(effects = []) { for(const effect of effects||[]){if(effect.type==='heal')this.state.player.hp=Math.min(this.state.player.maxHp,this.state.player.hp+this.state.player.maxHp*effect.ratio);if(effect.type==='shield')this.state.player.shield=Math.min(this.state.player.maxHp*PET_SKILL_BALANCE.shieldCap,this.state.player.shield+this.state.player.maxHp*effect.ratio);if(effect.type==='petHaste')this.battle.petBuffs.haste={value:effect.value,remaining:effect.duration,source:effect.source};} }
 
   updateEnemyEffects(enemy, dt) {
     if (!enemy.effects) return;
@@ -136,7 +138,7 @@ export class IdleGame {
       effect.remaining -= dt;
       if (key === 'burn') {
         effect.tickIn -= dt;
-        if (effect.tickIn <= 0 && enemy.alive && effect.ticksRemaining > 0) { effect.tickIn += effect.tickInterval; effect.ticksRemaining -= 1; this.damageEnemy(effect.damagePerTick, '灼燒', '#ff855d', false, 'petDot'); }
+        let safety=0; while(effect.tickIn<=0&&effect.ticksRemaining>0&&enemy.alive&&safety<6){effect.tickIn+=effect.tickInterval;effect.ticksRemaining-=1;this.damageEnemy(effect.damagePerTick,'灼燒','#ff855d',false,'petDot');safety+=1;}
       }
       if (effect.remaining <= 0) delete enemy.effects[key];
     }
@@ -199,21 +201,21 @@ export class IdleGame {
     const index=this.state.pets.findIndex(item=>item.id===pet.id); if(index>=0)this.state.pets[index]=pet;
     const modifiers=getPetCombatModifiers(pet); let damage=getPetEffectiveAttack(pet)*(1+(this.state.player.petDamage||0))*modifiers.damageMultiplier*skill.power;
     if(enemy.boss) damage*=1+modifiers.bossDamage+(skill.bossBonus||0);
-    const queue=(delay, amount, suffix='', critical=false, effect=null, multiplier=PET_SKILL_BALANCE.criticalMultiplier)=>this.queuePetHit(pet,delay,amount,`${getPetDisplayName(pet)}・${skill.name}${suffix}`,skill.visual==='fire'?'#ff8e62':skill.visual==='frost'?'#bdf6ff':skill.visual==='beam'?'#e3b5ff':'#ffe18a',critical,'petSkill',effect,multiplier);
+    const queue=(delay, amount, suffix='', critical=false, effect=null, multiplier=PET_SKILL_BALANCE.criticalMultiplier, playerEffects=[])=>this.queuePetHit(pet,delay,amount,`${getPetDisplayName(pet)}・${skill.name}${suffix}`,skill.visual==='fire'?'#ff8e62':skill.visual==='frost'?'#bdf6ff':skill.visual==='beam'?'#e3b5ff':'#ffe18a',critical,'petSkill',effect,multiplier,playerEffects);
     this.renderer.pulse(skill.visual,190,280,skill.visual==='fire'?'#ff825f':skill.visual==='frost'?'#b7efff':skill.visual==='beam'?'#d8b7ff':'#ffe18a',46+rank*6);
-    if(skill.effect==='multiStrike'){const hits=skill.hits||3;for(let i=0;i<hits;i+=1)queue(.16+i*.15,damage*(i===hits-1?(skill.secondMultiplier||1):1),` ${i+1}/${hits}`);}
-    else if(skill.effect==='splash'){queue(.18,damage);queue(.34,damage*(skill.followUp||.35),' 追擊');}
-    else if(skill.effect==='critStrike'||skill.effect==='critFollowUp'){const critical=Math.random()<Math.min(.5,modifiers.crit+(skill.critBonus||0));queue(.18,damage,'',critical);if(critical&&skill.followUp)queue(.36,damage*skill.followUp,' 冰霜追擊');}
-    else if(skill.effect==='shieldStrike'){queue(.18,damage);this.state.player.shield=Math.min(this.state.player.maxHp*PET_SKILL_BALANCE.shieldCap,this.state.player.shield+this.state.player.maxHp*(skill.shield||0));}
-    else if(skill.effect==='healStrike'){queue(.18,damage);this.state.player.hp=Math.min(this.state.player.maxHp,this.state.player.hp+this.state.player.maxHp*(skill.heal||0));}
-    else if(skill.effect==='healShield'){queue(.18,damage);this.state.player.hp=Math.min(this.state.player.maxHp,this.state.player.hp+this.state.player.maxHp*(skill.heal||0));this.state.player.shield=Math.min(this.state.player.maxHp*PET_SKILL_BALANCE.shieldCap,this.state.player.shield+this.state.player.maxHp*(skill.shield||0));}
+    if(skill.effect==='multiStrike'){const hits=skill.hits||3;for(let i=0;i<hits;i+=1){const last=i===hits-1;const crit=last&&skill.lastCrit?Math.random()<Math.min(.5,modifiers.crit+skill.lastCrit):false;queue(.16+i*.15,damage*(last?(skill.lastMultiplier||skill.secondMultiplier||1):1),` ${i+1}/${hits}`,crit);}}
+    else if(skill.effect==='splash'){const hits=skill.hits||2;for(let i=0;i<hits;i+=1)queue(.18+i*.16,damage*(i?(skill.followUp||.35):1),i?' 追擊':'');}
+    else if(skill.effect==='critStrike'||skill.effect==='critFollowUp'){const critical=Math.random()<Math.min(.5,modifiers.crit+(skill.critBonus||0));queue(.18,damage,'',critical,null,skill.critMultiplier||PET_SKILL_BALANCE.criticalMultiplier);if(critical&&skill.followUp)for(let i=0;i<(skill.hits||1);i+=1)queue(.36+i*.14,damage*skill.followUp,' 冰霜追擊');}
+    else if(skill.effect==='shieldStrike'){const bonus=this.state.player.shield>0?(skill.shieldDamage||0):0;queue(.18,damage*(1+bonus),'',false,null,PET_SKILL_BALANCE.criticalMultiplier,[{type:'shield',ratio:skill.shield||0}]);}
+    else if(skill.effect==='healStrike'){const low=this.state.player.hp/this.state.player.maxHp<.35?(skill.lowHpHeal||1):1;queue(.18,damage,'',false,null,PET_SKILL_BALANCE.criticalMultiplier,[{type:'heal',ratio:(skill.heal||0)*low},{type:'shield',ratio:skill.shield||0}]);}
+    else if(skill.effect==='healShield'){const low=this.state.player.hp/this.state.player.maxHp<.35?(skill.lowHpHeal||1):1;queue(.18,damage,'',false,null,PET_SKILL_BALANCE.criticalMultiplier,[{type:'heal',ratio:(skill.heal||0)*low},{type:'shield',ratio:skill.shield||0}]);}
     else if(skill.effect==='vulnerabilityStrike'){queue(.18,damage,'',false,{type:'vulnerability',value:skill.vulnerability,duration:skill.duration,source:pet.id});}
     else if(skill.effect==='burnStrike'||skill.effect==='bossBurnStrike'){queue(.18,damage,'',false,{type:'burn',value:0,duration:skill.duration,source:pet.id,extra:{damage:damage*(skill.burn||.3),ticks:skill.ticks||3,tickIn:1}});}
-    else if(skill.effect==='hasteStrike'){for(let i=0;i<(skill.hits||2);i+=1)queue(.14+i*.15,damage,` ${i+1}/${skill.hits||2}`);this.battle.petBuffs.haste={value:skill.haste||.26,remaining:skill.duration||3,source:skill.id};}
-    else if(skill.effect==='slowStrike'){queue(.18,damage,'',false,{type:'attackSlow',value:skill.slow,duration:skill.duration,source:pet.id});}
-    else if(skill.effect==='controlStrike'){queue(.18,damage,'',false,{type:'attackSlow',value:skill.slow,duration:skill.duration,source:pet.id});queue(.181,0,'',false,{type:'damageReduction',value:skill.damageReduction,duration:skill.duration,source:pet.id});}
-    else if(skill.effect==='delayedBeam'||skill.effect==='delayedBossBeam'){queue(skill.delay||.5,damage);}
-    else if(skill.effect==='bossStrike'){queue(.18,damage);}
+    else if(skill.effect==='hasteStrike'){for(let i=0;i<(skill.hits||2);i+=1)queue(.14+i*.15,damage,` ${i+1}/${skill.hits||2}`,false,null,PET_SKILL_BALANCE.criticalMultiplier,i===0?[{type:'petHaste',value:skill.haste||.26,duration:skill.duration||3,source:skill.id}]:[]);}
+    else if(skill.effect==='slowStrike'){queue(.18,damage,'',false,{type:'attackSlow',value:skill.slow,duration:skill.duration,source:pet.id});if(skill.followUp)queue(.34,damage*skill.followUp,' 冰晶追擊');}
+    else if(skill.effect==='controlStrike'){queue(.18,damage,'',false,{type:'attackSlow',value:skill.slow,duration:skill.duration,source:pet.id});queue(.181,0,'',false,{type:'damageReduction',value:skill.damageReduction,duration:skill.duration,source:pet.id});if(skill.followUp)queue(.34,damage*skill.followUp,' 冰霜追擊');}
+    else if(skill.effect==='delayedBeam'||skill.effect==='delayedBossBeam'){queue(skill.delay||.5,damage);if(skill.followUp)queue((skill.delay||.5)+.14,damage*skill.followUp,' 餘波');}
+    else if(skill.effect==='bossStrike'){queue(.18,damage);if(skill.followUp)queue(.36,damage*skill.followUp,' 震波');}
     this.event('寵物技能',`${getPetDisplayName(pet)} 施放「${skill.name}」。`); return true;
   }
 

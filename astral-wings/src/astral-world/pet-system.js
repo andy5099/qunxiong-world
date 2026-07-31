@@ -34,6 +34,7 @@ export function getPetSkillPower(pet = {}) {
 }
 export function getPetSkillProfile(pet = {}) { const skill=getPetSkillDefinition(pet); const rank=getPetSkillRank(pet); const scaling=PET_SKILL_RANK_SCALING[pet.sourceKind]||{}; const upgrades=Object.assign({},...Array.from({length:rank},(_,i)=>scaling[i+1]||{})); return { ...skill, ...upgrades, rank, power:getPetSkillPower(pet) }; }
 export function canCastPetSkill(pet = {}) { const skill=getPetSkillDefinition(pet); return getPetSkillRank(pet) >= skill.unlockRank && (Number(pet.skillEnergy) || 0) >= skill.energy; }
+export function validatePetSkillProfiles() { const issues=[]; for(const kind of Object.keys(PET_SKILL_DATA)){for(let rank=1;rank<=4;rank+=1){const profile=getPetSkillProfile({sourceKind:kind,evolutionRank:rank});if(!Number.isFinite(profile.power)||profile.power<=0)issues.push(`${kind} E${rank}: power`);if(profile.hits!==undefined&&(!Number.isInteger(profile.hits)||profile.hits<1))issues.push(`${kind} E${rank}: hits`);if(profile.duration!==undefined&&profile.duration<0)issues.push(`${kind} E${rank}: duration`);if(profile.critMultiplier!==undefined&&profile.critMultiplier<1)issues.push(`${kind} E${rank}: critMultiplier`);if(profile.followUp!==undefined&&profile.followUp<0)issues.push(`${kind} E${rank}: followUp`);}} return issues; }
 
 export function getPetEvolutionAbilities(pet = {}) {
   const data = PET_EVOLUTION_DATA[pet.sourceKind] || PET_EVOLUTION_DATA.slime;
