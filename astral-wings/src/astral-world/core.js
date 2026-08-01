@@ -2,6 +2,7 @@ import { AFFIXES, BALANCE, MONSTER_VISUALS, QUALITY, SLOTS } from './data.js';
 import { createPetFromEnemy, getPetEffectiveAttack, getPetEffectiveHpBonus, normalizePet } from './pet-system.js';
 import { getPetCodexBonuses, syncPetCodex } from './pet-codex-system.js';
 import { ensurePetTeam, getPetSupportBonuses } from './pet-team-system.js';
+import { getPetTeamSynergyBonuses } from './pet-synergy-system.js';
 
 export { getPetEffectiveAttack, getPetEffectiveHpBonus, normalizePet } from './pet-system.js';
 
@@ -40,6 +41,22 @@ export function recompute(state) {
   player.petSupportExtraHit = team.extraHit;
   player.petSupportShieldRatio = team.shieldRatio;
   player.regen = (player.regen || 0) + player.maxHp * team.regenRatio;
+  const synergy = getPetTeamSynergyBonuses(state);
+  player.petSynergyAttackBonus = synergy.attack;
+  player.petSynergyHpBonus = synergy.hp;
+  player.petSynergyCritBonus = synergy.crit;
+  player.petSynergyPetDamageBonus = synergy.petDamage;
+  player.petSynergyBossDamageBonus = synergy.bossDamage;
+  player.petSynergyNormalDamageBonus = synergy.normalDamage;
+  player.petSynergyGoldBonus = synergy.goldBonus;
+  player.petSynergyExpBonus = synergy.expBonus;
+  player.attack *= 1 + synergy.attack;
+  player.maxHp *= 1 + synergy.hp;
+  player.crit += synergy.crit;
+  player.bossDamage = (player.bossDamage || 0) + synergy.bossDamage;
+  player.goldBonus = (player.goldBonus || 0) + synergy.goldBonus;
+  player.expBonus = (player.expBonus || 0) + synergy.expBonus;
+  player.attackSpeed *= synergy.attackIntervalMultiplier;
   const codex = getPetCodexBonuses(state);
   player.codexAttackBonus = codex.attack;
   player.codexHpBonus = codex.hp;

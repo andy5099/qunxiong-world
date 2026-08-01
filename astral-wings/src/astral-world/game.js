@@ -169,6 +169,7 @@ export class IdleGame {
     if (forcedCritical && criticalMultiplier > 1) raw *= criticalMultiplier;
     if (source === 'playerSkill') raw *= 1 + (this.state.player.skillDamage || 0);
     if (enemy.boss) raw *= 1 + (this.state.player.bossDamage || 0);
+    else if (enemy.boss === false) raw *= 1 + (this.state.player.petSynergyNormalDamageBonus || 0);
     if (enemy.effects?.vulnerability) raw *= 1 + enemy.effects.vulnerability.value;
     const reduced = Math.max(1, raw * (100 / (100 + enemy.defense)));
     enemy.hp = Math.max(0, enemy.hp - reduced); enemy.hit = .12; enemy.action = 'hurt'; enemy.actionIn = .14;
@@ -190,7 +191,7 @@ export class IdleGame {
     const enemy = this.battle.enemy;
     if (!pet || !enemy?.alive) return false;
     const modifiers = getPetCombatModifiers(pet); const critical = Math.random() < modifiers.crit;
-    let damage = getPetEffectiveAttack(pet) * (1 + (this.state.player.petDamage || 0) + (this.state.player.codexPetDamageBonus || 0)) * modifiers.damageMultiplier;
+    let damage = getPetEffectiveAttack(pet) * (1 + (this.state.player.petDamage || 0) + (this.state.player.codexPetDamageBonus || 0) + (this.state.player.petSynergyPetDamageBonus || 0)) * modifiers.damageMultiplier;
     if (enemy.boss) damage *= 1 + modifiers.bossDamage;
     this.battle.petAction = 'attack'; this.battle.petActionIn = .36; this.battle.petReturnIn = .26;
     this.renderer.pulse('slash', 190, 280, '#ffd979', 22 + pet.evolutionRank * 4);
@@ -208,7 +209,7 @@ export class IdleGame {
     if (!enemy?.alive || rank < skill.unlockRank || (pet.skillEnergy||0) < skill.energy || this.battle.petSkillIn > 0) return false;
     pet.skillEnergy=0; this.battle.petSkillIn=skill.cooldown; this.battle.petAction='skill'; this.battle.petActionIn=Math.max(.42, skill.delay || .42); this.battle.petReturnIn=.26;
     const index=this.state.pets.findIndex(item=>item.id===pet.id); if(index>=0)this.state.pets[index]=pet;
-    const modifiers=getPetCombatModifiers(pet); let damage=getPetEffectiveAttack(pet)*(1+(this.state.player.petDamage||0)+(this.state.player.codexPetDamageBonus||0))*modifiers.damageMultiplier*skill.power;
+    const modifiers=getPetCombatModifiers(pet); let damage=getPetEffectiveAttack(pet)*(1+(this.state.player.petDamage||0)+(this.state.player.codexPetDamageBonus||0)+(this.state.player.petSynergyPetDamageBonus||0))*modifiers.damageMultiplier*skill.power;
     if(enemy.boss) damage*=1+modifiers.bossDamage+(skill.bossBonus||0);
     const queue=(delay, amount, suffix='', critical=false, effect=null, multiplier=PET_SKILL_BALANCE.criticalMultiplier, playerEffects=[])=>this.queuePetHit(pet,delay,amount,`${getPetDisplayName(pet)}・${skill.name}${suffix}`,skill.visual==='fire'?'#ff8e62':skill.visual==='frost'?'#bdf6ff':skill.visual==='beam'?'#e3b5ff':'#ffe18a',critical,'petSkill',effect,multiplier,playerEffects);
     this.renderer.pulse(skill.visual,190,280,skill.visual==='fire'?'#ff825f':skill.visual==='frost'?'#b7efff':skill.visual==='beam'?'#d8b7ff':'#ffe18a',46+rank*6);
@@ -234,8 +235,11 @@ export class IdleGame {
     battle.killing = true; enemy.alive = false;
     if (state.activePetId) { battle.petAction = 'celebrate'; battle.petActionIn = .5; battle.petReturnIn = 0; }
     this.renderer.pulse('burst', 278, 270, enemy.boss ? '#ffad72' : '#cf8aff', enemy.boss ? 68 : 36);
-    const mult = enemy.boss ? 4 : 1; const expResult = addExp(state, enemy.exp * mult * (1 + (state.player.expBonus || 0)));
-    state.player.gold += enemy.gold * mult * (1 + (state.player.goldBonus || 0)); state.stats.kills += 1;
+    const mult = enemy.boss ? 4 : 1;
+    const expAward = Math.floor(enemy.exp * mult * (1 + (state.player.expBonus || 0)));
+    const goldAward = Math.floor(enemy.gold * mult * (1 + (state.player.goldBonus || 0)));
+    const expResult = addExp(state, expAward);
+    state.player.gold += goldAward; state.stats.kills += 1;
     const petExp = grantPetExperience(state, enemy.exp * mult);
     // Pet levels are collection milestones too; rebuild derived codex bonuses immediately.
     if (petExp.levels > 0) recompute(state);
@@ -248,7 +252,7 @@ export class IdleGame {
     if (needTutorialGear || Math.random() < (enemy.boss ? 1 : .23)) this.grantEquipment(enemy.boss);
     if (needTutorialPet || Math.random() < (enemy.boss ? .12 : enemy.captureRate)) this.capture(enemy);
     if (enemy.boss) this.finishBoss(); else this.finishNormal();
-    this.event(`擊敗 ${enemy.name}`, `+${Math.floor(enemy.exp * mult)} 經驗、+${Math.floor(enemy.gold * mult)} 金幣`);
+    this.event(`擊敗 ${enemy.name}`, `+${expAward} 經驗、+${goldAward} 金幣`);
     enemy.action = 'death'; enemy.actionIn = 0; enemy.deathDuration = enemy.boss ? .82 : .46; enemy.deathIn = enemy.deathDuration;
   }
 
@@ -305,12 +309,15 @@ export class IdleGame {
   upgradeSkill(index) { const price = 100 * (this.state.skills[index] || 1); if (this.state.player.gold < price) return false; this.state.player.gold -= price; this.state.skills[index] += 1; recompute(this.state); return true; }
   setActivePet(id) { return this.setPetTeamSlot(id, 'main'); }
   setPetTeamSlot(id, slot) {
+    const priorMain = this.state.petTeam?.main || null;
     const result = assignPetTeamSlot(this.state, id, slot);
     if (!result.ok) return false;
-    this.battle.petBuffs = {};
-    this.battle.queuedHits = this.battle.queuedHits.filter(hit => !String(hit.source || '').startsWith('pet'));
-    this.battle.petAction = this.state.petTeam.main ? 'summon' : 'idle';
-    this.battle.petSummonIn = .52; this.battle.petActionIn = .52; this.battle.petReturnIn = 0;
+    if (priorMain !== this.state.petTeam.main) {
+      this.battle.petBuffs = {};
+      this.battle.queuedHits = this.battle.queuedHits.filter(hit => !String(hit.source || '').startsWith('pet'));
+      this.battle.petAction = this.state.petTeam.main ? 'summon' : 'idle';
+      this.battle.petSummonIn = .52; this.battle.petActionIn = .52; this.battle.petReturnIn = 0;
+    }
     recompute(this.state); saveState(this.state);
     return true;
   }
