@@ -1,4 +1,4 @@
-const CACHE = 'astral-world-idle-v20';
+const CACHE = 'astral-world-idle-v21';
 const CORE = [
   './', './index.html', './styles.css', './manifest.webmanifest', './assets/game-art/manifest.json', './assets/game-art/region-01-asset-spec.json',
   './src/astral-world/main.js', './src/astral-world/data.js', './src/astral-world/core.js',
@@ -7,8 +7,8 @@ const CORE = [
   './src/astral-world/equipment-affix-system.js',
   './src/astral-world/visual-theme.js', './src/astral-world/battle-background-renderer.js',
   './src/astral-world/ui-icons.js', './src/astral-world/equipment-icon-renderer.js', './src/astral-world/skill-icon-renderer.js',
-  './src/astral-world/art-asset-manager.js', './src/astral-world/sprite-renderer.js', './css/art-assets.css', './css/region-01-slice.css',
-  './assets/reference/astral-world-art-bible.png', './assets/reference/astral-world-ui-target.png',
+  './src/astral-world/art-asset-manager.js', './src/astral-world/sprite-renderer.js', './css/art-assets.css', './css/region-01-slice.css', './css/region-01-production.css',
+  './assets/reference/astral-world-art-bible.png', './assets/reference/astral-world-ui-target.png', './assets/reference/astral-world-region1-production-guide.png',
 ];
 
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE))));

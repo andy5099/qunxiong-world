@@ -1,0 +1,1 @@
+.battle-mode-badges{position:absolute;z-index:3;right:9px;bottom:9px;display:flex;gap:5px}.battle-mode-badges span{display:grid;place-items:center;min-width:34px;height:28px;padding:0 5px;border:1px solid rgba(246,207,114,.7);border-radius:50%;background:rgba(8,14,38,.88);color:#fff3bd;font:700 10px system-ui}

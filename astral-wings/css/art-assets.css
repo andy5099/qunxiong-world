@@ -1,1 +1,2 @@
 .has-art-image{background-image:var(--aw-art-image)!important;background-repeat:no-repeat!important;background-position:center!important;background-size:100% 100%!important}
+.has-nine-slice-art{border-style:solid!important;border-width:12px!important;border-image-source:var(--aw-art-image)!important;border-image-slice:var(--aw-art-border) fill!important;border-image-width:12px!important;background:none!important}.skill-card i img{width:100%;height:100%;object-fit:contain;border-radius:50%}

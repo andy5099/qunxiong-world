@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/visual-icons.css">
   <link rel="stylesheet" href="css/art-assets.css">
   <link rel="stylesheet" href="css/region-01-slice.css">
+  <link rel="stylesheet" href="css/region-01-production.css">
 </head>
 <body>
   <main class="phone-shell" id="app">
@@ -28,6 +29,7 @@
         <canvas id="battleCanvas" aria-label="星界冒險自動戰鬥畫面"></canvas>
         <aside class="battle-side-card pet-side"><b id="slicePetName">尚未出戰</b><small>主戰寵物</small><span id="slicePetEnergy">能量 0</span></aside>
         <div class="art-fallback-notice" id="artFallbackNotice" hidden>正式美術待置入 · 使用安全繪製</div>
+        <div class="battle-mode-badges" aria-label="戰鬥模式"><span>AUTO</span><span>×1</span></div>
       </div>
       <section class="combat-readout">
         <div class="life-row"><span>HP</span><div class="meter hp"><i id="playerHp"></i></div><b id="playerHpText">150 / 150</b></div>
@@ -62,6 +64,6 @@
     <div class="toast" id="toast" role="status"></div>
     <div class="modal" id="modal" aria-hidden="true"><div class="modal-card" id="modalCard"></div></div>
   </main>
-  <script type="module" src="src/astral-world/main.js?v=20.1"></script>
+  <script type="module" src="src/astral-world/main.js?v=21"></script>
 </body>
 </html>

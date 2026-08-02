@@ -4,8 +4,8 @@ export function getSpriteFrame({ frameCount=1, fps=1, elapsed=0, loop=true, powe
 
 export function drawSpriteAnimation(ctx,image,options={}) {
   if(!ctx||!image||!image.complete||!image.naturalWidth)return false;
-  const {frameWidth,frameHeight,frameCount=1,fps=8,elapsed=0,x=0,y=0,scale=1,anchorX=.5,anchorY=.5,flipX=false,loop=true,powerSave=false}=options;
-  if(!frameWidth||!frameHeight)return false;const frame=getSpriteFrame({frameCount,fps,elapsed,loop,powerSave});
+  const {frameWidth,frameHeight,frameCount=1,frameOffset=0,fps=8,elapsed=0,x=0,y=0,scale=1,anchorX=.5,anchorY=.5,flipX=false,loop=true,powerSave=false}=options;
+  if(!frameWidth||!frameHeight)return false;const frame=frameOffset+getSpriteFrame({frameCount,fps,elapsed,loop,powerSave});
   ctx.save();ctx.translate(x,y);ctx.scale(flipX?-scale:scale,scale);ctx.drawImage(image,frame*frameWidth,0,frameWidth,frameHeight,-frameWidth*anchorX,-frameHeight*anchorY,frameWidth,frameHeight);ctx.restore();return true;
 }
 
