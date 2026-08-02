@@ -5,7 +5,7 @@ import { normalizePet, getPetCombatModifiers, getPetEffectiveAttack } from '../s
 import { setPetTeamSlot } from '../src/astral-world/pet-team-system.js';
 import { PET_TEAM_SYNERGY_BALANCE, getActivePetTeamSynergies, getPetTeamSynergyBonuses, validatePetTeamSynergyData } from '../src/astral-world/pet-synergy-system.js';
 import { defaultState, importSave, loadState } from '../src/astral-world/save.js';
-import { SAVE_KEY } from '../src/astral-world/data.js';
+import { SAVE_KEY, SAVE_VERSION } from '../src/astral-world/data.js';
 import { AstralUI } from '../src/astral-world/ui.js';
 
 const saved=new Map();
@@ -36,7 +36,7 @@ const rewards=teamState(['slime','wolf','lizard']);rewards.player.exp=0;rewards.
 
 const switchState=teamState(['slime','rabbit','beetle']);const switchGame=new IdleGame(switchState,renderer);switchGame.battle.queuedHits=[{source:'petSkill'},{source:'playerSkill'}];switchGame.battle.petBuffs={haste:{value:.2,remaining:2}};switchGame.setPetTeamSlot(switchState.pets[2].id,'support1');assert.equal(switchGame.battle.queuedHits.length,2,'support changes preserve main queued hits');assert.ok(switchGame.battle.petBuffs.haste,'support changes preserve main buffs');switchGame.setPetTeamSlot(switchState.pets[1].id,'main');assert.deepEqual(switchGame.battle.queuedHits.map(hit=>hit.source),['playerSkill'],'main changes clear old pet hits only');assert.deepEqual(switchGame.battle.petBuffs,{});
 
-const legacy=importSave(JSON.stringify({...defaultState(),version:9,petTeam:undefined,pets:[pet('wolf')],activePetId:'team-wolf'}));assert.equal(legacy.version,9);assert.equal(legacy.petTeam.main,'team-wolf');
+const legacy=importSave(JSON.stringify({...defaultState(),version:9,petTeam:undefined,pets:[pet('wolf')],activePetId:'team-wolf'}));assert.equal(legacy.version,SAVE_VERSION);assert.equal(legacy.petTeam.main,'team-wolf');
 const petPage={innerHTML:''};const ui=Object.create(AstralUI.prototype);ui.state=sameRegion;ui.$=id=>id==='petsPage'?petPage:null;ui.renderPets();assert.match(petPage.innerHTML,/目前羈絆/);assert.match(petPage.innerHTML,/星光共鳴/);assert.match(petPage.innerHTML,/羈絆說明/);
 let modalCopy='';ui.openModal=(_title,text)=>{modalCopy=text;};ui.openSynergyInfo();assert.match(modalCopy,/跨域遠征/);assert.match(modalCopy,/已啟動/);
 

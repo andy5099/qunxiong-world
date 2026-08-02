@@ -1,4 +1,5 @@
-import { AFFIXES, BALANCE, MONSTER_VISUALS, QUALITY, SLOTS } from './data.js';
+import { BALANCE, MONSTER_VISUALS, QUALITY, SLOTS } from './data.js';
+import { equipmentPower as calculateEquipmentPower, generateEquipmentAffixes, getEquipmentAffixBonuses, getEquipmentStatProfile } from './equipment-affix-system.js';
 import { createPetFromEnemy, getPetEffectiveAttack, getPetEffectiveHpBonus, normalizePet } from './pet-system.js';
 import { getPetCodexBonuses, syncPetCodex } from './pet-codex-system.js';
 import { ensurePetTeam, getPetSupportBonuses } from './pet-team-system.js';
@@ -21,12 +22,25 @@ export function recompute(state) {
   const player = basePlayer(prior.level || 1);
   player.name = prior.name || player.name; player.exp = prior.exp || 0; player.gold = prior.gold || 0; player.diamonds = prior.diamonds || 0;
   const percent={attack:0,defense:0,maxHp:0};
+  const affixBonuses={flat:{},additiveRate:{},intervalMultiplier:1,bossDamage:0,normalDamage:0,goldBonus:0,expBonus:0};
   for (const item of Object.values(state.equipped || {})) {
     const multiplier=1+(item?.enhance||0)*.08;
     for (const [key,value] of Object.entries(item?.stats || {})) player[key] = (player[key] || 0) + value*multiplier;
-    for (const affix of item?.affixes || []) { if(affix.mode==='percent') percent[affix.key]=(percent[affix.key]||0)+affix.value; else player[affix.key]=(player[affix.key]||0)+affix.value; }
+    const bonus=getEquipmentAffixBonuses(item);
+    for(const [key,value] of Object.entries(bonus.flat)) affixBonuses.flat[key]=(affixBonuses.flat[key]||0)+value;
+    for(const [key,value] of Object.entries(bonus.percent)) percent[key]=(percent[key]||0)+value;
+    for(const [key,value] of Object.entries(bonus.additiveRate)) affixBonuses.additiveRate[key]=(affixBonuses.additiveRate[key]||0)+value;
+    affixBonuses.intervalMultiplier*=bonus.intervalMultiplier;
+    for(const key of ['bossDamage','normalDamage','goldBonus','expBonus']) affixBonuses[key]+=bonus[key];
   }
+  for(const [key,value] of Object.entries(affixBonuses.flat)) player[key]=(player[key]||0)+value;
   for(const [key,value] of Object.entries(percent)) player[key]*=1+value;
+  for(const [key,value] of Object.entries(affixBonuses.additiveRate)) player[key]=(player[key]||0)+value;
+  player.attackSpeed*=affixBonuses.intervalMultiplier;
+  player.equipmentBossDamageBonus=affixBonuses.bossDamage; player.equipmentNormalDamageBonus=affixBonuses.normalDamage;
+  player.equipmentGoldBonus=affixBonuses.goldBonus; player.equipmentExpBonus=affixBonuses.expBonus;
+  player.bossDamage=affixBonuses.bossDamage; player.normalDamage=affixBonuses.normalDamage;
+  player.goldBonus=affixBonuses.goldBonus; player.expBonus=affixBonuses.expBonus;
   const pet = state.pets?.find(entry => entry.id === state.petTeam.main);
   const team = getPetSupportBonuses(state);
   if (pet) { player.attack += getPetEffectiveAttack(pet); player.maxHp += getPetEffectiveHpBonus(pet); }
@@ -54,6 +68,7 @@ export function recompute(state) {
   player.maxHp *= 1 + synergy.hp;
   player.crit += synergy.crit;
   player.bossDamage = (player.bossDamage || 0) + synergy.bossDamage;
+  player.normalDamage = (player.normalDamage || 0) + synergy.normalDamage;
   player.goldBonus = (player.goldBonus || 0) + synergy.goldBonus;
   player.expBonus = (player.expBonus || 0) + synergy.expBonus;
   player.attackSpeed *= synergy.attackIntervalMultiplier;
@@ -71,21 +86,19 @@ export function recompute(state) {
 }
 
 function quality(random) { let roll = random()*100; for (const entry of BALANCE.quality) { roll -= entry.weight; if (roll <= 0) return entry; } return BALANCE.quality[0]; }
-const affixCount={common:[0,0],uncommon:[1,1],rare:[1,2],epic:[2,3],legendary:[3,4],mythic:[4,5],astral:[5,5]};
-const roundAffix=value=>Math.abs(value)<1?+value.toFixed(3):Math.round(value);
-function rollAffixes(tier,mapLevel,random){const [min,max]=affixCount[tier.id]||[0,0];const count=min+Math.floor(random()*(max-min+1));const pool=[...AFFIXES],out=[];for(let i=0;i<count&&pool.length;i+=1){const index=Math.floor(random()*pool.length),base=pool.splice(index,1)[0],scale=1+(mapLevel-1)*.035+(tier.id==='astral'?.25:0),value=roundAffix((base.min+random()*(base.max-base.min))*scale);out.push({...base,value});}return out;}
 export function createEquipment(mapLevel=1, boss=false, random=Math.random) {
   const slot = Object.keys(SLOTS)[Math.floor(random()*Object.keys(SLOTS).length)];
   let tier = quality(random); if (boss && tier.id === 'common') tier = QUALITY.uncommon;
   const scale=(6+mapLevel*2.5)*tier.power*(boss?1.22:1); const stats={};
   if(slot==='weapon') stats.attack=Math.round(scale*1.9); else if(slot==='armor'){stats.maxHp=Math.round(scale*16);stats.defense=Math.round(scale*.42);} else if(slot==='helmet'){stats.defense=Math.round(scale*.48);stats.crit=+(scale*.0018).toFixed(3);} else if(slot==='gloves'){stats.attack=Math.round(scale);stats.crit=+(scale*.002).toFixed(3);} else if(slot==='boots'){stats.attackSpeed=-Math.min(.22,scale*.002);stats.defense=Math.round(scale*.18);} else if(slot==='necklace'){stats.attack=Math.round(scale*.8);stats.critDamage=+(scale*.005).toFixed(3);} else if(slot==='ring'){stats.crit=+(scale*.003).toFixed(3);stats.attack=Math.round(scale*.55);} else stats.maxHp=Math.round(scale*10);
   const names={weapon:'星痕長劍',helmet:'銀穹頭環',armor:'月紗鎧甲',gloves:'流光手甲',boots:'疾星戰靴',necklace:'星核項鍊',ring:'晨曦戒指',wings:'輝翼披風'};
-  const affixes=rollAffixes(tier,mapLevel,random); const power=Math.floor(Object.values(stats).reduce((sum,v)=>sum+Math.abs(v)*(Math.abs(v)<1?220:4),0)+affixes.reduce((sum,a)=>sum+Math.abs(a.value)*(a.mode==='percent'?360:a.key==='regen'?3:60),0));
-  return {id:`gear_${Date.now()}_${Math.floor(random()*1e6)}`,slot,level:mapLevel,quality:tier.id,label:tier.label,color:tier.color,name:names[slot],stats,affixes,enhance:0,power,locked:false,obtainedAt:Date.now()};
+  const affixes=generateEquipmentAffixes({slot,quality:tier.id,level:mapLevel,random});
+  const item={id:`gear_${Date.now()}_${Math.floor(random()*1e6)}`,slot,level:mapLevel,quality:tier.id,label:tier.label,color:tier.color,name:names[slot],stats,affixes,enhance:0,locked:false,obtainedAt:Date.now()};
+  item.power=calculateEquipmentPower(item); return item;
 }
 
-export function equipmentPower(item){return Math.floor((item?.power||0)*(1+(item?.enhance||0)*.08));}
-export function compareEquipment(next,current){const keys=['attack','defense','maxHp','crit','critDamage','attackSpeed','skillDamage','bossDamage'];const total=(item,key)=>{let value=(item?.stats?.[key]||0)*(1+(item?.enhance||0)*.08);for(const affix of item?.affixes||[])if(affix.key===key)value+=affix.value;return value;};return {power:equipmentPower(next)-equipmentPower(current),stats:Object.fromEntries(keys.map(key=>[key,total(next,key)-total(current,key)]))};}
+export function equipmentPower(item){return calculateEquipmentPower(item);}
+export function compareEquipment(next,current){const keys=['attack','defense','maxHp','crit','critDamage','attackSpeed','bossDamage','normalDamage','goldBonus','expBonus'];const a=getEquipmentStatProfile(next),b=getEquipmentStatProfile(current);return {power:equipmentPower(next)-equipmentPower(current),stats:Object.fromEntries(keys.map(key=>[key,(a[key]||0)-(b[key]||0)])),affixes:{next:next?.affixes||[],current:current?.affixes||[]}};}
 export function enhanceCost(item){return Math.floor(80*(item.level+1)*(1+(item.enhance||0))**1.45);}
 export function enhanceChance(item){const n=item.enhance||0;if(n<3)return 1;if(n===3)return .9;if(n===4)return .85;if(n===5)return .75;if(n===6)return .65;if(n===7)return .55;if(n===8)return .45;if(n===9)return .35;return Math.max(.2,.32-(n-10)*.02);}
 

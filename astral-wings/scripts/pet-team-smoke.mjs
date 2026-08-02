@@ -5,6 +5,7 @@ import { defaultState, importSave } from '../src/astral-world/save.js';
 import { normalizePet } from '../src/astral-world/pet-system.js';
 import { getPetSupportBonuses, setPetTeamSlot } from '../src/astral-world/pet-team-system.js';
 import { AstralUI } from '../src/astral-world/ui.js';
+import { SAVE_VERSION } from '../src/astral-world/data.js';
 
 const saved = new Map();
 globalThis.localStorage = { getItem:key=>saved.get(key) || null, setItem:(key,value)=>saved.set(key,value), removeItem:key=>saved.delete(key) };
@@ -46,7 +47,7 @@ assert.ok(state.pets.find(entry => entry.id === 'main').skillEnergy > 0, 'main p
 assert.equal(state.pets.find(entry => entry.id === 'support-a').skillEnergy, supportEnergy, 'support must not gain skill energy');
 
 const legacy = importSave(JSON.stringify({ ...defaultState(), version:8, pets:[pet('legacy-main','wolf',90,50)], activePetId:'legacy-main', petTeam:undefined }));
-assert.equal(legacy.version, 9);
+assert.equal(legacy.version, SAVE_VERSION);
 assert.equal(legacy.petTeam.main, 'legacy-main');
 assert.deepEqual(legacy.petTeam.support, [null, null]);
 assert.equal(legacy.activePetId, 'legacy-main');

@@ -1,5 +1,5 @@
 import { MAPS, PET_SKILL_BALANCE, SKILLS, SLOTS } from './data.js';
-import { addExp, createEquipment, enhanceChance, enhanceCost, enemyFor, petFromEnemy, recompute } from './core.js';
+import { addExp, createEquipment, enhanceChance, enhanceCost, enemyFor, equipmentPower, petFromEnemy, recompute } from './core.js';
 import { saveState } from './save.js';
 import { applyPetCapture, canCastPetSkill, evolvePet as applyPetEvolution, getPetCombatModifiers, getPetDisplayName, getPetEffectiveAttack, getPetSkillDefinition, getPetSkillProfile, grantPetExperience, starPet as applyPetStar } from './pet-system.js';
 import { ensurePetTeam, setPetTeamSlot as assignPetTeamSlot } from './pet-team-system.js';
@@ -169,7 +169,7 @@ export class IdleGame {
     if (forcedCritical && criticalMultiplier > 1) raw *= criticalMultiplier;
     if (source === 'playerSkill') raw *= 1 + (this.state.player.skillDamage || 0);
     if (enemy.boss) raw *= 1 + (this.state.player.bossDamage || 0);
-    else if (enemy.boss === false) raw *= 1 + (this.state.player.petSynergyNormalDamageBonus || 0);
+    else if (enemy.boss === false) raw *= 1 + (this.state.player.normalDamage || 0);
     if (enemy.effects?.vulnerability) raw *= 1 + enemy.effects.vulnerability.value;
     const reduced = Math.max(1, raw * (100 / (100 + enemy.defense)));
     enemy.hp = Math.max(0, enemy.hp - reduced); enemy.hit = .12; enemy.action = 'hurt'; enemy.actionIn = .14;
@@ -279,13 +279,13 @@ export class IdleGame {
   grantEquipment(fromBoss) {
     const state = this.state; const item = createEquipment(state.mapId, fromBoss);
     const autoSellRank = qualityRank[state.settings.autoSell] || 0;
-    if (autoSellRank && qualityRank[item.quality] <= autoSellRank) { const value = Math.floor(item.power * 2.4); state.player.gold += value; this.event('自動出售', `${item.name} 已換得 ${value} 金幣。`); return; }
+    if (autoSellRank && qualityRank[item.quality] <= autoSellRank) { const value = Math.floor(equipmentPower(item) * 2.4); state.player.gold += value; this.event('自動出售', `${item.name} 已換得 ${value} 金幣。`); return; }
     if (state.inventory.length >= 100) { this.event('背包已滿', `${item.name} 無法放入背包。`); return; }
     state.inventory.push(item); state.stats.equipment += 1; this.quest('equipment', 1);
     let equipped = false;
-    if (state.settings.autoEquip) { const current = state.equipped[item.slot]; if (!current || item.power > current.power * 1.05) { state.equipped[item.slot] = item; equipped = true; } }
+    if (state.settings.autoEquip) { const current = state.equipped[item.slot]; if (!current || equipmentPower(item) > equipmentPower(current) * 1.05) { state.equipped[item.slot] = item; equipped = true; } }
     recompute(state); this.renderer.pulse('burst', 235, 260, item.color, 44);
-    this.event(`${item.name} 掉落`, `${item.label} ${equipped ? '已自動裝備，' : ''}戰力 +${item.power}`);
+    this.event(`${item.name} 掉落`, `${item.label} ${equipped ? '已自動裝備，' : ''}戰力 +${equipmentPower(item)}`);
   }
 
   capture(enemy) {
@@ -301,10 +301,10 @@ export class IdleGame {
   challengeBoss() { if (this.battle.enemy || this.state.killsInStage < 10) return false; this.battle.bossMode = true; this.battle.spawnIn = .15; return true; }
   setMap(mapId) { if (mapId > this.state.highestMap || mapId < 1 || mapId > MAPS.length) return false; this.state.mapId = mapId; this.state.stage = 1; this.state.killsInStage = 0; this.battle = this.newBattle(); this.event('前往新地圖', MAPS[mapId - 1].name); return true; }
   equip(itemId) { const item = this.state.inventory.find(entry => entry.id === itemId); if (!item) return false; this.state.equipped[item.slot] = item; recompute(this.state); this.event('裝備變更', `${item.name} 已裝備至 ${SLOTS[item.slot].label}`); return true; }
-  sell(itemId) { const item = this.state.inventory.find(entry => entry.id === itemId); if (!item || item.locked || this.state.equipped[item.slot]?.id === item.id) return false; this.state.inventory = this.state.inventory.filter(entry => entry.id !== itemId); this.state.player.gold += Math.floor(item.power * 2.4); this.event('出售裝備', `${item.name} 已換成金幣。`); return true; }
+  sell(itemId) { const item = this.state.inventory.find(entry => entry.id === itemId); if (!item || item.locked || this.state.equipped[item.slot]?.id === item.id) return false; this.state.inventory = this.state.inventory.filter(entry => entry.id !== itemId); this.state.player.gold += Math.floor(equipmentPower(item) * 2.4); this.event('出售裝備', `${item.name} 已換成金幣。`); return true; }
   toggleLock(itemId) { const item = this.state.inventory.find(entry => entry.id === itemId); if (!item) return false; item.locked = !item.locked; return true; }
   enhance(itemId) { const item=this.state.inventory.find(entry=>entry.id===itemId); if(!item)return {ok:false,reason:'missing'}; item.enhance=item.enhance||0; const cost=enhanceCost(item); if(this.state.player.gold<cost)return {ok:false,reason:'gold',cost}; this.state.player.gold-=cost; const chance=enhanceChance(item); if(Math.random()<=chance){item.enhance+=1; recompute(this.state); this.renderer.pulse('burst',235,260,item.color,52); this.event('強化成功',`${item.name} +${item.enhance}`);return {ok:true,cost,chance,item};} const down=item.enhance>=10&&Math.random()<.18; if(down)item.enhance-=1; recompute(this.state);this.event('強化失敗',down?'強化等級下降 1 級。':'僅消耗金幣，裝備未損失。');return {ok:false,reason:'fail',cost,chance,down,item}; }
-  equipBest() { let changed=0; for(const item of this.state.inventory){const current=this.state.equipped[item.slot];const score=(entry)=>(entry?.power||0)*(1+(entry?.enhance||0)*.08);if(!current||score(item)>score(current)){this.state.equipped[item.slot]=item;changed+=1;}}if(changed){recompute(this.state);this.event('最佳裝備',`已穿戴 ${changed} 件更強裝備。`);}return changed; }
+  equipBest() { let changed=0; for(const item of this.state.inventory){const current=this.state.equipped[item.slot];if(!current||equipmentPower(item)>equipmentPower(current)){this.state.equipped[item.slot]=item;changed+=1;}}if(changed){recompute(this.state);this.event('最佳裝備',`已穿戴 ${changed} 件更強裝備。`);}return changed; }
   toggleSkill(index) { this.state.skillAuto[index] = !this.state.skillAuto[index]; return this.state.skillAuto[index]; }
   upgradeSkill(index) { const price = 100 * (this.state.skills[index] || 1); if (this.state.player.gold < price) return false; this.state.player.gold -= price; this.state.skills[index] += 1; recompute(this.state); return true; }
   setActivePet(id) { return this.setPetTeamSlot(id, 'main'); }

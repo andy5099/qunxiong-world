@@ -5,7 +5,7 @@ import { ensureTutorial } from './tutorial-system.js';
 import { ensureObjectives, ensureUnlocks } from './objective-system.js';
 import { ensurePetCodex, syncPetCodex } from './pet-codex-system.js';
 import { ensurePetTeam } from './pet-team-system.js';
-import { getPetTeamSynergyBonuses } from './pet-synergy-system.js';
+import { normalizeEquipment } from './equipment-affix-system.js';
 
 const now = () => Date.now();
 const dayKey = () => new Date().toISOString().slice(0, 10);
@@ -59,8 +59,10 @@ function merge(base, raw) {
   const state = { ...base, ...(raw || {}) };
   state.version = SAVE_VERSION;
   state.player = { ...base.player, ...(raw?.player || {}) };
-  state.inventory = Array.isArray(raw?.inventory) ? raw.inventory : [];
-  state.equipped = raw?.equipped && typeof raw.equipped === 'object' ? raw.equipped : {};
+  state.inventory = Array.isArray(raw?.inventory) ? raw.inventory.map(normalizeEquipment).filter(Boolean) : [];
+  const inventoryById=new Map(state.inventory.map(item=>[item.id,item]));
+  state.equipped = {};
+  if(raw?.equipped && typeof raw.equipped==='object') for(const [slot,item] of Object.entries(raw.equipped)){const normalized=inventoryById.get(item?.id)||normalizeEquipment(item);if(normalized)state.equipped[slot]=normalized;}
   const petMigration = migratePets(Array.isArray(raw?.pets) ? raw.pets : [], raw?.petFragments && typeof raw.petFragments === 'object' ? raw.petFragments : {}, raw?.activePetId || null);
   state.pets = petMigration.pets;
   state.petFragments = petMigration.fragments;
@@ -102,13 +104,12 @@ function makeOffline(state, elapsedMs) {
   const battles = Math.floor(seconds / cycle);
   // Offline encounters are ordinary map fights: discovery attack applies, half of the
   // pet-output bonus is represented in the estimate, and Boss damage is deliberately excluded.
-  const synergy=getPetTeamSynergyBonuses(state);
   const codexCombat = 1 + Math.min(.12, (state.player?.codexAttackBonus || 0) + (state.player?.codexPetDamageBonus || 0) * .5);
   const multiplier = 0.35 * codexCombat;
   return {
     seconds,
-    exp: Math.floor(baseline.exp * battles * multiplier * (1 + synergy.expBonus)),
-    gold: Math.floor(baseline.gold * battles * multiplier * (1 + synergy.goldBonus)),
+    exp: Math.floor(baseline.exp * battles * multiplier * (1 + (state.player?.expBonus || 0))),
+    gold: Math.floor(baseline.gold * battles * multiplier * (1 + (state.player?.goldBonus || 0))),
     equipment: Math.min(8, Math.floor(battles / 42)),
     fragments: Math.min(12, Math.floor(battles / 70)),
     claimed: false,
