@@ -1,0 +1,4 @@
+const glyphs=['<path d="M9 34C19 13 32 8 41 10 31 14 24 22 18 38z"/><path d="M8 39c14-7 24-16 31-27"/>','<path d="M8 17h20l-8 7h20M8 31h19l-7 7h19"/><path d="M32 8l7 7-7 7M31 27l8 7-8 7"/>','<path d="M24 6l15 7v12c0 10-7 15-15 18-8-3-15-8-15-18V13z"/><path d="M17 25l5 5 10-12"/>','<path d="M24 4l5 13 14-1-11 9 5 14-13-8-13 8 5-14-11-9 14 1z"/><circle cx="24" cy="24" r="5"/>'];
+const colors=[['#8df5ff','#2870cf'],['#e4c2ff','#7250d2'],['#bafcff','#3c78c5'],['#fff09a','#df6e39']];
+export function skillIconSvg(index=0){const [a,b]=colors[index]||colors[0],id=`skill-${index}`;return `<svg viewBox="0 0 48 48" aria-hidden="true"><defs><radialGradient id="${id}"><stop stop-color="${a}"/><stop offset="1" stop-color="${b}"/></radialGradient></defs><g fill="url(#${id})" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${glyphs[index]||glyphs[0]}</g></svg>`;}
+export function validateSkillIcons(){return glyphs.length===4&&colors.length===4;}

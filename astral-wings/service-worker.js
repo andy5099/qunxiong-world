@@ -1,10 +1,12 @@
-const CACHE = 'astral-world-idle-v17';
+const CACHE = 'astral-world-idle-v18';
 const CORE = [
   './', './index.html', './styles.css', './manifest.webmanifest',
   './src/astral-world/main.js', './src/astral-world/data.js', './src/astral-world/core.js',
   './src/astral-world/save.js', './src/astral-world/renderer.js', './src/astral-world/monster-renderer.js', './src/astral-world/boss-renderer.js', './src/astral-world/pet-renderer.js', './src/astral-world/pet-system.js', './src/astral-world/pet-team-system.js', './src/astral-world/pet-synergy-system.js', './src/astral-world/pet-codex-system.js', './src/astral-world/game.js', './src/astral-world/ui.js', './src/astral-world/player-renderer.js',
-  './src/astral-world/tutorial-system.js', './src/astral-world/objective-system.js', './css/alpha-v02.css',
+  './src/astral-world/tutorial-system.js', './src/astral-world/objective-system.js', './css/alpha-v02.css', './css/visual-icons.css',
   './src/astral-world/equipment-affix-system.js',
+  './src/astral-world/visual-theme.js', './src/astral-world/battle-background-renderer.js',
+  './src/astral-world/ui-icons.js', './src/astral-world/equipment-icon-renderer.js', './src/astral-world/skill-icon-renderer.js',
 ];
 
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE))));

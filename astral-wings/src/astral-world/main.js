@@ -5,6 +5,7 @@ import { loadState, saveState } from './save.js';
 import { AstralUI } from './ui.js';
 import { updateObjective, updateUnlocks } from './objective-system.js';
 import { ensureTutorial } from './tutorial-system.js';
+import { installVisualIconObserver } from './ui-icons.js';
 
 const state = loadState();
 ensureTutorial(state);
@@ -20,6 +21,7 @@ const game = new IdleGame(state, renderer, {
   onEvent: event => ui?.event(event),
 });
 ui = new AstralUI(state, game, renderer, mapId => createEquipment(mapId));
+installVisualIconObserver(document, state);
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) saveState(game.state);
