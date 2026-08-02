@@ -1,6 +1,7 @@
 export function getSpriteFrame({ frameCount=1, fps=1, elapsed=0, loop=true, powerSave=false }={}) {
   const count=Math.max(1,Math.floor(frameCount));const rate=Math.max(.1,powerSave?Math.min(fps,6):fps);const raw=Math.max(0,Math.floor(elapsed*rate));return loop?raw%count:Math.min(count-1,raw);
 }
+export function isSpriteAnimationComplete({frameCount=1,fps=1,elapsed=0,powerSave=false}={}){const rate=Math.max(.1,powerSave?Math.min(fps,6):fps);return elapsed*rate>=Math.max(1,frameCount);}
 
 export function drawSpriteAnimation(ctx,image,options={}) {
   if(!ctx||!image||!image.complete||!image.naturalWidth)return false;

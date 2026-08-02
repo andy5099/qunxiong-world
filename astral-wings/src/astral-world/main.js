@@ -7,6 +7,7 @@ import { updateObjective, updateUnlocks } from './objective-system.js';
 import { ensureTutorial } from './tutorial-system.js';
 import { installVisualIconObserver } from './ui-icons.js';
 import { applyUiArtAssets, getArtLoadStatus, loadArtManifest, preloadArtAssets } from './art-asset-manager.js';
+import { getRegionOneArtStatus, validateRegionOneProductionAssets } from './region-one-art-validator.js';
 
 const state = loadState();
 loadArtManifest().then(()=>preloadArtAssets({bundle:'region01'})).then(()=>{applyUiArtAssets(document);const fallback=getArtLoadStatus().failed>0;document.getElementById('app')?.classList.toggle('art-fallback-active',fallback);const notice=document.getElementById('artFallbackNotice');if(notice)notice.hidden=!fallback;});
@@ -37,4 +38,4 @@ if ('serviceWorker' in navigator) {
 
 if (state.offlinePending) setTimeout(() => ui.openOffline(), 350);
 game.start();
-window.AstralWorld = { game, get state() { return game.state; }, save: () => saveState(game.state) };
+window.AstralWorld = { game, get state() { return game.state; }, save: () => saveState(game.state), getRegionOneArtStatus, validateRegionOneProductionAssets };

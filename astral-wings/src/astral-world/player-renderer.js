@@ -41,7 +41,8 @@ function drawMagic(ctx, action, time) {
 export function drawPlayer(ctx, state, battle, x, y, time) {
   const player=state.player,action=battle.playerAction||'idle',hurt=action==='hurt'||battle.playerFlash>0,downed=action==='downed'||battle.reviveIn>0;
   const animation=downed?'death':hurt?'hurt':action.startsWith('skill')?'skill':action==='attack'?'attack':'idle';const id=`character.astralBlade.${animation}`,image=getArtAsset(id),definition=getArtAssetDefinition(id);
-  if(image&&definition&&drawSpriteAnimation(ctx,image,{...definition,elapsed:time,x,y,scale:.46,loop:definition.loop!==false,powerSave:state.settings?.powerSave}))return;
+  const spriteElapsed=definition?.loop===false?Math.max(0,(definition.frameCount/definition.fps)-(battle.playerActionIn||0)):time;
+  if(image&&definition&&drawSpriteAnimation(ctx,image,{...definition,elapsed:spriteElapsed,x,y,scale:.46,loop:definition.loop!==false,powerSave:state.settings?.powerSave}))return;
   const bob=downed?16:Math.sin(time*2.5)*2.2,swing=(action==='attack'||action.startsWith('skill'))?Math.sin(Math.min(1,(battle.playerActionIn||0)*7)*Math.PI)*.9:0,low=player.hp/player.maxHp<.3,walk=Math.sin(time*4)*2;
   ctx.save();ctx.translate(x,y+bob);if(downed)ctx.rotate(-.82);if(hurt&&Math.floor(time*18)%2===0)ctx.globalAlpha=.58;ctx.shadowColor=low?'#ff6980':'#65cfff';ctx.shadowBlur=15;
   ctx.fillStyle=low?'#5a263f':'#2a2466';poly(ctx,[[-14,14],[-31,36],[-12,31],[-3,16]]);ctx.fill();poly(ctx,[[13,14],[31,36],[11,31],[3,16]]);ctx.fill();

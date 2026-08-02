@@ -1,0 +1,97 @@
+{
+  "status": "production-assets-required",
+  "do_not_crop_reference_boards": true,
+  "priority": [
+    "background.region01.battle",
+    "character.astralBlade.idle",
+    "monster.region01.starSlime"
+  ],
+  "assets": [
+    {
+      "id": "background.region01.battle",
+      "path": "assets/game-art/backgrounds/region-01/battle.webp",
+      "size": "1170x1290 minimum",
+      "alpha": false
+    },
+    {
+      "id": "character.astralBlade.idle",
+      "path": "assets/game-art/characters/astral-blade/idle.webp",
+      "frame": "256x256",
+      "frames": 8,
+      "layout": "horizontal",
+      "alpha": true
+    },
+    {
+      "id": "character.astralBlade.attack",
+      "path": "assets/game-art/characters/astral-blade/attack.webp",
+      "frame": "256x256",
+      "frames": 8,
+      "layout": "horizontal",
+      "alpha": true
+    },
+    {
+      "id": "character.astralBlade.skill",
+      "path": "assets/game-art/characters/astral-blade/skill.webp",
+      "frame": "256x256",
+      "frames": 10,
+      "layout": "horizontal",
+      "alpha": true
+    },
+    {
+      "id": "character.astralBlade.hurt",
+      "path": "assets/game-art/characters/astral-blade/hurt.webp",
+      "frame": "256x256",
+      "frames": 4,
+      "layout": "horizontal",
+      "alpha": true
+    },
+    {
+      "id": "character.astralBlade.death",
+      "path": "assets/game-art/characters/astral-blade/death.webp",
+      "frame": "256x256",
+      "frames": 10,
+      "layout": "horizontal",
+      "alpha": true
+    },
+    {
+      "id": "monster.region01.starSlime",
+      "path": "assets/game-art/monsters/region-01/star-slime.webp",
+      "frame": "192x192",
+      "frames": 8,
+      "layout": "horizontal",
+      "alpha": true
+    },
+    {
+      "id": "monster.region01.moonRabbit",
+      "path": "assets/game-art/monsters/region-01/moon-rabbit.webp",
+      "frame": "192x192",
+      "frames": 8,
+      "layout": "horizontal",
+      "alpha": true
+    },
+    {
+      "id": "monster.region01.starBeetle",
+      "path": "assets/game-art/monsters/region-01/star-beetle.webp",
+      "frame": "192x192",
+      "frames": 8,
+      "layout": "horizontal",
+      "alpha": true
+    },
+    {
+      "id": "boss.region01.crownedBeast",
+      "path": "assets/game-art/bosses/region-01/crowned-beast.webp",
+      "frame": "384x384",
+      "frames": 10,
+      "layout": "horizontal",
+      "alpha": true
+    },
+    {
+      "id": "pet.region01.starSlime",
+      "path": "assets/game-art/pets/region-01/star-slime.webp",
+      "frame": "128x128",
+      "frames": 8,
+      "layout": "horizontal",
+      "alpha": true
+    }
+  ]
+}
