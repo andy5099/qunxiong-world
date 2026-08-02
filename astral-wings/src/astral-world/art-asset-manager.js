@@ -21,7 +21,7 @@ export function hasArtAsset(id){return Boolean(getArtAsset(id));}
 export function getArtLoadStatus(){return {...status,errors:[...status.errors]};}
 export function getArtManifest(){return manifest;}
 export function applyUiArtAssets(root=globalThis.document){
-  if(!root)return 0;const bindings=[['ui.battleHud','.combat-readout'],['ui.skillFrame','.skill-card'],['ui.equipmentFrame','.slot'],['ui.bossBarFrame','.boss-button'],['ui.hpBarFrame','.meter.hp'],['ui.mpBarFrame','.meter.shield'],['ui.panelFrame','.panel'],['ui.buttonNormal','.action'],['ui.buttonPrimary','.boss-button'],['ui.dialogueFrame','.modal-card'],['ui.combatLogFrame','.event-log']];let applied=0;
+  if(!root)return 0;const bindings=[['ui.battleHud','.combat-readout'],['ui.skillFrame','.skill-card'],['ui.equipmentFrame','.slot'],['ui.inventorySlot','.item-card'],['ui.bossBarFrame','.boss-button'],['ui.hpBarFrame','.meter.hp'],['ui.mpBarFrame','.meter.shield'],['ui.panelFrame','.panel'],['ui.buttonNormal','.action'],['ui.buttonPrimary','.boss-button'],['ui.dialogueFrame','.modal-card'],['ui.combatLogFrame','.event-log']];let applied=0;
   for(const [id,selector] of bindings){const image=getArtAsset(id),entry=getArtAssetDefinition(id);if(!image)continue;root.querySelectorAll(selector).forEach(node=>{node.style.setProperty('--aw-art-image',`url("${image.src}")`);node.style.setProperty('--aw-art-border',String(entry?.border||24));node.classList.add(entry?.type==='nine-slice'?'has-nine-slice-art':'has-art-image');applied+=1;});}return applied;
 }
 export function resetArtAssetManagerForTests(){manifest=null;manifestPromise=null;records.clear();Object.assign(status,{phase:'idle',total:0,loaded:0,failed:0,progress:0,errors:[]});}

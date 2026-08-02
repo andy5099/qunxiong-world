@@ -1,4 +1,4 @@
-const CACHE = 'astral-world-idle-v22';
+const CACHE = 'astral-world-idle-v23';
 const CORE = [
   './', './index.html', './styles.css', './manifest.webmanifest', './PRODUCTION_ASSET_SPEC.json', './assets/game-art/manifest.json', './assets/game-art/region-01-asset-spec.json',
   './src/astral-world/main.js', './src/astral-world/data.js', './src/astral-world/core.js',
@@ -9,6 +9,11 @@ const CORE = [
   './src/astral-world/ui-icons.js', './src/astral-world/equipment-icon-renderer.js', './src/astral-world/skill-icon-renderer.js',
   './src/astral-world/art-asset-manager.js', './src/astral-world/sprite-renderer.js', './src/astral-world/region-one-art-validator.js', './css/art-assets.css', './css/region-01-slice.css', './css/region-01-production.css',
   './assets/reference/astral-world-art-bible.png', './assets/reference/astral-world-ui-target.png', './assets/reference/astral-world-region1-production-guide.png',
+  './assets/game-art/backgrounds/region-01/battle.webp',
+  './assets/game-art/characters/astral-blade/idle.webp', './assets/game-art/characters/astral-blade/attack.webp', './assets/game-art/characters/astral-blade/skill.webp', './assets/game-art/characters/astral-blade/hurt.webp', './assets/game-art/characters/astral-blade/death.webp',
+  './assets/game-art/monsters/region-01/star-slime.webp', './assets/game-art/monsters/region-01/moon-rabbit.webp', './assets/game-art/monsters/region-01/star-beetle.webp', './assets/game-art/bosses/region-01/crowned-beast.webp', './assets/game-art/pets/region-01/star-slime.webp',
+  './assets/game-art/skills/player/star-blade.webp', './assets/game-art/skills/player/meteor-combo.webp', './assets/game-art/skills/player/star-burst.webp', './assets/game-art/skills/player/astral-shield.webp',
+  './assets/game-art/ui/battle-hud.webp', './assets/game-art/ui/skill-frame.webp', './assets/game-art/ui/equipment-frame.webp', './assets/game-art/ui/inventory-slot.webp', './assets/game-art/ui/boss-bar-frame.webp', './assets/game-art/ui/hp-bar-frame.webp', './assets/game-art/ui/mp-bar-frame.webp', './assets/game-art/ui/panel-frame.webp', './assets/game-art/ui/button-normal.webp', './assets/game-art/ui/button-primary.webp', './assets/game-art/ui/button-danger.webp', './assets/game-art/ui/dialogue-frame.webp', './assets/game-art/ui/combat-log-frame.webp',
 ];
 
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE))));
