@@ -1,3 +1,5 @@
+import { getArtAsset, getArtAssetDefinition } from './art-asset-manager.js';
+import { drawSpriteAnimation } from './sprite-renderer.js';
 const TAU = Math.PI * 2;
 
 function disc(ctx, x, y, r, fill, stroke = null) { ctx.fillStyle = fill; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill(); if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 1.2; ctx.stroke(); } }
@@ -101,6 +103,7 @@ const PET_DRAWERS={slimePet:drawSlimeEvolution,iceSlimePet:drawSlimeEvolution,ra
 
 export function drawPet(ctx, pet, { time=0, action='idle', actionIn=0, returnIn=0, summonIn=0, skillType=null, skillProgress=0, powerSave=false, silhouette=false } = {}, x=142, y=300) {
   if (!pet) return;
+  const artId=pet.sourceKind==='slime'?'pet.region01.starSlime':null,image=artId&&getArtAsset(artId),definition=artId&&getArtAssetDefinition(artId);if(image&&definition&&!silhouette&&drawSpriteAnimation(ctx,image,{...definition,elapsed:time,x,y,scale:.42,loop:true,powerSave}))return;
   const skill=action==='skill'; const attacking=action==='attack'||skill; const returning=action==='return'; const celebrating=action==='celebrate';
   const attackProgress=attacking ? Math.max(0, 1-actionIn/.36) : 0;
   const returnProgress=returning ? Math.max(0, returnIn/.26) : 0;

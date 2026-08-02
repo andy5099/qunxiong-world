@@ -6,8 +6,10 @@ import { AstralUI } from './ui.js';
 import { updateObjective, updateUnlocks } from './objective-system.js';
 import { ensureTutorial } from './tutorial-system.js';
 import { installVisualIconObserver } from './ui-icons.js';
+import { applyUiArtAssets, loadArtManifest, preloadArtAssets } from './art-asset-manager.js';
 
 const state = loadState();
+loadArtManifest().then(()=>preloadArtAssets({bundle:'region01'})).then(()=>applyUiArtAssets(document));
 ensureTutorial(state);
 const renderer = new BattleRenderer(document.getElementById('battleCanvas'));
 let ui;

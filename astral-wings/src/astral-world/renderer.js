@@ -4,6 +4,8 @@ import { drawMonster } from './monster-renderer.js';
 import { drawPlayer } from './player-renderer.js';
 import { drawPet as drawBattlePet } from './pet-renderer.js';
 import { drawBattleBackground } from './battle-background-renderer.js';
+import { getArtAsset } from './art-asset-manager.js';
+import { drawCoverImage } from './sprite-renderer.js';
 
 const W = 390;
 const H = 430;
@@ -66,7 +68,9 @@ export class BattleRenderer {
     const scene = this.scene;
     ctx.clearRect(0, 0, W, H);
     const map = MAPS[(scene?.state?.mapId || 1) - 1] || MAPS[0];
-    drawBattleBackground(ctx, map, { time: this.time, powerSave: scene?.state?.settings?.powerSave, stars: this.stars });
+    const background=map.id===1?getArtAsset('background.region01.battle'):null;
+    if(!drawCoverImage(ctx,background,W,H))drawBattleBackground(ctx, map, { time: this.time, powerSave: scene?.state?.settings?.powerSave, stars: this.stars });
+    else if(!scene?.state?.settings?.powerSave){ctx.save();ctx.globalAlpha=.22;ctx.fillStyle='#eaf8ff';this.stars.slice(0,10).forEach(star=>{ctx.beginPath();ctx.arc(star.x,star.y,star.r,0,Math.PI*2);ctx.fill();});ctx.restore();}
     if (!scene?.battle) return;
     const enemy = scene.battle.enemy;
     if (enemy) this.drawMonster(ctx, enemy, scene.battle, scene.state.settings?.powerSave);

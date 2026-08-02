@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "assets": {
+    "character.astralBlade.idle": { "src": "characters/astral-blade/idle.webp", "type": "sprite", "frameWidth": 256, "frameHeight": 256, "frameCount": 8, "fps": 8, "anchorX": 0.5, "anchorY": 0.82 },
+    "character.astralBlade.attack": { "src": "characters/astral-blade/attack.webp", "type": "sprite", "frameWidth": 256, "frameHeight": 256, "frameCount": 8, "fps": 14, "loop": false, "anchorX": 0.5, "anchorY": 0.82 },
+    "character.astralBlade.skill": { "src": "characters/astral-blade/skill.webp", "type": "sprite", "frameWidth": 256, "frameHeight": 256, "frameCount": 10, "fps": 15, "loop": false, "anchorX": 0.5, "anchorY": 0.82 },
+    "character.astralBlade.hurt": { "src": "characters/astral-blade/hurt.webp", "type": "sprite", "frameWidth": 256, "frameHeight": 256, "frameCount": 4, "fps": 12, "loop": false, "anchorX": 0.5, "anchorY": 0.82 },
+    "character.astralBlade.death": { "src": "characters/astral-blade/death.webp", "type": "sprite", "frameWidth": 256, "frameHeight": 256, "frameCount": 10, "fps": 10, "loop": false, "anchorX": 0.5, "anchorY": 0.82 },
+    "monster.region01.starSlime": { "src": "monsters/region-01/star-slime.webp", "type": "sprite", "frameWidth": 192, "frameHeight": 192, "frameCount": 8, "fps": 8, "anchorX": 0.5, "anchorY": 0.82 },
+    "monster.region01.moonRabbit": { "src": "monsters/region-01/moon-rabbit.webp", "type": "sprite", "frameWidth": 192, "frameHeight": 192, "frameCount": 8, "fps": 8, "anchorX": 0.5, "anchorY": 0.82 },
+    "monster.region01.starBeetle": { "src": "monsters/region-01/star-beetle.webp", "type": "sprite", "frameWidth": 192, "frameHeight": 192, "frameCount": 8, "fps": 8, "anchorX": 0.5, "anchorY": 0.82 },
+    "boss.region01.crownedBeast": { "src": "bosses/region-01/crowned-beast.webp", "type": "sprite", "frameWidth": 384, "frameHeight": 384, "frameCount": 10, "fps": 8, "anchorX": 0.5, "anchorY": 0.82 },
+    "pet.region01.starSlime": { "src": "pets/region-01/star-slime.webp", "type": "sprite", "frameWidth": 128, "frameHeight": 128, "frameCount": 8, "fps": 8, "anchorX": 0.5, "anchorY": 0.82 },
+    "background.region01.battle": { "src": "backgrounds/region-01/battle.webp", "type": "background" },
+    "skill.starBlade": { "src": "skills/star-blade.webp", "type": "image" },
+    "skill.meteorCombo": { "src": "skills/meteor-combo.webp", "type": "image" },
+    "skill.astralShield": { "src": "skills/astral-shield.webp", "type": "image" },
+    "skill.starBurst": { "src": "skills/star-burst.webp", "type": "image" },
+    "ui.battleHud": { "src": "ui/battle-hud.webp", "type": "nine-slice" },
+    "ui.skillFrame": { "src": "ui/skill-frame.webp", "type": "image" },
+    "ui.equipmentFrame": { "src": "ui/equipment-frame.webp", "type": "nine-slice" },
+    "ui.bossBar": { "src": "ui/boss-bar.webp", "type": "nine-slice" },
+    "ui.button": { "src": "ui/button.webp", "type": "nine-slice" },
+    "ui.primaryButton": { "src": "ui/button-primary.webp", "type": "nine-slice" },
+    "ui.panelTitle": { "src": "ui/panel-title.webp", "type": "image" }
+  },
+  "bundles": {
+    "region01": ["character.astralBlade.idle", "character.astralBlade.attack", "character.astralBlade.skill", "character.astralBlade.hurt", "character.astralBlade.death", "monster.region01.starSlime", "monster.region01.moonRabbit", "monster.region01.starBeetle", "boss.region01.crownedBeast", "pet.region01.starSlime", "background.region01.battle", "skill.starBlade", "skill.meteorCombo", "skill.astralShield", "skill.starBurst", "ui.battleHud", "ui.skillFrame", "ui.bossBar"]
+  }
+}
