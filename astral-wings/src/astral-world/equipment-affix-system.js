@@ -1,7 +1,7 @@
 const all = ['weapon','helmet','armor','gloves','boots','necklace','ring','wings'];
 const rate = (min, max) => ({ min, max });
 
-export const EQUIPMENT_AFFIX_DATA = {
+const RAW_EQUIPMENT_AFFIX_DATA = {
   attack_flat: { label:'鋒銳', stat:'attack', mode:'flat', slots:['weapon','gloves','ring'], range:rate(3,12), weight:12, minLevel:1 },
   hp_flat: { label:'堅韌', stat:'maxHp', mode:'flat', slots:['helmet','armor','boots','necklace'], range:rate(24,90), weight:12, minLevel:1 },
   defense_flat: { label:'鐵壁', stat:'defense', mode:'flat', slots:['helmet','armor','gloves','boots'], range:rate(2,9), weight:11, minLevel:1 },
@@ -19,6 +19,11 @@ export const EQUIPMENT_AFFIX_DATA = {
   pet_damage: { label:'共鳴', stat:'petDamage', mode:'additiveRate', slots:['necklace','ring','wings'], range:rate(.03,.09), weight:4, minLevel:1 },
   regen: { label:'星光再生', stat:'regen', mode:'flat', slots:['armor','necklace','wings'], range:rate(1,6), weight:3, minLevel:1 },
 };
+
+const qualityScale={common:.65,uncommon:.82,rare:1,epic:1.22,legendary:1.5,mythic:1.82,astral:2.2};
+const descriptions={attack:'提高攻擊',maxHp:'提高最大生命',defense:'提高防禦',crit:'提高暴擊率',critDamage:'提高暴擊傷害',attackSpeed:'縮短攻擊間隔',bossDamage:'提高對 Boss 傷害',normalDamage:'提高對普通怪傷害',goldBonus:'提高金幣取得',expBonus:'提高經驗取得',skillDamage:'提高技能傷害',petDamage:'提高寵物傷害',regen:'提高生命恢復'};
+const qualityValue=(value,mode)=>mode==='flat'?Math.max(1,Math.round(value)):+Math.max(.001,value).toFixed(4);
+export const EQUIPMENT_AFFIX_DATA=Object.freeze(Object.fromEntries(Object.entries(RAW_EQUIPMENT_AFFIX_DATA).map(([id,data])=>[id,Object.freeze({...data,id,name:data.label,description:descriptions[data.stat]||data.label,ranges:Object.freeze(Object.fromEntries(Object.entries(qualityScale).map(([quality,scale])=>[quality,Object.freeze([qualityValue(data.range.min*scale,data.mode),qualityValue(data.range.max*scale,data.mode)])])) )})])));
 
 export const EQUIPMENT_AFFIX_COUNT = {
   common:[0,0], uncommon:[0,1], rare:[1,1], epic:[1,2], legendary:[2,2], mythic:[2,3], astral:[3,3],
@@ -62,7 +67,8 @@ export function generateEquipmentAffixes({ slot, quality='common', level=1, rand
   const result=[];
   while (result.length<count && pool.length) {
     const index=weightedPick(pool, random), picked=pool.splice(index,1)[0];
-    const raw=(picked.data.range.min + random()*(picked.data.range.max-picked.data.range.min))*levelScale(level);
+    const range=picked.data.ranges[quality]||picked.data.ranges.common;
+    const raw=(range[0] + random()*(range[1]-range[0]))*levelScale(level);
     result.push({ id:picked.id, value:rounded(raw,picked.data.mode), stat:picked.data.stat, mode:picked.data.mode });
   }
   return result;
@@ -134,7 +140,8 @@ export function validateEquipmentAffixData() {
   for (const slot of all) if (Object.values(EQUIPMENT_AFFIX_DATA).filter(data=>data.slots.includes(slot)).length<2) errors.push(`${slot} 可用詞綴不足`);
   for (const [id,data] of Object.entries(EQUIPMENT_AFFIX_DATA)) {
     if (!data.label || !data.stat || !['flat','percent','additiveRate','intervalReduction'].includes(data.mode)) errors.push(`${id} 定義無效`);
-    if (!(data.range.min>=0) || !(data.range.max>=data.range.min) || !(data.weight>0)) errors.push(`${id} 數值範圍無效`);
+    if (!(data.weight>0) || Object.values(data.ranges||{}).some(range=>!(range[0]>=0)||!(range[1]>=range[0]))) errors.push(`${id} 數值範圍無效`);
+    for(const quality of Object.keys(EQUIPMENT_AFFIX_COUNT)) if(!data.ranges?.[quality]) errors.push(`${id} 缺少 ${quality} 數值範圍`);
   }
   for (const [quality,range] of Object.entries(EQUIPMENT_AFFIX_COUNT)) if (range[0]<0||range[1]<range[0]) errors.push(`${quality} 詞綴數量無效`);
   return errors;
