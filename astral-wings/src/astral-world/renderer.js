@@ -3,6 +3,7 @@ import { clamp } from './core.js';
 import { drawMonster } from './monster-renderer.js';
 import { drawPlayer } from './player-renderer.js';
 import { drawPet as drawBattlePet } from './pet-renderer.js';
+import { drawBattleBackground } from './battle-background-renderer.js';
 
 const W = 390;
 const H = 430;
@@ -65,13 +66,8 @@ export class BattleRenderer {
     const scene = this.scene;
     ctx.clearRect(0, 0, W, H);
     const map = MAPS[(scene?.state?.mapId || 1) - 1] || MAPS[0];
-    const gradient = ctx.createLinearGradient(0, 0, 0, H);
-    gradient.addColorStop(0, map.colors[0]); gradient.addColorStop(1, map.colors[1]);
-    ctx.fillStyle = gradient; ctx.fillRect(0, 0, W, H);
-    this.drawBackdrop(ctx, map);
-    this.drawBiome(ctx, map);
+    drawBattleBackground(ctx, map, { time: this.time, powerSave: scene?.state?.settings?.powerSave, stars: this.stars });
     if (!scene?.battle) return;
-    this.drawFloor(ctx, map);
     const enemy = scene.battle.enemy;
     if (enemy) this.drawMonster(ctx, enemy, scene.battle, scene.state.settings?.powerSave);
     this.drawPet(ctx, scene.state, scene.battle, 142, 300);
@@ -177,9 +173,9 @@ export class BattleRenderer {
     for (const effect of this.effects) {
       const ratio = effect.life / effect.max;
       ctx.save(); ctx.globalAlpha = ratio; ctx.strokeStyle = effect.color; ctx.fillStyle = effect.color; ctx.lineWidth = 2;
-      if (effect.type === 'slash') { ctx.beginPath(); ctx.arc(effect.x, effect.y, effect.size * (1.35 - ratio), -.8, 1.7); ctx.stroke(); }
+      if (effect.type === 'slash') { ctx.lineWidth=5;ctx.shadowColor=effect.color;ctx.shadowBlur=12;ctx.beginPath();ctx.arc(effect.x, effect.y, effect.size * (1.35 - ratio), -.95, 1.55);ctx.stroke();ctx.lineWidth=1.2;ctx.strokeStyle='#fff';ctx.stroke(); }
       else if (effect.type === 'burst') { ctx.beginPath(); ctx.arc(effect.x, effect.y, effect.size * (1.2 - ratio), 0, Math.PI * 2); ctx.stroke(); for (let i = 0; i < 7; i += 1) { const a = i * .9 + this.time; ctx.fillRect(effect.x + Math.cos(a) * effect.size * (1 - ratio), effect.y + Math.sin(a) * effect.size * (1 - ratio), 3, 3); } }
-      else if (effect.type === 'beam') { ctx.lineWidth=5;ctx.globalAlpha=ratio*.75;ctx.beginPath();ctx.moveTo(effect.x-4,effect.y);ctx.lineTo(278,effect.y-18);ctx.stroke();ctx.lineWidth=1;ctx.strokeStyle='#fff';ctx.stroke(); }
+      else if (effect.type === 'beam') { const beam=ctx.createLinearGradient(effect.x,effect.y,278,effect.y-18);beam.addColorStop(0,'rgba(255,255,255,.9)');beam.addColorStop(.4,effect.color);beam.addColorStop(1,'rgba(255,255,255,.2)');ctx.strokeStyle=beam;ctx.lineWidth=12;ctx.shadowColor=effect.color;ctx.shadowBlur=18;ctx.globalAlpha=ratio*.8;ctx.beginPath();ctx.moveTo(effect.x-4,effect.y);ctx.lineTo(278,effect.y-18);ctx.stroke();ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke(); }
       else if (effect.type === 'fire') { for(let i=0;i<(this.scene?.state?.settings?.powerSave?3:7);i+=1){const a=i*.9+this.time*4;ctx.fillRect(effect.x+Math.cos(a)*effect.size*(1-ratio),effect.y+Math.sin(a)*effect.size*.45,4,7);} }
       else if (effect.type === 'frost') { for(let i=0;i<6;i+=1){const a=i*Math.PI/3;ctx.beginPath();ctx.moveTo(effect.x,effect.y);ctx.lineTo(effect.x+Math.cos(a)*effect.size*(1-ratio),effect.y+Math.sin(a)*effect.size*(1-ratio));ctx.stroke();} }
       else if (effect.type === 'shield' || effect.type === 'heal') { ctx.beginPath();ctx.arc(effect.x,effect.y,effect.size*(1.15-ratio*.35),0,Math.PI*2);ctx.stroke();if(effect.type==='heal'){ctx.globalAlpha*=.7;ctx.fillText?.('✦',effect.x,effect.y-effect.size*(1-ratio));} }

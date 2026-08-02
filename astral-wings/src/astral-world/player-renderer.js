@@ -12,6 +12,7 @@ function drawFace(ctx, time, hurt) {
   ctx.fillStyle=hurt?'#ffe7df':'#f7d6bd';ctx.beginPath();ctx.arc(0,-39,12.5,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#263663';poly(ctx,[[-13,-42],[-10,-53],[-2,-57],[4,-54],[13,-48],[10,-39],[4,-46],[-2,-43],[-8,-38]]);ctx.fill();
   ctx.fillStyle='#6ecfff';ctx.beginPath();ctx.arc(-4,-39,1.65,0,Math.PI*2);ctx.arc(5,-39,1.65,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-4.5,-39.6,.55,0,7);ctx.arc(4.5,-39.6,.55,0,7);ctx.fill();
   ctx.strokeStyle='#a25c65';ctx.lineWidth=1.1;ctx.beginPath();ctx.arc(1,-34,2.7,.1,Math.PI-.1);ctx.stroke();
   ctx.fillStyle='#f09bad';ctx.globalAlpha=.45+.12*Math.sin(time*4);ctx.beginPath();ctx.arc(-8,-33,2,0,Math.PI*2);ctx.arc(9,-33,2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
 }
@@ -21,6 +22,8 @@ function drawArmor(ctx, time, level, low) {
   const steel=ctx.createLinearGradient(0,-24,0,28);steel.addColorStop(0,'#c9f2ff');steel.addColorStop(.35,'#4d83c4');steel.addColorStop(1,'#1b275e');ctx.fillStyle=steel;poly(ctx,[[-13,-21],[0,-27],[13,-21],[15,8],[8,24],[0,29],[-8,24],[-15,8]]);ctx.fill();ctx.strokeStyle='#d9f9ff';ctx.lineWidth=1.4;ctx.stroke();
   ctx.fillStyle='#66dcff';ctx.shadowColor='#4ddcff';ctx.shadowBlur=12+level*1.4;ctx.beginPath();ctx.arc(0,1,4+Math.sin(time*6)*.7,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
   ctx.strokeStyle=low?'#ff6a7d':'#78baff';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-10,8);ctx.lineTo(10,8);ctx.moveTo(-7,16);ctx.lineTo(7,16);ctx.stroke();
+  ctx.fillStyle='#e8c16d';poly(ctx,[[-18,-16],[-27,-11],[-25,-3],[-15,-8]]);ctx.fill();poly(ctx,[[18,-16],[27,-11],[25,-3],[15,-8]]);ctx.fill();
+  ctx.fillStyle='#17204b';ctx.fillRect(-13,27,9,17);ctx.fillRect(4,27,9,17);ctx.fillStyle='#d5efff';ctx.fillRect(-14,40,11,5);ctx.fillRect(3,40,11,5);
   if(level>=3){ctx.fillStyle='#4775c9';poly(ctx,[[-16,-12],[-34,-1],[-22,10],[-12,4]]);ctx.fill();poly(ctx,[[16,-12],[34,-1],[22,10],[12,4]]);ctx.fill();}
   if(level>=5){ctx.strokeStyle='#baf6ff';ctx.globalAlpha=.65;ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,2,27+Math.sin(time*4)*2,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;}
 }
