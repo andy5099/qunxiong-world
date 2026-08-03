@@ -5,9 +5,11 @@ export function isSpriteAnimationComplete({frameCount=1,fps=1,elapsed=0,powerSav
 
 export function drawSpriteAnimation(ctx,image,options={}) {
   if(!ctx||!image||!image.complete||!image.naturalWidth)return false;
-  const {frameWidth,frameHeight,frameCount=1,frameOffset=0,fps=8,elapsed=0,x=0,y=0,scale=1,anchorX=.5,anchorY=.5,flipX=false,loop=true,powerSave=false}=options;
-  if(!frameWidth||!frameHeight)return false;const frame=frameOffset+getSpriteFrame({frameCount,fps,elapsed,loop,powerSave});
-  ctx.save();ctx.translate(x,y);ctx.scale(flipX?-scale:scale,scale);ctx.drawImage(image,frame*frameWidth,0,frameWidth,frameHeight,-frameWidth*anchorX,-frameHeight*anchorY,frameWidth,frameHeight);ctx.restore();return true;
+  const {frameWidth,frameHeight,sourceX=0,sourceY=0,sourceHeight=frameHeight,drawWidth=frameWidth,drawHeight=frameHeight,frameCount=1,frameOffset=0,fps=8,elapsed=0,x=0,y=0,scale=1,anchorX=.5,anchorY=.5,flipX=false,loop=true,powerSave=false}=options;
+  if(!frameWidth||!sourceHeight||!drawWidth||!drawHeight)return false;const frame=frameOffset+getSpriteFrame({frameCount,fps,elapsed,loop,powerSave});
+  const sx=sourceX+frame*frameWidth;
+  if(sx<0||sourceY<0||sx+frameWidth>image.naturalWidth+.5||sourceY+sourceHeight>image.naturalHeight+.5)return false;
+  ctx.save();ctx.translate(x,y);ctx.scale(flipX?-scale:scale,scale);ctx.drawImage(image,sx,sourceY,frameWidth,sourceHeight,-drawWidth*anchorX,-drawHeight*anchorY,drawWidth,drawHeight);ctx.restore();return true;
 }
 
 export function drawCoverImage(ctx,image,width,height){

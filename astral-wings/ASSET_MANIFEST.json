@@ -1,0 +1,314 @@
+{
+  "version": 1,
+  "source": "region1-master-asset-sheet.png",
+  "assets": {
+    "background.region01.battle": {
+      "path": "assets/game-art/backgrounds/region-01/battle.webp",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    "character.astralBlade.idle": {
+      "path": "assets/game-art/characters/astral-blade/idle.webp",
+      "size": [
+        241,
+        55
+      ]
+    },
+    "character.astralBlade.move": {
+      "path": "assets/game-art/characters/astral-blade/move.webp",
+      "size": [
+        236,
+        55
+      ]
+    },
+    "character.astralBlade.attack": {
+      "path": "assets/game-art/characters/astral-blade/attack.webp",
+      "size": [
+        240,
+        57
+      ]
+    },
+    "character.astralBlade.skill": {
+      "path": "assets/game-art/characters/astral-blade/skill.webp",
+      "size": [
+        239,
+        57
+      ]
+    },
+    "character.astralBlade.hurt": {
+      "path": "assets/game-art/characters/astral-blade/hurt.webp",
+      "size": [
+        239,
+        49
+      ]
+    },
+    "character.astralBlade.death": {
+      "path": "assets/game-art/characters/astral-blade/death.webp",
+      "size": [
+        231,
+        40
+      ]
+    },
+    "monster.region01.star-slime.idle": {
+      "path": "assets/game-art/monsters/region-01/star-slime-idle.webp",
+      "size": [
+        236,
+        55
+      ]
+    },
+    "monster.region01.star-slime.move": {
+      "path": "assets/game-art/monsters/region-01/star-slime-move.webp",
+      "size": [
+        235,
+        57
+      ]
+    },
+    "monster.region01.star-slime.attack": {
+      "path": "assets/game-art/monsters/region-01/star-slime-attack.webp",
+      "size": [
+        234,
+        58
+      ]
+    },
+    "monster.region01.star-slime.hurt": {
+      "path": "assets/game-art/monsters/region-01/star-slime-hurt.webp",
+      "size": [
+        236,
+        58
+      ]
+    },
+    "monster.region01.star-slime.death": {
+      "path": "assets/game-art/monsters/region-01/star-slime-death.webp",
+      "size": [
+        231,
+        35
+      ]
+    },
+    "monster.region01.moon-rabbit.idle": {
+      "path": "assets/game-art/monsters/region-01/moon-rabbit-idle.webp",
+      "size": [
+        244,
+        55
+      ]
+    },
+    "monster.region01.moon-rabbit.move": {
+      "path": "assets/game-art/monsters/region-01/moon-rabbit-move.webp",
+      "size": [
+        240,
+        57
+      ]
+    },
+    "monster.region01.moon-rabbit.attack": {
+      "path": "assets/game-art/monsters/region-01/moon-rabbit-attack.webp",
+      "size": [
+        244,
+        58
+      ]
+    },
+    "monster.region01.moon-rabbit.hurt": {
+      "path": "assets/game-art/monsters/region-01/moon-rabbit-hurt.webp",
+      "size": [
+        244,
+        58
+      ]
+    },
+    "monster.region01.moon-rabbit.death": {
+      "path": "assets/game-art/monsters/region-01/moon-rabbit-death.webp",
+      "size": [
+        244,
+        56
+      ]
+    },
+    "monster.region01.star-beetle.idle": {
+      "path": "assets/game-art/monsters/region-01/star-beetle-idle.webp",
+      "size": [
+        220,
+        55
+      ]
+    },
+    "monster.region01.star-beetle.move": {
+      "path": "assets/game-art/monsters/region-01/star-beetle-move.webp",
+      "size": [
+        220,
+        57
+      ]
+    },
+    "monster.region01.star-beetle.attack": {
+      "path": "assets/game-art/monsters/region-01/star-beetle-attack.webp",
+      "size": [
+        220,
+        58
+      ]
+    },
+    "monster.region01.star-beetle.hurt": {
+      "path": "assets/game-art/monsters/region-01/star-beetle-hurt.webp",
+      "size": [
+        220,
+        58
+      ]
+    },
+    "monster.region01.star-beetle.death": {
+      "path": "assets/game-art/monsters/region-01/star-beetle-death.webp",
+      "size": [
+        220,
+        56
+      ]
+    },
+    "boss.region01.crownedBeast.idle": {
+      "path": "assets/game-art/bosses/region-01/crowned-beast-idle.webp",
+      "size": [
+        252,
+        55
+      ]
+    },
+    "boss.region01.crownedBeast.attack": {
+      "path": "assets/game-art/bosses/region-01/crowned-beast-attack.webp",
+      "size": [
+        262,
+        56
+      ]
+    },
+    "boss.region01.crownedBeast.rage": {
+      "path": "assets/game-art/bosses/region-01/crowned-beast-rage.webp",
+      "size": [
+        259,
+        58
+      ]
+    },
+    "boss.region01.crownedBeast.hurt": {
+      "path": "assets/game-art/bosses/region-01/crowned-beast-hurt.webp",
+      "size": [
+        253,
+        57
+      ]
+    },
+    "boss.region01.crownedBeast.death": {
+      "path": "assets/game-art/bosses/region-01/crowned-beast-death.webp",
+      "size": [
+        261,
+        52
+      ]
+    },
+    "pet.region01.starSlime.summon": {
+      "path": "assets/game-art/pets/region-01/star-slime-summon.webp",
+      "size": [
+        321,
+        45
+      ]
+    },
+    "pet.region01.starSlime.idle": {
+      "path": "assets/game-art/pets/region-01/star-slime-idle.webp",
+      "size": [
+        317,
+        52
+      ]
+    },
+    "pet.region01.starSlime.attack": {
+      "path": "assets/game-art/pets/region-01/star-slime-attack.webp",
+      "size": [
+        317,
+        52
+      ]
+    },
+    "pet.region01.starSlime.return": {
+      "path": "assets/game-art/pets/region-01/star-slime-return.webp",
+      "size": [
+        317,
+        50
+      ]
+    },
+    "pet.region01.starSlime.celebrate": {
+      "path": "assets/game-art/pets/region-01/star-slime-celebrate.webp",
+      "size": [
+        321,
+        48
+      ]
+    },
+    "skill.star-blade": {
+      "path": "assets/game-art/skills/player/star-blade.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "skill.astral-vortex": {
+      "path": "assets/game-art/skills/player/astral-vortex.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "skill.star-burst": {
+      "path": "assets/game-art/skills/player/star-burst.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "skill.astral-shield": {
+      "path": "assets/game-art/skills/player/astral-shield.webp",
+      "size": [
+        256,
+        256
+      ]
+    },
+    "ui.panel-frame": {
+      "path": "assets/game-art/ui/panel-frame.webp",
+      "size": [
+        125,
+        145
+      ]
+    },
+    "ui.button-set": {
+      "path": "assets/game-art/ui/button-set.webp",
+      "size": [
+        148,
+        145
+      ]
+    },
+    "ui.bar-set": {
+      "path": "assets/game-art/ui/bar-set.webp",
+      "size": [
+        140,
+        145
+      ]
+    },
+    "ui.inventory-slot": {
+      "path": "assets/game-art/ui/inventory-slot.webp",
+      "size": [
+        125,
+        145
+      ]
+    },
+    "ui.battle-hud": {
+      "path": "assets/game-art/ui/battle-hud.webp",
+      "size": [
+        682,
+        107
+      ]
+    },
+    "ui.boss-bar-frame": {
+      "path": "assets/game-art/ui/boss-bar-frame.webp",
+      "size": [
+        402,
+        107
+      ]
+    },
+    "ui.top-menu-buttons": {
+      "path": "assets/game-art/ui/top-menu-buttons.webp",
+      "size": [
+        433,
+        107
+      ]
+    },
+    "ui.icon-set": {
+      "path": "assets/game-art/ui/icon-set.webp",
+      "size": [
+        357,
+        172
+      ]
+    }
+  }
+}

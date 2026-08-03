@@ -1,3 +1,18 @@
-import assert from 'node:assert/strict';import{readFile}from'node:fs/promises';import{validateRegionOneProductionAssets,getRegionOneArtStatus}from'../src/astral-world/region-one-art-validator.js';import{getSpriteFrame,isSpriteAnimationComplete}from'../src/astral-world/sprite-renderer.js';
-const spec=JSON.parse(await readFile(new URL('../PRODUCTION_ASSET_SPEC.json',import.meta.url),'utf8'));const manifest=JSON.parse(await readFile(new URL('../assets/game-art/manifest.json',import.meta.url),'utf8'));assert.equal(spec.do_not_crop_reference_boards,true);assert.ok(spec.assets.length>=11);for(const asset of spec.assets){assert.ok(!asset.path.startsWith('/'));assert.equal(manifest.assets[asset.id]?.src,asset.path.replace('assets/game-art/',''));}
-const result=await validateRegionOneProductionAssets({fetcher:async url=>String(url).includes('PRODUCTION_ASSET_SPEC')?{ok:true,json:async()=>spec}:{ok:false,status:404}});assert.equal(result.ready.length,0);assert.equal(result.invalid.length,0);assert.equal(result.missing.length,spec.assets.length);assert.deepEqual(getRegionOneArtStatus(),{backgroundReady:false,heroReady:false,monstersReady:false,bossReady:false,petReady:false,skillsReady:false,uiReady:false});assert.equal(getSpriteFrame({frameCount:4,fps:8,elapsed:.5,loop:false}),3);assert.equal(isSpriteAnimationComplete({frameCount:4,fps:8,elapsed:.5}),true);assert.equal(isSpriteAnimationComplete({frameCount:4,fps:8,elapsed:.2}),false);console.log('Region 1 production integration smoke: PASS');
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { getSpriteFrame, isSpriteAnimationComplete } from '../src/astral-world/sprite-renderer.js';
+
+const library = JSON.parse(await readFile(new URL('../ASSET_MANIFEST.json', import.meta.url), 'utf8'));
+const manifest = JSON.parse(await readFile(new URL('../assets/game-art/manifest.json', import.meta.url), 'utf8'));
+assert.equal(library.version, 1);
+assert.equal(manifest.version, 4);
+const integratedPaths = new Set(Object.values(manifest.assets).map(asset => `assets/game-art/${asset.src}`));
+for (const [id, asset] of Object.entries(library.assets)) {
+  if (id === 'ui.button-set' || id === 'ui.bar-set' || id === 'ui.top-menu-buttons' || id === 'ui.icon-set') continue;
+  assert.ok(integratedPaths.has(asset.path), `${id} is not connected to the runtime manifest`);
+}
+for (const id of manifest.bundles.region01) assert.ok(manifest.assets[id], `missing bundled definition: ${id}`);
+assert.equal(getSpriteFrame({frameCount:4,fps:8,elapsed:.5,loop:false}),3);
+assert.equal(isSpriteAnimationComplete({frameCount:4,fps:8,elapsed:.5}),true);
+assert.equal(isSpriteAnimationComplete({frameCount:4,fps:8,elapsed:.2}),false);
+console.log('Region 1 complete asset integration smoke: PASS');

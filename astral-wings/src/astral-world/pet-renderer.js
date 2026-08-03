@@ -103,7 +103,8 @@ const PET_DRAWERS={slimePet:drawSlimeEvolution,iceSlimePet:drawSlimeEvolution,ra
 
 export function drawPet(ctx, pet, { time=0, action='idle', actionIn=0, returnIn=0, summonIn=0, skillType=null, skillProgress=0, powerSave=false, silhouette=false } = {}, x=142, y=300) {
   if (!pet) return;
-  const artId=pet.sourceKind==='slime'?'pet.region01.starSlime':null,image=artId&&getArtAsset(artId),definition=artId&&getArtAssetDefinition(artId);if(image&&definition&&!silhouette){const animation=summonIn>0?'summon':action==='attack'||action==='skill'?'attack':action==='return'?'return':action==='celebrate'?'celebrate':'idle',range=definition.animations?.[animation]||[0,definition.frameCount];if(drawSpriteAnimation(ctx,image,{...definition,frameOffset:range[0],frameCount:range[1],elapsed:time,x,y,scale:.42,loop:animation==='idle',powerSave}))return;}
+  const animation=summonIn>0?'summon':action==='attack'||action==='skill'?'attack':action==='return'?'return':action==='celebrate'?'celebrate':'idle';
+  const baseArtId=pet.sourceKind==='slime'?'pet.region01.starSlime':null,artId=baseArtId?`${baseArtId}.${animation}`:null,image=artId&&getArtAsset(artId),definition=artId&&getArtAssetDefinition(artId);if(image&&definition&&!silhouette){if(drawSpriteAnimation(ctx,image,{...definition,elapsed:time,x,y,scale:1,loop:animation==='idle',powerSave}))return;}
   const skill=action==='skill'; const attacking=action==='attack'||skill; const returning=action==='return'; const celebrating=action==='celebrate';
   const attackProgress=attacking ? Math.max(0, 1-actionIn/.36) : 0;
   const returnProgress=returning ? Math.max(0, returnIn/.26) : 0;
