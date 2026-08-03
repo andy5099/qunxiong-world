@@ -1,0 +1,812 @@
+{
+  "version": "2.0.0",
+  "generatedBy": "Astral World Asset Installer v2.0",
+  "assetCount": 77,
+  "assets": {
+    "backgrounds.region-01.battle": {
+      "src": "backgrounds/region-01/battle.webp",
+      "category": "backgrounds",
+      "width": 1920,
+      "height": 1080,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "bosses.region-01.crowned-beast-attack": {
+      "src": "bosses/region-01/crowned-beast-attack.webp",
+      "category": "bosses",
+      "width": 262,
+      "height": 56,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "bosses.region-01.crowned-beast-death": {
+      "src": "bosses/region-01/crowned-beast-death.webp",
+      "category": "bosses",
+      "width": 261,
+      "height": 52,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "bosses.region-01.crowned-beast-hurt": {
+      "src": "bosses/region-01/crowned-beast-hurt.webp",
+      "category": "bosses",
+      "width": 253,
+      "height": 57,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "bosses.region-01.crowned-beast-idle": {
+      "src": "bosses/region-01/crowned-beast-idle.webp",
+      "category": "bosses",
+      "width": 252,
+      "height": 55,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "bosses.region-01.crowned-beast-rage": {
+      "src": "bosses/region-01/crowned-beast-rage.webp",
+      "category": "bosses",
+      "width": 259,
+      "height": 58,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.astral-blade.attack": {
+      "src": "characters/astral-blade/attack.webp",
+      "category": "characters",
+      "width": 240,
+      "height": 57,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.astral-blade.death": {
+      "src": "characters/astral-blade/death.webp",
+      "category": "characters",
+      "width": 231,
+      "height": 40,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.astral-blade.hurt": {
+      "src": "characters/astral-blade/hurt.webp",
+      "category": "characters",
+      "width": 239,
+      "height": 49,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.astral-blade.idle": {
+      "src": "characters/astral-blade/idle.webp",
+      "category": "characters",
+      "width": 241,
+      "height": 55,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.astral-blade.move": {
+      "src": "characters/astral-blade/move.webp",
+      "category": "characters",
+      "width": 236,
+      "height": 55,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.astral-blade.skill": {
+      "src": "characters/astral-blade/skill.webp",
+      "category": "characters",
+      "width": 239,
+      "height": 57,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.female.attack-strip": {
+      "src": "characters/female/attack-strip.webp",
+      "category": "characters",
+      "width": 467,
+      "height": 89,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.female.death-strip": {
+      "src": "characters/female/death-strip.webp",
+      "category": "characters",
+      "width": 467,
+      "height": 79,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.female.hurt-strip": {
+      "src": "characters/female/hurt-strip.webp",
+      "category": "characters",
+      "width": 467,
+      "height": 89,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.female.idle-strip": {
+      "src": "characters/female/idle-strip.webp",
+      "category": "characters",
+      "width": 467,
+      "height": 96,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.female.skill1-strip": {
+      "src": "characters/female/skill1-strip.webp",
+      "category": "characters",
+      "width": 467,
+      "height": 93,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.female.skill2-strip": {
+      "src": "characters/female/skill2-strip.webp",
+      "category": "characters",
+      "width": 467,
+      "height": 93,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.female.walk-strip": {
+      "src": "characters/female/walk-strip.webp",
+      "category": "characters",
+      "width": 467,
+      "height": 95,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.male.attack-strip": {
+      "src": "characters/male/attack-strip.webp",
+      "category": "characters",
+      "width": 481,
+      "height": 89,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.male.death-strip": {
+      "src": "characters/male/death-strip.webp",
+      "category": "characters",
+      "width": 481,
+      "height": 79,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.male.hurt-strip": {
+      "src": "characters/male/hurt-strip.webp",
+      "category": "characters",
+      "width": 481,
+      "height": 89,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.male.idle-strip": {
+      "src": "characters/male/idle-strip.webp",
+      "category": "characters",
+      "width": 481,
+      "height": 96,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.male.skill1-strip": {
+      "src": "characters/male/skill1-strip.webp",
+      "category": "characters",
+      "width": 481,
+      "height": 93,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.male.skill2-strip": {
+      "src": "characters/male/skill2-strip.webp",
+      "category": "characters",
+      "width": 481,
+      "height": 93,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "characters.male.walk-strip": {
+      "src": "characters/male/walk-strip.webp",
+      "category": "characters",
+      "width": 481,
+      "height": 95,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "icons.player.astral-shield": {
+      "src": "icons/player/astral-shield.webp",
+      "category": "icons",
+      "width": 256,
+      "height": 256,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required"
+      ]
+    },
+    "icons.player.astral-vortex": {
+      "src": "icons/player/astral-vortex.webp",
+      "category": "icons",
+      "width": 256,
+      "height": 256,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required"
+      ]
+    },
+    "icons.player.star-blade": {
+      "src": "icons/player/star-blade.webp",
+      "category": "icons",
+      "width": 256,
+      "height": 256,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required"
+      ]
+    },
+    "icons.player.star-burst": {
+      "src": "icons/player/star-burst.webp",
+      "category": "icons",
+      "width": 256,
+      "height": 256,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "alpha_required"
+      ]
+    },
+    "monsters.region-01.moon-rabbit-attack": {
+      "src": "monsters/region-01/moon-rabbit-attack.webp",
+      "category": "monsters",
+      "width": 244,
+      "height": 58,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "monsters.region-01.moon-rabbit-death": {
+      "src": "monsters/region-01/moon-rabbit-death.webp",
+      "category": "monsters",
+      "width": 244,
+      "height": 56,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "monsters.region-01.moon-rabbit-hurt": {
+      "src": "monsters/region-01/moon-rabbit-hurt.webp",
+      "category": "monsters",
+      "width": 244,
+      "height": 58,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "monsters.region-01.moon-rabbit-idle": {
+      "src": "monsters/region-01/moon-rabbit-idle.webp",
+      "category": "monsters",
+      "width": 244,
+      "height": 55,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "monsters.region-01.moon-rabbit-move": {
+      "src": "monsters/region-01/moon-rabbit-move.webp",
+      "category": "monsters",
+      "width": 240,
+      "height": 57,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "monsters.region-01.star-beetle-attack": {
+      "src": "monsters/region-01/star-beetle-attack.webp",
+      "category": "monsters",
+      "width": 220,
+      "height": 58,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "monsters.region-01.star-beetle-death": {
+      "src": "monsters/region-01/star-beetle-death.webp",
+      "category": "monsters",
+      "width": 220,
+      "height": 56,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "monsters.region-01.star-beetle-hurt": {
+      "src": "monsters/region-01/star-beetle-hurt.webp",
+      "category": "monsters",
+      "width": 220,
+      "height": 58,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "monsters.region-01.star-beetle-idle": {
+      "src": "monsters/region-01/star-beetle-idle.webp",
+      "category": "monsters",
+      "width": 220,
+      "height": 55,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "monsters.region-01.star-beetle-move": {
+      "src": "monsters/region-01/star-beetle-move.webp",
+      "category": "monsters",
+      "width": 220,
+      "height": 57,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "monsters.region-01.star-slime-attack": {
+      "src": "monsters/region-01/star-slime-attack.webp",
+      "category": "monsters",
+      "width": 234,
+      "height": 58,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "monsters.region-01.star-slime-death": {
+      "src": "monsters/region-01/star-slime-death.webp",
+      "category": "monsters",
+      "width": 231,
+      "height": 35,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "monsters.region-01.star-slime-hurt": {
+      "src": "monsters/region-01/star-slime-hurt.webp",
+      "category": "monsters",
+      "width": 236,
+      "height": 58,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "monsters.region-01.star-slime-idle": {
+      "src": "monsters/region-01/star-slime-idle.webp",
+      "category": "monsters",
+      "width": 236,
+      "height": 55,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "monsters.region-01.star-slime-move": {
+      "src": "monsters/region-01/star-slime-move.webp",
+      "category": "monsters",
+      "width": 235,
+      "height": 57,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "pets.region-01.star-slime-attack": {
+      "src": "pets/region-01/star-slime-attack.webp",
+      "category": "pets",
+      "width": 317,
+      "height": 52,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "pets.region-01.star-slime-celebrate": {
+      "src": "pets/region-01/star-slime-celebrate.webp",
+      "category": "pets",
+      "width": 321,
+      "height": 48,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "pets.region-01.star-slime-idle": {
+      "src": "pets/region-01/star-slime-idle.webp",
+      "category": "pets",
+      "width": 317,
+      "height": 52,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "pets.region-01.star-slime-return": {
+      "src": "pets/region-01/star-slime-return.webp",
+      "category": "pets",
+      "width": 317,
+      "height": 50,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "pets.region-01.star-slime-summon": {
+      "src": "pets/region-01/star-slime-summon.webp",
+      "category": "pets",
+      "width": 321,
+      "height": 45,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    "ui.avatars.female-battle": {
+      "src": "ui/avatars/female-battle.webp",
+      "category": "ui",
+      "width": 141,
+      "height": 210,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.avatars.female-death": {
+      "src": "ui/avatars/female-death.webp",
+      "category": "ui",
+      "width": 115,
+      "height": 210,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.avatars.female-hurt": {
+      "src": "ui/avatars/female-hurt.webp",
+      "category": "ui",
+      "width": 141,
+      "height": 210,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.avatars.female-icon": {
+      "src": "ui/avatars/female-icon.webp",
+      "category": "ui",
+      "width": 140,
+      "height": 210,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.avatars.male-battle": {
+      "src": "ui/avatars/male-battle.webp",
+      "category": "ui",
+      "width": 142,
+      "height": 210,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.avatars.male-death": {
+      "src": "ui/avatars/male-death.webp",
+      "category": "ui",
+      "width": 130,
+      "height": 210,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.avatars.male-hurt": {
+      "src": "ui/avatars/male-hurt.webp",
+      "category": "ui",
+      "width": 141,
+      "height": 210,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.avatars.male-icon": {
+      "src": "ui/avatars/male-icon.webp",
+      "category": "ui",
+      "width": 140,
+      "height": 210,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.bar-set": {
+      "src": "ui/bar-set.webp",
+      "category": "ui",
+      "width": 140,
+      "height": 145,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.battle-hud": {
+      "src": "ui/battle-hud.webp",
+      "category": "ui",
+      "width": 682,
+      "height": 107,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.boss-bar-frame": {
+      "src": "ui/boss-bar-frame.webp",
+      "category": "ui",
+      "width": 402,
+      "height": 107,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.button-danger": {
+      "src": "ui/button-danger.webp",
+      "category": "ui",
+      "width": 110,
+      "height": 30,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.button-normal": {
+      "src": "ui/button-normal.webp",
+      "category": "ui",
+      "width": 110,
+      "height": 28,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.button-primary": {
+      "src": "ui/button-primary.webp",
+      "category": "ui",
+      "width": 110,
+      "height": 28,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.button-set": {
+      "src": "ui/button-set.webp",
+      "category": "ui",
+      "width": 148,
+      "height": 145,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.combat-log-frame": {
+      "src": "ui/combat-log-frame.webp",
+      "category": "ui",
+      "width": 340,
+      "height": 110,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.dialogue-frame": {
+      "src": "ui/dialogue-frame.webp",
+      "category": "ui",
+      "width": 220,
+      "height": 140,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.equipment-frame": {
+      "src": "ui/equipment-frame.webp",
+      "category": "ui",
+      "width": 96,
+      "height": 96,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.hp-bar-frame": {
+      "src": "ui/hp-bar-frame.webp",
+      "category": "ui",
+      "width": 89,
+      "height": 22,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.icon-set": {
+      "src": "ui/icon-set.webp",
+      "category": "ui",
+      "width": 357,
+      "height": 172,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.inventory-slot": {
+      "src": "ui/inventory-slot.webp",
+      "category": "ui",
+      "width": 65,
+      "height": 47,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.mp-bar-frame": {
+      "src": "ui/mp-bar-frame.webp",
+      "category": "ui",
+      "width": 89,
+      "height": 22,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.panel-frame": {
+      "src": "ui/panel-frame.webp",
+      "category": "ui",
+      "width": 53,
+      "height": 101,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.portraits.female-full": {
+      "src": "ui/portraits/female-full.webp",
+      "category": "ui",
+      "width": 385,
+      "height": 376,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.portraits.male-full": {
+      "src": "ui/portraits/male-full.webp",
+      "category": "ui",
+      "width": 385,
+      "height": 378,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.skill-frame": {
+      "src": "ui/skill-frame.webp",
+      "category": "ui",
+      "width": 96,
+      "height": 96,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    },
+    "ui.top-menu-buttons": {
+      "src": "ui/top-menu-buttons.webp",
+      "category": "ui",
+      "width": 433,
+      "height": 107,
+      "alpha": false,
+      "status": "pass",
+      "issues": []
+    }
+  }
+}

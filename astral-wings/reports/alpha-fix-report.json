@@ -1,0 +1,102 @@
+{
+  "title": "Alpha Fix Report",
+  "version": 1,
+  "summary": {
+    "fixed": 0,
+    "skipped_complex_background": 18,
+    "failed": 0,
+    "already_valid": 0
+  },
+  "assets": [
+    {
+      "path": "assets/game-art/characters/female/attack-strip.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/characters/female/death-strip.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/characters/female/hurt-strip.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/characters/female/idle-strip.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/characters/female/skill1-strip.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/characters/female/skill2-strip.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/characters/female/walk-strip.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/characters/male/attack-strip.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/characters/male/death-strip.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/characters/male/hurt-strip.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/characters/male/idle-strip.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/characters/male/skill1-strip.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/characters/male/skill2-strip.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/characters/male/walk-strip.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/icons/player/astral-shield.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/icons/player/astral-vortex.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/icons/player/star-blade.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    },
+    {
+      "path": "assets/game-art/icons/player/star-burst.webp",
+      "status": "skipped_complex_background",
+      "reason": "背景含漸層／面板／文字／分隔線；依安全規則保留原檔，需人工原生透明素材。"
+    }
+  ]
+}

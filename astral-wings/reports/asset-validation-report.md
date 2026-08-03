@@ -1,0 +1,84 @@
+# Astral World Asset Validation Report
+
+- Total: 77
+- Pass: 28
+- Warning: 49
+- Invalid: 0
+
+- [PASS] `assets/game-art/backgrounds/region-01/battle.webp` 1920x1080 alpha=False issues=-
+- [WARNING] `assets/game-art/bosses/region-01/crowned-beast-attack.webp` 262x56 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/bosses/region-01/crowned-beast-death.webp` 261x52 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/bosses/region-01/crowned-beast-hurt.webp` 253x57 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/bosses/region-01/crowned-beast-idle.webp` 252x55 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/bosses/region-01/crowned-beast-rage.webp` 259x58 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/astral-blade/attack.webp` 240x57 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/astral-blade/death.webp` 231x40 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/astral-blade/hurt.webp` 239x49 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/astral-blade/idle.webp` 241x55 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/astral-blade/move.webp` 236x55 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/astral-blade/skill.webp` 239x57 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/female/attack-strip.webp` 467x89 alpha=False issues=alpha_required, unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/female/death-strip.webp` 467x79 alpha=False issues=alpha_required, unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/female/hurt-strip.webp` 467x89 alpha=False issues=alpha_required, unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/female/idle-strip.webp` 467x96 alpha=False issues=alpha_required, unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/female/skill1-strip.webp` 467x93 alpha=False issues=alpha_required, unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/female/skill2-strip.webp` 467x93 alpha=False issues=alpha_required, unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/female/walk-strip.webp` 467x95 alpha=False issues=alpha_required, unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/male/attack-strip.webp` 481x89 alpha=False issues=alpha_required, unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/male/death-strip.webp` 481x79 alpha=False issues=alpha_required, unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/male/hurt-strip.webp` 481x89 alpha=False issues=alpha_required, unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/male/idle-strip.webp` 481x96 alpha=False issues=alpha_required, unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/male/skill1-strip.webp` 481x93 alpha=False issues=alpha_required, unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/male/skill2-strip.webp` 481x93 alpha=False issues=alpha_required, unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/characters/male/walk-strip.webp` 481x95 alpha=False issues=alpha_required, unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/icons/player/astral-shield.webp` 256x256 alpha=False issues=alpha_required
+- [WARNING] `assets/game-art/icons/player/astral-vortex.webp` 256x256 alpha=False issues=alpha_required
+- [WARNING] `assets/game-art/icons/player/star-blade.webp` 256x256 alpha=False issues=alpha_required
+- [WARNING] `assets/game-art/icons/player/star-burst.webp` 256x256 alpha=False issues=alpha_required
+- [WARNING] `assets/game-art/monsters/region-01/moon-rabbit-attack.webp` 244x58 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/monsters/region-01/moon-rabbit-death.webp` 244x56 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/monsters/region-01/moon-rabbit-hurt.webp` 244x58 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/monsters/region-01/moon-rabbit-idle.webp` 244x55 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/monsters/region-01/moon-rabbit-move.webp` 240x57 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/monsters/region-01/star-beetle-attack.webp` 220x58 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/monsters/region-01/star-beetle-death.webp` 220x56 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/monsters/region-01/star-beetle-hurt.webp` 220x58 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/monsters/region-01/star-beetle-idle.webp` 220x55 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/monsters/region-01/star-beetle-move.webp` 220x57 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/monsters/region-01/star-slime-attack.webp` 234x58 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/monsters/region-01/star-slime-death.webp` 231x35 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/monsters/region-01/star-slime-hurt.webp` 236x58 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/monsters/region-01/star-slime-idle.webp` 236x55 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/monsters/region-01/star-slime-move.webp` 235x57 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/pets/region-01/star-slime-attack.webp` 317x52 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/pets/region-01/star-slime-celebrate.webp` 321x48 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/pets/region-01/star-slime-idle.webp` 317x52 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/pets/region-01/star-slime-return.webp` 317x50 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/pets/region-01/star-slime-summon.webp` 321x45 alpha=True issues=unexpected_sprite_dimensions
+- [PASS] `assets/game-art/ui/avatars/female-battle.webp` 141x210 alpha=False issues=-
+- [PASS] `assets/game-art/ui/avatars/female-death.webp` 115x210 alpha=False issues=-
+- [PASS] `assets/game-art/ui/avatars/female-hurt.webp` 141x210 alpha=False issues=-
+- [PASS] `assets/game-art/ui/avatars/female-icon.webp` 140x210 alpha=False issues=-
+- [PASS] `assets/game-art/ui/avatars/male-battle.webp` 142x210 alpha=False issues=-
+- [PASS] `assets/game-art/ui/avatars/male-death.webp` 130x210 alpha=False issues=-
+- [PASS] `assets/game-art/ui/avatars/male-hurt.webp` 141x210 alpha=False issues=-
+- [PASS] `assets/game-art/ui/avatars/male-icon.webp` 140x210 alpha=False issues=-
+- [PASS] `assets/game-art/ui/bar-set.webp` 140x145 alpha=False issues=-
+- [PASS] `assets/game-art/ui/battle-hud.webp` 682x107 alpha=False issues=-
+- [PASS] `assets/game-art/ui/boss-bar-frame.webp` 402x107 alpha=False issues=-
+- [PASS] `assets/game-art/ui/button-danger.webp` 110x30 alpha=False issues=-
+- [PASS] `assets/game-art/ui/button-normal.webp` 110x28 alpha=False issues=-
+- [PASS] `assets/game-art/ui/button-primary.webp` 110x28 alpha=False issues=-
+- [PASS] `assets/game-art/ui/button-set.webp` 148x145 alpha=False issues=-
+- [PASS] `assets/game-art/ui/combat-log-frame.webp` 340x110 alpha=False issues=-
+- [PASS] `assets/game-art/ui/dialogue-frame.webp` 220x140 alpha=False issues=-
+- [PASS] `assets/game-art/ui/equipment-frame.webp` 96x96 alpha=False issues=-
+- [PASS] `assets/game-art/ui/hp-bar-frame.webp` 89x22 alpha=False issues=-
+- [PASS] `assets/game-art/ui/icon-set.webp` 357x172 alpha=False issues=-
+- [PASS] `assets/game-art/ui/inventory-slot.webp` 65x47 alpha=False issues=-
+- [PASS] `assets/game-art/ui/mp-bar-frame.webp` 89x22 alpha=False issues=-
+- [PASS] `assets/game-art/ui/panel-frame.webp` 53x101 alpha=False issues=-
+- [PASS] `assets/game-art/ui/portraits/female-full.webp` 385x376 alpha=False issues=-
+- [PASS] `assets/game-art/ui/portraits/male-full.webp` 385x378 alpha=False issues=-
+- [PASS] `assets/game-art/ui/skill-frame.webp` 96x96 alpha=False issues=-
+- [PASS] `assets/game-art/ui/top-menu-buttons.webp` 433x107 alpha=False issues=-

@@ -1,0 +1,134 @@
+{
+  "version": "2.0.0",
+  "projectRootRelative": ".",
+  "assetRoot": "assets/game-art",
+  "supportedExtensions": [
+    ".png",
+    ".webp"
+  ],
+  "rules": {
+    "characters": {
+      "pathPrefix": "assets/game-art/characters",
+      "requiredAlpha": true,
+      "allowedFrameSizes": [
+        [
+          256,
+          256
+        ],
+        [
+          512,
+          512
+        ]
+      ],
+      "defaultDisplayCss": [
+        96,
+        128
+      ],
+      "anchor": [
+        0.5,
+        0.86
+      ]
+    },
+    "monsters": {
+      "pathPrefix": "assets/game-art/monsters",
+      "requiredAlpha": true,
+      "allowedFrameSizes": [
+        [
+          192,
+          192
+        ],
+        [
+          384,
+          384
+        ]
+      ],
+      "defaultDisplayCss": [
+        82,
+        82
+      ],
+      "anchor": [
+        0.5,
+        0.86
+      ]
+    },
+    "bosses": {
+      "pathPrefix": "assets/game-art/bosses",
+      "requiredAlpha": true,
+      "allowedFrameSizes": [
+        [
+          384,
+          384
+        ],
+        [
+          768,
+          768
+        ]
+      ],
+      "defaultDisplayCss": [
+        150,
+        150
+      ],
+      "anchor": [
+        0.5,
+        0.88
+      ]
+    },
+    "pets": {
+      "pathPrefix": "assets/game-art/pets",
+      "requiredAlpha": true,
+      "allowedFrameSizes": [
+        [
+          128,
+          128
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "defaultDisplayCss": [
+        58,
+        58
+      ],
+      "anchor": [
+        0.5,
+        0.86
+      ]
+    },
+    "ui": {
+      "pathPrefix": "assets/game-art/ui",
+      "requiredAlpha": false,
+      "allowAnySize": true
+    },
+    "backgrounds": {
+      "pathPrefix": "assets/game-art/backgrounds",
+      "requiredAlpha": false,
+      "minimumSize": [
+        1280,
+        720
+      ]
+    },
+    "icons": {
+      "pathPrefix": "assets/game-art/icons",
+      "requiredAlpha": true,
+      "allowedSizes": [
+        [
+          64,
+          64
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          256,
+          256
+        ],
+        [
+          512,
+          512
+        ]
+      ]
+    }
+  }
+}

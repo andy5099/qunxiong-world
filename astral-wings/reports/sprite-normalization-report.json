@@ -1,0 +1,596 @@
+{
+  "title": "Sprite Normalization Report",
+  "version": 1,
+  "summary": {
+    "success": 0,
+    "manual_frame_definition_required": 45,
+    "failed": 0
+  },
+  "assets": [
+    {
+      "path": "assets/game-art/bosses/region-01/crowned-beast-attack.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        262,
+        56
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/bosses/region-01/crowned-beast-death.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        261,
+        52
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/bosses/region-01/crowned-beast-hurt.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        253,
+        57
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/bosses/region-01/crowned-beast-idle.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        252,
+        55
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/bosses/region-01/crowned-beast-rage.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        259,
+        58
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/astral-blade/attack.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        240,
+        57
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/astral-blade/death.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        231,
+        40
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/astral-blade/hurt.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        239,
+        49
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/astral-blade/idle.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        241,
+        55
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/astral-blade/move.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        236,
+        55
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/astral-blade/skill.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        239,
+        57
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/female/attack-strip.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        467,
+        89
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/female/death-strip.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        467,
+        79
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/female/hurt-strip.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        467,
+        89
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/female/idle-strip.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        467,
+        96
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/female/skill1-strip.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        467,
+        93
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/female/skill2-strip.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        467,
+        93
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/female/walk-strip.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        467,
+        95
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/male/attack-strip.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        481,
+        89
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/male/death-strip.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        481,
+        79
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/male/hurt-strip.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        481,
+        89
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/male/idle-strip.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        481,
+        96
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/male/skill1-strip.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        481,
+        93
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/male/skill2-strip.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        481,
+        93
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/characters/male/walk-strip.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        481,
+        95
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/moon-rabbit-attack.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        244,
+        58
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/moon-rabbit-death.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        244,
+        56
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/moon-rabbit-hurt.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        244,
+        58
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/moon-rabbit-idle.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        244,
+        55
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/moon-rabbit-move.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        240,
+        57
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-beetle-attack.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        220,
+        58
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-beetle-death.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        220,
+        56
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-beetle-hurt.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        220,
+        58
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-beetle-idle.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        220,
+        55
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-beetle-move.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        220,
+        57
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-slime-attack.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        234,
+        58
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-slime-death.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        231,
+        35
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-slime-hurt.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        236,
+        58
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-slime-idle.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        236,
+        55
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-slime-move.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        235,
+        57
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/pets/region-01/star-slime-attack.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        317,
+        52
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/pets/region-01/star-slime-celebrate.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        321,
+        48
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/pets/region-01/star-slime-idle.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        317,
+        52
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/pets/region-01/star-slime-return.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        317,
+        50
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    },
+    {
+      "path": "assets/game-art/pets/region-01/star-slime-summon.webp",
+      "status": "manual_frame_definition_required",
+      "reason": "尺寸不可被標準格寬／格高整除，且無可一致驗證的規律透明分隔；未猜測格數。",
+      "originalSize": [
+        321,
+        45
+      ],
+      "frameCount": null,
+      "outputSize": null,
+      "recentered": false,
+      "scaled": false
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-const CACHE = 'astral-world-idle-v24';
+const CACHE = 'astral-world-idle-v25';
 const CORE = [
   './', './index.html', './styles.css', './manifest.webmanifest', './PRODUCTION_ASSET_SPEC.json', './assets/game-art/manifest.json', './assets/game-art/region-01-asset-spec.json',
   './src/astral-world/main.js', './src/astral-world/data.js', './src/astral-world/core.js',
@@ -16,7 +16,7 @@ const CORE = [
   './assets/game-art/monsters/region-01/star-beetle-idle.webp', './assets/game-art/monsters/region-01/star-beetle-move.webp', './assets/game-art/monsters/region-01/star-beetle-attack.webp', './assets/game-art/monsters/region-01/star-beetle-hurt.webp', './assets/game-art/monsters/region-01/star-beetle-death.webp',
   './assets/game-art/bosses/region-01/crowned-beast-idle.webp', './assets/game-art/bosses/region-01/crowned-beast-attack.webp', './assets/game-art/bosses/region-01/crowned-beast-rage.webp', './assets/game-art/bosses/region-01/crowned-beast-hurt.webp', './assets/game-art/bosses/region-01/crowned-beast-death.webp',
   './assets/game-art/pets/region-01/star-slime-summon.webp', './assets/game-art/pets/region-01/star-slime-idle.webp', './assets/game-art/pets/region-01/star-slime-attack.webp', './assets/game-art/pets/region-01/star-slime-return.webp', './assets/game-art/pets/region-01/star-slime-celebrate.webp',
-  './assets/game-art/skills/player/star-blade.webp', './assets/game-art/skills/player/astral-vortex.webp', './assets/game-art/skills/player/star-burst.webp', './assets/game-art/skills/player/astral-shield.webp',
+  './assets/game-art/icons/player/star-blade.webp', './assets/game-art/icons/player/astral-vortex.webp', './assets/game-art/icons/player/star-burst.webp', './assets/game-art/icons/player/astral-shield.webp',
   './assets/game-art/ui/battle-hud.webp', './assets/game-art/ui/skill-frame.webp', './assets/game-art/ui/equipment-frame.webp', './assets/game-art/ui/inventory-slot.webp', './assets/game-art/ui/boss-bar-frame.webp', './assets/game-art/ui/hp-bar-frame.webp', './assets/game-art/ui/mp-bar-frame.webp', './assets/game-art/ui/panel-frame.webp', './assets/game-art/ui/button-normal.webp', './assets/game-art/ui/button-primary.webp', './assets/game-art/ui/button-danger.webp', './assets/game-art/ui/dialogue-frame.webp', './assets/game-art/ui/combat-log-frame.webp', './assets/game-art/ui/button-set.webp', './assets/game-art/ui/bar-set.webp', './assets/game-art/ui/top-menu-buttons.webp', './assets/game-art/ui/icon-set.webp',
 ];
 

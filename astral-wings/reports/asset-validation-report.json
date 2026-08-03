@@ -1,0 +1,970 @@
+{
+  "version": "2.0.0",
+  "summary": {
+    "total": 77,
+    "pass": 28,
+    "warning": 49,
+    "invalid": 0
+  },
+  "assets": [
+    {
+      "path": "assets/game-art/backgrounds/region-01/battle.webp",
+      "category": "backgrounds",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 350902,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/bosses/region-01/crowned-beast-attack.webp",
+      "category": "bosses",
+      "width": 262,
+      "height": 56,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 9540,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/bosses/region-01/crowned-beast-death.webp",
+      "category": "bosses",
+      "width": 261,
+      "height": 52,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 7166,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/bosses/region-01/crowned-beast-hurt.webp",
+      "category": "bosses",
+      "width": 253,
+      "height": 57,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 8116,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/bosses/region-01/crowned-beast-idle.webp",
+      "category": "bosses",
+      "width": 252,
+      "height": 55,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 6724,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/bosses/region-01/crowned-beast-rage.webp",
+      "category": "bosses",
+      "width": 259,
+      "height": 58,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 9872,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/astral-blade/attack.webp",
+      "category": "characters",
+      "width": 240,
+      "height": 57,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 6340,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/astral-blade/death.webp",
+      "category": "characters",
+      "width": 231,
+      "height": 40,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 3960,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/astral-blade/hurt.webp",
+      "category": "characters",
+      "width": 239,
+      "height": 49,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 5830,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/astral-blade/idle.webp",
+      "category": "characters",
+      "width": 241,
+      "height": 55,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 5508,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/astral-blade/move.webp",
+      "category": "characters",
+      "width": 236,
+      "height": 55,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 6158,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/astral-blade/skill.webp",
+      "category": "characters",
+      "width": 239,
+      "height": 57,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 6716,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/female/attack-strip.webp",
+      "category": "characters",
+      "width": 467,
+      "height": 89,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 13638,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/female/death-strip.webp",
+      "category": "characters",
+      "width": 467,
+      "height": 79,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 10856,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/female/hurt-strip.webp",
+      "category": "characters",
+      "width": 467,
+      "height": 89,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 11636,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/female/idle-strip.webp",
+      "category": "characters",
+      "width": 467,
+      "height": 96,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 13582,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/female/skill1-strip.webp",
+      "category": "characters",
+      "width": 467,
+      "height": 93,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 15904,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/female/skill2-strip.webp",
+      "category": "characters",
+      "width": 467,
+      "height": 93,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 10638,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/female/walk-strip.webp",
+      "category": "characters",
+      "width": 467,
+      "height": 95,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 12788,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/male/attack-strip.webp",
+      "category": "characters",
+      "width": 481,
+      "height": 89,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 13336,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/male/death-strip.webp",
+      "category": "characters",
+      "width": 481,
+      "height": 79,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 10242,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/male/hurt-strip.webp",
+      "category": "characters",
+      "width": 481,
+      "height": 89,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 10014,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/male/idle-strip.webp",
+      "category": "characters",
+      "width": 481,
+      "height": 96,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 13230,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/male/skill1-strip.webp",
+      "category": "characters",
+      "width": 481,
+      "height": 93,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 13672,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/male/skill2-strip.webp",
+      "category": "characters",
+      "width": 481,
+      "height": 93,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 12870,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/characters/male/walk-strip.webp",
+      "category": "characters",
+      "width": 481,
+      "height": 95,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 12158,
+      "status": "warning",
+      "issues": [
+        "alpha_required",
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/icons/player/astral-shield.webp",
+      "category": "icons",
+      "width": 256,
+      "height": 256,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 12618,
+      "status": "warning",
+      "issues": [
+        "alpha_required"
+      ]
+    },
+    {
+      "path": "assets/game-art/icons/player/astral-vortex.webp",
+      "category": "icons",
+      "width": 256,
+      "height": 256,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 10244,
+      "status": "warning",
+      "issues": [
+        "alpha_required"
+      ]
+    },
+    {
+      "path": "assets/game-art/icons/player/star-blade.webp",
+      "category": "icons",
+      "width": 256,
+      "height": 256,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 11640,
+      "status": "warning",
+      "issues": [
+        "alpha_required"
+      ]
+    },
+    {
+      "path": "assets/game-art/icons/player/star-burst.webp",
+      "category": "icons",
+      "width": 256,
+      "height": 256,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 9998,
+      "status": "warning",
+      "issues": [
+        "alpha_required"
+      ]
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/moon-rabbit-attack.webp",
+      "category": "monsters",
+      "width": 244,
+      "height": 58,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 4998,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/moon-rabbit-death.webp",
+      "category": "monsters",
+      "width": 244,
+      "height": 56,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 3824,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/moon-rabbit-hurt.webp",
+      "category": "monsters",
+      "width": 244,
+      "height": 58,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 3994,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/moon-rabbit-idle.webp",
+      "category": "monsters",
+      "width": 244,
+      "height": 55,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 5026,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/moon-rabbit-move.webp",
+      "category": "monsters",
+      "width": 240,
+      "height": 57,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 5142,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-beetle-attack.webp",
+      "category": "monsters",
+      "width": 220,
+      "height": 58,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 5178,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-beetle-death.webp",
+      "category": "monsters",
+      "width": 220,
+      "height": 56,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 3484,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-beetle-hurt.webp",
+      "category": "monsters",
+      "width": 220,
+      "height": 58,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 4566,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-beetle-idle.webp",
+      "category": "monsters",
+      "width": 220,
+      "height": 55,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 4434,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-beetle-move.webp",
+      "category": "monsters",
+      "width": 220,
+      "height": 57,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 5028,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-slime-attack.webp",
+      "category": "monsters",
+      "width": 234,
+      "height": 58,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 5076,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-slime-death.webp",
+      "category": "monsters",
+      "width": 231,
+      "height": 35,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 4892,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-slime-hurt.webp",
+      "category": "monsters",
+      "width": 236,
+      "height": 58,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 4132,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-slime-idle.webp",
+      "category": "monsters",
+      "width": 236,
+      "height": 55,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 5306,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/monsters/region-01/star-slime-move.webp",
+      "category": "monsters",
+      "width": 235,
+      "height": 57,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 5324,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/pets/region-01/star-slime-attack.webp",
+      "category": "pets",
+      "width": 317,
+      "height": 52,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 6018,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/pets/region-01/star-slime-celebrate.webp",
+      "category": "pets",
+      "width": 321,
+      "height": 48,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 6196,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/pets/region-01/star-slime-idle.webp",
+      "category": "pets",
+      "width": 317,
+      "height": 52,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 5680,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/pets/region-01/star-slime-return.webp",
+      "category": "pets",
+      "width": 317,
+      "height": 50,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 5358,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/pets/region-01/star-slime-summon.webp",
+      "category": "pets",
+      "width": 321,
+      "height": 45,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 5800,
+      "status": "warning",
+      "issues": [
+        "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/ui/avatars/female-battle.webp",
+      "category": "ui",
+      "width": 141,
+      "height": 210,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 11832,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/avatars/female-death.webp",
+      "category": "ui",
+      "width": 115,
+      "height": 210,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 8998,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/avatars/female-hurt.webp",
+      "category": "ui",
+      "width": 141,
+      "height": 210,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 11410,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/avatars/female-icon.webp",
+      "category": "ui",
+      "width": 140,
+      "height": 210,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 11614,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/avatars/male-battle.webp",
+      "category": "ui",
+      "width": 142,
+      "height": 210,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 10518,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/avatars/male-death.webp",
+      "category": "ui",
+      "width": 130,
+      "height": 210,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 10222,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/avatars/male-hurt.webp",
+      "category": "ui",
+      "width": 141,
+      "height": 210,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 10536,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/avatars/male-icon.webp",
+      "category": "ui",
+      "width": 140,
+      "height": 210,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 10876,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/bar-set.webp",
+      "category": "ui",
+      "width": 140,
+      "height": 145,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 5852,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/battle-hud.webp",
+      "category": "ui",
+      "width": 682,
+      "height": 107,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 20358,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/boss-bar-frame.webp",
+      "category": "ui",
+      "width": 402,
+      "height": 107,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 12160,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/button-danger.webp",
+      "category": "ui",
+      "width": 110,
+      "height": 30,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 4600,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/button-normal.webp",
+      "category": "ui",
+      "width": 110,
+      "height": 28,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 4110,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/button-primary.webp",
+      "category": "ui",
+      "width": 110,
+      "height": 28,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 4314,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/button-set.webp",
+      "category": "ui",
+      "width": 148,
+      "height": 145,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 7508,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/combat-log-frame.webp",
+      "category": "ui",
+      "width": 340,
+      "height": 110,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 3494,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/dialogue-frame.webp",
+      "category": "ui",
+      "width": 220,
+      "height": 140,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 3224,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/equipment-frame.webp",
+      "category": "ui",
+      "width": 96,
+      "height": 96,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 3048,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/hp-bar-frame.webp",
+      "category": "ui",
+      "width": 89,
+      "height": 22,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 2662,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/icon-set.webp",
+      "category": "ui",
+      "width": 357,
+      "height": 172,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 21224,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/inventory-slot.webp",
+      "category": "ui",
+      "width": 65,
+      "height": 47,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 1966,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/mp-bar-frame.webp",
+      "category": "ui",
+      "width": 89,
+      "height": 22,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 2784,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/panel-frame.webp",
+      "category": "ui",
+      "width": 53,
+      "height": 101,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 3768,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/portraits/female-full.webp",
+      "category": "ui",
+      "width": 385,
+      "height": 376,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 70806,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/portraits/male-full.webp",
+      "category": "ui",
+      "width": 385,
+      "height": 378,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 64224,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/skill-frame.webp",
+      "category": "ui",
+      "width": 96,
+      "height": 96,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 3048,
+      "status": "pass",
+      "issues": []
+    },
+    {
+      "path": "assets/game-art/ui/top-menu-buttons.webp",
+      "category": "ui",
+      "width": 433,
+      "height": 107,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 14680,
+      "status": "pass",
+      "issues": []
+    }
+  ]
+}
