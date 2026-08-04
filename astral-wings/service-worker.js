@@ -1,13 +1,15 @@
-const CACHE = 'astral-world-idle-v25';
+const CACHE = 'astral-world-idle-v26';
 const CORE = [
   './', './index.html', './styles.css', './manifest.webmanifest', './PRODUCTION_ASSET_SPEC.json', './assets/game-art/manifest.json', './assets/game-art/region-01-asset-spec.json',
-  './src/astral-world/main.js', './src/astral-world/data.js', './src/astral-world/core.js',
-  './src/astral-world/save.js', './src/astral-world/renderer.js', './src/astral-world/monster-renderer.js', './src/astral-world/boss-renderer.js', './src/astral-world/pet-renderer.js', './src/astral-world/pet-system.js', './src/astral-world/pet-team-system.js', './src/astral-world/pet-synergy-system.js', './src/astral-world/pet-codex-system.js', './src/astral-world/game.js', './src/astral-world/ui.js', './src/astral-world/player-renderer.js',
+  './src/astral-world/main.js?v=26', './src/astral-world/data.js', './src/astral-world/core.js',
+  './src/astral-world/save.js?v=26', './src/astral-world/renderer.js?v=26', './src/astral-world/monster-renderer.js', './src/astral-world/boss-renderer.js', './src/astral-world/pet-renderer.js', './src/astral-world/pet-system.js', './src/astral-world/pet-team-system.js', './src/astral-world/pet-synergy-system.js', './src/astral-world/pet-codex-system.js', './src/astral-world/game.js', './src/astral-world/ui.js?v=26', './src/astral-world/player-renderer.js',
   './src/astral-world/tutorial-system.js', './src/astral-world/objective-system.js', './css/alpha-v02.css', './css/visual-icons.css',
   './src/astral-world/equipment-affix-system.js',
   './src/astral-world/visual-theme.js', './src/astral-world/battle-background-renderer.js',
   './src/astral-world/ui-icons.js', './src/astral-world/equipment-icon-renderer.js', './src/astral-world/skill-icon-renderer.js',
-  './src/astral-world/art-asset-manager.js', './src/astral-world/sprite-renderer.js', './src/astral-world/region-one-art-validator.js', './css/art-assets.css', './css/region-01-slice.css', './css/region-01-production.css',
+  './src/astral-world/art-asset-manager.js', './src/astral-world/sprite-renderer.js', './src/astral-world/cc0-pixel-theme.js', './src/astral-world/region-one-art-validator.js', './css/art-assets.css', './css/region-01-slice.css', './css/region-01-production.css',
+  './assets/game-art/cc0/characters/jotem/row-00.webp', './assets/game-art/cc0/characters/jotem/row-01.webp', './assets/game-art/cc0/characters/jotem/row-02.webp', './assets/game-art/cc0/characters/jotem/row-03.webp', './assets/game-art/cc0/characters/jotem/row-04.webp', './assets/game-art/cc0/characters/jotem/row-05.webp', './assets/game-art/cc0/characters/jotem/row-06.webp', './assets/game-art/cc0/characters/jotem/row-07.webp', './assets/game-art/cc0/characters/jotem/row-08.webp', './assets/game-art/cc0/characters/jotem/row-09.webp', './assets/game-art/cc0/characters/jotem/row-10.webp', './assets/game-art/cc0/characters/jotem/row-11.webp',
+  './assets/game-art/cc0/monsters/star-slime.webp', './assets/game-art/cc0/monsters/moon-rabbit.webp', './assets/game-art/cc0/monsters/star-beetle.webp', './assets/game-art/cc0/bosses/crowned-beast.webp', './assets/game-art/cc0/pets/star-slime.webp', './assets/game-art/cc0/backgrounds/region-01-field.webp',
   './assets/reference/astral-world-art-bible.png', './assets/reference/astral-world-ui-target.png', './assets/reference/astral-world-region1-production-guide.png',
   './assets/game-art/backgrounds/region-01/battle.webp',
   './assets/game-art/characters/astral-blade/idle.webp', './assets/game-art/characters/astral-blade/move.webp', './assets/game-art/characters/astral-blade/attack.webp', './assets/game-art/characters/astral-blade/skill.webp', './assets/game-art/characters/astral-blade/hurt.webp', './assets/game-art/characters/astral-blade/death.webp',

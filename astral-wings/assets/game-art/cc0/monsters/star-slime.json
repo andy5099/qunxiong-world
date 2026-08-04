@@ -1,0 +1,18 @@
+{
+  "name": "星芽史萊姆",
+  "source": "third_party/tiny-creatures/tiny-creatures/Tiles/tile_0046.png",
+  "pack": "tiny-creatures",
+  "author": "Clint Bellanger",
+  "license": "CC0 1.0",
+  "originalSize": [
+    16,
+    16
+  ],
+  "outputSize": [
+    192,
+    192
+  ],
+  "scalingMethod": "edge-connected background removal, then nearest-neighbor",
+  "artType": "static-art",
+  "animation": false
+}

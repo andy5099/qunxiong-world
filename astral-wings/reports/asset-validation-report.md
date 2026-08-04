@@ -1,8 +1,8 @@
 # Astral World Asset Validation Report
 
-- Total: 77
+- Total: 95
 - Pass: 28
-- Warning: 49
+- Warning: 67
 - Invalid: 0
 
 - [PASS] `assets/game-art/backgrounds/region-01/battle.webp` 1920x1080 alpha=False issues=-
@@ -11,6 +11,24 @@
 - [WARNING] `assets/game-art/bosses/region-01/crowned-beast-hurt.webp` 253x57 alpha=True issues=unexpected_sprite_dimensions
 - [WARNING] `assets/game-art/bosses/region-01/crowned-beast-idle.webp` 252x55 alpha=True issues=unexpected_sprite_dimensions
 - [WARNING] `assets/game-art/bosses/region-01/crowned-beast-rage.webp` 259x58 alpha=True issues=unexpected_sprite_dimensions
+- [WARNING] `assets/game-art/cc0/backgrounds/region-01-field.webp` 1920x1080 alpha=False issues=unknown_category
+- [WARNING] `assets/game-art/cc0/bosses/crowned-beast.webp` 384x384 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/characters/jotem/row-00.webp` 768x128 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/characters/jotem/row-01.webp` 1024x128 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/characters/jotem/row-02.webp` 768x128 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/characters/jotem/row-03.webp` 1024x128 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/characters/jotem/row-04.webp` 384x128 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/characters/jotem/row-05.webp` 640x128 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/characters/jotem/row-06.webp` 1280x128 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/characters/jotem/row-07.webp` 1280x128 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/characters/jotem/row-08.webp` 640x128 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/characters/jotem/row-09.webp` 1536x128 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/characters/jotem/row-10.webp` 1536x128 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/characters/jotem/row-11.webp` 768x128 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/monsters/moon-rabbit.webp` 192x192 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/monsters/star-beetle.webp` 192x192 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/monsters/star-slime.webp` 192x192 alpha=True issues=unknown_category
+- [WARNING] `assets/game-art/cc0/pets/star-slime.webp` 128x128 alpha=True issues=unknown_category
 - [WARNING] `assets/game-art/characters/astral-blade/attack.webp` 240x57 alpha=True issues=unexpected_sprite_dimensions
 - [WARNING] `assets/game-art/characters/astral-blade/death.webp` 231x40 alpha=True issues=unexpected_sprite_dimensions
 - [WARNING] `assets/game-art/characters/astral-blade/hurt.webp` 239x49 alpha=True issues=unexpected_sprite_dimensions

@@ -1,0 +1,17 @@
+{
+  "id": "jotem-old-hero",
+  "archive": "Jotem.zip",
+  "sha256": "f7e4fd8f11762a941da8c9f71df37ecaa1beb7ac3ba33a813d26dd36357a4fca",
+  "files": [
+    "Jotem.aseprite",
+    "Jotem spritesheet.png"
+  ],
+  "license": "CC0 per source download page; archive does not embed a license file",
+  "sourcePage": "https://atari-boy.itch.io/oldherocharacter",
+  "processedOutputs": 12,
+  "frameSize": [
+    128,
+    128
+  ],
+  "totalFrames": 91
+}

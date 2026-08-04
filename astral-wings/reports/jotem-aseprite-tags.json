@@ -1,0 +1,252 @@
+{
+  "source": "third_party/jotem-old-hero/Jotem.aseprite",
+  "sheetSize": [
+    128,
+    128
+  ],
+  "frameCount": 97,
+  "durationsMs": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    500,
+    500
+  ],
+  "tags": [
+    {
+      "name": "idle 1 old",
+      "from": 0,
+      "to": 5,
+      "frameCount": 6,
+      "direction": 2,
+      "repeat": 0,
+      "color": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Idle swordback",
+      "from": 6,
+      "to": 11,
+      "frameCount": 6,
+      "direction": 2,
+      "repeat": 0,
+      "color": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "walk swordback",
+      "from": 12,
+      "to": 19,
+      "frameCount": 8,
+      "direction": 0,
+      "repeat": 0,
+      "color": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "idle sword hand",
+      "from": 20,
+      "to": 25,
+      "frameCount": 6,
+      "direction": 2,
+      "repeat": 0,
+      "color": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "walk 2",
+      "from": 26,
+      "to": 33,
+      "frameCount": 8,
+      "direction": 0,
+      "repeat": 0,
+      "color": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "jump",
+      "from": 34,
+      "to": 36,
+      "frameCount": 3,
+      "direction": 0,
+      "repeat": 0,
+      "color": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Fall",
+      "from": 37,
+      "to": 41,
+      "frameCount": 5,
+      "direction": 0,
+      "repeat": 0,
+      "color": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Item",
+      "from": 42,
+      "to": 51,
+      "frameCount": 10,
+      "direction": 0,
+      "repeat": 0,
+      "color": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "atk",
+      "from": 52,
+      "to": 61,
+      "frameCount": 10,
+      "direction": 0,
+      "repeat": 0,
+      "color": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "hurt",
+      "from": 62,
+      "to": 66,
+      "frameCount": 5,
+      "direction": 0,
+      "repeat": 0,
+      "color": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Death",
+      "from": 67,
+      "to": 96,
+      "frameCount": 30,
+      "direction": 0,
+      "repeat": 0,
+      "color": [
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}

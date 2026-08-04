@@ -1,0 +1,149 @@
+{
+  "version": 2,
+  "characterId": "jotem",
+  "source": "third_party/jotem-old-hero/Jotem spritesheet.png",
+  "sourceAseprite": "third_party/jotem-old-hero/Jotem.aseprite",
+  "sheetSize": [
+    1536,
+    1536
+  ],
+  "grid": {
+    "frameWidth": 128,
+    "frameHeight": 128,
+    "columns": 12,
+    "rows": 12
+  },
+  "totalNonEmptyFrames": 91,
+  "rows": [
+    {
+      "row": 0,
+      "path": "assets/game-art/cc0/characters/jotem/row-00.webp",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frameCount": 6,
+      "fpsSuggested": 10,
+      "loop": null,
+      "action": null
+    },
+    {
+      "row": 1,
+      "path": "assets/game-art/cc0/characters/jotem/row-01.webp",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frameCount": 8,
+      "fpsSuggested": 10,
+      "loop": null,
+      "action": null
+    },
+    {
+      "row": 2,
+      "path": "assets/game-art/cc0/characters/jotem/row-02.webp",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frameCount": 6,
+      "fpsSuggested": 10,
+      "loop": null,
+      "action": null
+    },
+    {
+      "row": 3,
+      "path": "assets/game-art/cc0/characters/jotem/row-03.webp",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frameCount": 8,
+      "fpsSuggested": 10,
+      "loop": null,
+      "action": null
+    },
+    {
+      "row": 4,
+      "path": "assets/game-art/cc0/characters/jotem/row-04.webp",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frameCount": 3,
+      "fpsSuggested": 10,
+      "loop": null,
+      "action": null
+    },
+    {
+      "row": 5,
+      "path": "assets/game-art/cc0/characters/jotem/row-05.webp",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frameCount": 5,
+      "fpsSuggested": 10,
+      "loop": null,
+      "action": null
+    },
+    {
+      "row": 6,
+      "path": "assets/game-art/cc0/characters/jotem/row-06.webp",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frameCount": 10,
+      "fpsSuggested": 10,
+      "loop": null,
+      "action": null
+    },
+    {
+      "row": 7,
+      "path": "assets/game-art/cc0/characters/jotem/row-07.webp",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frameCount": 10,
+      "fpsSuggested": 10,
+      "loop": null,
+      "action": null
+    },
+    {
+      "row": 8,
+      "path": "assets/game-art/cc0/characters/jotem/row-08.webp",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frameCount": 5,
+      "fpsSuggested": 10,
+      "loop": null,
+      "action": null
+    },
+    {
+      "row": 9,
+      "path": "assets/game-art/cc0/characters/jotem/row-09.webp",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frameCount": 12,
+      "fpsSuggested": 10,
+      "loop": null,
+      "action": null
+    },
+    {
+      "row": 10,
+      "path": "assets/game-art/cc0/characters/jotem/row-10.webp",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frameCount": 12,
+      "fpsSuggested": 10,
+      "loop": null,
+      "action": null
+    },
+    {
+      "row": 11,
+      "path": "assets/game-art/cc0/characters/jotem/row-11.webp",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frameCount": 6,
+      "fpsSuggested": 10,
+      "loop": null,
+      "action": null
+    }
+  ],
+  "actionMappingStatus": "requires_aseprite_tag_or_visual_confirmation",
+  "anchor": [
+    0.5,
+    0.9
+  ],
+  "displayCss": [
+    96,
+    96
+  ],
+  "alpha": true
+}

@@ -1,8 +1,8 @@
 import { createEquipment } from './core.js';
 import { IdleGame } from './game.js';
-import { BattleRenderer } from './renderer.js';
-import { loadState, saveState } from './save.js';
-import { AstralUI } from './ui.js';
+import { BattleRenderer } from './renderer.js?v=26';
+import { loadState, saveState } from './save.js?v=26';
+import { AstralUI } from './ui.js?v=26';
 import { updateObjective, updateUnlocks } from './objective-system.js';
 import { ensureTutorial } from './tutorial-system.js';
 import { installVisualIconObserver } from './ui-icons.js';
@@ -10,7 +10,7 @@ import { applyUiArtAssets, getArtLoadStatus, loadArtManifest, preloadArtAssets }
 import { getRegionOneArtStatus, validateRegionOneProductionAssets } from './region-one-art-validator.js';
 
 const state = loadState();
-loadArtManifest().then(()=>preloadArtAssets({bundle:'region01'})).then(()=>{applyUiArtAssets(document);const fallback=getArtLoadStatus().failed>0;document.getElementById('app')?.classList.toggle('art-fallback-active',fallback);const notice=document.getElementById('artFallbackNotice');if(notice)notice.hidden=!fallback;});
+loadArtManifest().then(async()=>{await preloadArtAssets({bundle:'region01'});if(state.settings.artTheme==='cc0-pixel')await preloadArtAssets({bundle:'cc0-region01'});}).then(()=>{applyUiArtAssets(document);const fallback=getArtLoadStatus().failed>0;document.getElementById('app')?.classList.toggle('art-fallback-active',fallback);const notice=document.getElementById('artFallbackNotice');if(notice)notice.hidden=!fallback;});
 ensureTutorial(state);
 const renderer = new BattleRenderer(document.getElementById('battleCanvas'));
 let ui;

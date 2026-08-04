@@ -1,0 +1,30 @@
+[
+  {
+    "id": "kenney-roguelike-pack",
+    "source_archive": "Roguelike pack.zip",
+    "destination": "third_party/kenney-roguelike-pack",
+    "file_count": 13,
+    "sha256": "8e7d2378f8f794245645f6d7dc7aeeb246791410a7e512293c594b46a5a9524b"
+  },
+  {
+    "id": "tiny-creatures",
+    "source_archive": "tiny-creatures.zip",
+    "destination": "third_party/tiny-creatures",
+    "file_count": 197,
+    "sha256": "b397566a1a0f9189dbeb1119a797e35d5985b587596b02f6631d1eacec40252d"
+  },
+  {
+    "id": "kenney-rpg-base",
+    "source_archive": "KenneyRPGpack.zip",
+    "destination": "third_party/kenney-rpg-base",
+    "file_count": 239,
+    "sha256": "49759ab087fdc28d8357010e0f2a17d1c9db61c8fe9b320da965acdfbc298ef5"
+  },
+  {
+    "id": "kenney-roguelike-characters",
+    "source_archive": "Roguelike Characters pack.zip",
+    "destination": "third_party/kenney-roguelike-characters",
+    "file_count": 9,
+    "sha256": "def6c164bb58b4bef7b865c1100c1ad257508bca8bb916cbba092bc72039992d"
+  }
+]

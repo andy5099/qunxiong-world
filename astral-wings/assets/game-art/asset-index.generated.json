@@ -1,7 +1,7 @@
 {
   "version": "2.0.0",
   "generatedBy": "Astral World Asset Installer v2.0",
-  "assetCount": 77,
+  "assetCount": 95,
   "assets": {
     "backgrounds.region-01.battle": {
       "src": "backgrounds/region-01/battle.webp",
@@ -65,6 +65,204 @@
       "status": "warning",
       "issues": [
         "unexpected_sprite_dimensions"
+      ]
+    },
+    "cc0.backgrounds.region-01-field": {
+      "src": "cc0/backgrounds/region-01-field.webp",
+      "category": "unknown",
+      "width": 1920,
+      "height": 1080,
+      "alpha": false,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.bosses.crowned-beast": {
+      "src": "cc0/bosses/crowned-beast.webp",
+      "category": "unknown",
+      "width": 384,
+      "height": 384,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.characters.jotem.row-00": {
+      "src": "cc0/characters/jotem/row-00.webp",
+      "category": "unknown",
+      "width": 768,
+      "height": 128,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.characters.jotem.row-01": {
+      "src": "cc0/characters/jotem/row-01.webp",
+      "category": "unknown",
+      "width": 1024,
+      "height": 128,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.characters.jotem.row-02": {
+      "src": "cc0/characters/jotem/row-02.webp",
+      "category": "unknown",
+      "width": 768,
+      "height": 128,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.characters.jotem.row-03": {
+      "src": "cc0/characters/jotem/row-03.webp",
+      "category": "unknown",
+      "width": 1024,
+      "height": 128,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.characters.jotem.row-04": {
+      "src": "cc0/characters/jotem/row-04.webp",
+      "category": "unknown",
+      "width": 384,
+      "height": 128,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.characters.jotem.row-05": {
+      "src": "cc0/characters/jotem/row-05.webp",
+      "category": "unknown",
+      "width": 640,
+      "height": 128,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.characters.jotem.row-06": {
+      "src": "cc0/characters/jotem/row-06.webp",
+      "category": "unknown",
+      "width": 1280,
+      "height": 128,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.characters.jotem.row-07": {
+      "src": "cc0/characters/jotem/row-07.webp",
+      "category": "unknown",
+      "width": 1280,
+      "height": 128,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.characters.jotem.row-08": {
+      "src": "cc0/characters/jotem/row-08.webp",
+      "category": "unknown",
+      "width": 640,
+      "height": 128,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.characters.jotem.row-09": {
+      "src": "cc0/characters/jotem/row-09.webp",
+      "category": "unknown",
+      "width": 1536,
+      "height": 128,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.characters.jotem.row-10": {
+      "src": "cc0/characters/jotem/row-10.webp",
+      "category": "unknown",
+      "width": 1536,
+      "height": 128,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.characters.jotem.row-11": {
+      "src": "cc0/characters/jotem/row-11.webp",
+      "category": "unknown",
+      "width": 768,
+      "height": 128,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.monsters.moon-rabbit": {
+      "src": "cc0/monsters/moon-rabbit.webp",
+      "category": "unknown",
+      "width": 192,
+      "height": 192,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.monsters.star-beetle": {
+      "src": "cc0/monsters/star-beetle.webp",
+      "category": "unknown",
+      "width": 192,
+      "height": 192,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.monsters.star-slime": {
+      "src": "cc0/monsters/star-slime.webp",
+      "category": "unknown",
+      "width": 192,
+      "height": 192,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    "cc0.pets.star-slime": {
+      "src": "cc0/pets/star-slime.webp",
+      "category": "unknown",
+      "width": 128,
+      "height": 128,
+      "alpha": true,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
       ]
     },
     "characters.astral-blade.attack": {

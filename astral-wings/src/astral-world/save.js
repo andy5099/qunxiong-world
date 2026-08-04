@@ -38,6 +38,7 @@ export function defaultState() {
       powerSave: false,
       music: false,
       sound: false,
+      artTheme: 'current',
     },
     quests: { date: dayKey(), progress: {}, claimed: {} },
     stats: { kills: 0, bosses: 0, equipment: 0, captures: 0, battleSeconds: 0 },
@@ -75,6 +76,7 @@ function merge(base, raw) {
   state.skillAuto = Array.isArray(raw?.skillAuto) ? raw.skillAuto.slice(0, 4).map(Boolean) : base.skillAuto;
   while (state.skillAuto.length < 4) state.skillAuto.push(true);
   state.settings = { ...base.settings, ...(raw?.settings || {}) };
+  state.settings.artTheme = state.settings.artTheme === 'cc0-pixel' ? 'cc0-pixel' : 'current';
   state.stats = { ...base.stats, ...(raw?.stats || {}) };
   state.tutorial = { ...base.tutorial, ...(raw?.tutorial || {}) };
   state.objectives = { ...base.objectives, ...(raw?.objectives || {}) };

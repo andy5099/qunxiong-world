@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "source": "third_party/jotem-old-hero/Jotem.aseprite",
+  "frameWidth": 128,
+  "frameHeight": 128,
+  "anchorX": 0.5,
+  "anchorY": 0.9,
+  "animations": {
+    "idle": { "rows": [0], "frameCount": 6, "fps": 10, "loop": true, "confidence": "high", "evidence": "Aseprite tag: idle 1 old, frames 0-5" },
+    "walk": { "rows": [1], "frameCount": 8, "fps": 10, "loop": true, "confidence": "high", "evidence": "Aseprite tag: walk swordback, frames 12-19; exported rows omit the unused Idle swordback tag" },
+    "itemUse": { "rows": [6], "frameCount": 10, "fps": 10, "loop": false, "confidence": "high", "evidence": "Aseprite tag: Item, frames 42-51" },
+    "attack": { "rows": [7], "frameCount": 10, "fps": 10, "loop": false, "confidence": "high", "evidence": "Aseprite tag: atk, frames 52-61" },
+    "hurt": { "rows": [8], "frameCount": 5, "fps": 10, "loop": false, "confidence": "high", "evidence": "Aseprite tag: hurt, frames 62-66" },
+    "death": { "rows": [9, 10, 11], "segmentFrames": [12, 12, 6], "frameCount": 30, "fps": 10, "loop": false, "confidence": "high", "evidence": "Aseprite tag: Death, frames 67-96" },
+    "jump": { "rows": [4], "frameCount": 3, "fps": 10, "loop": false, "confidence": "high", "evidence": "Aseprite tag: jump, frames 34-36" },
+    "fall": { "rows": [5], "frameCount": 5, "fps": 10, "loop": false, "confidence": "high", "evidence": "Aseprite tag: Fall, frames 37-41" }
+  }
+}

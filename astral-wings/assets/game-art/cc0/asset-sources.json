@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "licensePolicy": "All derivatives remain attributable to their CC0 source package.",
+  "assets": [
+    {
+      "output": "assets/game-art/cc0/monsters/star-slime.webp",
+      "name": "星芽史萊姆",
+      "source": "third_party/tiny-creatures/tiny-creatures/Tiles/tile_0046.png",
+      "pack": "tiny-creatures",
+      "author": "Clint Bellanger",
+      "license": "CC0 1.0",
+      "originalSize": [
+        16,
+        16
+      ],
+      "outputSize": [
+        192,
+        192
+      ],
+      "scalingMethod": "edge-connected background removal, then nearest-neighbor",
+      "artType": "static-art",
+      "animation": false
+    },
+    {
+      "output": "assets/game-art/cc0/monsters/moon-rabbit.webp",
+      "name": "月耳兔",
+      "source": "third_party/tiny-creatures/tiny-creatures/Tiles/tile_0177.png",
+      "pack": "tiny-creatures",
+      "author": "Clint Bellanger",
+      "license": "CC0 1.0",
+      "originalSize": [
+        16,
+        16
+      ],
+      "outputSize": [
+        192,
+        192
+      ],
+      "scalingMethod": "edge-connected background removal, then nearest-neighbor",
+      "artType": "static-art",
+      "animation": false
+    },
+    {
+      "output": "assets/game-art/cc0/monsters/star-beetle.webp",
+      "name": "星甲蟲",
+      "source": "third_party/tiny-creatures/tiny-creatures/Tiles/tile_0140.png",
+      "pack": "tiny-creatures",
+      "author": "Clint Bellanger",
+      "license": "CC0 1.0",
+      "originalSize": [
+        16,
+        16
+      ],
+      "outputSize": [
+        192,
+        192
+      ],
+      "scalingMethod": "edge-connected background removal, then nearest-neighbor",
+      "artType": "static-art",
+      "animation": false
+    },
+    {
+      "output": "assets/game-art/cc0/bosses/crowned-beast.webp",
+      "name": "王冠巨獸",
+      "source": "third_party/tiny-creatures/tiny-creatures/Tiles/tile_0169.png",
+      "pack": "tiny-creatures",
+      "author": "Clint Bellanger",
+      "license": "CC0 1.0",
+      "originalSize": [
+        16,
+        16
+      ],
+      "outputSize": [
+        384,
+        384
+      ],
+      "scalingMethod": "edge-connected background removal, then nearest-neighbor",
+      "artType": "static-art",
+      "animation": false
+    },
+    {
+      "output": "assets/game-art/cc0/pets/star-slime.webp",
+      "name": "星芽史萊姆寵物",
+      "source": "third_party/tiny-creatures/tiny-creatures/Tiles/tile_0059.png",
+      "pack": "tiny-creatures",
+      "author": "Clint Bellanger",
+      "license": "CC0 1.0",
+      "originalSize": [
+        16,
+        16
+      ],
+      "outputSize": [
+        128,
+        128
+      ],
+      "scalingMethod": "edge-connected background removal, then nearest-neighbor",
+      "artType": "static-art",
+      "animation": false
+    },
+    {
+      "output": "assets/game-art/cc0/backgrounds/region-01-field.webp",
+      "pack": "kenney-rpg-base",
+      "author": "Kenney",
+      "license": "CC0 1.0",
+      "size": [
+        1920,
+        1080
+      ],
+      "method": "native-size independent tile composition"
+    }
+  ],
+  "characterParts": {
+    "source": "third_party/kenney-roguelike-characters/Spritesheet/roguelikeChar_transparent.png",
+    "pack": "kenney-roguelike-characters",
+    "author": "Kenney",
+    "license": "CC0 1.0",
+    "tileSize": [
+      16,
+      16
+    ],
+    "margin": 1,
+    "spacing": 1,
+    "columns": 53,
+    "rows": 11,
+    "note": "Paper-doll parts index only; no player animation is inferred."
+  },
+  "jotem": {
+    "source": "third_party/jotem-old-hero/Jotem spritesheet.png",
+    "sourceAseprite": "third_party/jotem-old-hero/Jotem.aseprite",
+    "pack": "jotem-old-hero",
+    "author": "Atari Boy",
+    "license": "CC0",
+    "sourcePage": "https://atari-boy.itch.io/oldherocharacter",
+    "processing": "Supplied 128x128 row exports used without re-cutting",
+    "outputs": "assets/game-art/cc0/characters/jotem/row-00.webp through row-11.webp"
+  },
+  "uiCandidates": [],
+  "uiDecision": "No semantic UI tile IDs were supplied; no UI elements were guessed from a sheet."
+}

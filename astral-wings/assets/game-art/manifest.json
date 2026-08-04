@@ -2,6 +2,24 @@
   "version": 4,
   "artDirection": { "bible": "../reference/astral-world-art-bible.png", "uiTarget": "../reference/astral-world-ui-target.png", "productionGuide": "../reference/astral-world-region1-production-guide.png", "note": "Style references only; never crop into production assets." },
   "assets": {
+    "cc0.character.jotem.row00": { "src": "cc0/characters/jotem/row-00.webp", "type": "sprite", "frameWidth": 128, "frameHeight": 128, "frameCount": 6, "fps": 10, "drawWidth": 96, "drawHeight": 96, "anchorX": 0.5, "anchorY": 0.9 },
+    "cc0.character.jotem.row01": { "src": "cc0/characters/jotem/row-01.webp", "type": "sprite", "frameWidth": 128, "frameHeight": 128, "frameCount": 8, "fps": 10, "drawWidth": 96, "drawHeight": 96, "anchorX": 0.5, "anchorY": 0.9 },
+    "cc0.character.jotem.row02": { "src": "cc0/characters/jotem/row-02.webp", "type": "sprite", "frameWidth": 128, "frameHeight": 128, "frameCount": 6, "fps": 10, "drawWidth": 96, "drawHeight": 96, "anchorX": 0.5, "anchorY": 0.9 },
+    "cc0.character.jotem.row03": { "src": "cc0/characters/jotem/row-03.webp", "type": "sprite", "frameWidth": 128, "frameHeight": 128, "frameCount": 8, "fps": 10, "drawWidth": 96, "drawHeight": 96, "anchorX": 0.5, "anchorY": 0.9 },
+    "cc0.character.jotem.row04": { "src": "cc0/characters/jotem/row-04.webp", "type": "sprite", "frameWidth": 128, "frameHeight": 128, "frameCount": 3, "fps": 10, "drawWidth": 96, "drawHeight": 96, "anchorX": 0.5, "anchorY": 0.9 },
+    "cc0.character.jotem.row05": { "src": "cc0/characters/jotem/row-05.webp", "type": "sprite", "frameWidth": 128, "frameHeight": 128, "frameCount": 5, "fps": 10, "drawWidth": 96, "drawHeight": 96, "anchorX": 0.5, "anchorY": 0.9 },
+    "cc0.character.jotem.row06": { "src": "cc0/characters/jotem/row-06.webp", "type": "sprite", "frameWidth": 128, "frameHeight": 128, "frameCount": 10, "fps": 10, "drawWidth": 96, "drawHeight": 96, "anchorX": 0.5, "anchorY": 0.9 },
+    "cc0.character.jotem.row07": { "src": "cc0/characters/jotem/row-07.webp", "type": "sprite", "frameWidth": 128, "frameHeight": 128, "frameCount": 10, "fps": 10, "drawWidth": 96, "drawHeight": 96, "anchorX": 0.5, "anchorY": 0.9 },
+    "cc0.character.jotem.row08": { "src": "cc0/characters/jotem/row-08.webp", "type": "sprite", "frameWidth": 128, "frameHeight": 128, "frameCount": 5, "fps": 10, "drawWidth": 96, "drawHeight": 96, "anchorX": 0.5, "anchorY": 0.9 },
+    "cc0.character.jotem.row09": { "src": "cc0/characters/jotem/row-09.webp", "type": "sprite", "frameWidth": 128, "frameHeight": 128, "frameCount": 12, "fps": 10, "drawWidth": 96, "drawHeight": 96, "anchorX": 0.5, "anchorY": 0.9 },
+    "cc0.character.jotem.row10": { "src": "cc0/characters/jotem/row-10.webp", "type": "sprite", "frameWidth": 128, "frameHeight": 128, "frameCount": 12, "fps": 10, "drawWidth": 96, "drawHeight": 96, "anchorX": 0.5, "anchorY": 0.9 },
+    "cc0.character.jotem.row11": { "src": "cc0/characters/jotem/row-11.webp", "type": "sprite", "frameWidth": 128, "frameHeight": 128, "frameCount": 6, "fps": 10, "drawWidth": 96, "drawHeight": 96, "anchorX": 0.5, "anchorY": 0.9 },
+    "cc0.monster.region01.starSlime": { "src": "cc0/monsters/star-slime.webp", "type": "static-art" },
+    "cc0.monster.region01.moonRabbit": { "src": "cc0/monsters/moon-rabbit.webp", "type": "static-art" },
+    "cc0.monster.region01.starBeetle": { "src": "cc0/monsters/star-beetle.webp", "type": "static-art" },
+    "cc0.boss.region01.crownedBeast": { "src": "cc0/bosses/crowned-beast.webp", "type": "static-art" },
+    "cc0.pet.region01.starSlime": { "src": "cc0/pets/star-slime.webp", "type": "static-art" },
+    "cc0.background.region01.field": { "src": "cc0/backgrounds/region-01-field.webp", "type": "background" },
     "character.astralBlade.idle": { "src": "characters/astral-blade/idle.webp", "type": "sprite", "frameWidth": 48.2, "frameHeight": 55, "sourceY": 23, "sourceHeight": 32, "drawWidth": 98, "drawHeight": 72, "frameCount": 5, "fps": 7, "anchorX": 0.5, "anchorY": 0.88 },
     "character.astralBlade.move": { "src": "characters/astral-blade/move.webp", "type": "sprite", "frameWidth": 47.2, "frameHeight": 55, "sourceY": 22, "sourceHeight": 33, "drawWidth": 98, "drawHeight": 72, "frameCount": 5, "fps": 9, "anchorX": 0.5, "anchorY": 0.88 },
     "character.astralBlade.attack": { "src": "characters/astral-blade/attack.webp", "type": "sprite", "frameWidth": 60, "frameHeight": 57, "sourceY": 16, "sourceHeight": 41, "drawWidth": 112, "drawHeight": 78, "frameCount": 4, "fps": 12, "loop": false, "anchorX": 0.5, "anchorY": 0.88 },
@@ -58,6 +76,10 @@
     "ui.combatLogFrame": { "src": "ui/combat-log-frame.webp", "type": "nine-slice", "border": 20 }
   },
   "bundles": {
+    "cc0-region01": [
+      "cc0.character.jotem.row00", "cc0.character.jotem.row01", "cc0.character.jotem.row02", "cc0.character.jotem.row03", "cc0.character.jotem.row04", "cc0.character.jotem.row05", "cc0.character.jotem.row06", "cc0.character.jotem.row07", "cc0.character.jotem.row08", "cc0.character.jotem.row09", "cc0.character.jotem.row10", "cc0.character.jotem.row11",
+      "cc0.monster.region01.starSlime", "cc0.monster.region01.moonRabbit", "cc0.monster.region01.starBeetle", "cc0.boss.region01.crownedBeast", "cc0.pet.region01.starSlime", "cc0.background.region01.field"
+    ],
     "region01": [
       "character.astralBlade.idle", "character.astralBlade.move", "character.astralBlade.attack", "character.astralBlade.skill", "character.astralBlade.hurt", "character.astralBlade.death",
       "monster.region01.starSlime.idle", "monster.region01.starSlime.move", "monster.region01.starSlime.attack", "monster.region01.starSlime.hurt", "monster.region01.starSlime.death",

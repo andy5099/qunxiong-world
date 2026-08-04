@@ -1,9 +1,9 @@
 {
   "version": "2.0.0",
   "summary": {
-    "total": 77,
+    "total": 95,
     "pass": 28,
-    "warning": 49,
+    "warning": 67,
     "invalid": 0
   },
   "assets": [
@@ -81,6 +81,240 @@
       "status": "warning",
       "issues": [
         "unexpected_sprite_dimensions"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/backgrounds/region-01-field.webp",
+      "category": "unknown",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "has_alpha": false,
+      "file_size": 105238,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/bosses/crowned-beast.webp",
+      "category": "unknown",
+      "width": 384,
+      "height": 384,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 210,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/characters/jotem/row-00.webp",
+      "category": "unknown",
+      "width": 768,
+      "height": 128,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 764,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/characters/jotem/row-01.webp",
+      "category": "unknown",
+      "width": 1024,
+      "height": 128,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 1398,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/characters/jotem/row-02.webp",
+      "category": "unknown",
+      "width": 768,
+      "height": 128,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 922,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/characters/jotem/row-03.webp",
+      "category": "unknown",
+      "width": 1024,
+      "height": 128,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 1382,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/characters/jotem/row-04.webp",
+      "category": "unknown",
+      "width": 384,
+      "height": 128,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 686,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/characters/jotem/row-05.webp",
+      "category": "unknown",
+      "width": 640,
+      "height": 128,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 824,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/characters/jotem/row-06.webp",
+      "category": "unknown",
+      "width": 1280,
+      "height": 128,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 1626,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/characters/jotem/row-07.webp",
+      "category": "unknown",
+      "width": 1280,
+      "height": 128,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 2560,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/characters/jotem/row-08.webp",
+      "category": "unknown",
+      "width": 640,
+      "height": 128,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 2484,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/characters/jotem/row-09.webp",
+      "category": "unknown",
+      "width": 1536,
+      "height": 128,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 1720,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/characters/jotem/row-10.webp",
+      "category": "unknown",
+      "width": 1536,
+      "height": 128,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 2418,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/characters/jotem/row-11.webp",
+      "category": "unknown",
+      "width": 768,
+      "height": 128,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 1808,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/monsters/moon-rabbit.webp",
+      "category": "unknown",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 164,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/monsters/star-beetle.webp",
+      "category": "unknown",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 166,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/monsters/star-slime.webp",
+      "category": "unknown",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 184,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
+      ]
+    },
+    {
+      "path": "assets/game-art/cc0/pets/star-slime.webp",
+      "category": "unknown",
+      "width": 128,
+      "height": 128,
+      "mode": "RGBA",
+      "has_alpha": true,
+      "file_size": 168,
+      "status": "warning",
+      "issues": [
+        "unknown_category"
       ]
     },
     {

@@ -1,0 +1,4605 @@
+{
+  "output": "assets/game-art/cc0/backgrounds/region-01-field.webp",
+  "pack": "kenney-rpg-base",
+  "author": "Kenney",
+  "license": "CC0 1.0",
+  "size": [
+    1920,
+    1080
+  ],
+  "method": "native-size independent tile composition",
+  "tiles": [
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 0,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 64,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 128,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 192,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 256,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 320,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 384,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 448,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 512,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 576,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 640,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 704,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 768,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 832,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 896,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 960,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1024,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1088,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1152,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1216,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1280,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1344,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1408,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1472,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1536,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1600,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1664,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1728,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1792,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1856,
+      "y": 0,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 0,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 64,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 128,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 192,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 256,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 320,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 384,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 448,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 512,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 576,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 640,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 704,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 768,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 832,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 896,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 960,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1024,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1088,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1152,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1216,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1280,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1344,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1408,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1472,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1536,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1600,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1664,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1728,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1792,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1856,
+      "y": 64,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 0,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 64,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 128,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 192,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 256,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 320,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 384,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 448,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 512,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 576,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 640,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 704,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 768,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 832,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 896,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 960,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1024,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1088,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1152,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1216,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1280,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1344,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1408,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1472,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1536,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1600,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1664,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1728,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1792,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1856,
+      "y": 128,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 0,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 64,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 128,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 192,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 256,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 320,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 384,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 448,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 512,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 576,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 640,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 704,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 768,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 832,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 896,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 960,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1024,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1088,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1152,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1216,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1280,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1344,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1408,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1472,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1536,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1600,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1664,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1728,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1792,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1856,
+      "y": 192,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 0,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 64,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 128,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 192,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 256,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 320,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 384,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 448,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 512,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 576,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 640,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 704,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 768,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 832,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 896,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 960,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1024,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1088,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1152,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1216,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1280,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1344,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1408,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1472,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1536,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1600,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1664,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1728,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1792,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1856,
+      "y": 256,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 0,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 64,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 128,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 192,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 256,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 320,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 384,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 448,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 512,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 576,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 640,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 704,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 768,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 832,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 896,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 960,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1024,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1088,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1152,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1216,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1280,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1344,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1408,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1472,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1536,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1600,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1664,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1728,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1792,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1856,
+      "y": 320,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 0,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 64,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 128,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 192,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 256,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 320,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 384,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 448,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 512,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 576,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 640,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 704,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 768,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 832,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 896,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 960,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1024,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1088,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1152,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1216,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1280,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1344,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1408,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1472,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1536,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1600,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1664,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1728,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1792,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1856,
+      "y": 384,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 0,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 64,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 128,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 192,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 256,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 320,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 384,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 448,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 512,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 576,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 640,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 704,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 768,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 832,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 896,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 960,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1024,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1088,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1152,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1216,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1280,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1344,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1408,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1472,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1536,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1600,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1664,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1728,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1792,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1856,
+      "y": 448,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 0,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 64,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 128,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 192,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 256,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 320,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 384,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 448,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 512,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 576,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 640,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 704,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 768,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 832,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 896,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 960,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1024,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1088,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1152,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1216,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1280,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1344,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1408,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1472,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1536,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1600,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1664,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1728,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1792,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1856,
+      "y": 512,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 0,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 64,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 128,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 192,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 256,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 320,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 384,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 448,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 512,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 576,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 640,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 704,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 768,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 832,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 896,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 960,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1024,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1088,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1152,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1216,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1280,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1344,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1408,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1472,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1536,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1600,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1664,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1728,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1792,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1856,
+      "y": 576,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 0,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 64,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 128,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 192,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 256,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 320,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 384,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 448,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 512,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 576,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 640,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 704,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 768,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 832,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 896,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 960,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1024,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1088,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1152,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1216,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1280,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1344,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1408,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1472,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1536,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1600,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1664,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1728,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1792,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1856,
+      "y": 640,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 0,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 64,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 128,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 192,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 256,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 320,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 384,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 448,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 512,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 576,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 640,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 704,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 768,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 832,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 896,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 960,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1024,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1088,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1152,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1216,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1280,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1344,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1408,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1472,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1536,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1600,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1664,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1728,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1792,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1856,
+      "y": 704,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 0,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 64,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 128,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 192,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 256,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 320,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 384,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 448,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 512,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 576,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 640,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 704,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 768,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 832,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 896,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 960,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1024,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1088,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1152,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1216,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1280,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1344,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1408,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1472,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1536,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1600,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1664,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1728,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1792,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1856,
+      "y": 768,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 0,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 64,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 128,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 192,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 256,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 320,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 384,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 448,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 512,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 576,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 640,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 704,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 768,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 832,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 896,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 960,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1024,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1088,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1152,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1216,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1280,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1344,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1408,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1472,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1536,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1600,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1664,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1728,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1792,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1856,
+      "y": 832,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 0,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 64,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 128,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 192,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 256,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 320,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 384,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 448,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 512,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 576,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 640,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 704,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 768,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 832,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 896,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 960,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1024,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1088,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1152,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1216,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1280,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1344,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1408,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1472,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1536,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1600,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1664,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1728,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1792,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1856,
+      "y": 896,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 0,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 64,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 128,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 192,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 256,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 320,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 384,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 448,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 512,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 576,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 640,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 704,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 768,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 832,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 896,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 960,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1024,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1088,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1152,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1216,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1280,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1344,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1408,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1472,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1536,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1600,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1664,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1728,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1792,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1856,
+      "y": 960,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 0,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 64,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 128,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 192,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 256,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 320,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 384,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 448,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 512,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 576,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 640,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 704,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 768,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 832,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 896,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 960,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1024,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1088,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1152,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1216,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1280,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1344,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1408,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1472,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1536,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1600,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1664,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1728,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile003.png",
+      "x": 1792,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile004.png",
+      "x": 1856,
+      "y": 1024,
+      "scale": 1,
+      "layer": "ground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile005.png",
+      "x": 128,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 192,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 256,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 320,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 384,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 448,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 512,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 576,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 640,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 704,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 768,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 832,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 896,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 960,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 1024,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 1088,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 1152,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 1216,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 1280,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 1344,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 1408,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 1472,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 1536,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 1600,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile006.png",
+      "x": 1664,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile007.png",
+      "x": 1728,
+      "y": 512,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 128,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 192,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 256,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 320,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 384,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 448,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 512,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 576,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 640,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 704,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 768,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 832,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 896,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 960,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 1024,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 1088,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 1152,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 1216,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 1280,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 1344,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 1408,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 1472,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 1536,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 1600,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 1664,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 1728,
+      "y": 576,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 128,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 192,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 256,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 320,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 384,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 448,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 512,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 576,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 640,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 704,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 768,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 832,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 896,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 960,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 1024,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 1088,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 1152,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 1216,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 1280,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 1344,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 1408,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 1472,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 1536,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 1600,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile008.png",
+      "x": 1664,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile009.png",
+      "x": 1728,
+      "y": 640,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile041.png",
+      "x": 128,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 192,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 256,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 320,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 384,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 448,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 512,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 576,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 640,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 704,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 768,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 832,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 896,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 960,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 1024,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 1088,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 1152,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 1216,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 1280,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 1344,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 1408,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 1472,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 1536,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 1600,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile042.png",
+      "x": 1664,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile043.png",
+      "x": 1728,
+      "y": 704,
+      "scale": 1,
+      "layer": "path"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile175.png",
+      "x": 0,
+      "y": 0,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile195.png",
+      "x": 0,
+      "y": 64,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile177.png",
+      "x": 192,
+      "y": 0,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile197.png",
+      "x": 192,
+      "y": 64,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile179.png",
+      "x": 384,
+      "y": 0,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile199.png",
+      "x": 384,
+      "y": 64,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile175.png",
+      "x": 576,
+      "y": 0,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile195.png",
+      "x": 576,
+      "y": 64,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile177.png",
+      "x": 768,
+      "y": 0,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile197.png",
+      "x": 768,
+      "y": 64,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile179.png",
+      "x": 960,
+      "y": 0,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile199.png",
+      "x": 960,
+      "y": 64,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile175.png",
+      "x": 1152,
+      "y": 0,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile195.png",
+      "x": 1152,
+      "y": 64,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile177.png",
+      "x": 1344,
+      "y": 0,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile197.png",
+      "x": 1344,
+      "y": 64,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile179.png",
+      "x": 1536,
+      "y": 0,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile199.png",
+      "x": 1536,
+      "y": 64,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile175.png",
+      "x": 1728,
+      "y": 0,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile195.png",
+      "x": 1728,
+      "y": 64,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile177.png",
+      "x": 0,
+      "y": 300,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile197.png",
+      "x": 0,
+      "y": 364,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile179.png",
+      "x": 64,
+      "y": 360,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile199.png",
+      "x": 64,
+      "y": 424,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile175.png",
+      "x": 1792,
+      "y": 330,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile195.png",
+      "x": 1792,
+      "y": 394,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile177.png",
+      "x": 1856,
+      "y": 280,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile197.png",
+      "x": 1856,
+      "y": 344,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile155.png",
+      "x": 80,
+      "y": 210,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile157.png",
+      "x": 310,
+      "y": 260,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile159.png",
+      "x": 1490,
+      "y": 240,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile155.png",
+      "x": 1710,
+      "y": 190,
+      "scale": 1,
+      "layer": "foliage"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile181.png",
+      "x": 0,
+      "y": 1000,
+      "scale": 1,
+      "layer": "foreground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile182.png",
+      "x": 192,
+      "y": 940,
+      "scale": 1,
+      "layer": "foreground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile201.png",
+      "x": 384,
+      "y": 1000,
+      "scale": 1,
+      "layer": "foreground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile202.png",
+      "x": 576,
+      "y": 940,
+      "scale": 1,
+      "layer": "foreground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile215.png",
+      "x": 768,
+      "y": 1000,
+      "scale": 1,
+      "layer": "foreground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile216.png",
+      "x": 960,
+      "y": 940,
+      "scale": 1,
+      "layer": "foreground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile181.png",
+      "x": 1152,
+      "y": 1000,
+      "scale": 1,
+      "layer": "foreground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile182.png",
+      "x": 1344,
+      "y": 940,
+      "scale": 1,
+      "layer": "foreground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile201.png",
+      "x": 1536,
+      "y": 1000,
+      "scale": 1,
+      "layer": "foreground"
+    },
+    {
+      "source": "third_party/kenney-rpg-base/PNG/rpgTile202.png",
+      "x": 1728,
+      "y": 940,
+      "scale": 1,
+      "layer": "foreground"
+    }
+  ]
+}

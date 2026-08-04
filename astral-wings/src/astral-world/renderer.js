@@ -6,6 +6,7 @@ import { drawPet as drawBattlePet } from './pet-renderer.js';
 import { drawBattleBackground } from './battle-background-renderer.js';
 import { getArtAsset } from './art-asset-manager.js';
 import { drawCoverImage } from './sprite-renderer.js';
+import { drawCc0PixelMonster, drawCc0PixelPet, drawCc0PixelPlayer, getCc0PixelBackground, shouldUseCc0PixelTheme } from './cc0-pixel-theme.js';
 
 const W = 390;
 const H = 430;
@@ -68,14 +69,15 @@ export class BattleRenderer {
     const scene = this.scene;
     ctx.clearRect(0, 0, W, H);
     const map = MAPS[(scene?.state?.mapId || 1) - 1] || MAPS[0];
-    const background=map.id===1?getArtAsset('background.region01.battle'):null;
+    const pixelTheme=shouldUseCc0PixelTheme(scene?.state);
+    const background=pixelTheme?getCc0PixelBackground():(map.id===1?getArtAsset('background.region01.battle'):null);
     if(!drawCoverImage(ctx,background,W,H))drawBattleBackground(ctx, map, { time: this.time, powerSave: scene?.state?.settings?.powerSave, stars: this.stars });
     else if(!scene?.state?.settings?.powerSave){ctx.save();ctx.globalAlpha=.22;ctx.fillStyle='#eaf8ff';this.stars.slice(0,10).forEach(star=>{ctx.beginPath();ctx.arc(star.x,star.y,star.r,0,Math.PI*2);ctx.fill();});ctx.restore();}
     if (!scene?.battle) return;
     const enemy = scene.battle.enemy;
-    if (enemy) this.drawMonster(ctx, enemy, scene.battle, scene.state.settings?.powerSave);
-    this.drawPet(ctx, scene.state, scene.battle, 142, 300);
-    drawPlayer(ctx, scene.state, scene.battle, 110, 315, this.time);
+    if (enemy) pixelTheme?this.drawCc0Monster(ctx,enemy,scene.battle):this.drawMonster(ctx, enemy, scene.battle, scene.state.settings?.powerSave);
+    if(pixelTheme)this.drawCc0Pet(ctx,scene.state,scene.battle,142,300);else this.drawPet(ctx, scene.state, scene.battle, 142, 300);
+    if(pixelTheme)drawCc0PixelPlayer(ctx,scene.state,scene.battle,110,315,this.time);else drawPlayer(ctx, scene.state, scene.battle, 110, 315, this.time);
     this.drawEffects(ctx);
     this.drawNumbers(ctx);
   }
@@ -130,6 +132,10 @@ export class BattleRenderer {
     if (!pet) return;
     drawBattlePet(ctx, pet, { time:this.time, action:battle?.petAction, actionIn:battle?.petActionIn, returnIn:battle?.petReturnIn, summonIn:battle?.petSummonIn, skillType:battle?.petAction==='skill' ? 'active' : null, skillProgress:battle?.petActionIn, powerSave:state.settings?.powerSave }, x, y);
   }
+
+  drawCc0Pet(ctx,state,battle,x,y){const pet=state.pets.find(item=>item.id===state.activePetId);drawCc0PixelPet(ctx,pet,{time:this.time,action:battle?.petAction,actionIn:battle?.petActionIn},x,y);}
+
+  drawCc0Monster(ctx,enemy,battle){const pose=drawCc0PixelMonster(ctx,enemy,{time:this.time,attackIn:battle.enemyAttackIn});if(!pose)return;const boss=enemy.boss;this.bar(ctx,pose.x-(boss?76:34),pose.y+(boss?108:42),boss?152:68,boss?8:7,enemy.hp/enemy.maxHp,boss?(pose.rage?'#ff5578':'#ff8269'):'#dc80ff');if(boss){ctx.save();ctx.textAlign='center';ctx.font='700 11px system-ui';ctx.fillStyle=pose.rage?'#ff8a9c':'#ffe2a8';ctx.fillText(`${enemy.name}${pose.rage?' · 狂暴':''}`,pose.x,Math.max(22,pose.y-112));ctx.restore();}}
 
   drawEnemy(ctx, enemy, map) {
     const x = 278 + Math.sin(this.time * 1.6) * 8;
