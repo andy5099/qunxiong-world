@@ -1,4 +1,4 @@
-import { BALANCE, MONSTER_VISUALS, QUALITY, SLOTS } from './data.js';
+import { BALANCE, MONSTER_VISUALS, QUALITY, SLOTS } from './data.js?v=27';
 import { equipmentPower as calculateEquipmentPower, generateEquipmentAffixes, getEquipmentAffixBonuses, getEquipmentStatProfile } from './equipment-affix-system.js';
 import { createPetFromEnemy, getPetEffectiveAttack, getPetEffectiveHpBonus, normalizePet } from './pet-system.js';
 import { getPetCodexBonuses, syncPetCodex } from './pet-codex-system.js';
@@ -12,7 +12,7 @@ export const format = value => value >= 1e9 ? `${(value/1e9).toFixed(1)}B` : val
 export const expFor = level => Math.floor(55 * level ** 1.36 + level * 28);
 
 export function basePlayer(level = 1) {
-  return { name:'星界冒險者', className:'星刃使', level, exp:0, nextExp:expFor(level), hp:150+(level-1)*24, maxHp:150+(level-1)*24, attack:20+(level-1)*5, defense:5+(level-1)*1.4, crit:.05, critDamage:1.5, attackSpeed:BALANCE.attackInterval, shield:0, gold:0, diamonds:0, power:0 };
+  return { name:'星界冒險者', className:'星刃使', level, exp:0, nextExp:expFor(level), hp:150+(level-1)*24, maxHp:150+(level-1)*24, attack:20+(level-1)*5, defense:5+(level-1)*1.4, crit:.05, critDamage:1.5, attackSpeed:BALANCE.attackInterval, shield:0, mp:100, maxMp:100, mpRegenPerSecond:8, rage:0, maxRage:100, gold:0, diamonds:0, power:0 };
 }
 
 export function recompute(state) {
@@ -21,6 +21,8 @@ export function recompute(state) {
   const prior = state.player || basePlayer();
   const player = basePlayer(prior.level || 1);
   player.name = prior.name || player.name; player.exp = prior.exp || 0; player.gold = prior.gold || 0; player.diamonds = prior.diamonds || 0;
+  player.maxMp = Math.max(1, Number(prior.maxMp) || player.maxMp); player.mpRegenPerSecond = Math.max(0, Number(prior.mpRegenPerSecond) || player.mpRegenPerSecond);
+  player.maxRage = Math.max(1, Number(prior.maxRage) || player.maxRage); player.mp = clamp(Number(prior.mp ?? player.maxMp), 0, player.maxMp); player.rage = clamp(Number(prior.rage) || 0, 0, player.maxRage);
   const percent={attack:0,defense:0,maxHp:0};
   const affixBonuses={flat:{},additiveRate:{},intervalMultiplier:1,bossDamage:0,normalDamage:0,goldBonus:0,expBonus:0};
   for (const item of Object.values(state.equipped || {})) {

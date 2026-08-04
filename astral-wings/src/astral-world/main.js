@@ -1,8 +1,8 @@
 import { createEquipment } from './core.js';
-import { IdleGame } from './game.js';
-import { BattleRenderer } from './renderer.js?v=26';
-import { loadState, saveState } from './save.js?v=26';
-import { AstralUI } from './ui.js?v=26';
+import { IdleGame } from './game.js?v=27';
+import { BattleRenderer } from './renderer.js?v=27';
+import { loadState, saveState } from './save.js?v=27';
+import { AstralUI } from './ui.js?v=27';
 import { updateObjective, updateUnlocks } from './objective-system.js';
 import { ensureTutorial } from './tutorial-system.js';
 import { installVisualIconObserver } from './ui-icons.js';
@@ -33,7 +33,7 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('beforeunload', () => saveState(game.state));
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('../../service-worker.js').catch(() => {}));
+  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(() => {}));
 }
 
 if (state.offlinePending) setTimeout(() => ui.openOffline(), 350);

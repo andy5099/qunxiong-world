@@ -8,6 +8,7 @@
   <title>Astral World：星界冒險</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="css/alpha-v02.css">
+  <link rel="stylesheet" href="css/battle-v2.css">
   <link rel="stylesheet" href="css/visual-icons.css">
   <link rel="stylesheet" href="css/art-assets.css">
   <link rel="stylesheet" href="css/region-01-slice.css">
@@ -34,6 +35,8 @@
       <section class="combat-readout">
         <div class="life-row"><span>HP</span><div class="meter hp"><i id="playerHp"></i></div><b id="playerHpText">150 / 150</b></div>
         <div class="life-row shield-row"><span>盾</span><div class="meter shield"><i id="playerShield"></i></div><b id="playerShieldText">0</b></div>
+        <div class="life-row mp-row"><span>MP</span><div class="meter mp"><i id="playerMp"></i></div><b id="playerMpText">100 / 100</b></div>
+        <div class="life-row rage-row"><span>怒</span><div class="meter rage"><i id="playerRage"></i></div><b id="playerRageText">0 / 100</b></div>
         <div class="stage-progress"><span>擊殺 <b id="killProgress">0 / 10</b></span><span id="battleState">自動探索</span></div>
       </section>
       <section class="skills" id="skills"></section>
@@ -65,6 +68,6 @@
     <div class="modal" id="modal" aria-hidden="true"><div class="modal-card" id="modalCard"></div></div>
   </main>
   <script>window.__bootErrors=[];addEventListener('error',event=>window.__bootErrors.push(String(event.error?.message||event.message)));addEventListener('unhandledrejection',event=>window.__bootErrors.push(String(event.reason?.message||event.reason)));</script>
-  <script type="module" src="src/astral-world/main.js?v=26"></script>
+  <script type="module" src="src/astral-world/main.js?v=27"></script>
 </body>
 </html>

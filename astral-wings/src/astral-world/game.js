@@ -1,8 +1,9 @@
-import { MAPS, PET_SKILL_BALANCE, SKILLS, SLOTS } from './data.js';
-import { addExp, createEquipment, enhanceChance, enhanceCost, enemyFor, equipmentPower, petFromEnemy, recompute } from './core.js';
+import { MAPS, PET_SKILL_BALANCE, SKILLS, SLOTS } from './data.js?v=27';
+import { addExp, createEquipment, enhanceChance, enhanceCost, enemyFor, equipmentPower, petFromEnemy, recompute } from './core.js?v=27';
 import { saveState } from './save.js';
 import { applyPetCapture, canCastPetSkill, evolvePet as applyPetEvolution, getPetCombatModifiers, getPetDisplayName, getPetEffectiveAttack, getPetSkillDefinition, getPetSkillProfile, grantPetExperience, starPet as applyPetStar } from './pet-system.js';
 import { ensurePetTeam, setPetTeamSlot as assignPetTeamSlot } from './pet-team-system.js';
+import { addRage, advanceSkillRuntime, cancelActiveSkill, chooseAutoSkill, ensureBattle2State, regenerateBattleResources, requestSkillCast, retainBattleRage, tickSkillCooldowns } from './battle-skill-system.js?v=27';
 
 const pick = list => list[Math.floor(Math.random() * list.length)];
 const qualityRank = { common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5, mythic: 6, astral: 7 };
@@ -10,6 +11,7 @@ const qualityRank = { common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5, my
 export class IdleGame {
   constructor(state, renderer, callbacks = {}) {
     this.state = state;
+    ensureBattle2State(this.state);
     ensurePetTeam(this.state);
     this.renderer = renderer;
     this.callbacks = callbacks;
@@ -24,7 +26,8 @@ export class IdleGame {
   }
 
   newBattle() {
-    return { enemy: null, spawnIn: 0.45, attackIn: 0.35, enemyAttackIn: 0.7, petIn: 1.2, petSkillIn:0, petBuffs:{}, petAction:'summon', petActionIn:.52, petReturnIn:0, petSummonIn:.52, cooldowns: [0, 0, 0, 0], queuedHits: [], playerFlash: 0, playerAction: 'idle', playerActionIn: 0, reviveIn: 0, bossMode: false, killing: false };
+    cancelActiveSkill(this.state);
+    return { enemy: null, spawnIn: 0.45, attackIn: 0.35, enemyAttackIn: 0.7, petIn: 1.2, petSkillIn:0, petBuffs:{}, petAction:'summon', petActionIn:.52, petReturnIn:0, petSummonIn:.52, cooldowns: SKILLS.map(skill => this.state.skillCooldowns[skill.id]), queuedHits: [], playerFlash: 0, playerAction: 'idle', playerActionIn: 0, reviveIn: 0, bossMode: false, killing: false };
   }
 
   start() { if (!this.running) { this.running = true; this.last = performance.now(); this.frame = requestAnimationFrame(this._bound); } }
@@ -34,18 +37,23 @@ export class IdleGame {
   update(dt) {
     const { state, battle } = this;
     state.stats.battleSeconds += dt;
+    tickSkillCooldowns(state, dt);
+    regenerateBattleResources(state, dt, Boolean(battle.enemy?.alive));
+    battle.cooldowns = SKILLS.map(skill => state.skillCooldowns[skill.id]);
     if (state.player.hp > 0 && state.player.regen) state.player.hp = Math.min(state.player.maxHp, state.player.hp + state.player.regen * dt);
     this.saveIn -= dt;
     this.renderer.setScene({ state, battle });
     this.renderer.update(dt);
     if (battle.reviveIn > 0) {
+      cancelActiveSkill(state);
       battle.reviveIn -= dt;
       if (battle.reviveIn <= 0) { state.player.hp = state.player.maxHp; state.player.shield = 0; battle.playerAction = 'revive'; battle.playerActionIn = .72; battle.spawnIn = .65; this.event('重新集結', '星界能量讓你恢復滿生命，繼續探索。'); }
       this.flush(); return;
     }
-    if (!battle.enemy) { battle.spawnIn -= dt; if (battle.spawnIn <= 0) this.spawn(battle.bossMode); this.flush(); return; }
+    if (!battle.enemy) { cancelActiveSkill(state); battle.spawnIn -= dt; if (battle.spawnIn <= 0) this.spawn(battle.bossMode); this.flush(); return; }
     const enemy = battle.enemy;
     if (!enemy.alive) {
+      cancelActiveSkill(state);
       battle.queuedHits.length = 0;
       enemy.deathIn = Math.max(0, (enemy.deathIn || .46) - dt);
       if (enemy.deathIn <= 0) { battle.enemy = null; battle.killing = false; }
@@ -62,13 +70,19 @@ export class IdleGame {
     battle.petActionIn = Math.max(0, (battle.petActionIn || 0) - dt); battle.petReturnIn = Math.max(0, (battle.petReturnIn || 0) - dt); battle.petSummonIn = Math.max(0, (battle.petSummonIn || 0) - dt);
     if ((battle.petAction === 'attack' || battle.petAction === 'skill') && battle.petActionIn <= 0) { battle.petAction = 'return'; battle.petReturnIn = .26; }
     else if ((battle.petAction === 'return' && battle.petReturnIn <= 0) || (battle.petAction === 'celebrate' && battle.petActionIn <= 0) || (battle.petAction === 'summon' && battle.petSummonIn <= 0)) battle.petAction = 'idle';
-    for (let i = 0; i < battle.cooldowns.length; i += 1) battle.cooldowns[i] = Math.max(0, battle.cooldowns[i] - dt);
     for (let i = battle.queuedHits.length - 1; i >= 0; i -= 1) {
       const hit = battle.queuedHits[i]; hit.in -= dt;
       if (hit.in <= 0) { if (battle.enemy?.id === hit.enemyId && battle.enemy.alive) { this.damageEnemy(hit.damage, hit.label, hit.color, hit.critical, hit.source, hit.criticalMultiplier); this.applyPlayerHitEffects(hit.onHitPlayerEffects); if (battle.enemy?.alive && hit.onHitEffect) this.applyEnemyEffect(hit.onHitEffect.type, hit.onHitEffect.value, hit.onHitEffect.duration, hit.onHitEffect.source, hit.onHitEffect.extra); } battle.queuedHits.splice(i, 1); }
     }
-    if (battle.attackIn <= 0) { this.basicAttack(); battle.attackIn += Math.max(.34, state.player.attackSpeed); }
+    const skillBusy = ['queued','casting','resolving'].includes(state.skillRuntimeState.phase);
+    if (battle.attackIn <= 0 && !skillBusy) { this.basicAttack(); battle.attackIn += Math.max(.34, state.player.attackSpeed); }
     this.autoSkills();
+    advanceSkillRuntime(state, dt, {
+      isTargetValid: targetId => Boolean(battle.enemy?.alive && battle.enemy.id === targetId),
+      onCasting: skill => { battle.playerAction = skill.animation; battle.playerActionIn = Math.max(skill.castTime, .2); },
+      onResolve: skill => this.resolveSkill(skill),
+    });
+    battle.cooldowns = SKILLS.map(skill => state.skillCooldowns[skill.id]);
     for (const buff of Object.values(battle.petBuffs)) buff.remaining -= dt;
     for (const [key,buff] of Object.entries(battle.petBuffs)) if(buff.remaining<=0) delete battle.petBuffs[key];
     if (battle.petIn <= 0 && battle.petAction !== 'skill') { const pet = state.pets.find(item => item.id === state.activePetId); this.petAttack(); const haste=battle.petBuffs.haste?.value||0; battle.petIn += Math.max(.42,2.1 * getPetCombatModifiers(pet).intervalMultiplier * (1-haste)); }
@@ -101,33 +115,43 @@ export class IdleGame {
     this.battle.playerAction = 'attack'; this.battle.playerActionIn = .24;
     const critical = Math.random() < this.state.player.crit;
     this.damageEnemy(this.state.player.attack * (critical ? this.state.player.critDamage : 1), '星刃普攻', critical ? '#ffe38b' : '#8cdfff', critical);
+    addRage(this.state, 8);
     if (this.battle.enemy?.alive && this.state.player.petSupportExtraHit) {
       this.damageEnemy(this.state.player.attack * this.state.player.petSupportExtraHit, '支援追擊', '#c7a8ff', false, 'petSupport');
     }
   }
 
-  autoSkills() { for (let i = 0; i < SKILLS.length; i += 1) { if (['kill_first','manual_skill'].includes(this.state.objectives?.currentId) && i === 0) continue; if (this.state.skillAuto[i] && this.battle.cooldowns[i] <= 0) this.castSkill(i); } }
+  autoSkills() {
+    const blockedTutorial = ['kill_first','manual_skill'].includes(this.state.objectives?.currentId);
+    const skill = chooseAutoSkill(this.state, Boolean(this.battle.enemy?.alive));
+    if (skill && !(blockedTutorial && skill.id === SKILLS[0].id)) this.castSkill(skill.id);
+  }
   castSkill(index) {
-    const skill = SKILLS[index];
-    if (!skill || !this.battle.enemy || this.battle.cooldowns[index] > 0) return false;
+    const skill = typeof index === 'string' ? SKILLS.find(entry => entry.id === index) : SKILLS[index];
+    if (!skill || !this.battle.enemy?.alive) return false;
+    return requestSkillCast(this.state, skill.id, this.battle.enemy.id, true).ok;
+  }
+
+  resolveSkill(skill) {
+    if (!skill || !this.battle.enemy?.alive) return false;
+    const index = SKILLS.findIndex(entry => entry.id === skill.id);
     const level = this.state.skills[index] || 1;
-    const power = skill.power + (level - 1) * skill.perLevel;
-    this.battle.cooldowns[index] = skill.cooldown;
-    this.battle.playerAction = `skill${index + 1}`; this.battle.playerActionIn = index === 3 ? .52 : .36;
-    if (index === 2) {
+    const power = skill.damageMultiplier + (level - 1) * skill.perLevel;
+    this.battle.playerAction = skill.animation; this.battle.playerActionIn = index === 3 ? .52 : .36;
+    if (skill.type === 'shield') {
       const shield = this.state.player.maxHp * power;
       this.state.player.shield = Math.min(this.state.player.maxHp * .65, this.state.player.shield + shield);
       this.renderer.pulse('shield', 110, 315, '#a4d8ff', 44);
       this.event(skill.name, `獲得 ${Math.floor(shield)} 點星光護盾。`);
-    } else if (index === 1) {
-      for (let hit = 0; hit < 3; hit += 1) this.battle.queuedHits.push({ in: .1 + hit * .18, damage: this.state.player.attack * power, label: skill.name, color: '#9a8cff', enemyId:this.battle.enemy.id, source:'playerSkill' });
+    } else if (skill.type === 'multiHit') {
+      for (let hit = 0; hit < skill.hits; hit += 1) this.battle.queuedHits.push({ in: .1 + hit * .18, damage: this.state.player.attack * power, label: skill.name, color: '#9a8cff', enemyId:this.battle.enemy.id, source:'playerSkill' });
       this.renderer.pulse('slash', 267, 270, '#a998ff', 46);
       this.event(skill.name, '三段星光斬擊依序命中。');
     } else {
       let damage = this.state.player.attack * power;
-      if (index === 3 && this.battle.enemy.hp / this.battle.enemy.maxHp < .25) damage *= 1.5;
-      this.damageEnemy(damage, skill.name, index === 3 ? '#ffd06f' : '#75dcff', index === 3, 'playerSkill');
-      this.renderer.pulse(index === 3 ? 'burst' : 'slash', 275, 265, index === 3 ? '#ffd16a' : '#67d8ff', index === 3 ? 65 : 42);
+      if (skill.type === 'execute' && this.battle.enemy.hp / this.battle.enemy.maxHp < .25) damage *= 1.5;
+      this.damageEnemy(damage, skill.name, skill.type === 'execute' ? '#ffd06f' : '#75dcff', skill.type === 'execute', 'playerSkill');
+      this.renderer.pulse(skill.type === 'execute' ? 'burst' : 'slash', 275, 265, skill.type === 'execute' ? '#ffd16a' : '#67d8ff', skill.type === 'execute' ? 65 : 42);
       this.event(skill.name, `Lv.${level} 技能已施放。`);
     }
     return true;
@@ -182,8 +206,9 @@ export class IdleGame {
     let amount = Math.max(1, raw * (100 / (100 + player.defense)));
     const shieldDamage = Math.min(player.shield, amount);
     player.shield -= shieldDamage; amount -= shieldDamage; player.hp = Math.max(0, player.hp - amount);
+    addRage(this.state, 5);
     this.battle.playerFlash = .38; this.battle.playerAction = 'hurt'; this.battle.playerActionIn = .28; this.renderer.damage(shieldDamage + amount, 110, 275, false, '#ff8f9d'); this.renderer.pulse('hit', 110, 305, '#ff859b', 26);
-    if (player.hp <= 0) { this.battle.playerAction = 'downed'; this.battle.enemy = null; this.battle.reviveIn = 3; this.event('戰鬥失利', '3 秒後將在目前關卡重新集結。'); }
+    if (player.hp <= 0) { cancelActiveSkill(this.state); this.battle.playerAction = 'downed'; this.battle.enemy = null; this.battle.reviveIn = 3; this.event('戰鬥失利', '3 秒後將在目前關卡重新集結。'); }
   }
 
   petAttack() {
@@ -233,6 +258,7 @@ export class IdleGame {
     const { state, battle } = this; const enemy = battle.enemy;
     if (!enemy || battle.killing) return;
     battle.killing = true; enemy.alive = false;
+    cancelActiveSkill(state); retainBattleRage(state);
     if (state.activePetId) { battle.petAction = 'celebrate'; battle.petActionIn = .5; battle.petReturnIn = 0; }
     this.renderer.pulse('burst', 278, 270, enemy.boss ? '#ffad72' : '#cf8aff', enemy.boss ? 68 : 36);
     const mult = enemy.boss ? 4 : 1;
@@ -305,7 +331,7 @@ export class IdleGame {
   toggleLock(itemId) { const item = this.state.inventory.find(entry => entry.id === itemId); if (!item) return false; item.locked = !item.locked; return true; }
   enhance(itemId) { const item=this.state.inventory.find(entry=>entry.id===itemId); if(!item)return {ok:false,reason:'missing'}; item.enhance=item.enhance||0; const cost=enhanceCost(item); if(this.state.player.gold<cost)return {ok:false,reason:'gold',cost}; this.state.player.gold-=cost; const chance=enhanceChance(item); if(Math.random()<=chance){item.enhance+=1; recompute(this.state); this.renderer.pulse('burst',235,260,item.color,52); this.event('強化成功',`${item.name} +${item.enhance}`);return {ok:true,cost,chance,item};} const down=item.enhance>=10&&Math.random()<.18; if(down)item.enhance-=1; recompute(this.state);this.event('強化失敗',down?'強化等級下降 1 級。':'僅消耗金幣，裝備未損失。');return {ok:false,reason:'fail',cost,chance,down,item}; }
   equipBest() { let changed=0; for(const item of this.state.inventory){const current=this.state.equipped[item.slot];if(!current||equipmentPower(item)>equipmentPower(current)){this.state.equipped[item.slot]=item;changed+=1;}}if(changed){recompute(this.state);this.event('最佳裝備',`已穿戴 ${changed} 件更強裝備。`);}return changed; }
-  toggleSkill(index) { this.state.skillAuto[index] = !this.state.skillAuto[index]; return this.state.skillAuto[index]; }
+  toggleSkill(index) { const skill=SKILLS[index]; if(!skill)return false; this.state.skillAutoSettings[skill.id]=!this.state.skillAutoSettings[skill.id]; this.state.skillAuto=SKILLS.map(entry=>this.state.skillAutoSettings[entry.id]); saveState(this.state); return this.state.skillAutoSettings[skill.id]; }
   upgradeSkill(index) { const price = 100 * (this.state.skills[index] || 1); if (this.state.player.gold < price) return false; this.state.player.gold -= price; this.state.skills[index] += 1; recompute(this.state); return true; }
   setActivePet(id) { return this.setPetTeamSlot(id, 'main'); }
   setPetTeamSlot(id, slot) {

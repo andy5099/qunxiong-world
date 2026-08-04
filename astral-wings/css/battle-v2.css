@@ -1,0 +1,18 @@
+/* Battle 2.0 resources and independent manual/AUTO skill controls. */
+.meter.mp i{background:linear-gradient(90deg,#397cff,#72e3ff)}
+.mp-row{color:#9edfff}
+.meter.rage i{background:linear-gradient(90deg,#ff754e,#ffd45d)}
+.rage-row{color:#ffc078}
+.skills .skill-card{min-width:0;min-height:84px;padding:3px}
+.skill-cast{position:relative;width:100%;min-height:58px;padding:2px;border:0;background:transparent;color:inherit;text-align:left}
+.skill-cast:disabled{opacity:.52}
+.skills .skill-card small{display:block;font-size:8px;white-space:nowrap}
+.skill-auto{position:relative;width:100%;min-height:18px;border:1px solid #6a78aa;border-radius:5px;background:#0d1432;color:#8997bf;font-size:8px}
+.skill-auto.on{border-color:#64d7ff;color:#b9f3ff;background:#123859}
+.skill-card.active-cast{box-shadow:0 0 13px #77ddff88}
+.cast-state{position:absolute;inset:0;background:#14285edb;display:grid;place-items:center;color:#fff1aa;font-size:9px;font-weight:800;text-transform:uppercase}
+.skills .skill-card .cool{background:#071025cf}
+@media(max-width:390px){.skills{gap:4px;padding-inline:3px}.skills .skill-card i{width:34px;height:34px}.skills .skill-card b{font-size:9px}}
+
+/* Constrain onboarding to the centered phone shell on narrow desktop and mobile viewports. */
+.phone-shell .tutorial-overlay{position:absolute}

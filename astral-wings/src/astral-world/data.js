@@ -1,5 +1,5 @@
 export const SAVE_KEY = 'astralWorldIdleV1';
-export const SAVE_VERSION = 10;
+export const SAVE_VERSION = 11;
 
 export const BALANCE = {
   attackInterval: 1.2,
@@ -26,10 +26,10 @@ export const MAPS = [
 export const PET_SOURCE_KINDS = Object.fromEntries(MAPS.flatMap(map => [...map.mobs, map.boss].map(([name, kind]) => [name, kind])));
 
 export const SKILLS = [
-  { id:'slash', name:'星刃斬', cooldown:4, power:1.6, perLevel:.08, description:'對單一敵人造成高額斬擊。' },
-  { id:'meteor', name:'流星連擊', cooldown:7, power:.75, perLevel:.04, description:'以三段殘影連續斬擊敵人。' },
-  { id:'shield', name:'星光護盾', cooldown:12, power:.2, perLevel:.015, description:'獲得最大生命比例的暫時護盾。' },
-  { id:'burst', name:'星爆終結', cooldown:18, power:3.5, perLevel:.16, description:'對殘血敵人造成額外傷害的星爆。' },
+  { id:'slash', name:'星刃斬', shortName:'星刃', type:'damage', cooldown:4, mpCost:18, rageCost:0, castTime:.18, animation:'skill1', target:'enemy', damageMultiplier:1.6, perLevel:.08, priority:40, autoCast:true, description:'消耗 MP，對單一敵人造成高額斬擊。' },
+  { id:'vortex', name:'星界旋渦', shortName:'旋渦', type:'multiHit', cooldown:7, mpCost:28, rageCost:0, castTime:.3, animation:'skill2', target:'enemy', damageMultiplier:.75, hits:3, perLevel:.04, priority:30, autoCast:true, description:'消耗 MP，以星界旋渦連續命中三次。' },
+  { id:'shelter', name:'星界庇護', shortName:'庇護', type:'shield', cooldown:12, mpCost:32, rageCost:0, castTime:.24, animation:'skill3', target:'self', damageMultiplier:.2, perLevel:.015, priority:10, autoCast:false, description:'消耗 MP，獲得最大生命比例的星光護盾。' },
+  { id:'burst', name:'星光爆裂', shortName:'爆裂', type:'execute', cooldown:18, mpCost:0, rageCost:60, castTime:.42, animation:'skill4', target:'enemy', damageMultiplier:3.5, perLevel:.16, priority:50, autoCast:true, description:'消耗 Rage；敵人生命低於 25% 時傷害提高 50%。' },
 ];
 
 export const SLOTS = { weapon:{label:'武器'}, helmet:{label:'頭盔'}, armor:{label:'鎧甲'}, gloves:{label:'手套'}, boots:{label:'鞋子'}, necklace:{label:'項鍊'}, ring:{label:'戒指'}, wings:{label:'翅膀'} };

@@ -1,11 +1,12 @@
-import { SAVE_KEY, SAVE_VERSION, MAPS } from './data.js';
-import { addExp, basePlayer, dailyQuests, recompute } from './core.js';
+import { SAVE_KEY, SAVE_VERSION, MAPS } from './data.js?v=27';
+import { addExp, basePlayer, dailyQuests, recompute } from './core.js?v=27';
 import { migratePets } from './pet-system.js';
 import { ensureTutorial } from './tutorial-system.js';
 import { ensureObjectives, ensureUnlocks } from './objective-system.js';
 import { ensurePetCodex, syncPetCodex } from './pet-codex-system.js';
 import { ensurePetTeam } from './pet-team-system.js';
 import { normalizeEquipment } from './equipment-affix-system.js';
+import { createSkillAutoSettings, createSkillCooldowns, createSkillRuntimeState, ensureBattle2State } from './battle-skill-system.js?v=27';
 
 const now = () => Date.now();
 const dayKey = () => new Date().toISOString().slice(0, 10);
@@ -27,7 +28,10 @@ export function defaultState() {
     evolutionCores: 0,
     petCodex: { version:1, species:{}, claimedRewards:[] },
     skills: [1, 1, 1, 1],
-    skillAuto: [true, true, true, true],
+    skillAuto: [true, true, false, true],
+    skillCooldowns: createSkillCooldowns(),
+    skillAutoSettings: createSkillAutoSettings(),
+    skillRuntimeState: createSkillRuntimeState(),
     settings: {
       autoBoss: false,
       autoAdvance: true,
@@ -75,6 +79,12 @@ function merge(base, raw) {
   while (state.skills.length < 4) state.skills.push(1);
   state.skillAuto = Array.isArray(raw?.skillAuto) ? raw.skillAuto.slice(0, 4).map(Boolean) : base.skillAuto;
   while (state.skillAuto.length < 4) state.skillAuto.push(true);
+  state.skillCooldowns = createSkillCooldowns(raw?.skillCooldowns);
+  state.skillAutoSettings = createSkillAutoSettings(raw?.skillAutoSettings, state.skillAuto);
+  // A saved cast has no live target after reload; resources and cooldowns remain valid,
+  // while queued/casting work is safely cleared instead of resolving against a new enemy.
+  const runtime = createSkillRuntimeState(raw?.skillRuntimeState);
+  state.skillRuntimeState = ['queued','casting','resolving'].includes(runtime.phase) ? createSkillRuntimeState() : runtime;
   state.settings = { ...base.settings, ...(raw?.settings || {}) };
   state.settings.artTheme = state.settings.artTheme === 'cc0-pixel' ? 'cc0-pixel' : 'current';
   state.stats = { ...base.stats, ...(raw?.stats || {}) };
@@ -94,6 +104,7 @@ function merge(base, raw) {
   ensureUnlocks(state);
   syncPetCodex(state);
   recompute(state);
+  ensureBattle2State(state);
   return state;
 }
 
