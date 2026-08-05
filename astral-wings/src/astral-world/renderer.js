@@ -79,6 +79,7 @@ export class BattleRenderer {
     const presentation=scene.battle.presentation,shake=presentation?.shake||{x:0,y:0};
     const enemyOffset=getCombatOffset(presentation,'enemy'),playerOffset=getCombatOffset(presentation,'player'),petOffset=getCombatOffset(presentation,'pet');
     ctx.save();ctx.translate(shake.x||0,shake.y||0);
+    this.drawBossEncounter(ctx,scene.battle.bossRuntime);
     if (enemy) pixelTheme?this.drawCc0Monster(ctx,enemy,scene.battle,enemyOffset):this.drawMonster(ctx, enemy, scene.battle, scene.state.settings?.powerSave,enemyOffset);
     if(pixelTheme)this.drawCc0Pet(ctx,scene.state,scene.battle,142+petOffset,300);else this.drawPet(ctx, scene.state, scene.battle, 142+petOffset,300);
     if(pixelTheme)drawCc0PixelPlayer(ctx,scene.state,scene.battle,110+playerOffset,315,this.time);else drawPlayer(ctx, scene.state, scene.battle,110+playerOffset,315,this.time);
@@ -187,6 +188,14 @@ export class BattleRenderer {
     ctx.fillStyle = 'rgba(5,9,24,.76)'; ctx.fillRect(x, y, width, height); ctx.fillStyle = color; ctx.fillRect(x + 1, y + 1, Math.max(0, (width - 2) * clamp(ratio, 0, 1)), height - 2); ctx.strokeStyle = 'rgba(220,240,255,.4)'; ctx.strokeRect(x, y, width, height);
   }
 
+  drawBossEncounter(ctx,runtime){
+    if(!runtime)return;const powerSave=this.scene?.state?.settings?.powerSave,telegraph=runtime.telegraph;
+    ctx.save();
+    if(telegraph){const ratio=telegraph.total?1-telegraph.remaining/telegraph.total:0;ctx.globalAlpha=.18+ratio*.35;ctx.strokeStyle=telegraph.aoe?'#ff4f72':'#ffb45e';ctx.fillStyle=telegraph.aoe?'#ff365622':'#ffb45e18';ctx.lineWidth=powerSave?2:3;ctx.setLineDash([8,6]);ctx.beginPath();ctx.arc(110,315,(telegraph.aoe?72:42)*(1-ratio*.25),0,Math.PI*2);ctx.fill();ctx.stroke();ctx.setLineDash([]);}
+    for(let i=0;i<runtime.adds.length;i+=1){const x=230+i*75,y=304+Math.sin(this.time*5+i)*4;ctx.globalAlpha=.9;ctx.fillStyle='#8f66c9';ctx.strokeStyle='#dfc1ff';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,y-14);ctx.lineTo(x+13,y);ctx.lineTo(x,y+13);ctx.lineTo(x-13,y);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#bff6ff';ctx.fillRect(x-3,y-3,6,6);}
+    ctx.restore();
+  }
+
   drawPresentationEffects(ctx, presentation) {
     const powerSave=this.scene?.state?.settings?.powerSave;
     for(const event of activeCombatEvents(presentation)){
@@ -203,6 +212,7 @@ export class BattleRenderer {
         else if(id==='vortex'){for(let i=0;i<(powerSave?2:3);i+=1){ctx.beginPath();ctx.arc(event.x,event.y,size*(.35+i*.2+progress*.25),progress*4+i,progress*4+i+Math.PI*1.45);ctx.stroke();}}
         else if(id==='burst'){const radius=size*(.18+progress*.82);ctx.beginPath();ctx.arc(event.x,event.y,radius,0,Math.PI*2);ctx.stroke();ctx.globalAlpha*=.3;ctx.fill();}
         else if(id==='shelter'){for(let i=0;i<2;i+=1){ctx.beginPath();ctx.arc(event.x,event.y,size*(.65+i*.22+progress*.18),0,Math.PI*2);ctx.stroke();}}
+        else{ctx.beginPath();ctx.arc(event.x,event.y,size*(.25+progress*.8),0,Math.PI*2);ctx.stroke();if(event.payload?.bossFx==='interrupted'){ctx.font='900 13px system-ui';ctx.textAlign='center';ctx.fillText('INTERRUPTED',event.x,event.y-56);}}
       }
       ctx.restore();
     }

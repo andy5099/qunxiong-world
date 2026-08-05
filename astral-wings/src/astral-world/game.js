@@ -5,6 +5,7 @@ import { applyPetCapture, canCastPetSkill, evolvePet as applyPetEvolution, getPe
 import { ensurePetTeam, setPetTeamSlot as assignPetTeamSlot } from './pet-team-system.js';
 import { addRage, advanceSkillRuntime, cancelActiveSkill, chooseAutoSkill, ensureBattle2State, regenerateBattleResources, requestSkillCast, retainBattleRage, tickSkillCooldowns } from './battle-skill-system.js?v=27';
 import { clearCombatEvents, createCombatPresentationState, emitCombatEvent, recordComboHit, triggerCombatShake, updateCombatPresentation } from './combat-presentation-system.js?v=28';
+import { applyBossInterrupt, createBossRuntime, updateBossRuntime } from './boss-ai-system.js?v=29';
 
 const pick = list => list[Math.floor(Math.random() * list.length)];
 const qualityRank = { common: 1, uncommon: 2, rare: 3, epic: 4, legendary: 5, mythic: 6, astral: 7 };
@@ -28,7 +29,7 @@ export class IdleGame {
 
   newBattle() {
     cancelActiveSkill(this.state);
-    return { enemy: null, spawnIn: 0.45, attackIn: 0.35, enemyAttackIn: 0.7, petIn: 1.2, petSkillIn:0, petBuffs:{}, petAction:'summon', petActionIn:.52, petReturnIn:0, petSummonIn:.52, cooldowns: SKILLS.map(skill => this.state.skillCooldowns[skill.id]), queuedHits: [], presentation:createCombatPresentationState(), playerFlash: 0, playerAction: 'idle', playerActionIn: 0, reviveIn: 0, bossMode: false, killing: false };
+    return { enemy: null, spawnIn: 0.45, attackIn: 0.35, enemyAttackIn: 0.7, petIn: 1.2, petSkillIn:0, petBuffs:{}, petAction:'summon', petActionIn:.52, petReturnIn:0, petSummonIn:.52, cooldowns: SKILLS.map(skill => this.state.skillCooldowns[skill.id]), queuedHits: [], presentation:createCombatPresentationState(), bossRuntime:null, playerFlash: 0, playerAction: 'idle', playerActionIn: 0, reviveIn: 0, bossMode: false, killing: false };
   }
 
   start() { if (!this.running) { this.running = true; this.last = performance.now(); this.frame = requestAnimationFrame(this._bound); } }
@@ -88,8 +89,11 @@ export class IdleGame {
     for (const buff of Object.values(battle.petBuffs)) buff.remaining -= dt;
     for (const [key,buff] of Object.entries(battle.petBuffs)) if(buff.remaining<=0) delete battle.petBuffs[key];
     if (battle.petIn <= 0 && battle.petAction !== 'skill') { const pet = state.pets.find(item => item.id === state.activePetId); this.petAttack(); const haste=battle.petBuffs.haste?.value||0; battle.petIn += Math.max(.42,2.1 * getPetCombatModifiers(pet).intervalMultiplier * (1-haste)); }
-    if (enemy.alive && battle.enemyAttackIn <= .28 && enemy.action === 'idle') { enemy.action = 'attack'; enemy.actionIn = .32; }
-    if (enemy.alive && battle.enemyAttackIn <= 0) { const slow=enemy.effects?.attackSlow?.value||0; const reduction=enemy.effects?.damageReduction?.value||0; this.damagePlayer(enemy.attack*(1-reduction)); battle.enemyAttackIn += enemy.attackSpeed * (1 + slow); }
+    if(enemy.boss)this.updateBossAI(dt);
+    else{
+      if (enemy.alive && battle.enemyAttackIn <= .28 && enemy.action === 'idle') { enemy.action = 'attack'; enemy.actionIn = .32; }
+      if (enemy.alive && battle.enemyAttackIn <= 0) { const slow=enemy.effects?.attackSlow?.value||0; const reduction=enemy.effects?.damageReduction?.value||0; this.damagePlayer(enemy.attack*(1-reduction)); battle.enemyAttackIn += enemy.attackSpeed * (1 + slow); }
+    }
     this.flush();
   }
 
@@ -98,6 +102,7 @@ export class IdleGame {
     const source = isBoss ? map.boss : pick(map.mobs);
     clearCombatEvents(this.battle.presentation);
     this.battle.enemy = enemyFor(source, map.id, this.state.stage, isBoss);
+    this.battle.bossRuntime=isBoss?createBossRuntime():null;
     if (isBoss) { this.battle.enemy.spawnDuration = .68; this.battle.enemy.spawnIn = .68; }
     if (!isBoss && this.state.stage >= 2 && Math.random() < .16) {
       const enemy = this.battle.enemy;
@@ -114,6 +119,30 @@ export class IdleGame {
       this.combatEvent('shield',{source:'petSupport',target:'player',value:this.state.player.shield-before,x:110,y:286});
     }
     this.event(isBoss ? '區域 Boss 降臨' : this.battle.enemy.elite ? '菁英怪物出現' : '遭遇怪物', this.battle.enemy.name);
+  }
+
+  updateBossAI(dt){
+    const enemy=this.battle.enemy,runtime=this.battle.bossRuntime;if(!enemy?.alive||!runtime)return;
+    const actions=updateBossRuntime(runtime,{dt,hpRatio:enemy.hp/enemy.maxHp,alive:enemy.alive,powerSave:this.state.settings?.powerSave});
+    for(const action of actions)this.handleBossAction(action);
+  }
+
+  handleBossAction(action){
+    const enemy=this.battle.enemy,runtime=this.battle.bossRuntime;if(!enemy?.alive||!runtime)return;
+    if(action.type==='telegraph'){
+      enemy.action='attack';enemy.actionIn=action.skill.telegraphTime+action.skill.chargeTime;
+      this.combatEvent('skillImpact',{source:'boss',target:action.skill.target==='self'?'enemy':'player',x:action.skill.target==='self'?278:110,y:action.skill.target==='self'?267:315,duration:action.skill.telegraphTime+action.skill.chargeTime,payload:{bossFx:'telegraph',skillId:action.skill.id,color:action.skill.aoe?'#ff5d78':'#ffb25d',size:action.skill.aoe?76:48}});
+      this.event(`Boss 預警：${action.skill.name}`,action.skill.interruptible?'使用技能累積中斷力！':'防禦即將到來的攻擊。');
+    }else if(action.type==='phaseTransition'){
+      this.combatEvent('skillImpact',{source:'boss',target:'enemy',x:278,y:267,duration:.75,payload:{bossFx:'transition',color:action.phase===3?'#ff476f':'#bd8cff',size:88}});triggerCombatShake(this.battle.presentation,{intensity:4,duration:.28,frequency:28},this.state.settings?.powerSave);this.event(`PHASE ${action.phase}`,action.phase===3?'王冠巨獸進入最終階段。':'王冠巨獸釋放新的星界力量。');
+    }else if(action.type==='enraged'){
+      this.combatEvent('combo',{source:'boss',target:'hud',x:195,y:82,payload:{label:'ENRAGED'}});this.event('ENRAGED','Boss 攻擊與技能頻率提升。');
+    }else if(action.type==='resolve'){
+      const mitigation=action.skill.aoe&&this.state.player.shield>0 ? .65 : 1;this.damagePlayer(enemy.attack*action.skill.damageMultiplier*mitigation);this.combatEvent('skillImpact',{source:'boss',target:'player',x:110,y:315,payload:{bossFx:'resolve',color:action.skill.aoe?'#ff5577':'#ffb65e',size:action.skill.aoe?82:46}});
+    }else if(action.type==='summon'){
+      this.combatEvent('skillImpact',{source:'boss',target:'enemy',x:278,y:267,payload:{bossFx:'summon',color:'#c99cff',size:64}});this.event('王庭召集',`召喚 ${action.count} 隻王庭星獸。`);
+    }else if(action.type==='addAttack')this.damagePlayer(enemy.attack*.3);
+    else if(action.type==='staggerRecovered')this.event('Boss 恢復','王冠巨獸結束失衡狀態。');
   }
 
   basicAttack() {
@@ -199,6 +228,7 @@ export class IdleGame {
     const enemy = this.battle.enemy;
     if (!enemy?.alive) return;
     if(outcome==='miss'||outcome==='evade'){this.combatEvent(outcome,{source,target:'enemy',x:278,y:238,payload:{label}});return 0;}
+    if(enemy.boss&&this.battle.bossRuntime?.transitionLock){this.combatEvent('evade',{source:'bossTransition',target:'enemy',x:278,y:238,payload:{label:'PHASE SHIFT'}});return 0;}
     if (forcedCritical && criticalMultiplier > 1) raw *= criticalMultiplier;
     if (source === 'playerSkill') raw *= 1 + (this.state.player.skillDamage || 0);
     if (enemy.boss) raw *= 1 + (this.state.player.bossDamage || 0);
@@ -211,6 +241,10 @@ export class IdleGame {
     this.combatEvent('knockback',{source,target:'enemy',x:278,y:267,payload:{direction:1,distance:enemy.boss?4:10}});
     recordComboHit(this.battle.presentation,{powerSave:this.state.settings?.powerSave});
     if(forcedCritical)triggerCombatShake(this.battle.presentation,{intensity:3.2,duration:.2,frequency:42},this.state.settings?.powerSave);
+    if(enemy.boss&&enemy.hp>0&&source==='playerSkill'){
+      const skill=SKILLS.find(entry=>entry.name===label),power={slash:25,vortex:12,shelter:0,burst:45}[skill?.id]||0,result=applyBossInterrupt(this.battle.bossRuntime,power);
+      if(result.ok){this.combatEvent('skillImpact',{source:'player',target:'enemy',x:278,y:267,payload:{bossFx:'interrupted',color:'#ffe274',size:72}});triggerCombatShake(this.battle.presentation,{intensity:4,duration:.25,frequency:36},this.state.settings?.powerSave);this.event('INTERRUPTED','終焉星墜被中斷，Boss 陷入失衡。');}
+    }
     if (enemy.hp <= 0) this.killEnemy();
     return reduced;
   }
@@ -274,6 +308,7 @@ export class IdleGame {
     const { state, battle } = this; const enemy = battle.enemy;
     if (!enemy || battle.killing) return;
     battle.killing = true; enemy.alive = false;
+    if(battle.bossRuntime)updateBossRuntime(battle.bossRuntime,{dt:0,hpRatio:0,alive:false});
     cancelActiveSkill(state); retainBattleRage(state);
     if (state.activePetId) { battle.petAction = 'celebrate'; battle.petActionIn = .5; battle.petReturnIn = 0; }
     this.combatEvent('death',{source:'player',target:'enemy',x:278,y:270,payload:{boss:enemy.boss,color:enemy.boss?'#ffad72':'#cf8aff'}});

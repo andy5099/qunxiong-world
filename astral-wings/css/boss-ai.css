@@ -1,0 +1,7 @@
+.boss-encounter-hud{margin:4px 8px;padding:7px 10px;border:1px solid #d796ff;border-radius:10px;background:linear-gradient(135deg,#190d36ed,#32143bed);box-shadow:0 0 14px #b74dff38;color:#f8edff}
+.boss-encounter-hud[hidden]{display:none}
+.boss-encounter-hud>div:first-child,.boss-encounter-hud p{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0}
+.boss-encounter-hud b{font-size:12px}.boss-encounter-hud span,.boss-encounter-hud small{font-size:10px}.boss-encounter-hud strong{font-size:10px;color:#ff718b;text-shadow:0 0 8px #ff345e}
+.boss-cast-bar{height:5px;margin-top:5px;overflow:hidden;border-radius:5px;background:#090a1c}.boss-cast-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffb45e,#ff4f78);transition:width .08s linear}
+.boss-interrupt{margin-top:4px;color:#ffe27a;font-size:10px;text-align:right}
+@media(max-width:390px){.boss-encounter-hud{margin-inline:6px;padding:6px 8px}.boss-encounter-hud p{white-space:nowrap;overflow:hidden}.boss-encounter-hud #bossAiSkill{overflow:hidden;text-overflow:ellipsis}}

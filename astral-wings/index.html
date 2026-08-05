@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="css/alpha-v02.css">
   <link rel="stylesheet" href="css/battle-v2.css">
+  <link rel="stylesheet" href="css/boss-ai.css">
   <link rel="stylesheet" href="css/visual-icons.css">
   <link rel="stylesheet" href="css/art-assets.css">
   <link rel="stylesheet" href="css/region-01-slice.css">
@@ -25,6 +26,7 @@
     <section class="screen active" data-screen="battle">
       <div class="battle-meta"><span id="mapName">星光草原</span><span id="stageLabel">1-1</span><button class="boss-button" id="bossButton" data-action="boss">挑戰 Boss</button></div>
       <section class="objective-card" id="objectiveCard"><b id="objectiveTitle">主線目標</b><span id="objectiveText">正在準備星界探索…</span><small id="unlockHint"></small></section>
+      <section class="boss-encounter-hud" id="bossEncounterHud" hidden aria-live="polite"><div><b id="bossAiName">王冠巨獸</b><span id="bossAiPhase">PHASE 1</span><strong id="bossAiEnrage" hidden>ENRAGED</strong></div><p><span id="bossAiSkill">待機</span><small id="bossAiAdds">小怪 0 / 2</small></p><div class="boss-cast-bar"><i id="bossAiCast"></i></div><div class="boss-interrupt" id="bossInterrupt" hidden>中斷 <b id="bossInterruptText">0 / 0</b></div></section>
       <div class="battle-stage-layout">
         <aside class="battle-side-card hero-side"><b>星刃使</b><small id="sliceHeroLevel">Lv.1</small><span id="sliceHeroPower">戰力 0</span></aside>
         <canvas id="battleCanvas" aria-label="星界冒險自動戰鬥畫面"></canvas>
@@ -68,6 +70,6 @@
     <div class="modal" id="modal" aria-hidden="true"><div class="modal-card" id="modalCard"></div></div>
   </main>
   <script>window.__bootErrors=[];addEventListener('error',event=>window.__bootErrors.push(String(event.error?.message||event.message)));addEventListener('unhandledrejection',event=>window.__bootErrors.push(String(event.reason?.message||event.reason)));</script>
-  <script type="module" src="src/astral-world/main.js?v=28"></script>
+  <script type="module" src="src/astral-world/main.js?v=29"></script>
 </body>
 </html>
