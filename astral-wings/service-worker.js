@@ -1,8 +1,8 @@
-const CACHE = 'astral-world-idle-v27';
+const CACHE = 'astral-world-idle-v28';
 const CORE = [
   './', './index.html', './styles.css', './manifest.webmanifest', './PRODUCTION_ASSET_SPEC.json', './assets/game-art/manifest.json', './assets/game-art/region-01-asset-spec.json',
-  './src/astral-world/main.js?v=27', './src/astral-world/data.js?v=27', './src/astral-world/core.js?v=27',
-  './src/astral-world/save.js?v=27', './src/astral-world/renderer.js?v=27', './src/astral-world/monster-renderer.js', './src/astral-world/boss-renderer.js', './src/astral-world/pet-renderer.js', './src/astral-world/pet-system.js', './src/astral-world/pet-team-system.js', './src/astral-world/pet-synergy-system.js', './src/astral-world/pet-codex-system.js', './src/astral-world/game.js?v=27', './src/astral-world/ui.js?v=27', './src/astral-world/player-renderer.js', './src/astral-world/battle-skill-system.js?v=27',
+  './src/astral-world/main.js?v=28', './src/astral-world/data.js?v=27', './src/astral-world/core.js?v=27',
+  './src/astral-world/save.js?v=27', './src/astral-world/renderer.js?v=28', './src/astral-world/monster-renderer.js', './src/astral-world/boss-renderer.js', './src/astral-world/pet-renderer.js', './src/astral-world/pet-system.js', './src/astral-world/pet-team-system.js', './src/astral-world/pet-synergy-system.js', './src/astral-world/pet-codex-system.js', './src/astral-world/game.js?v=28', './src/astral-world/ui.js?v=27', './src/astral-world/player-renderer.js', './src/astral-world/battle-skill-system.js?v=27', './src/astral-world/combat-presentation-system.js?v=28',
   './src/astral-world/tutorial-system.js', './src/astral-world/objective-system.js', './css/alpha-v02.css', './css/visual-icons.css', './css/battle-v2.css',
   './src/astral-world/equipment-affix-system.js',
   './src/astral-world/visual-theme.js', './src/astral-world/battle-background-renderer.js',

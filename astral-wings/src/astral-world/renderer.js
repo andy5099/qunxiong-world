@@ -7,6 +7,7 @@ import { drawBattleBackground } from './battle-background-renderer.js';
 import { getArtAsset } from './art-asset-manager.js';
 import { drawCoverImage } from './sprite-renderer.js';
 import { drawCc0PixelMonster, drawCc0PixelPet, drawCc0PixelPlayer, getCc0PixelBackground, shouldUseCc0PixelTheme } from './cc0-pixel-theme.js';
+import { activeCombatEvents, getCombatOffset } from './combat-presentation-system.js?v=28';
 
 const W = 390;
 const H = 430;
@@ -75,10 +76,17 @@ export class BattleRenderer {
     else if(!scene?.state?.settings?.powerSave){ctx.save();ctx.globalAlpha=.22;ctx.fillStyle='#eaf8ff';this.stars.slice(0,10).forEach(star=>{ctx.beginPath();ctx.arc(star.x,star.y,star.r,0,Math.PI*2);ctx.fill();});ctx.restore();}
     if (!scene?.battle) return;
     const enemy = scene.battle.enemy;
-    if (enemy) pixelTheme?this.drawCc0Monster(ctx,enemy,scene.battle):this.drawMonster(ctx, enemy, scene.battle, scene.state.settings?.powerSave);
-    if(pixelTheme)this.drawCc0Pet(ctx,scene.state,scene.battle,142,300);else this.drawPet(ctx, scene.state, scene.battle, 142, 300);
-    if(pixelTheme)drawCc0PixelPlayer(ctx,scene.state,scene.battle,110,315,this.time);else drawPlayer(ctx, scene.state, scene.battle, 110, 315, this.time);
+    const presentation=scene.battle.presentation,shake=presentation?.shake||{x:0,y:0};
+    const enemyOffset=getCombatOffset(presentation,'enemy'),playerOffset=getCombatOffset(presentation,'player'),petOffset=getCombatOffset(presentation,'pet');
+    ctx.save();ctx.translate(shake.x||0,shake.y||0);
+    if (enemy) pixelTheme?this.drawCc0Monster(ctx,enemy,scene.battle,enemyOffset):this.drawMonster(ctx, enemy, scene.battle, scene.state.settings?.powerSave,enemyOffset);
+    if(pixelTheme)this.drawCc0Pet(ctx,scene.state,scene.battle,142+petOffset,300);else this.drawPet(ctx, scene.state, scene.battle, 142+petOffset,300);
+    if(pixelTheme)drawCc0PixelPlayer(ctx,scene.state,scene.battle,110+playerOffset,315,this.time);else drawPlayer(ctx, scene.state, scene.battle,110+playerOffset,315,this.time);
+    this.drawPresentationEffects(ctx,presentation);
     this.drawEffects(ctx);
+    ctx.restore();
+    this.drawPresentationNumbers(ctx,presentation);
+    this.drawCombo(ctx,presentation);
     this.drawNumbers(ctx);
   }
 
@@ -135,7 +143,7 @@ export class BattleRenderer {
 
   drawCc0Pet(ctx,state,battle,x,y){const pet=state.pets.find(item=>item.id===state.activePetId);drawCc0PixelPet(ctx,pet,{time:this.time,action:battle?.petAction,actionIn:battle?.petActionIn},x,y);}
 
-  drawCc0Monster(ctx,enemy,battle){const pose=drawCc0PixelMonster(ctx,enemy,{time:this.time,attackIn:battle.enemyAttackIn});if(!pose)return;const boss=enemy.boss;this.bar(ctx,pose.x-(boss?76:34),pose.y+(boss?108:42),boss?152:68,boss?8:7,enemy.hp/enemy.maxHp,boss?(pose.rage?'#ff5578':'#ff8269'):'#dc80ff');if(boss){ctx.save();ctx.textAlign='center';ctx.font='700 11px system-ui';ctx.fillStyle=pose.rage?'#ff8a9c':'#ffe2a8';ctx.fillText(`${enemy.name}${pose.rage?' · 狂暴':''}`,pose.x,Math.max(22,pose.y-112));ctx.restore();}}
+  drawCc0Monster(ctx,enemy,battle,offset=0){const pose=drawCc0PixelMonster(ctx,enemy,{time:this.time,attackIn:battle.enemyAttackIn,x:278+offset});if(!pose)return;const boss=enemy.boss;this.bar(ctx,pose.x-(boss?76:34),pose.y+(boss?108:42),boss?152:68,boss?8:7,enemy.hp/enemy.maxHp,boss?(pose.rage?'#ff5578':'#ff8269'):'#dc80ff');if(boss){ctx.save();ctx.textAlign='center';ctx.font='700 11px system-ui';ctx.fillStyle=pose.rage?'#ff8a9c':'#ffe2a8';ctx.fillText(`${enemy.name}${pose.rage?' · 狂暴':''}`,pose.x,Math.max(22,pose.y-112));ctx.restore();}}
 
   drawEnemy(ctx, enemy, map) {
     const x = 278 + Math.sin(this.time * 1.6) * 8;
@@ -165,8 +173,8 @@ export class BattleRenderer {
     this.bar(ctx, x - (enemy.boss ? 64 : 34), y + (enemy.boss ? 68 : 42), enemy.boss ? 128 : 68, 7, enemy.hp / enemy.maxHp, enemy.boss ? '#ff8269' : '#dc80ff');
   }
 
-  drawMonster(ctx, enemy, battle, powerSave = false) {
-    const pose = drawMonster(ctx, enemy, { time:this.time, attackIn:battle.enemyAttackIn, powerSave });
+  drawMonster(ctx, enemy, battle, powerSave = false, offset = 0) {
+    const pose = drawMonster(ctx, enemy, { time:this.time, attackIn:battle.enemyAttackIn, powerSave, x:278+offset });
     const boss = enemy.boss;
     if (!enemy.alive && !boss) return;
     ctx.save(); ctx.globalAlpha = enemy.alive ? 1 : Math.max(.12, pose.alpha);
@@ -177,6 +185,44 @@ export class BattleRenderer {
 
   bar(ctx, x, y, width, height, ratio, color) {
     ctx.fillStyle = 'rgba(5,9,24,.76)'; ctx.fillRect(x, y, width, height); ctx.fillStyle = color; ctx.fillRect(x + 1, y + 1, Math.max(0, (width - 2) * clamp(ratio, 0, 1)), height - 2); ctx.strokeStyle = 'rgba(220,240,255,.4)'; ctx.strokeRect(x, y, width, height);
+  }
+
+  drawPresentationEffects(ctx, presentation) {
+    const powerSave=this.scene?.state?.settings?.powerSave;
+    for(const event of activeCombatEvents(presentation)){
+      if(!['hit','death','skillImpact'].includes(event.type))continue;
+      const progress=event.elapsed/event.duration,fade=1-progress,color=event.payload?.color||'#8eeaff',size=event.payload?.size||28;
+      ctx.save();ctx.globalAlpha=Math.max(0,fade);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.shadowColor=color;ctx.shadowBlur=powerSave?3:12;
+      if(event.type==='hit'){
+        ctx.lineWidth=2.5;for(let i=0;i<(powerSave?3:6);i+=1){const a=i*Math.PI/3+.2;ctx.beginPath();ctx.moveTo(event.x+Math.cos(a)*4,event.y+Math.sin(a)*4);ctx.lineTo(event.x+Math.cos(a)*(8+20*progress),event.y+Math.sin(a)*(8+20*progress));ctx.stroke();}
+      }else if(event.type==='death'){
+        ctx.lineWidth=3;ctx.beginPath();ctx.arc(event.x,event.y,(event.payload?.boss?64:34)*progress,0,Math.PI*2);ctx.stroke();if(!powerSave)for(let i=0;i<8;i+=1){const a=i*Math.PI/4;ctx.fillRect(event.x+Math.cos(a)*size*progress,event.y+Math.sin(a)*size*.65*progress,3,3);}
+      }else{
+        const id=event.payload?.skillId;ctx.lineWidth=powerSave?3:5;
+        if(id==='slash'){ctx.beginPath();ctx.moveTo(event.x-34+progress*12,event.y+31);ctx.quadraticCurveTo(event.x,event.y-24,event.x+38,event.y-34);ctx.stroke();}
+        else if(id==='vortex'){for(let i=0;i<(powerSave?2:3);i+=1){ctx.beginPath();ctx.arc(event.x,event.y,size*(.35+i*.2+progress*.25),progress*4+i,progress*4+i+Math.PI*1.45);ctx.stroke();}}
+        else if(id==='burst'){const radius=size*(.18+progress*.82);ctx.beginPath();ctx.arc(event.x,event.y,radius,0,Math.PI*2);ctx.stroke();ctx.globalAlpha*=.3;ctx.fill();}
+        else if(id==='shelter'){for(let i=0;i<2;i+=1){ctx.beginPath();ctx.arc(event.x,event.y,size*(.65+i*.22+progress*.18),0,Math.PI*2);ctx.stroke();}}
+      }
+      ctx.restore();
+    }
+  }
+
+  drawPresentationNumbers(ctx, presentation) {
+    const events=activeCombatEvents(presentation).filter(event=>['damage','critical','miss','evade','heal','shield'].includes(event.type));
+    ctx.save();ctx.textAlign='center';
+    for(const event of events){
+      const progress=event.elapsed/event.duration,stagger=(Number(event.id.split('-').pop())%3-1)*12,x=clamp(event.x+stagger,28,W-28),y=clamp(event.y-progress*34,34,H-74),critical=event.type==='critical';
+      ctx.globalAlpha=Math.min(1,(1-progress)*1.8);ctx.font=`${critical?900:800} ${critical?19:15}px system-ui`;ctx.lineWidth=3;ctx.strokeStyle='#11162b';ctx.fillStyle=event.payload?.color||(event.type==='heal'?'#78f0a3':event.type==='shield'?'#8edfff':event.type==='miss'||event.type==='evade'?'#f0f4ff':'#e9f7ff');
+      const label=event.type==='miss'?'MISS':event.type==='evade'?'EVADE':event.type==='heal'?`+${Math.floor(event.value)}`:event.type==='shield'?`盾 +${Math.floor(event.value)}`:`${Math.floor(event.value)}`;
+      if(critical){ctx.strokeText('CRITICAL',x,y-18);ctx.fillText('CRITICAL',x,y-18);}ctx.strokeText(label,x,y);ctx.fillText(label,x,y);
+    }
+    ctx.restore();
+  }
+
+  drawCombo(ctx,presentation){
+    const combo=presentation?.combo;if(!combo?.count||combo.remaining<=0)return;
+    ctx.save();ctx.textAlign='center';ctx.font='900 17px system-ui';ctx.fillStyle=combo.count>=20?'#ffd56a':'#9eeaff';ctx.strokeStyle='#10152b';ctx.lineWidth=4;const label=`${combo.count} COMBO${combo.label?` · ${combo.label}`:''}`;ctx.strokeText(label,W/2,53);ctx.fillText(label,W/2,53);ctx.restore();
   }
 
   drawEffects(ctx) {

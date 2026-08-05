@@ -1,6 +1,6 @@
 import { createEquipment } from './core.js';
-import { IdleGame } from './game.js?v=27';
-import { BattleRenderer } from './renderer.js?v=27';
+import { IdleGame } from './game.js?v=28';
+import { BattleRenderer } from './renderer.js?v=28';
 import { loadState, saveState } from './save.js?v=27';
 import { AstralUI } from './ui.js?v=27';
 import { updateObjective, updateUnlocks } from './objective-system.js';
