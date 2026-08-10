@@ -13,7 +13,14 @@ export function createState(playerName) {
     gold: 120,
     party: createParty(playerName),
     inventory: { woodenSword: 0, clothArmor: 0, potion: 2 },
-    equipment: { weapon: false, armor: false },
+    equipment: {
+      hero: { weapon: null, armor: null, accessory: null },
+      'liu-bei': { weapon: null, armor: null, accessory: null },
+      'guan-yu': { weapon: null, armor: null, accessory: null },
+      'zhang-fei': { weapon: null, armor: null, accessory: null }
+    },
+    unlocks: { forest: false },
+    ui: { selectedItem: null, selectedMember: 'hero' },
     settings: { autoBattle: false },
     exploration: { auto: false, active: false },
     battle: null,
@@ -49,13 +56,27 @@ export function normalize(raw) {
     party,
     gold: Math.max(0, finite(raw.gold, base.gold)),
     inventory: { ...base.inventory, ...(raw.inventory || {}) },
-    equipment: { ...base.equipment, ...(raw.equipment || {}) },
+    equipment: normalizeEquipment(raw.equipment, base.equipment),
+    unlocks: { ...base.unlocks, ...(raw.unlocks || {}), forest: Boolean(raw.unlocks?.forest || party[0].level >= 3) },
+    ui: { ...base.ui, ...(raw.ui || {}) },
     settings: { ...base.settings, ...(raw.settings || {}) },
     exploration: { ...base.exploration, ...(raw.exploration || {}), auto: false, active: false },
     battle: null,
     log: Array.isArray(raw.log) ? raw.log.slice(-60) : [],
-    screen: ['village', 'plain', 'party', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
+    screen: ['village', 'plain', 'forest', 'party', 'inventory', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
   };
+}
+
+function normalizeEquipment(rawEquipment, fallback) {
+  const normalized = Object.fromEntries(Object.entries(fallback).map(([id, slots]) => [id, { ...slots }]));
+  if (!rawEquipment || typeof rawEquipment !== 'object') return normalized;
+  if (typeof rawEquipment.weapon === 'boolean' || typeof rawEquipment.armor === 'boolean') {
+    normalized.hero.weapon = rawEquipment.weapon ? 'woodenSword' : null;
+    normalized.hero.armor = rawEquipment.armor ? 'clothArmor' : null;
+    return normalized;
+  }
+  for (const [id, slots] of Object.entries(normalized)) normalized[id] = { ...slots, ...(rawEquipment[id] || {}) };
+  return normalized;
 }
 
 export function save(state) {

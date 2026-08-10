@@ -13,7 +13,7 @@ for (const member of state.party.filter(Boolean)) {
 }
 
 assert.equal(buyItem(state, 'woodenSword').ok, true);
-assert.equal(state.equipment.weapon, true);
+assert.equal(state.inventory.woodenSword, 1);
 state.party[0].hp = 1;
 assert.equal(visitInn(state).ok, true);
 assert.equal(state.party[0].hp, state.party[0].maxHp);
@@ -43,10 +43,10 @@ assert.equal(defeated.location, '桃源村');
 assert.ok(defeated.gold < 100);
 assert.ok(defeated.party.filter(Boolean).every(member => member.hp > 0));
 
-const repaired = normalize({ created: true, playerName: '舊存檔', party: createState('舊存檔').party.map(member => member ? { ...member, hp: 'bad' } : null), gold: 'bad' });
+const repaired = normalize({ created: true, playerName: '安全存檔', party: createState('安全存檔').party.map(member => member ? { ...member, hp: 'bad' } : null), gold: 'bad' });
 assert.equal(repaired.party.every(member => !member || Number.isFinite(member.hp)), true);
 assert.equal(Number.isFinite(repaired.gold), true);
 assert.equal(repaired.battle, null);
-assert.deepEqual(normalize({ created: true, playerName: '殘缺存檔' }).party.slice(0, 4).map(member => member.name), ['殘缺存檔', '劉備', '關羽', '張飛']);
+assert.deepEqual(normalize({ created: true, playerName: '舊版主角' }).party.slice(0, 4).map(member => member.name), ['舊版主角', '劉備', '關羽', '張飛']);
 
 console.log('V0.1 PR#1 smoke test: 18 assertions passed');
