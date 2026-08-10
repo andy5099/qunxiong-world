@@ -1,4 +1,4 @@
-import { buyItem, chooseAutoCommand, createEncounter, leaveBattle, resolveRound, usePotion, visitInn } from './engine.js';
+import { buyItem, chooseAutoCommand, createEncounter, enterArea, equipItem, leaveBattle, refreshUnlocks, resolveRound, sellItem, unequipItem, usePotion, visitInn } from './engine.js';
 import { clearSave, createState, load, save } from './store.js';
 import { render, renderCreation } from './ui.js';
 
@@ -14,18 +14,21 @@ function stopLoop() {
 function schedule() {
   stopLoop();
   if (!state) return;
-  const shouldAutoFight = state.battle && !state.battle.finished && state.settings.autoBattle;
-  const shouldAutoExplore = !state.battle && state.screen === 'plain' && state.exploration.auto;
-  if (!shouldAutoFight && !shouldAutoExplore) return;
+  const shouldAutoFight = state.battle && !state.battle.finished && (state.settings.autoBattle || state.exploration.auto);
+  const shouldAutoContinue = state.battle?.finished && state.battle.result === 'victory' && state.exploration.auto;
+  const shouldAutoExplore = !state.battle && ['plain', 'forest'].includes(state.screen) && state.exploration.auto;
+  if (!shouldAutoFight && !shouldAutoContinue && !shouldAutoExplore) return;
   loopTimer = window.setTimeout(() => {
     loopTimer = null;
     if (shouldAutoFight) resolveRound(state, chooseAutoCommand(state));
+    else if (shouldAutoContinue) { leaveBattle(state); state.notice = '自動探索繼續前進。'; }
     else if (shouldAutoExplore) createEncounter(state);
     persistAndDraw();
-  }, shouldAutoFight ? 680 : 1100);
+  }, shouldAutoFight ? 680 : 950);
 }
 
 function draw() {
+  if (state) refreshUnlocks(state);
   app.innerHTML = state ? render(state) : renderCreation();
   requestAnimationFrame(() => {
     const log = app.querySelector('.battle-log');
@@ -50,17 +53,17 @@ app.addEventListener('click', event => {
   if (!target || !state) return;
   const action = target.dataset.action;
   if (action.startsWith('screen:')) {
+    const screen = action.slice(7);
     stopLoop();
-    state.screen = action.slice(7);
-    state.location = state.screen === 'plain' ? '村外平原' : '桃源村';
     state.exploration.auto = false;
-  } else if (action === 'leave-village') {
-    state.screen = 'plain'; state.location = '村外平原'; state.notice = '你離開桃源村，來到遼闊的村外平原。';
+    if (screen === 'plain' || screen === 'forest') enterArea(state, screen);
+    else { state.screen = screen; if (screen === 'village' || screen === 'shop') state.location = '桃源村'; }
   } else if (action === 'inn') visitInn(state);
   else if (action.startsWith('buy:')) buyItem(state, action.slice(4));
   else if (action === 'explore-once') createEncounter(state);
   else if (action === 'auto-explore') { state.exploration.auto = true; state.notice = '開始自動探索。'; }
   else if (action === 'stop-explore') { state.exploration.auto = false; stopLoop(); state.notice = '已停止探索。'; }
+  else if (action === 'battle:stop-auto') { state.exploration.auto = false; stopLoop(); state.notice = '已停止自動探索，本場戰鬥改為手動。'; }
   else if (action.startsWith('battle:') && action !== 'battle:close') {
     const command = action.slice(7);
     if (command === 'potion') usePotion(state); else resolveRound(state, command);
@@ -68,6 +71,17 @@ app.addEventListener('click', event => {
     const lost = state.battle?.result === 'defeat';
     leaveBattle(state);
     if (!lost && state.exploration.auto) state.notice = '稍作整備後繼續探索。';
+  } else if (action.startsWith('inspect:')) {
+    state.ui.selectedItem = action.slice(8);
+    if (!state.ui.selectedMember) state.ui.selectedMember = 'hero';
+  } else if (action.startsWith('equip:')) equipItem(state, state.ui.selectedMember, action.slice(6));
+  else if (action.startsWith('unequip:')) {
+    const [, memberId, slot] = action.split(':');
+    unequipItem(state, memberId, slot);
+  } else if (action.startsWith('sell:')) {
+    const itemId = action.slice(5);
+    sellItem(state, itemId);
+    if (!(state.inventory[itemId] > 0)) state.ui.selectedItem = null;
   } else if (action === 'save') state.notice = save(state) ? '進度已保存。' : '無法寫入存檔。';
   else if (action === 'reset') {
     if (target.dataset.confirm === 'yes') { clearSave(); state = null; stopLoop(); draw(); return; }
@@ -77,8 +91,9 @@ app.addEventListener('click', event => {
 });
 
 app.addEventListener('change', event => {
-  if (!state || !event.target.dataset.setting) return;
-  state.settings[event.target.dataset.setting] = event.target.checked;
+  if (!state) return;
+  if (event.target.dataset.setting) state.settings[event.target.dataset.setting] = event.target.checked;
+  if (event.target.matches('[data-member-select]')) state.ui.selectedMember = event.target.value;
   persistAndDraw();
 });
 
