@@ -1,17 +1,89 @@
-// 應用程式入口：單一排程避免重複自動狩獵計時器。
-import {loadGameData} from './data.js';
-import {newState,load,save,exportSave,importSave} from './store.js';
-import {migrateHunt,huntStep,attemptCapture,equipGear,toggleGear,sellGear,deployPartner,starPartner} from './hunting-core.js';
-import {render} from './ui.js';
-const app=document.querySelector('#app');let data,state,timer=null;
-function stopTimer(){if(timer){clearTimeout(timer);timer=null;}}
-function schedule(){if(timer||!state.exploration.running)return;timer=setTimeout(()=>{timer=null;huntStep(state);save(state);draw();},Math.max(180,900/state.hunting.auto.speed));}
-function draw(){app.innerHTML=render(state,data);requestAnimationFrame(()=>{const log=app.querySelector('.battle-log');if(log)log.scrollTop=log.scrollHeight;});schedule();}
-function screen(name){state.screen=name;draw();}
-async function boot(){try{data=await loadGameData();state=migrateHunt(load()||newState());draw();}catch(error){app.innerHTML=`<section class="card notice bad">無法載入遊戲資料：${error.message}</section>`;}}
-app.addEventListener('click',async event=>{const el=event.target.closest('[data-action]');if(!el)return;const a=el.dataset.action;
-  if(a==='start'){state.exploration.running=true;}else if(a==='stop'){state.exploration.running=false;stopTimer();}else if(a==='hunt-once')huntStep(state);else if(a.startsWith('screen:'))return screen(a.slice(7));else if(a.startsWith('hunt-map:')){state.hunting.mapId=a.slice(9);state.exploration.enemy=null;screen('home');return;}else if(a.startsWith('capture:')){const result=attemptCapture(state,a.slice(8));if(!result.ok&&state.exploration.enemy){state.exploration.enemy.hp=Math.max(state.exploration.enemy.hp,state.exploration.enemy.maxHp*.21);state.hunting.auto.autoBoss=true;}}else if(a.startsWith('gear-equip:'))equipGear(state,a.slice(11));else if(a.startsWith('gear-lock:'))toggleGear(state,a.slice(10));else if(a.startsWith('gear-sell:'))sellGear(state,a.slice(10));else if(a.startsWith('partner-deploy:'))deployPartner(state,a.slice(15));else if(a.startsWith('partner-star:'))starPartner(state,a.slice(13));else if(a==='save')save(state);else if(a==='export')exportSave(state);else if(a==='import')document.querySelector('#save-file')?.click();save(state);draw();
+import { buyItem, chooseAutoCommand, createEncounter, leaveBattle, resolveRound, usePotion, visitInn } from './engine.js';
+import { clearSave, createState, load, save } from './store.js';
+import { render, renderCreation } from './ui.js';
+
+const app = document.querySelector('#app');
+let state = load();
+let loopTimer = null;
+
+function stopLoop() {
+  if (loopTimer !== null) clearTimeout(loopTimer);
+  loopTimer = null;
+}
+
+function schedule() {
+  stopLoop();
+  if (!state) return;
+  const shouldAutoFight = state.battle && !state.battle.finished && state.settings.autoBattle;
+  const shouldAutoExplore = !state.battle && state.screen === 'plain' && state.exploration.auto;
+  if (!shouldAutoFight && !shouldAutoExplore) return;
+  loopTimer = window.setTimeout(() => {
+    loopTimer = null;
+    if (shouldAutoFight) resolveRound(state, chooseAutoCommand(state));
+    else if (shouldAutoExplore) createEncounter(state);
+    persistAndDraw();
+  }, shouldAutoFight ? 680 : 1100);
+}
+
+function draw() {
+  app.innerHTML = state ? render(state) : renderCreation();
+  requestAnimationFrame(() => {
+    const log = app.querySelector('.battle-log');
+    if (log) log.scrollTop = log.scrollHeight;
+  });
+  schedule();
+}
+
+function persistAndDraw() { if (state) save(state); draw(); }
+
+app.addEventListener('submit', event => {
+  if (event.target.id !== 'create-form') return;
+  event.preventDefault();
+  const name = new FormData(event.target).get('playerName')?.toString().trim();
+  if (!name) return;
+  state = createState(name);
+  persistAndDraw();
 });
-app.addEventListener('change',async event=>{const el=event.target;if(el.dataset.auto){state.hunting.auto[el.dataset.auto]=el.type==='checkbox'?el.checked:Number(el.value);}if(el.id==='save-file'&&el.files[0])state=migrateHunt(await importSave(el.files[0]));save(state);draw();});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){stopTimer();save(state);}else schedule();});window.addEventListener('pagehide',()=>save(state));
-boot();
+
+app.addEventListener('click', event => {
+  const target = event.target.closest('[data-action]');
+  if (!target || !state) return;
+  const action = target.dataset.action;
+  if (action.startsWith('screen:')) {
+    stopLoop();
+    state.screen = action.slice(7);
+    state.location = state.screen === 'plain' ? '村外平原' : '桃源村';
+    state.exploration.auto = false;
+  } else if (action === 'leave-village') {
+    state.screen = 'plain'; state.location = '村外平原'; state.notice = '你離開桃源村，來到遼闊的村外平原。';
+  } else if (action === 'inn') visitInn(state);
+  else if (action.startsWith('buy:')) buyItem(state, action.slice(4));
+  else if (action === 'explore-once') createEncounter(state);
+  else if (action === 'auto-explore') { state.exploration.auto = true; state.notice = '開始自動探索。'; }
+  else if (action === 'stop-explore') { state.exploration.auto = false; stopLoop(); state.notice = '已停止探索。'; }
+  else if (action.startsWith('battle:') && action !== 'battle:close') {
+    const command = action.slice(7);
+    if (command === 'potion') usePotion(state); else resolveRound(state, command);
+  } else if (action === 'battle:close') {
+    const lost = state.battle?.result === 'defeat';
+    leaveBattle(state);
+    if (!lost && state.exploration.auto) state.notice = '稍作整備後繼續探索。';
+  } else if (action === 'save') state.notice = save(state) ? '進度已保存。' : '無法寫入存檔。';
+  else if (action === 'reset') {
+    if (target.dataset.confirm === 'yes') { clearSave(); state = null; stopLoop(); draw(); return; }
+    target.dataset.confirm = 'yes'; target.textContent = '再次點擊確認重開'; return;
+  }
+  persistAndDraw();
+});
+
+app.addEventListener('change', event => {
+  if (!state || !event.target.dataset.setting) return;
+  state.settings[event.target.dataset.setting] = event.target.checked;
+  persistAndDraw();
+});
+
+document.addEventListener('visibilitychange', () => { if (document.hidden) { stopLoop(); if (state) save(state); } else schedule(); });
+window.addEventListener('pagehide', () => { stopLoop(); if (state) save(state); });
+
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(() => {}));
+draw();
