@@ -1,4 +1,4 @@
-import { buyItem, chooseAutoCommand, createEncounter, enterArea, equipItem, leaveBattle, refreshUnlocks, resolveRound, sellItem, unequipItem, usePotion, visitInn } from './engine.js';
+import { buyItem, chooseAutoCommand, continueAfterChapter, createBossEncounter, createEncounter, enterArea, equipItem, leaveBattle, recruitBlackwindLeader, refreshUnlocks, resolveRound, sellItem, spareBlackwindLeader, unequipItem, usePotion, visitInn } from './engine.js';
 import { clearSave, createState, load, save } from './store.js';
 import { render, renderCreation } from './ui.js';
 
@@ -15,8 +15,8 @@ function schedule() {
   stopLoop();
   if (!state) return;
   const shouldAutoFight = state.battle && !state.battle.finished && (state.settings.autoBattle || state.exploration.auto);
-  const shouldAutoContinue = state.battle?.finished && state.battle.result === 'victory' && state.exploration.auto;
-  const shouldAutoExplore = !state.battle && ['plain', 'forest'].includes(state.screen) && state.exploration.auto;
+  const shouldAutoContinue = state.battle?.finished && state.battle.result === 'victory' && !state.battle.awaitingRecruit && !state.battle.boss && state.exploration.auto;
+  const shouldAutoExplore = !state.battle && ['plain', 'forest', 'stronghold'].includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete;
   if (!shouldAutoFight && !shouldAutoContinue && !shouldAutoExplore) return;
   loopTimer = window.setTimeout(() => {
     loopTimer = null;
@@ -56,14 +56,17 @@ app.addEventListener('click', event => {
     const screen = action.slice(7);
     stopLoop();
     state.exploration.auto = false;
-    if (screen === 'plain' || screen === 'forest') enterArea(state, screen);
+    if (screen === 'plain' || screen === 'forest' || screen === 'stronghold') enterArea(state, screen);
     else { state.screen = screen; if (screen === 'village' || screen === 'shop') state.location = '桃源村'; }
   } else if (action === 'inn') visitInn(state);
   else if (action.startsWith('buy:')) buyItem(state, action.slice(4));
   else if (action === 'explore-once') createEncounter(state);
   else if (action === 'auto-explore') { state.exploration.auto = true; state.notice = '開始自動探索。'; }
   else if (action === 'stop-explore') { state.exploration.auto = false; stopLoop(); state.notice = '已停止探索。'; }
+  else if (action === 'challenge-boss') { state.exploration.auto = false; stopLoop(); createBossEncounter(state); }
   else if (action === 'battle:stop-auto') { state.exploration.auto = false; stopLoop(); state.notice = '已停止自動探索，本場戰鬥改為手動。'; }
+  else if (action === 'battle:recruit') { stopLoop(); recruitBlackwindLeader(state); }
+  else if (action === 'battle:spare') { stopLoop(); spareBlackwindLeader(state); }
   else if (action.startsWith('battle:') && action !== 'battle:close') {
     const command = action.slice(7);
     if (command === 'potion') usePotion(state); else resolveRound(state, command);
@@ -82,7 +85,8 @@ app.addEventListener('click', event => {
     const itemId = action.slice(5);
     sellItem(state, itemId);
     if (!(state.inventory[itemId] > 0)) state.ui.selectedItem = null;
-  } else if (action === 'save') state.notice = save(state) ? '進度已保存。' : '無法寫入存檔。';
+  } else if (action === 'chapter:continue') continueAfterChapter(state);
+  else if (action === 'save') state.notice = save(state) ? '進度已保存。' : '無法寫入存檔。';
   else if (action === 'reset') {
     if (target.dataset.confirm === 'yes') { clearSave(); state = null; stopLoop(); draw(); return; }
     target.dataset.confirm = 'yes'; target.textContent = '再次點擊確認重開'; return;

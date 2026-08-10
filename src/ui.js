@@ -15,6 +15,7 @@ function nav(state) {
     ${button('screen:village', '桃源村', state.screen === 'village' ? 'active' : '')}
     ${button('screen:plain', '村外平原', state.screen === 'plain' ? 'active' : '')}
     ${button('screen:forest', state.unlocks.forest ? '黑風森林' : '森林 Lv.3', state.screen === 'forest' ? 'active' : '')}
+    ${button('screen:stronghold', state.unlocks.stronghold ? '黑風寨' : '寨 Lv.5', state.screen === 'stronghold' ? 'active' : '')}
     ${button('screen:party', '隊伍', state.screen === 'party' ? 'active' : '')}
     ${button('screen:inventory', '背包', state.screen === 'inventory' ? 'active' : '')}
     ${button('screen:shop', '商店', state.screen === 'shop' ? 'active' : '')}
@@ -33,17 +34,25 @@ function explorationPanel(state, areaId) {
   const forest = areaId === 'forest';
   const locked = forest && !state.unlocks.forest;
   return `<section class="scene ${forest ? 'forest-scene' : 'plain-scene'}"><div class="scene-copy"><p class="eyebrow">${forest ? 'Lv.3～Lv.6 探索區' : '桃源村郊外'}</p><h1>${forest ? '黑風森林' : '村外平原'}</h1><p>${locked ? '需要 Lv.3 才能進入黑風森林。' : forest ? '黑風狼、森林山賊與黃巾弓手盤據此地，勝利後有機會取得裝備。' : '野狼速度較快；山賊攻擊較高。此地不會掉落裝備。'}</p></div></section>
-  <section class="panel"><h2>探索</h2><div class="action-grid three">${button('explore-once', '探索一次', 'primary', locked || Boolean(state.battle))}${button('auto-explore', state.exploration.auto ? '自動探索中' : '自動探索', '', locked || state.exploration.auto || Boolean(state.battle))}${button('stop-explore', '停止探索', 'danger', !state.exploration.auto)}</div><p class="notice">${esc(state.notice)}</p></section>`;
+  <section class="panel"><h2>探索</h2><div class="action-grid three">${button('explore-once', '探索一次', 'primary', locked || Boolean(state.battle))}${button('auto-explore', state.exploration.auto ? '自動探索中' : '自動探索', '', locked || state.exploration.auto || Boolean(state.battle))}${button('stop-explore', '停止探索', 'danger', !state.exploration.auto)}</div>${forest ? `<div class="route-action">${button('screen:stronghold', state.unlocks.stronghold ? '前往黑風寨' : '黑風寨・Lv.5 後開放', 'primary', !state.unlocks.stronghold)}</div>` : ''}<p class="notice">${esc(state.notice)}</p></section>`;
 }
 
 const plain = state => explorationPanel(state, 'plain');
 const forest = state => explorationPanel(state, 'forest');
 
+function stronghold(state) {
+  const locked = !state.unlocks.stronghold;
+  const kills = Math.min(10, state.progress.strongholdKills || 0);
+  const bossReady = state.progress.bossUnlocked;
+  return `<section class="scene stronghold-scene"><div class="scene-copy"><p class="eyebrow">第一章決戰地</p><h1>黑風寨</h1><p>${locked ? '黑風寨守衛森嚴，目前還不是進攻的時候。' : '寨兵、刀客與頭目據守山寨。擊破十名守軍即可挑戰寨主。'}</p></div></section>
+  <section class="panel"><div class="progress-heading"><h2>黑風寨擊破</h2><b>${kills} / 10</b></div>${hpBar(kills, 10, 'stronghold-progress')}<p class="boss-status">${bossReady ? '寨主挑戰已解鎖。' : `再擊敗 ${10 - kills} 名守軍。`}</p><div class="action-grid three">${button('explore-once', '探索一次', 'primary', locked || Boolean(state.battle))}${button('auto-explore', state.exploration.auto ? '自動探索中' : '自動探索', '', locked || state.exploration.auto || Boolean(state.battle))}${button('stop-explore', '停止探索', 'danger', !state.exploration.auto)}</div><div class="stronghold-actions">${button('challenge-boss', state.progress.bossDefeated ? '再次挑戰寨主' : '挑戰寨主', 'boss-button', !bossReady || Boolean(state.battle))}${button('screen:forest', '返回黑風森林')}</div><p class="notice">${esc(state.notice)}</p></section>`;
+}
+
 function memberCard(state, member, index) {
   if (!member) return `<article class="member empty-slot"><span>第五格</span><strong>空位</strong></article>`;
   const stats = getFinalStats(state, member);
   const equipped = getEquippedSummary(state, member.id);
-  return `<article class="member"><div class="member-title"><span>${index + 1}</span><h3>${esc(member.name)}</h3><b>Lv.${member.level}</b></div>${hpBar(member.hp, stats.maxHp)}<p>兵力 ${member.hp}/${stats.maxHp}・技力 ${member.mp}/${member.maxMp}</p><dl><div><dt>武力</dt><dd>${stats.might}</dd></div><div><dt>智力</dt><dd>${member.intelligence}</dd></div><div><dt>防禦</dt><dd>${stats.defense}</dd></div><div><dt>速度</dt><dd>${stats.speed}</dd></div></dl><small>EXP ${member.exp}/${EXP_TO_LEVEL(member.level)}</small><div class="equipped-row">${equipped.map(entry => `<span>${entry.slotName}：${entry.item ? `<b>${entry.item.name}</b>` : '無'}</span>${entry.item ? button(`unequip:${member.id}:${entry.slot}`, '卸下', 'mini') : ''}`).join('')}</div></article>`;
+  return `<article class="member"><div class="member-title"><span>${index + 1}</span><h3>${esc(member.name)}</h3><b>Lv.${member.level}</b></div>${hpBar(member.hp, stats.maxHp)}<p>兵力 ${member.hp}/${stats.maxHp}・技力 ${member.mp}/${member.maxMp}${member.id === 'blackwind-lord' ? '・技能 強襲' : ''}</p><dl><div><dt>武力</dt><dd>${stats.might}</dd></div><div><dt>智力</dt><dd>${member.intelligence}</dd></div><div><dt>防禦</dt><dd>${stats.defense}</dd></div><div><dt>速度</dt><dd>${stats.speed}</dd></div></dl><small>EXP ${member.exp}/${EXP_TO_LEVEL(member.level)}</small><div class="equipped-row">${equipped.map(entry => `<span>${entry.slotName}：${entry.item ? `<b>${entry.item.name}</b>` : '無'}</span>${entry.item ? button(`unequip:${member.id}:${entry.slot}`, '卸下', 'mini') : ''}`).join('')}</div></article>`;
 }
 
 function party(state) {
@@ -96,12 +105,19 @@ function battle(state) {
   const members = state.party.filter(Boolean).map(member => { const stats = getFinalStats(state, member); return `<article class="battle-member ${member.hp <= 0 ? 'defeated' : ''}"><strong>${esc(member.name)}</strong><span>兵 ${member.hp}/${stats.maxHp}</span><span>技 ${member.mp}/${member.maxMp}</span></article>`; }).join('');
   const active = !battle.finished;
   const auto = state.settings.autoBattle || state.exploration.auto;
-  return `<div class="battle-overlay"><section class="battle-panel"><div class="battle-heading"><div><p class="eyebrow">${battle.areaId === 'forest' ? '黑風森林・' : ''}回合 ${battle.round}</p><h2>${battle.finished ? (battle.result === 'victory' ? '戰鬥勝利' : '戰鬥失敗') : '遭遇戰'}</h2></div><span>${auto ? 'AUTO ON' : '手動'}</span></div><div class="enemy-row">${enemies}</div><div class="versus">交 戰</div><div class="party-battle-row">${members}</div><div class="battle-log">${battleLog(state.log)}</div><div class="battle-actions">${active ? `${button('battle:attack', '普通攻擊', 'primary')}${button('battle:slam', '猛擊・技力 6', '', state.party[0].mp < 6)}${button('battle:defend', '全隊防禦')}${button('battle:potion', `回復藥 ×${state.inventory.potion || 0}`, '', !state.inventory.potion)}${state.exploration.auto ? button('battle:stop-auto', '停止自動探索', 'danger') : ''}` : button('battle:close', battle.result === 'victory' ? (state.exploration.auto ? '自動繼續中' : '繼續探索') : '返回桃源村', 'primary')}</div></section></div>`;
+  const finishedActions = battle.awaitingRecruit ? `${button('battle:recruit', '招降', 'primary')}${button('battle:spare', '放過')}` : button('battle:close', battle.result === 'victory' ? (state.exploration.auto ? '自動繼續中' : '繼續探索') : '返回桃源村', 'primary');
+  return `<div class="battle-overlay"><section class="battle-panel ${battle.boss ? 'boss-battle' : ''}"><div class="battle-heading"><div><p class="eyebrow">${battle.boss ? '寨主決戰・' : battle.areaId === 'stronghold' ? '黑風寨・' : battle.areaId === 'forest' ? '黑風森林・' : ''}回合 ${battle.round}</p><h2>${battle.finished ? (battle.boss && battle.result === 'victory' ? '黑風寨主已敗！' : battle.result === 'victory' ? '戰鬥勝利' : '戰鬥失敗') : battle.boss ? '黑風寨主戰' : '遭遇戰'}</h2></div><span>${auto ? 'AUTO ON' : '手動'}</span></div><div class="enemy-row">${enemies}</div><div class="versus">交 戰</div><div class="party-battle-row">${members}</div><div class="battle-log">${battleLog(state.log)}</div>${battle.awaitingRecruit ? '<p class="recruit-copy">黑風寨主已敗。要招降他成為第五名武將嗎？</p>' : ''}<div class="battle-actions">${active ? `${button('battle:attack', '普通攻擊', 'primary')}${button('battle:slam', '猛擊・技力 6', '', state.party[0].mp < 6)}${button('battle:defend', '全隊防禦')}${button('battle:potion', `回復藥 ×${state.inventory.potion || 0}`, '', !state.inventory.potion)}${state.exploration.auto ? button('battle:stop-auto', '停止自動探索', 'danger') : ''}` : finishedActions}</div></section></div>`;
+}
+
+function chapterComplete(state) {
+  if (!state.ui.chapterComplete) return '';
+  const equipmentCount = Object.entries(state.inventory).reduce((sum, [id, count]) => sum + (ITEMS[id]?.type === 'equipment' ? Number(count) || 0 : 0), 0);
+  return `<div class="chapter-overlay"><section class="chapter-card"><p class="eyebrow">V0.1 第一章</p><h2>第一章完成！</h2><p>黑風寨主願意追隨你，五人隊伍正式集結。</p><dl><div><dt>主角等級</dt><dd>Lv.${state.party[0].level}</dd></div><div><dt>隊伍人數</dt><dd>${state.party.filter(Boolean).length}</dd></div><div><dt>新武將</dt><dd>黑風寨主</dd></div><div><dt>擊敗敵人</dt><dd>${state.progress.totalKills}</dd></div><div><dt>取得裝備</dt><dd>${equipmentCount}</dd></div></dl>${button('chapter:continue', '繼續冒險', 'primary')}</section></div>`;
 }
 
 export function render(state) {
-  const views = { village, plain, forest, party, inventory, shop, settings };
-  return `<div class="app-shell">${header(state)}<main>${(views[state.screen] || village)(state)}</main>${nav(state)}${battle(state)}</div>`;
+  const views = { village, plain, forest, stronghold, party, inventory, shop, settings };
+  return `<div class="app-shell">${header(state)}<main>${(views[state.screen] || village)(state)}</main>${nav(state)}${battle(state)}${chapterComplete(state)}</div>`;
 }
 
 export function renderCreation() {
