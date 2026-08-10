@@ -1,5 +1,11 @@
-const CACHE='qunxiong-world-v4';
-const ASSETS=['./','./index.html','./style.css','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./src/main.js','./src/data.js','./src/store.js','./src/engine.js','./src/ui.js','./data/monsters.json','./data/items.json','./data/skills.json','./data/heroes.json','./data/maps.json','./data/quests.json','./data/bosses.json','./data/achievements.json','./data/formations.json','./data/daily-quests.json','./data/events.json','./data/artifacts.json','./data/dungeons.json'];
-self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
-self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
-self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;event.respondWith(fetch(event.request).then(response=>{const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));return response;}).catch(()=>caches.match(event.request).then(hit=>hit||caches.match('./index.html'))));});
+const CACHE = 'qunxiong-world-v01-pr1';
+const ASSETS = ['./', './index.html', './style.css', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './src/main.js', './src/data.js', './src/store.js', './src/engine.js', './src/ui.js'];
+self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())));
+self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  event.respondWith(fetch(event.request).then(response => {
+    if (response.ok) caches.open(CACHE).then(cache => cache.put(event.request, response.clone()));
+    return response;
+  }).catch(() => caches.match(event.request).then(hit => hit || caches.match('./index.html'))));
+});
