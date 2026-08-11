@@ -21,7 +21,7 @@ function winCurrentBattle(state) {
   check(guard < 20, 'battle resolves safely');
 }
 
-equal(SAVE_VERSION, 6, 'save version upgraded');
+equal(SAVE_VERSION, 7, 'save version upgraded');
 const state = createState('寨主驗收');
 state.party[0].level = 4;
 state.progress.forestEntered = true;
@@ -54,8 +54,8 @@ while (state.progress.strongholdKills < 10) {
 equal(state.progress.strongholdKills, 10, 'kill counter caps at 10');
 equal(state.progress.bossUnlocked, true, '10 kills permanently unlock boss');
 const strongholdHtml = render(state);
-check(strongholdHtml.includes('黑風寨擊破'), 'stronghold UI shows kill progress');
-check(strongholdHtml.includes('寨主挑戰已解鎖'), 'stronghold UI shows boss qualification');
+check(strongholdHtml.includes('危險偵察'), 'stronghold UI shows danger encounter progress');
+check(strongholdHtml.includes('前線偵察'), 'stronghold UI explains random boss encounter');
 
 state.exploration.auto = true;
 const bossBattle = createBossEncounter(state);
@@ -108,8 +108,8 @@ equal(equipItem(state, 'blackwind-lord', 'blackwindBlade').ok, true, 'leader equ
 equal(equipItem(state, 'blackwind-lord', 'blackwindArmor').ok, true, 'leader equips armor');
 equal(equipItem(state, 'blackwind-lord', 'blackwindCharm').ok, true, 'leader equips accessory');
 const leader = state.party[4];
-equal(getFinalStats(state, leader).might, leader.might + 15, 'leader weapon and charm affect might');
-equal(getFinalStats(state, leader).defense, leader.defense + 12, 'leader armor and charm affect defense');
+equal(getFinalStats(state, leader).might, leader.might + 17, 'leader weapon and charm affect might');
+equal(getFinalStats(state, leader).defense, leader.defense + 13, 'leader armor and charm affect defense');
 
 continueAfterChapter(state);
 equal(state.ui.chapterComplete, false, 'chapter panel closes');
@@ -137,7 +137,7 @@ const migrated = normalize({
   equipment: { ...createState('PR2存檔').equipment, hero: { weapon: 'greenEdgeSword', armor: null, accessory: null } },
   party: createState('PR2存檔').party
 });
-equal(migrated.version, 6, 'PR2 save migrates to version 6');
+equal(migrated.version, 7, 'PR2 save migrates to current version');
 equal(migrated.inventory.greenEdgeSword, 1, 'migration preserves inventory');
 equal(migrated.equipment.hero.weapon, 'greenEdgeSword', 'migration preserves equipment');
 equal(migrated.progress.forestEntered, true, 'migration infers forest visit');

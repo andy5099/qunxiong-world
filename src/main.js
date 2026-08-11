@@ -1,4 +1,4 @@
-import { buyItem, chooseAutoCommand, continueAfterChapter, createBossEncounter, createEncounter, enterArea, equipItem, leaveBattle, recruitBlackwindLeader, refreshUnlocks, resolveRound, sellItem, spareBlackwindLeader, unequipItem, usePotion, visitInn } from './engine.js';
+import { buyItem, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, enterArea, equipItem, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, spareBlackwindLeader, unequipItem, usePotion, visitInn } from './engine.js';
 import { clearSave, createState, load, save } from './store.js';
 import { render, renderCreation } from './ui.js';
 
@@ -16,7 +16,7 @@ function schedule() {
   if (!state) return;
   const shouldAutoFight = state.battle && !state.battle.finished && (state.settings.autoBattle || state.exploration.auto);
   const shouldAutoContinue = state.battle?.finished && state.battle.result === 'victory' && !state.battle.awaitingRecruit && !state.battle.boss && state.exploration.auto;
-  const shouldAutoExplore = !state.battle && ['plain', 'forest', 'stronghold'].includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete;
+  const shouldAutoExplore = !state.battle && !state.ui.bossWarning && ['plain', 'forest', 'stronghold'].includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete;
   if (!shouldAutoFight && !shouldAutoContinue && !shouldAutoExplore) return;
   loopTimer = window.setTimeout(() => {
     loopTimer = null;
@@ -64,9 +64,15 @@ app.addEventListener('click', event => {
   else if (action === 'auto-explore') { state.exploration.auto = true; state.notice = '開始自動探索。'; }
   else if (action === 'stop-explore') { state.exploration.auto = false; stopLoop(); state.notice = '已停止探索。'; }
   else if (action === 'challenge-boss') { state.exploration.auto = false; stopLoop(); createBossEncounter(state); }
+  else if (action === 'boss:engage') { state.exploration.auto = false; stopLoop(); createBossEncounter(state); }
+  else if (action === 'boss:retreat') { stopLoop(); retreatFromBoss(state); }
   else if (action === 'battle:stop-auto') { state.exploration.auto = false; stopLoop(); state.notice = '已停止自動探索，本場戰鬥改為手動。'; }
   else if (action === 'battle:recruit') { stopLoop(); recruitBlackwindLeader(state); }
   else if (action === 'battle:spare') { stopLoop(); spareBlackwindLeader(state); }
+  else if (action === 'battle:quick-equip') {
+    const dropId = state.battle?.dropId;
+    if (dropId && !state.battle.awaitingRecruit) { leaveBattle(state); prepareQuickEquip(state, dropId); }
+  }
   else if (action.startsWith('battle:') && action !== 'battle:close') {
     const command = action.slice(7);
     if (command === 'potion') usePotion(state); else resolveRound(state, command);
@@ -77,6 +83,18 @@ app.addEventListener('click', event => {
   } else if (action.startsWith('inspect:')) {
     state.ui.selectedItem = action.slice(8);
     if (!state.ui.selectedMember) state.ui.selectedMember = 'hero';
+  } else if (action.startsWith('quick:')) prepareQuickEquip(state, action.slice(6));
+  else if (action === 'quick-confirm') confirmQuickEquip(state);
+  else if (action === 'optimize-equipment') optimizeEquipment(state);
+  else if (action.startsWith('party-slot:')) {
+    const [, memberId, slot] = action.split(':');
+    state.ui.partyEquipMember = memberId;
+    state.ui.partyEquipSlot = slot;
+  } else if (action.startsWith('party-equip:')) {
+    const [, memberId, itemId] = action.split(':');
+    equipItem(state, memberId, itemId);
+    state.ui.partyEquipMember = null;
+    state.ui.partyEquipSlot = null;
   } else if (action.startsWith('equip:')) equipItem(state, state.ui.selectedMember, action.slice(6));
   else if (action.startsWith('unequip:')) {
     const [, memberId, slot] = action.split(':');

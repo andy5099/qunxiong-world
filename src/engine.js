@@ -1,4 +1,4 @@
-import { AREAS, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -18,6 +18,60 @@ export function getFinalStats(state, memberOrId) {
     for (const [stat, value] of Object.entries(item.stats)) result[stat] = (result[stat] || 0) + value;
   }
   return result;
+}
+
+export function getMemberPower(state, memberOrId) {
+  const member = typeof memberOrId === 'string' ? getMember(state, memberOrId) : memberOrId;
+  const stats = getFinalStats(state, member);
+  if (!member || !stats) return 0;
+  return Math.round(member.level * 34 + stats.might * 7 + stats.defense * 6 + stats.maxHp * 0.65 + stats.speed * 4);
+}
+
+export function getTeamPower(state) {
+  return state.party.filter(Boolean).reduce((sum, member) => sum + getMemberPower(state, member), 0);
+}
+
+export function getItemScore(item) {
+  if (!item?.stats) return 0;
+  return (item.stats.might || 0) * 7 + (item.stats.defense || 0) * 6 + (item.stats.maxHp || 0) * 0.65 + (item.stats.speed || 0) * 4;
+}
+
+export function createEliteEnemy(base, index = 0) {
+  return {
+    ...base,
+    instanceId: `${base.id}-elite-${index}`,
+    name: `精英・${base.name}`,
+    displayName: `精英・${base.name}`,
+    maxHp: Math.round(base.maxHp * 1.65),
+    hp: Math.round(base.maxHp * 1.65),
+    might: Math.round(base.might * 1.3),
+    defense: base.defense + 3,
+    exp: Math.round(base.exp * 2),
+    gold: base.gold.map(value => Math.round(value * 1.8)),
+    elite: true,
+    danger: Math.min(3, (AREAS[base.areaId]?.danger || 1) + 1),
+    guarding: false,
+    side: 'enemy'
+  };
+}
+
+export function getBossEncounterChance(count) {
+  if (count < 6) return 0;
+  if (count >= BOSS_PITY_LIMIT) return 1;
+  return Math.min(0.19, 0.05 + (count - 6) * 0.01);
+}
+
+export function checkBossEncounter(state, rng = Math.random) {
+  state.progress.bossEncounterCount = Math.max(0, Number(state.progress.bossEncounterCount) || 0) + 1;
+  const chance = getBossEncounterChance(state.progress.bossEncounterCount);
+  if (!chance || rng() >= chance) return false;
+  state.progress.bossEncounterCount = 0;
+  state.progress.bossEncounters = (state.progress.bossEncounters || 0) + 1;
+  state.exploration.auto = false;
+  state.exploration.active = false;
+  state.ui.bossWarning = true;
+  state.notice = '偵測到強大的氣息……';
+  return true;
 }
 
 export function visitInn(state) {
@@ -70,29 +124,35 @@ export function enterArea(state, areaId) {
   state.location = AREAS[areaId].name;
   if (areaId === 'forest') state.progress.forestEntered = true;
   refreshUnlocks(state);
-  state.notice = areaId === 'forest' ? '林間黑風盤旋，新的敵人與裝備正在等待。' : areaId === 'stronghold' ? '你已攻入黑風寨，擊破守軍即可挑戰寨主。' : '你來到桃源村外的平原。';
+  state.notice = areaId === 'forest' ? '林間黑風盤旋，新的敵人與裝備正在等待。' : areaId === 'stronghold' ? '你已攻入黑風寨，危險敵將可能隨時現身。' : '你來到桃源村外的平原。';
   return true;
 }
 
 export function createEncounter(state, forcedId, rng = Math.random) {
   const area = Object.values(AREAS).find(candidate => candidate.name === state.location) || AREAS.plain;
+  if (!forcedId && area.id === 'stronghold' && checkBossEncounter(state, rng)) return null;
   const id = forcedId || pick(area.enemies, rng);
   const base = ENEMIES[id];
   if (!base) return null;
-  const count = area.id === 'plain' ? (id === 'wolf' ? randomInt(2, 3, rng) : randomInt(1, 2, rng)) : randomInt(1, 2, rng);
-  const enemies = Array.from({ length: count }, (_, index) => ({ ...base, instanceId: `${id}-${index}`, hp: base.maxHp, guarding: false, side: 'enemy' }));
+  const canBeElite = !forcedId && area.id !== 'plain';
+  const elite = canBeElite && rng() < 0.1;
+  const count = elite ? 1 : area.id === 'plain' ? (id === 'wolf' ? randomInt(2, 3, rng) : randomInt(1, 2, rng)) : randomInt(1, 2, rng);
+  const enemies = elite
+    ? [createEliteEnemy({ ...base, areaId: area.id })]
+    : Array.from({ length: count }, (_, index) => ({ ...base, instanceId: `${id}-${index}`, hp: base.maxHp, guarding: false, side: 'enemy', danger: area.danger }));
   state.party.filter(Boolean).forEach(member => { member.guarding = false; });
-  state.battle = { enemies, round: 1, awaitingCommand: true, finished: false, areaId: area.id, boss: false };
+  state.battle = { enemies, round: 1, awaitingCommand: true, finished: false, areaId: area.id, boss: false, elite };
   state.exploration.active = false;
   state.log = [];
-  appendLog(state, `遭遇 ${base.name}${count > 1 ? ` ×${count}` : ''}！`);
+  appendLog(state, elite ? `精英敵人出現：精英・${base.name}！` : `遭遇 ${base.name}${count > 1 ? ` ×${count}` : ''}！`, elite ? 'rare' : '');
   return state.battle;
 }
 
 export function createBossEncounter(state) {
-  if (!state.progress.bossUnlocked || state.battle) return null;
+  if ((!state.ui.bossWarning && !state.progress.bossUnlocked) || state.battle) return null;
   state.exploration.auto = false;
   state.exploration.active = false;
+  state.ui.bossWarning = false;
   const boss = ENEMIES.blackwindLord;
   const soldier = ENEMIES.strongholdSoldier;
   const enemies = [
@@ -100,11 +160,21 @@ export function createBossEncounter(state) {
     ...Array.from({ length: 2 }, (_, index) => ({ ...soldier, instanceId: `strongholdSoldier-${index}`, hp: soldier.maxHp, guarding: false, side: 'enemy' }))
   ];
   state.party.filter(Boolean).forEach(member => { member.guarding = false; });
-  state.battle = { enemies, round: 1, awaitingCommand: true, finished: false, areaId: 'stronghold', boss: true, awaitingRecruit: false };
+  state.battle = { enemies, round: 1, awaitingCommand: true, finished: false, areaId: 'stronghold', boss: true, awaitingRecruit: false, recommendedPower: BOSS_RECOMMENDED_POWER };
   state.log = [];
   appendLog(state, '黑風寨主率領兩名寨兵迎戰！', 'epic');
   state.notice = '寨主挑戰開始！';
   return state.battle;
+}
+
+export function retreatFromBoss(state) {
+  if (!state.ui.bossWarning) return false;
+  state.ui.bossWarning = false;
+  state.progress.bossEncounterCount = 0;
+  state.exploration.auto = false;
+  state.exploration.active = false;
+  state.notice = '你選擇撤退整備。沒有損失，危險探索將重新累積。';
+  return true;
 }
 
 function attackPower(state, actor, multiplier = 1, rng = Math.random) {
@@ -119,7 +189,9 @@ function dealDamage(state, actor, target, skill = false, rng = Math.random, skil
   const reduced = target.guarding ? 0.48 : 1;
   const damage = Math.max(1, Math.round((attackPower(state, actor, skill ? multiplier : 1, rng) - targetDefense * 0.45) * reduced));
   target.hp = Math.max(0, target.hp - damage);
-  appendLog(state, `${actor.name}${skill ? `施展${skillName}` : '攻擊'} ${target.name}，造成 ${damage} 傷害。${target.hp ? '' : ` ${target.name}倒下了！`}`);
+  const actorName = actor.displayName || actor.name;
+  const targetName = target.displayName || target.name;
+  appendLog(state, `${actorName}${skill ? `施展${skillName}` : '攻擊'} ${targetName}，造成 ${damage} 傷害。${target.hp ? '' : ` ${targetName}倒下了！`}`);
   return damage;
 }
 
@@ -135,7 +207,7 @@ export function performEnemyAction(state, enemy, rng = Math.random) {
     }
     if (roll < 0.75) {
       target.intimidatedRounds = 2;
-      appendLog(state, `${enemy.name}施展威嚇，${target.name}的防禦暫時下降！`, 'epic');
+      appendLog(state, `${enemy.displayName || enemy.name}施展威嚇，${target.name}的防禦暫時下降！`, 'epic');
       return { type: 'intimidate', targetId: target.id };
     }
   }
@@ -158,13 +230,20 @@ function gainExp(member, amount, state) {
   }
 }
 
-function rollBattleDrop(enemies, rng = Math.random, bossBattle = false) {
+export function rollBattleDrop(enemies, rng = Math.random, bossBattle = false, firstBossKill = false) {
   const sources = enemies.filter(enemy => enemy.loot);
   if (!sources.length) return null;
   const roll = rng();
-  const quality = bossBattle ? (roll < 0.12 ? 'epic' : roll < 0.45 ? 'rare' : roll < 0.78 ? 'common' : null) : (roll < 0.01 ? 'epic' : roll < 0.06 ? 'rare' : roll < 0.24 ? 'common' : roll < 0.34 ? 'supply' : null);
+  const eliteBattle = enemies.some(enemy => enemy.elite);
+  const quality = bossBattle
+    ? (roll < 0.08 ? 'epic' : firstBossKill || roll < 0.58 ? 'rare' : null)
+    : eliteBattle
+      ? (roll < 0.025 ? 'epic' : roll < 0.24 ? 'rare' : roll < 0.62 ? 'common' : roll < 0.72 ? 'supply' : null)
+      : (roll < 0.01 ? 'epic' : roll < 0.06 ? 'rare' : roll < 0.24 ? 'common' : roll < 0.34 ? 'supply' : null);
   if (!quality) return null;
-  const source = pick(sources, rng);
+  // Boss battles always use the boss-exclusive table, never an escort's table.
+  const source = bossBattle ? sources.find(enemy => enemy.boss) : pick(sources, rng);
+  if (!source) return null;
   const table = source.loot[quality];
   return table?.length ? pick(table, rng) : null;
 }
@@ -172,11 +251,17 @@ function rollBattleDrop(enemies, rng = Math.random, bossBattle = false) {
 function finishVictory(state, rng) {
   const defeated = state.battle.enemies;
   const bossBattle = Boolean(state.battle.boss);
+  const eliteBattle = defeated.some(enemy => enemy.elite);
+  const firstBossKill = bossBattle && !state.progress.bossFirstKill;
   const exp = defeated.reduce((sum, enemy) => sum + enemy.exp, 0);
   const gold = defeated.reduce((sum, enemy) => sum + randomInt(enemy.gold[0], enemy.gold[1], rng), 0);
   state.party.filter(Boolean).forEach(member => gainExp(member, exp, state));
   state.gold += gold;
   state.progress.totalKills += defeated.length;
+  if (eliteBattle) {
+    state.progress.elitesDefeated = (state.progress.elitesDefeated || 0) + defeated.filter(enemy => enemy.elite).length;
+    appendLog(state, '精英敵人擊破！', 'rare');
+  }
   if (state.battle.areaId === 'stronghold' && !bossBattle) {
     state.progress.strongholdKills = Math.min(10, state.progress.strongholdKills + defeated.length);
     if (state.progress.strongholdKills >= 10 && !state.progress.bossUnlocked) {
@@ -184,14 +269,19 @@ function finishVictory(state, rng) {
       appendLog(state, '黑風寨擊破達 10 名，寨主挑戰已解鎖！', 'epic');
     }
   }
-  if (bossBattle) state.progress.bossDefeated = true;
+  if (bossBattle) {
+    state.progress.bossDefeated = true;
+    state.progress.bossFirstKill = true;
+  }
   refreshUnlocks(state);
-  const dropId = rollBattleDrop(defeated, rng, bossBattle);
+  const dropId = rollBattleDrop(defeated, rng, bossBattle, firstBossKill);
   if (dropId) {
     const item = ITEMS[dropId];
     state.inventory[dropId] = (state.inventory[dropId] || 0) + 1;
     appendLog(state, `獲得【${item.name}】！`, item.quality === '史詩' ? 'epic' : item.quality === '稀有' ? 'rare' : 'drop');
+    if (bossBattle && item.quality === '史詩') appendLog(state, `★★★★★ 史詩戰利品！獲得【${item.name}】！`, 'epic');
     state.battle.dropId = dropId;
+    state.battle.dropQuality = item.quality;
   }
   state.battle.finished = true;
   state.battle.result = 'victory';
@@ -315,13 +405,75 @@ export function getEquippedSummary(state, memberId) {
   return Object.entries(state.equipment[memberId] || {}).map(([slot, itemId]) => ({ slot, slotName: SLOT_NAMES[slot], item: ITEMS[itemId] || null }));
 }
 
+export function recommendMemberForItem(state, itemId) {
+  const item = ITEMS[itemId];
+  if (!item || item.type !== 'equipment') return null;
+  const candidates = state.party.filter(Boolean).map(member => {
+    const currentId = state.equipment[member.id]?.[item.slot];
+    const delta = getItemScore(item) - getItemScore(ITEMS[currentId]);
+    const affinity = item.slot === 'weapon' ? member.might : item.slot === 'armor' ? member.defense + member.maxHp * 0.08 : member.speed + member.might * 0.2;
+    return { member, current: ITEMS[currentId] || null, delta, affinity };
+  });
+  return candidates.sort((a, b) => b.delta - a.delta || b.affinity - a.affinity)[0] || null;
+}
+
+export function prepareQuickEquip(state, itemId) {
+  if (!ITEMS[itemId] || !(state.inventory[itemId] > 0)) return false;
+  state.ui.quickEquipItem = itemId;
+  state.ui.selectedItem = itemId;
+  state.screen = 'inventory';
+  return true;
+}
+
+export function confirmQuickEquip(state) {
+  const itemId = state.ui.quickEquipItem;
+  const recommendation = recommendMemberForItem(state, itemId);
+  if (!recommendation) return { ok: false, message: '沒有可用的裝備建議。' };
+  const result = equipItem(state, recommendation.member.id, itemId);
+  if (result.ok) state.ui.quickEquipItem = null;
+  return result;
+}
+
+export function optimizeEquipment(state) {
+  const members = state.party.filter(Boolean);
+  const previous = Object.fromEntries(members.map(member => [member.id, { ...(state.equipment[member.id] || {}) }]));
+  const next = Object.fromEntries(members.map(member => [member.id, { weapon: null, armor: null, accessory: null }]));
+  for (const slot of ['weapon', 'armor', 'accessory']) {
+    const pool = [];
+    for (const item of Object.values(ITEMS).filter(candidate => candidate.type === 'equipment' && candidate.slot === slot)) {
+      for (let count = 0; count < (state.inventory[item.id] || 0); count += 1) pool.push(item);
+    }
+    pool.sort((a, b) => getItemScore(b) - getItemScore(a));
+    const memberOrder = [...members].sort((a, b) => {
+      const affinity = member => slot === 'weapon' ? member.might : slot === 'armor' ? member.defense + member.maxHp * 0.08 : member.speed + member.might * 0.2;
+      return affinity(b) - affinity(a);
+    });
+    memberOrder.forEach((member, index) => { next[member.id][slot] = pool[index]?.id || null; });
+  }
+  const changes = [];
+  for (const member of members) {
+    for (const slot of ['weapon', 'armor', 'accessory']) {
+      const from = previous[member.id]?.[slot] || null;
+      const to = next[member.id][slot] || null;
+      if (from !== to) changes.push(`${member.name}：${SLOT_NAMES[slot]} ${ITEMS[from]?.name || '無'} → ${ITEMS[to]?.name || '無'}`);
+    }
+    state.equipment[member.id] = next[member.id];
+    member.hp = Math.min(member.hp, getFinalStats(state, member).maxHp);
+  }
+  state.ui.optimizeChanges = changes;
+  state.notice = changes.length ? '已最佳化隊伍裝備。' : '目前已是最佳裝備配置。';
+  return changes;
+}
+
 export function recruitBlackwindLeader(state) {
   if (!state.battle?.awaitingRecruit || state.progress.bossRecruited || state.party[4]) return false;
+  const dropId = state.battle.dropId;
   state.party[4] = createBlackwindLeader();
   state.equipment['blackwind-lord'] ||= { weapon: null, armor: null, accessory: null };
   state.progress.bossRecruited = true;
   state.progress.chapterOneComplete = true;
   state.ui.chapterComplete = true;
+  if (dropId && ['rare', 'epic'].includes(ITEMS[dropId]?.quality)) state.ui.quickEquipItem = dropId;
   state.battle = null;
   state.screen = 'stronghold';
   state.location = AREAS.stronghold.name;
@@ -331,6 +483,8 @@ export function recruitBlackwindLeader(state) {
 
 export function spareBlackwindLeader(state) {
   if (!state.battle?.awaitingRecruit) return false;
+  const dropId = state.battle.dropId;
+  if (dropId && ['rare', 'epic'].includes(ITEMS[dropId]?.quality)) state.ui.quickEquipItem = dropId;
   state.battle = null;
   state.screen = 'stronghold';
   state.location = AREAS.stronghold.name;
@@ -340,6 +494,10 @@ export function spareBlackwindLeader(state) {
 
 export function continueAfterChapter(state) {
   state.ui.chapterComplete = false;
+  if (state.ui.quickEquipItem) {
+    state.screen = 'inventory';
+    state.ui.selectedItem = state.ui.quickEquipItem;
+  }
   state.notice = '第一章已完成，你可以繼續在現有地區冒險。';
 }
 

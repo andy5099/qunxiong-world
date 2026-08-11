@@ -21,8 +21,8 @@ export function createState(playerName) {
       'blackwind-lord': { weapon: null, armor: null, accessory: null }
     },
     unlocks: { forest: false, stronghold: false },
-    progress: { forestEntered: false, strongholdKills: 0, bossUnlocked: false, bossDefeated: false, bossRecruited: false, chapterOneComplete: false, totalKills: 0 },
-    ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false },
+    progress: { forestEntered: false, strongholdKills: 0, bossUnlocked: false, bossDefeated: false, bossFirstKill: false, bossRecruited: false, chapterOneComplete: false, totalKills: 0, elitesDefeated: 0, bossEncounterCount: 0, bossEncounters: 0 },
+    ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false, bossWarning: false, quickEquipItem: null, partyEquipMember: null, partyEquipSlot: null, optimizeChanges: [] },
     settings: { autoBattle: false },
     exploration: { auto: false, active: false },
     battle: null,
@@ -53,10 +53,14 @@ export function normalize(raw) {
     ...base.progress,
     ...(raw.progress || {}),
     strongholdKills: Math.max(0, finite(raw.progress?.strongholdKills, 0)),
-    totalKills: Math.max(0, finite(raw.progress?.totalKills, 0))
+    totalKills: Math.max(0, finite(raw.progress?.totalKills, 0)),
+    elitesDefeated: Math.max(0, finite(raw.progress?.elitesDefeated, 0)),
+    bossEncounterCount: Math.max(0, finite(raw.progress?.bossEncounterCount, 0)),
+    bossEncounters: Math.max(0, finite(raw.progress?.bossEncounters, 0))
   };
   if (!progress.forestEntered && raw.location === '黑風森林') progress.forestEntered = true;
   progress.bossUnlocked = Boolean(progress.bossUnlocked || progress.strongholdKills >= 10 || progress.bossDefeated);
+  progress.bossFirstKill = Boolean(progress.bossFirstKill || progress.bossDefeated);
   const party = Array.from({ length: 5 }, (_, index) => normalizeMember(raw.party?.[index], index === 4 && progress.bossRecruited ? createBlackwindLeader() : base.party[index]));
   if (party[4]?.id === 'blackwind-lord') {
     progress.bossRecruited = true;
@@ -81,7 +85,7 @@ export function normalize(raw) {
       stronghold: Boolean(raw.unlocks?.stronghold || (party[0].level >= 5 && progress.forestEntered))
     },
     progress,
-    ui: { ...base.ui, ...(raw.ui || {}) },
+    ui: { ...base.ui, ...(raw.ui || {}), bossWarning: false, optimizeChanges: [] },
     settings: { ...base.settings, ...(raw.settings || {}) },
     exploration: { ...base.exploration, ...(raw.exploration || {}), auto: false, active: false },
     battle: null,
