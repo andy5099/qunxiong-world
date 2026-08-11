@@ -1,4 +1,4 @@
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 
 export const ITEMS = {
   woodenSword: { id: 'woodenSword', name: '木劍', type: 'equipment', slot: 'weapon', quality: '普通', price: 60, sell: 18, stats: { might: 3 }, description: '武力 +3', shop: true },
@@ -13,9 +13,12 @@ export const ITEMS = {
   ironArmor: { id: 'ironArmor', name: '鐵甲', type: 'equipment', slot: 'armor', quality: '稀有', sell: 110, stats: { defense: 7, maxHp: 18 }, description: '防禦 +7・最大兵力 +18' },
   woodRing: { id: 'woodRing', name: '木戒', type: 'equipment', slot: 'accessory', quality: '普通', sell: 24, stats: { maxHp: 8 }, description: '最大兵力 +8' },
   copperRing: { id: 'copperRing', name: '銅戒', type: 'equipment', slot: 'accessory', quality: '稀有', sell: 75, stats: { might: 2, maxHp: 12 }, description: '武力 +2・最大兵力 +12' },
-  blackwindBlade: { id: 'blackwindBlade', name: '黑風刀', type: 'equipment', slot: 'weapon', quality: '史詩', sell: 320, stats: { might: 12, speed: 2 }, description: '武力 +12・速度 +2' },
-  blackwindArmor: { id: 'blackwindArmor', name: '黑風甲', type: 'equipment', slot: 'armor', quality: '史詩', sell: 300, stats: { defense: 9, maxHp: 24 }, description: '防禦 +9・最大兵力 +24' },
-  blackwindCharm: { id: 'blackwindCharm', name: '黑風護符', type: 'equipment', slot: 'accessory', quality: '史詩', sell: 280, stats: { might: 3, defense: 3, maxHp: 16 }, description: '武力 +3・防禦 +3・最大兵力 +16' },
+  blackwindBlade: { id: 'blackwindBlade', name: '黑風刀', type: 'equipment', slot: 'weapon', quality: '稀有', bossOnly: true, sell: 320, stats: { might: 13, speed: 2 }, description: '武力 +13・速度 +2' },
+  blackwindArmor: { id: 'blackwindArmor', name: '黑風甲', type: 'equipment', slot: 'armor', quality: '稀有', bossOnly: true, sell: 300, stats: { defense: 10, maxHp: 28 }, description: '防禦 +10・最大兵力 +28' },
+  blackwindCharm: { id: 'blackwindCharm', name: '黑風護符', type: 'equipment', slot: 'accessory', quality: '稀有', bossOnly: true, sell: 280, stats: { might: 4, defense: 3, speed: 2 }, description: '武力 +4・防禦 +3・速度 +2' },
+  overlordBlade: { id: 'overlordBlade', name: '寨主霸王刀', type: 'equipment', slot: 'weapon', quality: '史詩', bossOnly: true, sell: 620, stats: { might: 18, speed: 4 }, description: '武力 +18・速度 +4' },
+  blackwindWarArmor: { id: 'blackwindWarArmor', name: '黑風戰甲', type: 'equipment', slot: 'armor', quality: '史詩', bossOnly: true, sell: 580, stats: { defense: 15, maxHp: 48 }, description: '防禦 +15・最大兵力 +48' },
+  leaderToken: { id: 'leaderToken', name: '寨主令牌', type: 'equipment', slot: 'accessory', quality: '史詩', bossOnly: true, sell: 560, stats: { might: 7, defense: 7, speed: 4 }, description: '武力 +7・防禦 +7・速度 +4' },
   potion: { id: 'potion', name: '回復藥', type: 'consumable', price: 20, heal: 45, description: '戰鬥中恢復 45 兵力' }
 };
 
@@ -45,17 +48,20 @@ export const ENEMIES = {
   blackwindWolf: { id: 'blackwindWolf', name: '黑風狼', maxHp: 92, might: 19, defense: 7, speed: 22, exp: 48, gold: [20, 30], loot: { common: ['clothShoes', 'woodRing'], rare: ['wolfBracers'], epic: ['greenEdgeSword'], supply: ['potion'] } },
   forestBandit: { id: 'forestBandit', name: '森林山賊', maxHp: 135, might: 25, defense: 12, speed: 13, exp: 58, gold: [28, 40], loot: { common: ['ironSword', 'leatherArmor'], rare: ['banditDagger', 'ironArmor'], epic: ['greenEdgeSword'] } },
   yellowTurbanArcher: { id: 'yellowTurbanArcher', name: '黃巾弓手', maxHp: 115, might: 22, defense: 9, speed: 17, exp: 53, gold: [24, 35], loot: { common: ['woodBow', 'clothShoes'], rare: ['copperRing'], epic: ['greenEdgeSword'], supply: ['potion'] } },
-  strongholdSoldier: { id: 'strongholdSoldier', name: '黑風寨兵', maxHp: 145, might: 26, defense: 13, speed: 13, exp: 65, gold: [32, 45], loot: { common: ['ironSword', 'leatherArmor'], rare: ['copperRing'], epic: ['blackwindArmor'], supply: ['potion'] } },
-  blackwindSwordsman: { id: 'blackwindSwordsman', name: '黑風刀客', maxHp: 125, might: 31, defense: 10, speed: 16, exp: 72, gold: [36, 50], loot: { common: ['banditDagger', 'leatherArmor'], rare: ['blackwindBlade'], epic: ['blackwindBlade'], supply: ['potion'] } },
-  blackwindCaptain: { id: 'blackwindCaptain', name: '黑風頭目', maxHp: 185, might: 29, defense: 17, speed: 12, exp: 88, gold: [45, 62], loot: { common: ['ironSword', 'leatherArmor'], rare: ['ironArmor', 'blackwindCharm'], epic: ['blackwindArmor'], supply: ['potion'] } },
-  blackwindLord: { id: 'blackwindLord', name: '黑風寨主', level: 7, maxHp: 390, maxMp: 36, mp: 36, might: 38, intelligence: 14, defense: 20, speed: 17, exp: 240, gold: [150, 210], boss: true, skills: ['assault', 'intimidate'], loot: { common: ['blackwindBlade', 'blackwindArmor', 'blackwindCharm'], rare: ['blackwindBlade', 'blackwindArmor', 'blackwindCharm'], epic: ['blackwindBlade', 'blackwindArmor', 'blackwindCharm'], supply: ['potion'] } }
+  strongholdSoldier: { id: 'strongholdSoldier', name: '黑風寨兵', maxHp: 145, might: 26, defense: 13, speed: 13, exp: 65, gold: [32, 45], loot: { common: ['ironSword', 'leatherArmor'], rare: ['copperRing', 'ironArmor'], epic: ['greenEdgeSword'], supply: ['potion'] } },
+  blackwindSwordsman: { id: 'blackwindSwordsman', name: '黑風刀客', maxHp: 125, might: 31, defense: 10, speed: 16, exp: 72, gold: [36, 50], loot: { common: ['banditDagger', 'leatherArmor'], rare: ['ironArmor', 'copperRing'], epic: ['greenEdgeSword'], supply: ['potion'] } },
+  blackwindCaptain: { id: 'blackwindCaptain', name: '黑風頭目', maxHp: 185, might: 29, defense: 17, speed: 12, exp: 88, gold: [45, 62], loot: { common: ['ironSword', 'leatherArmor'], rare: ['ironArmor', 'banditDagger'], epic: ['greenEdgeSword'], supply: ['potion'] } },
+  blackwindLord: { id: 'blackwindLord', name: '黑風寨主', displayName: '敵將・黑風寨主', level: 9, maxHp: 620, maxMp: 48, mp: 48, might: 47, intelligence: 16, defense: 28, speed: 18, exp: 420, gold: [260, 360], boss: true, skills: ['assault', 'intimidate'], loot: { rare: ['blackwindBlade', 'blackwindArmor', 'blackwindCharm'], epic: ['overlordBlade', 'blackwindWarArmor', 'leaderToken'] } }
 };
 
 export const AREAS = {
-  plain: { id: 'plain', name: '村外平原', enemies: ['wolf', 'bandit'], level: 1 },
-  forest: { id: 'forest', name: '黑風森林', enemies: ['blackwindWolf', 'forestBandit', 'yellowTurbanArcher'], level: 3 },
-  stronghold: { id: 'stronghold', name: '黑風寨', enemies: ['strongholdSoldier', 'blackwindSwordsman', 'blackwindCaptain'], level: 5 }
+  plain: { id: 'plain', name: '村外平原', enemies: ['wolf', 'bandit'], level: 1, danger: 1, recommendedPower: 850 },
+  forest: { id: 'forest', name: '黑風森林', enemies: ['blackwindWolf', 'forestBandit', 'yellowTurbanArcher'], level: 3, danger: 2, recommendedPower: 1650 },
+  stronghold: { id: 'stronghold', name: '黑風寨', enemies: ['strongholdSoldier', 'blackwindSwordsman', 'blackwindCaptain'], level: 5, danger: 3, recommendedPower: 2450 }
 };
+
+export const BOSS_RECOMMENDED_POWER = 3200;
+export const BOSS_PITY_LIMIT = 20;
 
 export const SLOT_NAMES = { weapon: '武器', armor: '防具', accessory: '飾品' };
 export const STAT_NAMES = { might: '武力', defense: '防禦', maxHp: '最大兵力', speed: '速度' };

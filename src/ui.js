@@ -1,13 +1,14 @@
-import { EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js';
-import { compareItem, equippedCount, getEquippedSummary, getFinalStats } from './engine.js';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js';
+import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getTeamPower, recommendMemberForItem } from './engine.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
 const hpBar = (value, max, type = '') => `<div class="meter ${type}"><i style="width:${Math.max(0, value / max * 100)}%"></i></div>`;
-const qualityClass = quality => `quality-${quality || '普通'}`;
+const qualityClass = quality => `quality-${({ '普通': 'common', '稀有': 'rare', '史詩': 'epic' })[quality] || 'common'}`;
+const dangerStars = value => '★'.repeat(Math.max(1, Number(value) || 1));
 
 function header(state) {
-  return `<header class="status-bar"><div><strong>${esc(state.playerName)}</strong><small>${esc(state.location)}</small></div><span>金錢 <b>${state.gold}</b></span></header>`;
+  return `<header class="status-bar"><div><strong>${esc(state.playerName)}</strong><small>${esc(state.location)}</small></div><div class="header-values"><span>戰力 <b>${getTeamPower(state).toLocaleString()}</b></span><span>金錢 <b>${state.gold}</b></span></div></header>`;
 }
 
 function nav(state) {
@@ -33,7 +34,8 @@ function village(state) {
 function explorationPanel(state, areaId) {
   const forest = areaId === 'forest';
   const locked = forest && !state.unlocks.forest;
-  return `<section class="scene ${forest ? 'forest-scene' : 'plain-scene'}"><div class="scene-copy"><p class="eyebrow">${forest ? 'Lv.3～Lv.6 探索區' : '桃源村郊外'}</p><h1>${forest ? '黑風森林' : '村外平原'}</h1><p>${locked ? '需要 Lv.3 才能進入黑風森林。' : forest ? '黑風狼、森林山賊與黃巾弓手盤據此地，勝利後有機會取得裝備。' : '野狼速度較快；山賊攻擊較高。此地不會掉落裝備。'}</p></div></section>
+  const area = AREAS[areaId];
+  return `<section class="scene ${forest ? 'forest-scene' : 'plain-scene'}"><div class="scene-copy"><p class="eyebrow">${forest ? 'Lv.3～Lv.6 探索區' : '桃源村郊外'}</p><h1>${forest ? '黑風森林' : '村外平原'}</h1><div class="danger-line"><span>危險度：${dangerStars(area.danger)}</span><span>建議戰力 ${area.recommendedPower.toLocaleString()}</span></div><p>${locked ? '需要 Lv.3 才能進入黑風森林。' : forest ? '黑風狼、森林山賊與黃巾弓手盤據此地，勝利後有機會取得裝備。' : '野狼速度較快；山賊攻擊較高。此地不會掉落裝備。'}</p></div></section>
   <section class="panel"><h2>探索</h2><div class="action-grid three">${button('explore-once', '探索一次', 'primary', locked || Boolean(state.battle))}${button('auto-explore', state.exploration.auto ? '自動探索中' : '自動探索', '', locked || state.exploration.auto || Boolean(state.battle))}${button('stop-explore', '停止探索', 'danger', !state.exploration.auto)}</div>${forest ? `<div class="route-action">${button('screen:stronghold', state.unlocks.stronghold ? '前往黑風寨' : '黑風寨・Lv.5 後開放', 'primary', !state.unlocks.stronghold)}</div>` : ''}<p class="notice">${esc(state.notice)}</p></section>`;
 }
 
@@ -42,21 +44,31 @@ const forest = state => explorationPanel(state, 'forest');
 
 function stronghold(state) {
   const locked = !state.unlocks.stronghold;
-  const kills = Math.min(10, state.progress.strongholdKills || 0);
-  const bossReady = state.progress.bossUnlocked;
-  return `<section class="scene stronghold-scene"><div class="scene-copy"><p class="eyebrow">第一章決戰地</p><h1>黑風寨</h1><p>${locked ? '黑風寨守衛森嚴，目前還不是進攻的時候。' : '寨兵、刀客與頭目據守山寨。擊破十名守軍即可挑戰寨主。'}</p></div></section>
-  <section class="panel"><div class="progress-heading"><h2>黑風寨擊破</h2><b>${kills} / 10</b></div>${hpBar(kills, 10, 'stronghold-progress')}<p class="boss-status">${bossReady ? '寨主挑戰已解鎖。' : `再擊敗 ${10 - kills} 名守軍。`}</p><div class="action-grid three">${button('explore-once', '探索一次', 'primary', locked || Boolean(state.battle))}${button('auto-explore', state.exploration.auto ? '自動探索中' : '自動探索', '', locked || state.exploration.auto || Boolean(state.battle))}${button('stop-explore', '停止探索', 'danger', !state.exploration.auto)}</div><div class="stronghold-actions">${button('challenge-boss', state.progress.bossDefeated ? '再次挑戰寨主' : '挑戰寨主', 'boss-button', !bossReady || Boolean(state.battle))}${button('screen:forest', '返回黑風森林')}</div><p class="notice">${esc(state.notice)}</p></section>`;
+  const count = Math.min(BOSS_PITY_LIMIT, state.progress.bossEncounterCount || 0);
+  const hint = count < 5 ? `前線偵察 ${count} / 5・暫未發現寨主` : count >= BOSS_PITY_LIMIT - 1 ? '危險氣息已逼近，下次探索必有強敵。' : `危險氣息累積中・保底進度 ${count} / ${BOSS_PITY_LIMIT}`;
+  return `<section class="scene stronghold-scene"><div class="scene-copy"><p class="eyebrow">第一章決戰地</p><h1>黑風寨</h1><div class="danger-line"><span>危險度：${dangerStars(AREAS.stronghold.danger)}</span><span>建議戰力 ${AREAS.stronghold.recommendedPower.toLocaleString()}</span></div><p>${locked ? '黑風寨守衛森嚴，目前還不是進攻的時候。' : '寨兵、刀客與頭目據守山寨，強大敵將可能在探索途中突然現身。'}</p></div></section>
+  <section class="panel"><div class="progress-heading"><h2>危險偵察</h2><b>${count} / ${BOSS_PITY_LIMIT}</b></div>${hpBar(count, BOSS_PITY_LIMIT, 'stronghold-progress')}<p class="boss-status">${hint}</p><div class="action-grid three">${button('explore-once', '探索一次', 'primary', locked || Boolean(state.battle))}${button('auto-explore', state.exploration.auto ? '自動探索中' : '自動探索', '', locked || state.exploration.auto || Boolean(state.battle))}${button('stop-explore', '停止探索', 'danger', !state.exploration.auto)}</div><div class="route-action">${button('screen:forest', '返回黑風森林')}</div><p class="notice">${esc(state.notice)}</p></section>`;
 }
 
 function memberCard(state, member, index) {
   if (!member) return `<article class="member empty-slot"><span>第五格</span><strong>空位</strong></article>`;
   const stats = getFinalStats(state, member);
   const equipped = getEquippedSummary(state, member.id);
-  return `<article class="member"><div class="member-title"><span>${index + 1}</span><h3>${esc(member.name)}</h3><b>Lv.${member.level}</b></div>${hpBar(member.hp, stats.maxHp)}<p>兵力 ${member.hp}/${stats.maxHp}・技力 ${member.mp}/${member.maxMp}${member.id === 'blackwind-lord' ? '・技能 強襲' : ''}</p><dl><div><dt>武力</dt><dd>${stats.might}</dd></div><div><dt>智力</dt><dd>${member.intelligence}</dd></div><div><dt>防禦</dt><dd>${stats.defense}</dd></div><div><dt>速度</dt><dd>${stats.speed}</dd></div></dl><small>EXP ${member.exp}/${EXP_TO_LEVEL(member.level)}</small><div class="equipped-row">${equipped.map(entry => `<span>${entry.slotName}：${entry.item ? `<b>${entry.item.name}</b>` : '無'}</span>${entry.item ? button(`unequip:${member.id}:${entry.slot}`, '卸下', 'mini') : ''}`).join('')}</div></article>`;
+  return `<article class="member"><div class="member-title"><span>${index + 1}</span><h3>${esc(member.name)}</h3><b>Lv.${member.level}</b></div>${hpBar(member.hp, stats.maxHp)}<p>兵力 ${member.hp}/${stats.maxHp}・技力 ${member.mp}/${member.maxMp}${member.id === 'blackwind-lord' ? '・技能 強襲' : ''}</p><dl><div><dt>武力</dt><dd>${stats.might}</dd></div><div><dt>智力</dt><dd>${member.intelligence}</dd></div><div><dt>防禦</dt><dd>${stats.defense}</dd></div><div><dt>速度</dt><dd>${stats.speed}</dd></div></dl><small>EXP ${member.exp}/${EXP_TO_LEVEL(member.level)}・戰力 ${getTeamPower({ ...state, party: [member] }).toLocaleString()}</small><div class="equipped-row">${equipped.map(entry => `<div class="slot-control"><span>${entry.slotName}：${entry.item ? `<b>${entry.item.name}</b>` : '無'}</span>${button(`party-slot:${member.id}:${entry.slot}`, `更換${entry.slotName}`, 'mini')}${entry.item ? button(`unequip:${member.id}:${entry.slot}`, '卸下', 'mini') : ''}</div>`).join('')}</div></article>`;
 }
 
+function partyEquipmentPicker(state) {
+  const member = state.party.find(candidate => candidate?.id === state.ui.partyEquipMember);
+  const slot = state.ui.partyEquipSlot;
+  if (!member || !SLOT_NAMES[slot]) return '';
+  const options = Object.values(ITEMS).filter(item => item.type === 'equipment' && item.slot === slot && (state.inventory[item.id] || 0) > equippedCount(state, item.id) - (state.equipment[member.id]?.[slot] === item.id ? 1 : 0)).sort((a, b) => getItemScoreForUi(b) - getItemScoreForUi(a));
+  return `<section class="quick-panel"><h2>${esc(member.name)}・更換${SLOT_NAMES[slot]}</h2><div class="quick-list">${options.length ? options.map(item => `${button(`party-equip:${member.id}:${item.id}`, `${item.name}｜${item.description}`, qualityClass(item.quality))}`).join('') : '<p class="empty">沒有可用裝備。</p>'}</div></section>`;
+}
+
+const getItemScoreForUi = item => (item.stats?.might || 0) * 7 + (item.stats?.defense || 0) * 6 + (item.stats?.maxHp || 0) * 0.65 + (item.stats?.speed || 0) * 4;
+
 function party(state) {
-  return `<section class="panel"><p class="eyebrow">最多五人・能力已包含裝備</p><h1>隊伍</h1><div class="party-list">${state.party.map((member, index) => memberCard(state, member, index)).join('')}</div></section>`;
+  return `<section class="panel"><p class="eyebrow">最多五人・能力已包含裝備</p><h1>隊伍</h1><div class="team-power">隊伍戰力 <b>${getTeamPower(state).toLocaleString()}</b></div>${partyEquipmentPicker(state)}<div class="party-list">${state.party.map((member, index) => memberCard(state, member, index)).join('')}</div></section>`;
 }
 
 function shop(state) {
@@ -68,7 +80,16 @@ function inventoryCard(state, item) {
   const owned = state.inventory[item.id] || 0;
   const equipped = equippedCount(state, item.id);
   const available = owned - equipped;
-  return `<article class="inventory-item ${qualityClass(item.quality)} ${state.ui.selectedItem === item.id ? 'selected' : ''}"><div><span class="quality-label">${item.quality}</span><h3>${item.name}</h3><p>${item.description}</p><small>${SLOT_NAMES[item.slot]}・持有 ${owned}・可用 ${available}${equipped ? `・已裝備 ${equipped}` : ''}</small></div><div class="item-actions">${button(`inspect:${item.id}`, '比較')}${button(`sell:${item.id}`, `出售 ${item.sell} 金`, '', available <= 0)}</div></article>`;
+  return `<article class="inventory-item ${qualityClass(item.quality)} ${state.ui.selectedItem === item.id ? 'selected' : ''}"><div><span class="quality-label">${item.quality}</span><h3>${item.name}</h3><p>${item.description}</p><small>${SLOT_NAMES[item.slot]}・持有 ${owned}・可用 ${available}${equipped ? `・已裝備 ${equipped}` : ''}</small></div><div class="item-actions">${button(`quick:${item.id}`, '快速裝備', 'primary', available <= 0)}${button(`inspect:${item.id}`, '比較')}${button(`sell:${item.id}`, `出售 ${item.sell} 金`, '', available <= 0)}</div></article>`;
+}
+
+function quickEquipPanel(state) {
+  const itemId = state.ui.quickEquipItem;
+  const item = ITEMS[itemId];
+  const recommendation = recommendMemberForItem(state, itemId);
+  if (!item || !recommendation) return '';
+  const differences = compareItem(state, recommendation.member.id, itemId).differences;
+  return `<section class="quick-panel"><p class="eyebrow">快速裝備推薦</p><h2>建議裝備給${esc(recommendation.member.name)}</h2><p>目前：${recommendation.current?.name || '無'}<br>更換：${item.name}</p><div class="difference-list">${differences.map(diff => `<span class="${diff.value > 0 ? 'positive' : diff.value < 0 ? 'negative' : ''}">${diff.name} ${diff.value > 0 ? '+' : ''}${diff.value}</span>`).join('')}</div>${button('quick-confirm', '確認裝備', 'primary')}</section>`;
 }
 
 function comparison(state) {
@@ -84,7 +105,8 @@ function comparison(state) {
 
 function inventory(state) {
   const equipment = Object.values(ITEMS).filter(item => item.type === 'equipment' && (state.inventory[item.id] || 0) > 0).sort((a, b) => QUALITY_ORDER[b.quality] - QUALITY_ORDER[a.quality] || a.name.localeCompare(b.name, 'zh-Hant'));
-  return `<section class="panel inventory-panel"><p class="eyebrow">共用背包</p><h1>背包裝備</h1>${comparison(state)}<div class="inventory-list">${equipment.length ? equipment.map(item => inventoryCard(state, item)).join('') : '<p class="empty">尚未取得裝備。黑風森林的敵人有機會掉落裝備。</p>'}</div><p class="notice">${esc(state.notice)}</p></section>`;
+  const changes = state.ui.optimizeChanges || [];
+  return `<section class="panel inventory-panel"><p class="eyebrow">共用背包</p><div class="inventory-heading"><h1>背包裝備</h1>${button('optimize-equipment', '一鍵最佳裝備', 'primary', !equipment.length)}</div>${quickEquipPanel(state)}${comparison(state)}${changes.length ? `<div class="optimize-result"><strong>最佳化結果</strong>${changes.slice(0, 12).map(change => `<span>${esc(change)}</span>`).join('')}</div>` : ''}<div class="inventory-list">${equipment.length ? equipment.map(item => inventoryCard(state, item)).join('') : '<p class="empty">尚未取得裝備。黑風森林的敵人有機會掉落裝備。</p>'}</div><p class="notice">${esc(state.notice)}</p></section>`;
 }
 
 function settings(state) {
@@ -101,12 +123,20 @@ function battleLog(log) {
 function battle(state) {
   const battle = state.battle;
   if (!battle) return '';
-  const enemies = battle.enemies.map(enemy => `<article class="enemy ${enemy.hp <= 0 ? 'defeated' : ''}"><h3>${enemy.name}</h3>${hpBar(enemy.hp, enemy.maxHp, 'enemy-hp')}<span>${enemy.hp}/${enemy.maxHp}</span></article>`).join('');
+  const enemies = battle.enemies.map(enemy => `<article class="enemy ${enemy.elite ? 'elite-enemy' : ''} ${enemy.hp <= 0 ? 'defeated' : ''}"><small>${dangerStars(enemy.boss ? 4 : enemy.elite ? Math.max(2, enemy.danger || 2) : enemy.danger || 1)}</small><h3>${esc(enemy.displayName || enemy.name)}</h3>${hpBar(enemy.hp, enemy.maxHp, 'enemy-hp')}<span>${enemy.hp}/${enemy.maxHp}</span></article>`).join('');
   const members = state.party.filter(Boolean).map(member => { const stats = getFinalStats(state, member); return `<article class="battle-member ${member.hp <= 0 ? 'defeated' : ''}"><strong>${esc(member.name)}</strong><span>兵 ${member.hp}/${stats.maxHp}</span><span>技 ${member.mp}/${member.maxMp}</span></article>`; }).join('');
   const active = !battle.finished;
   const auto = state.settings.autoBattle || state.exploration.auto;
-  const finishedActions = battle.awaitingRecruit ? `${button('battle:recruit', '招降', 'primary')}${button('battle:spare', '放過')}` : button('battle:close', battle.result === 'victory' ? (state.exploration.auto ? '自動繼續中' : '繼續探索') : '返回桃源村', 'primary');
-  return `<div class="battle-overlay"><section class="battle-panel ${battle.boss ? 'boss-battle' : ''}"><div class="battle-heading"><div><p class="eyebrow">${battle.boss ? '寨主決戰・' : battle.areaId === 'stronghold' ? '黑風寨・' : battle.areaId === 'forest' ? '黑風森林・' : ''}回合 ${battle.round}</p><h2>${battle.finished ? (battle.boss && battle.result === 'victory' ? '黑風寨主已敗！' : battle.result === 'victory' ? '戰鬥勝利' : '戰鬥失敗') : battle.boss ? '黑風寨主戰' : '遭遇戰'}</h2></div><span>${auto ? 'AUTO ON' : '手動'}</span></div><div class="enemy-row">${enemies}</div><div class="versus">交 戰</div><div class="party-battle-row">${members}</div><div class="battle-log">${battleLog(state.log)}</div>${battle.awaitingRecruit ? '<p class="recruit-copy">黑風寨主已敗。要招降他成為第五名武將嗎？</p>' : ''}<div class="battle-actions">${active ? `${button('battle:attack', '普通攻擊', 'primary')}${button('battle:slam', '猛擊・技力 6', '', state.party[0].mp < 6)}${button('battle:defend', '全隊防禦')}${button('battle:potion', `回復藥 ×${state.inventory.potion || 0}`, '', !state.inventory.potion)}${state.exploration.auto ? button('battle:stop-auto', '停止自動探索', 'danger') : ''}` : finishedActions}</div></section></div>`;
+  const quickDrop = battle.dropId && ['稀有', '史詩'].includes(ITEMS[battle.dropId]?.quality) && !battle.awaitingRecruit ? button('battle:quick-equip', '立即裝備', 'primary') : '';
+  const finishedActions = battle.awaitingRecruit ? `${button('battle:recruit', '招降', 'primary')}${button('battle:spare', '放過')}` : `${quickDrop}${button('battle:close', battle.result === 'victory' ? (state.exploration.auto ? '自動繼續中' : '繼續探索') : '返回桃源村', 'primary')}`;
+  return `<div class="battle-overlay"><section class="battle-panel ${battle.boss ? 'boss-battle' : battle.elite ? 'elite-battle' : ''}"><div class="battle-heading"><div><p class="eyebrow">${battle.boss ? '★★★★ 寨主決戰・' : battle.elite ? '精英遭遇・' : battle.areaId === 'stronghold' ? '黑風寨・' : battle.areaId === 'forest' ? '黑風森林・' : ''}回合 ${battle.round}</p><h2>${battle.finished ? (battle.boss && battle.result === 'victory' ? '敵將・黑風寨主已敗！' : battle.elite && battle.result === 'victory' ? '精英敵人擊破！' : battle.result === 'victory' ? '戰鬥勝利' : '戰鬥失敗') : battle.boss ? '敵將・黑風寨主戰' : battle.elite ? '精英遭遇戰' : '遭遇戰'}</h2></div><span>${auto ? 'AUTO ON' : '手動'}</span></div><div class="enemy-row">${enemies}</div><div class="versus">交 戰</div><div class="party-battle-row">${members}</div><div class="battle-log">${battleLog(state.log)}</div>${battle.awaitingRecruit ? '<p class="recruit-copy">敵將・黑風寨主已敗。要招降他成為第五名武將嗎？</p>' : ''}<div class="battle-actions">${active ? `${button('battle:attack', '普通攻擊', 'primary')}${button('battle:slam', '猛擊・技力 6', '', state.party[0].mp < 6)}${button('battle:defend', '全隊防禦')}${button('battle:potion', `回復藥 ×${state.inventory.potion || 0}`, '', !state.inventory.potion)}${state.exploration.auto ? button('battle:stop-auto', '停止自動探索', 'danger') : ''}` : finishedActions}</div></section></div>`;
+}
+
+function bossWarning(state) {
+  if (!state.ui.bossWarning) return '';
+  const teamPower = getTeamPower(state);
+  const safe = teamPower >= BOSS_RECOMMENDED_POWER;
+  return `<div class="danger-overlay"><section class="danger-card"><p class="eyebrow">偵測到強大的氣息……</p><div class="danger-stars">★★★★</div><h2>強敵出現</h2><h3>敵將・黑風寨主率眾殺出！</h3><dl><div><dt>你的隊伍戰力</dt><dd>${teamPower.toLocaleString()}</dd></div><div><dt>建議戰力</dt><dd>${BOSS_RECOMMENDED_POWER.toLocaleString()}</dd></div></dl><p class="challenge-rating ${safe ? 'safe' : 'warning'}">${safe ? '適合挑戰' : '⚠ 危險'}</p><div class="action-grid">${button('boss:engage', '迎戰', 'boss-button')}${button('boss:retreat', '撤退')}</div></section></div>`;
 }
 
 function chapterComplete(state) {
@@ -117,7 +147,7 @@ function chapterComplete(state) {
 
 export function render(state) {
   const views = { village, plain, forest, stronghold, party, inventory, shop, settings };
-  return `<div class="app-shell">${header(state)}<main>${(views[state.screen] || village)(state)}</main>${nav(state)}${battle(state)}${chapterComplete(state)}</div>`;
+  return `<div class="app-shell">${header(state)}<main>${(views[state.screen] || village)(state)}</main>${nav(state)}${battle(state)}${bossWarning(state)}${chapterComplete(state)}</div>`;
 }
 
 export function renderCreation() {
