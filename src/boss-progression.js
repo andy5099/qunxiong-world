@@ -112,7 +112,8 @@ export function getPromotionChance(rank, blessing = 0) {
 export function normalizeBossProgress(raw = {}) {
   const talismans = Object.fromEntries(Object.keys(TALISMANS).map(id => [id, Math.max(0, Math.floor(Number(raw.talismans?.[id]) || 0))]));
   const blessings = Object.fromEntries([1, 2, 3, 4].map(rank => [rank, Math.max(0, Math.min(0.75, Number(raw.blessings?.[rank]) || 0))]));
-  return { talismans, blessings, records: Array.isArray(raw.records) ? raw.records.slice(-80) : [] };
+  const divineTalismans = Object.fromEntries(['novice', 'intermediate', 'advanced'].map(id => [id, Math.max(0, Math.floor(Number(raw.divineTalismans?.[id]) || 0))]));
+  return { talismans, divineTalismans, blessings, records: Array.isArray(raw.records) ? raw.records.slice(-80) : [] };
 }
 
 export function applyLeaderRarity(member, targetRank) {

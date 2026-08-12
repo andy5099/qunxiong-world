@@ -12,7 +12,7 @@ let assertions = 0;
 const check = (value, message) => { assert.ok(value, message); assertions += 1; };
 const equal = (actual, expected, message) => { assert.equal(actual, expected, message); assertions += 1; };
 
-equal(SAVE_VERSION, 9, 'save version is 9');
+equal(SAVE_VERSION, 10, 'save version is 10');
 equal(AREAS.plain.danger, 1, 'plain danger');
 equal(AREAS.forest.danger, 2, 'forest danger');
 equal(AREAS.stronghold.danger, 3, 'stronghold danger');
@@ -65,7 +65,7 @@ check(pity.battle.enemies[0].boss, 'first enemy is boss');
 equal(pity.battle.enemies[0].displayName, '★ 普通・黑風寨主', 'enemy boss identity clear');
 
 const bossOnly = Object.values(ITEMS).filter(item => item.bossOnly);
-equal(bossOnly.length, 6, 'six boss-exclusive rewards');
+equal(bossOnly.length, 9, 'nine boss-exclusive rewards including evolutions');
 equal(bossOnly.filter(item => item.quality === '稀有').length, 3, 'three rare boss rewards');
 equal(bossOnly.filter(item => item.quality === '史詩').length, 3, 'three epic boss rewards');
 const firstDrop = rollBattleDrop([{ ...ENEMIES.blackwindLord }], () => 0.5, true, true);
@@ -96,7 +96,7 @@ check(partyHtml.includes('更換'), 'party slot change UI');
 check(partyHtml.includes('隊伍戰力'), 'party power UI');
 
 const migrated = normalize({ ...createState('舊玩家'), version: 6, progress: { bossDefeated: true }, inventory: { blackwindBlade: 1 } });
-equal(migrated.version, 9, 'v6 save migrates');
+equal(migrated.version, 10, 'v6 save migrates');
 check(migrated.progress.bossFirstKill, 'old boss victory preserves first kill');
 equal(migrated.inventory.blackwindBlade, 1, 'old inventory preserved');
 equal(migrated.progress.bossEncounterCount, 0, 'new pity counter defaults safely');

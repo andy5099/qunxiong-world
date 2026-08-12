@@ -1,5 +1,6 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v013-dungeon';
-import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v013-dungeon';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v014-boss-gear';
+import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v014-boss-gear';
+import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo, rollDivineTalismanDrops } from './boss-gear-system.js?v=v014-boss-gear';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -18,6 +19,11 @@ export function getFinalStats(state, memberOrId) {
     if (!item?.stats) continue;
     for (const [stat, value] of Object.entries(item.stats)) result[stat] = (result[stat] || 0) + value;
   }
+  const resonance = getBlackwindResonance(state, member);
+  result.might = Math.round(result.might * (1 + resonance.mightPct));
+  result.defense = Math.round(result.defense * (1 + resonance.defensePct));
+  result.maxHp = Math.round(result.maxHp * (1 + resonance.hpPct));
+  result.speed = Math.round(result.speed * (1 + resonance.speedPct));
   return result;
 }
 
@@ -468,6 +474,13 @@ function finishVictory(state, rng) {
       appendLog(state, `獲得【${TALISMANS[talismanId].name}】×${amount}！`, 'epic');
       if (state.battle.dungeon) state.dungeon.loot.talismans[talismanId] = (state.dungeon.loot.talismans[talismanId] || 0) + amount;
     });
+    const divineDrops = rollDivineTalismanDrops(rank, Boolean(state.battle.dungeon), rng);
+    state.battle.divineTalismanDrops = divineDrops;
+    Object.entries(divineDrops).forEach(([id, amount]) => {
+      state.bossProgress.divineTalismans[id] = (state.bossProgress.divineTalismans[id] || 0) + amount;
+      appendLog(state, `獲得【${DIVINE_TALISMANS[id].name}】×${amount}！`, id === 'advanced' ? 'epic' : 'rare');
+      if (id === 'advanced' && rank === 5) appendLog(state, '高階神兵素材！', 'epic');
+    });
     if (state.battle.dungeon) {
       const completionGold = 300 + rank * 120;
       state.gold += completionGold;
@@ -516,6 +529,13 @@ export function resolveRound(state, command = 'attack', rng = Math.random) {
   const battle = state.battle;
   if (!battle || battle.finished || !battle.awaitingCommand) return false;
   battle.awaitingCommand = false;
+  const leader = state.party.find(unit => unit?.id === 'blackwind-lord');
+  const leaderResonance = getBlackwindResonance(state, leader);
+  if (!battle.resonanceAnnounced && leaderResonance.set) {
+    appendLog(state, `黑風寨主觸發【${leaderResonance.set}】！`, 'epic');
+    battle.resonanceAnnounced = true;
+    battle.freeLeaderAssault = leaderResonance.freeAssault;
+  }
   const allies = state.party.filter(alive);
   const enemies = battle.enemies.filter(alive);
   if (!allies.length || !enemies.length) return false;
@@ -532,10 +552,13 @@ export function resolveRound(state, command = 'attack', rng = Math.random) {
       if (!targets.length) break;
       if (command === 'defend') { appendLog(state, `${turn.unit.name}採取防禦姿態。`); continue; }
       const useSlam = turn.unit.isPlayer && command === 'slam' && turn.unit.mp >= 6;
-      const leaderAssault = turn.unit.id === 'blackwind-lord' && turn.unit.mp >= 5 && rng() < 0.35;
+      const leaderProfile = turn.unit.id === 'blackwind-lord' ? getBlackwindResonance(state, turn.unit) : null;
+      const freeAssault = Boolean(turn.unit.id === 'blackwind-lord' && battle.freeLeaderAssault);
+      const leaderAssault = turn.unit.id === 'blackwind-lord' && (freeAssault || (turn.unit.mp >= 5 && rng() < 0.35));
       if (useSlam) turn.unit.mp -= 6;
-      if (leaderAssault) turn.unit.mp -= 5;
-      const leaderMultiplier = 1.55 + ((turn.unit.rarityRank || 1) - 1) * 0.13;
+      if (leaderAssault && !freeAssault) turn.unit.mp -= 5;
+      if (freeAssault) battle.freeLeaderAssault = false;
+      const leaderMultiplier = (1.55 + ((turn.unit.rarityRank || 1) - 1) * 0.13) * (1 + (leaderProfile?.assaultPct || 0));
       dealDamage(state, turn.unit, targets[0], useSlam || leaderAssault, rng, leaderAssault ? '強襲' : '猛擊', leaderAssault ? leaderMultiplier : 1.65);
     } else performEnemyAction(state, turn.unit, rng);
     if (!state.party.some(alive)) break;
@@ -619,7 +642,8 @@ export function recommendMemberForItem(state, itemId) {
     const currentId = state.equipment[member.id]?.[item.slot];
     const delta = getItemScore(item) - getItemScore(ITEMS[currentId]);
     const affinity = item.slot === 'weapon' ? member.might : item.slot === 'armor' ? member.defense + member.maxHp * 0.08 : member.speed + member.might * 0.2;
-    return { member, current: ITEMS[currentId] || null, delta, affinity };
+    const resonanceBonus = member.id === 'blackwind-lord' && getBossGearInfo(itemId) ? getItemScore(item) * 0.7 : 0;
+    return { member, current: ITEMS[currentId] || null, delta: delta + resonanceBonus, affinity };
   });
   return candidates.sort((a, b) => b.delta - a.delta || b.affinity - a.affinity)[0] || null;
 }
@@ -655,6 +679,12 @@ export function optimizeEquipment(state) {
       const affinity = member => slot === 'weapon' ? member.might : slot === 'armor' ? member.defense + member.maxHp * 0.08 : member.speed + member.might * 0.2;
       return affinity(b) - affinity(a);
     });
+    const leaderIndex = memberOrder.findIndex(member => member.id === 'blackwind-lord');
+    const bossGearIndex = pool.findIndex(item => getBossGearInfo(item.id));
+    if (leaderIndex >= 0 && bossGearIndex >= 0) {
+      const [leader] = memberOrder.splice(leaderIndex, 1); memberOrder.unshift(leader);
+      const [gear] = pool.splice(bossGearIndex, 1); pool.unshift(gear);
+    }
     memberOrder.forEach((member, index) => { next[member.id][slot] = pool[index]?.id || null; });
   }
   const changes = [];

@@ -1,11 +1,12 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v013-dungeon';
-import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getTeamPower, recommendMemberForItem } from './engine.js?v=v013-dungeon';
-import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v013-dungeon';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v014-boss-gear';
+import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getTeamPower, recommendMemberForItem } from './engine.js?v=v014-boss-gear';
+import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v014-boss-gear';
+import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v014-boss-gear';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
 const hpBar = (value, max, type = '') => `<div class="meter ${type}"><i style="width:${Math.max(0, value / max * 100)}%"></i></div>`;
-const qualityClass = quality => `quality-${({ '普通': 'common', '稀有': 'rare', '史詩': 'epic' })[quality] || 'common'}`;
+const qualityClass = quality => `quality-${({ '普通': 'common', '稀有': 'rare', '史詩': 'epic', '傳說': 'legendary' })[quality] || 'common'}`;
 const dangerStars = value => '★'.repeat(Math.max(1, Number(value) || 1));
 
 function header(state) {
@@ -56,7 +57,14 @@ function memberCard(state, member, index) {
   const stats = getFinalStats(state, member);
   const equipped = getEquippedSummary(state, member.id);
   const rarity = member.id === 'blackwind-lord' ? getBossRarity(member.rarityRank) : null;
-  return `<article class="member ${rarity ? `boss-rank-${rarity.rank}` : ''}"><div class="member-title"><span>${index + 1}</span><h3>${esc(member.name)}</h3><b>Lv.${member.level}</b></div>${rarity ? `<div class="leader-rarity">${rarity.stars} ${rarity.name}</div>` : ''}${hpBar(member.hp, stats.maxHp)}<p>兵力 ${member.hp}/${stats.maxHp}・技力 ${member.mp}/${member.maxMp}${member.id === 'blackwind-lord' ? '・技能 強襲' : ''}</p><dl><div><dt>武力</dt><dd>${stats.might}</dd></div><div><dt>智力</dt><dd>${member.intelligence}</dd></div><div><dt>防禦</dt><dd>${stats.defense}</dd></div><div><dt>速度</dt><dd>${stats.speed}</dd></div></dl><small>EXP ${member.exp}/${EXP_TO_LEVEL(member.level)}・戰力 ${getTeamPower({ ...state, party: [member] }).toLocaleString()}</small>${rarity ? promotionPanel(state, member) : ''}<div class="equipped-row">${equipped.map(entry => `<div class="slot-control"><span>${entry.slotName}：${entry.item ? `<b>${entry.item.name}</b>` : '無'}</span>${button(`party-slot:${member.id}:${entry.slot}`, `更換${entry.slotName}`, 'mini')}${entry.item ? button(`unequip:${member.id}:${entry.slot}`, '卸下', 'mini') : ''}</div>`).join('')}</div></article>`;
+  const resonance = member.id === 'blackwind-lord' ? resonancePanel(state, member) : '';
+  return `<article class="member ${rarity ? `boss-rank-${rarity.rank}` : ''}"><div class="member-title"><span>${index + 1}</span><h3>${esc(member.name)}</h3><b>Lv.${member.level}</b></div>${rarity ? `<div class="leader-rarity">${rarity.stars} ${rarity.name}</div>` : ''}${hpBar(member.hp, stats.maxHp)}<p>兵力 ${member.hp}/${stats.maxHp}・技力 ${member.mp}/${member.maxMp}${member.id === 'blackwind-lord' ? '・技能 強襲' : ''}</p><dl><div><dt>武力</dt><dd>${stats.might}</dd></div><div><dt>智力</dt><dd>${member.intelligence}</dd></div><div><dt>防禦</dt><dd>${stats.defense}</dd></div><div><dt>速度</dt><dd>${stats.speed}</dd></div></dl><small>EXP ${member.exp}/${EXP_TO_LEVEL(member.level)}・戰力 ${getTeamPower({ ...state, party: [member] }).toLocaleString()}</small>${resonance}${rarity ? promotionPanel(state, member) : ''}<div class="equipped-row">${equipped.map(entry => `<div class="slot-control"><span>${entry.slotName}：${entry.item ? `<b>${entry.item.name}</b>` : '無'}</span>${button(`party-slot:${member.id}:${entry.slot}`, `更換${entry.slotName}`, 'mini')}${entry.item ? button(`unequip:${member.id}:${entry.slot}`, '卸下', 'mini') : ''}</div>`).join('')}</div></article>`;
+}
+
+function resonancePanel(state, member) {
+  const r = getBlackwindResonance(state, member);
+  const tier = value => value ? ['I', 'II', 'III'][value - 1] : '尚未啟動';
+  return `<section class="resonance-box"><strong>專屬共鳴</strong><span>武器：黑風共鳴 ${tier(r.weaponTier)}</span><span>防具：寨主護體 ${tier(r.armorTier)}</span><span>飾品：寨主威勢 ${tier(r.accessoryTier)}</span><span>全套：${r.set || '尚未啟動'}</span></section>`;
 }
 
 function promotionPanel(state, member) {
@@ -93,7 +101,21 @@ function inventoryCard(state, item) {
   const owned = state.inventory[item.id] || 0;
   const equipped = equippedCount(state, item.id);
   const available = owned - equipped;
-  return `<article class="inventory-item ${qualityClass(item.quality)} ${state.ui.selectedItem === item.id ? 'selected' : ''}"><div><span class="quality-label">${item.quality}</span><h3>${item.name}</h3><p>${item.description}</p><small>${SLOT_NAMES[item.slot]}・持有 ${owned}・可用 ${available}${equipped ? `・已裝備 ${equipped}` : ''}</small></div><div class="item-actions">${button(`quick:${item.id}`, '快速裝備', 'primary', available <= 0)}${button(`inspect:${item.id}`, '比較')}${button(`sell:${item.id}`, `出售 ${item.sell} 金`, '', available <= 0)}</div></article>`;
+  const gear = getBossGearInfo(item.id);
+  const evolution = gear?.nextId ? bossGearEvolution(state, item, gear) : '';
+  return `<article class="inventory-item ${qualityClass(item.quality)} ${state.ui.selectedItem === item.id ? 'selected' : ''}"><div><span class="quality-label">${item.quality}</span><h3>${item.name}</h3><p>${item.description}</p><small>${SLOT_NAMES[item.slot]}・持有 ${owned}・可用 ${available}${equipped ? `・已裝備 ${equipped}` : ''}</small>${evolution}</div><div class="item-actions">${button(`quick:${item.id}`, '快速裝備', 'primary', available <= 0)}${button(`inspect:${item.id}`, '比較')}${button(`sell:${item.id}`, `出售 ${item.sell} 金`, '', available <= 0)}</div></article>`;
+}
+
+function bossGearEvolution(state, item, gear) {
+  const next = ITEMS[gear.nextId];
+  const costs = Object.entries(gear.costs).map(([id, amount]) => `${DIVINE_TALISMANS[id].name} ${state.bossProgress.divineTalismans[id] || 0} / ${amount}`).join('・');
+  const disabled = Object.entries(gear.costs).some(([id, amount]) => (state.bossProgress.divineTalismans[id] || 0) < amount);
+  return `<div class="gear-evolution"><strong>Boss 專屬裝備進化</strong><span>目前：${'★'.repeat(gear.tier + 2)} ${item.quality}</span><span>下一階：${'★'.repeat(gear.tier + 3)} ${next.quality}</span><small>${costs}</small>${button(`evolve-boss-gear:${item.id}`, '進化', 'primary', disabled)}</div>`;
+}
+
+function divineTalismanPanel(state) {
+  const d = state.bossProgress.divineTalismans;
+  return `<section class="divine-panel"><h2>神兵符</h2><p>Boss 專屬裝備進化素材，與轉職兵符分開使用。</p><div class="talisman-list">${Object.values(DIVINE_TALISMANS).map(item => `<span>${item.name} ×${d[item.id] || 0}</span>`).join('')}</div><div class="craft-actions">${button('combine-divine:intermediate', '合成中階｜5 初階 → 1', 'mini', (d.novice || 0) < 5)}${button('combine-divine:advanced', '合成高階｜5 中階 → 1', 'mini', (d.intermediate || 0) < 5)}${button('combine-all-divine', '全部可合成', 'primary', (d.novice || 0) < 5 && (d.intermediate || 0) < 5)}</div></section>`;
 }
 
 function quickEquipPanel(state) {
@@ -119,7 +141,7 @@ function comparison(state) {
 function inventory(state) {
   const equipment = Object.values(ITEMS).filter(item => item.type === 'equipment' && (state.inventory[item.id] || 0) > 0).sort((a, b) => QUALITY_ORDER[b.quality] - QUALITY_ORDER[a.quality] || a.name.localeCompare(b.name, 'zh-Hant'));
   const changes = state.ui.optimizeChanges || [];
-  return `<section class="panel inventory-panel"><p class="eyebrow">共用背包</p><div class="inventory-heading"><h1>背包裝備</h1>${button('optimize-equipment', '一鍵最佳裝備', 'primary', !equipment.length)}</div>${quickEquipPanel(state)}${comparison(state)}${changes.length ? `<div class="optimize-result"><strong>最佳化結果</strong>${changes.slice(0, 12).map(change => `<span>${esc(change)}</span>`).join('')}</div>` : ''}<div class="inventory-list">${equipment.length ? equipment.map(item => inventoryCard(state, item)).join('') : '<p class="empty">尚未取得裝備。黑風森林的敵人有機會掉落裝備。</p>'}</div><p class="notice">${esc(state.notice)}</p></section>`;
+  return `<section class="panel inventory-panel"><p class="eyebrow">共用背包</p><div class="inventory-heading"><h1>背包裝備</h1>${button('optimize-equipment', '一鍵最佳裝備', 'primary', !equipment.length)}</div>${divineTalismanPanel(state)}${quickEquipPanel(state)}${comparison(state)}${changes.length ? `<div class="optimize-result"><strong>最佳化結果</strong>${changes.slice(0, 12).map(change => `<span>${esc(change)}</span>`).join('')}</div>` : ''}<div class="inventory-list">${equipment.length ? equipment.map(item => inventoryCard(state, item)).join('') : '<p class="empty">尚未取得裝備。黑風森林的敵人有機會掉落裝備。</p>'}</div><p class="notice">${esc(state.notice)}</p></section>`;
 }
 
 function settings(state) {
@@ -146,7 +168,8 @@ function battle(state) {
   const captureLabel = bossRarity ? (!currentLeader ? '招降 Boss' : bossRarity.rank > (currentLeader.rarityRank || 1) ? '招降並升格' : '招降／升格') : '';
   const noDowngrade = bossRarity && currentLeader && bossRarity.rank <= (currentLeader.rarityRank || 1) ? '<small>敵方稀有度不高於現有武將；成功時不會降階，將轉化額外金錢。</small>' : '';
   const talismanLoot = Object.entries(battle.talismanDrops || {}).map(([id, amount]) => `${TALISMANS[id].name} ×${amount}`).join('、');
-  const recruitPanel = battle.awaitingRecruit && bossRarity ? `<section class="boss-recruit-first"><p class="eyebrow">Boss Victory</p><h2>${bossRarity.stars} ${bossRarity.name}・黑風寨主</h2><strong>招降成功率 ${Math.round(bossRarity.captureRate * 100)}%</strong>${noDowngrade}<div class="battle-actions">${button('battle:recruit', captureLabel, 'primary recruit-primary')}${button('battle:spare', '放棄招降')}</div><div class="victory-loot"><b>戰利品</b><span>EXP ${battle.rewardExp || 0}</span><span>金錢 ${battle.rewardGold || 0}</span>${battle.dropId ? `<span>裝備 ${ITEMS[battle.dropId].name}</span>` : ''}${talismanLoot ? `<span>${talismanLoot}</span>` : ''}</div></section>` : '';
+  const divineLoot = Object.entries(battle.divineTalismanDrops || {}).map(([id, amount]) => `${DIVINE_TALISMANS[id].name} ×${amount}`).join('、');
+  const recruitPanel = battle.awaitingRecruit && bossRarity ? `<section class="boss-recruit-first"><p class="eyebrow">Boss Victory</p><h2>${bossRarity.stars} ${bossRarity.name}・黑風寨主</h2><strong>招降成功率 ${Math.round(bossRarity.captureRate * 100)}%</strong>${noDowngrade}<div class="battle-actions">${button('battle:recruit', captureLabel, 'primary recruit-primary')}${button('battle:spare', '放棄招降')}</div><div class="victory-loot"><b>戰利品</b><span>EXP ${battle.rewardExp || 0}</span><span>金錢 ${battle.rewardGold || 0}</span>${battle.dropId ? `<span>裝備 ${ITEMS[battle.dropId].name}</span>` : ''}${talismanLoot ? `<span>${talismanLoot}</span>` : ''}${divineLoot ? `<span class="divine-loot">${divineLoot}</span>` : ''}</div></section>` : '';
   const finishedActions = battle.awaitingRecruit ? '' : `${quickDrop}${button('battle:close', battle.result === 'victory' ? (battle.dungeon ? '結束本層' : state.exploration.auto ? '自動繼續中' : '繼續探索') : '返回桃源村', 'primary')}`;
   return `<div class="battle-overlay"><section class="battle-panel ${battle.dungeon ? 'dungeon-battle' : ''} ${battle.boss ? `boss-battle boss-rank-${bossRarity.rank}` : battle.elite ? 'elite-battle' : ''}"><div class="battle-heading"><div><p class="eyebrow">${battle.dungeon ? `${DUNGEON.name}・第 ${battle.dungeonFloor} / ${DUNGEON.floors} 層・` : ''}${battle.boss ? `${bossRarity.stars} ${bossRarity.name}寨主決戰・` : battle.elite ? '精英遭遇・' : battle.areaId === 'stronghold' ? '黑風寨・' : battle.areaId === 'forest' ? '黑風森林・' : ''}回合 ${battle.round}</p><h2>${battle.finished ? (battle.boss && battle.result === 'victory' ? `${bossRarity.name}黑風寨主已敗！` : battle.elite && battle.result === 'victory' ? '精英敵人擊破！' : battle.result === 'victory' ? '戰鬥勝利' : '戰鬥失敗') : battle.boss ? `${bossRarity.stars} ${bossRarity.name}・黑風寨主戰` : battle.elite ? '精英遭遇戰' : '遭遇戰'}</h2></div><span>${auto ? 'AUTO ON' : '手動'}</span></div>${recruitPanel}<div class="enemy-row">${enemies}</div><div class="versus">交 戰</div><div class="party-battle-row">${members}</div><div class="battle-log">${battleLog(state.log)}</div><div class="battle-actions">${active ? `${button('battle:attack', '普通攻擊', 'primary')}${button('battle:slam', '猛擊・技力 6', '', state.party[0].mp < 6)}${button('battle:defend', '全隊防禦')}${button('battle:potion', `回復藥 ×${state.inventory.potion || 0}`, '', !state.inventory.potion)}${state.exploration.auto ? button('battle:stop-auto', '停止自動探索', 'danger') : ''}` : finishedActions}</div></section></div>`;
 }
