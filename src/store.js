@@ -1,5 +1,5 @@
-import { SAVE_VERSION, createBlackwindLeader, createParty } from './data.js';
-import { getBossRarity, normalizeBossProgress } from './boss-progression.js';
+import { SAVE_VERSION, createBlackwindLeader, createParty } from './data.js?v=v013-dungeon';
+import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v013-dungeon';
 
 export const STORAGE_KEY = 'qunxiong-world-v01';
 const LEGACY_KEY = 'qunxiong-world-v2';
@@ -27,6 +27,7 @@ export function createState(playerName) {
     ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false, bossWarning: false, bossRarityRank: null, captureResult: null, quickEquipItem: null, partyEquipMember: null, partyEquipSlot: null, optimizeChanges: [] },
     settings: { autoBattle: false },
     exploration: { auto: false, active: false },
+    dungeon: { warning: false, active: false, name: '血色洞窟', floor: 0, sourceScreen: null, sourceLocation: null, pity: 0, awaitingAdvance: false, completed: false, loot: { gold: 0, potion: 0, items: [], talismans: {} } },
     battle: null,
     notice: '桃源村的晨霧尚未散去，新的旅程正等待著你。',
     log: []
@@ -76,6 +77,29 @@ export function normalize(raw) {
   }
   if (progress.bossRecruited && !party[4]) party[4] = createBlackwindLeader();
   party[0].name = base.playerName;
+  const rawDungeon = raw.dungeon || {};
+  const dungeonSource = ['forest', 'stronghold'].includes(rawDungeon.sourceScreen) ? rawDungeon.sourceScreen : null;
+  const dungeon = {
+    ...base.dungeon,
+    pity: Math.max(0, finite(rawDungeon.pity, 0)),
+    sourceScreen: dungeonSource,
+    sourceLocation: typeof rawDungeon.sourceLocation === 'string' ? rawDungeon.sourceLocation : null,
+    loot: {
+      ...base.dungeon.loot,
+      ...(rawDungeon.loot || {}),
+      gold: Math.max(0, finite(rawDungeon.loot?.gold, 0)),
+      potion: Math.max(0, finite(rawDungeon.loot?.potion, 0)),
+      items: Array.isArray(rawDungeon.loot?.items) ? rawDungeon.loot.items.filter(Boolean).slice(-30) : [],
+      talismans: { ...(rawDungeon.loot?.talismans || {}) }
+    }
+  };
+  // Active combat is intentionally not serialized; resume safely at the source area.
+  if (rawDungeon.active || rawDungeon.warning) {
+    dungeon.active = false;
+    dungeon.warning = false;
+    dungeon.floor = 0;
+    dungeon.awaitingAdvance = false;
+  }
   return {
     ...base,
     ...raw,
@@ -92,13 +116,14 @@ export function normalize(raw) {
       stronghold: Boolean(raw.unlocks?.stronghold || (party[0].level >= 5 && progress.forestEntered))
     },
     progress,
+    dungeon,
     bossProgress: normalizeBossProgress(raw.bossProgress),
     ui: { ...base.ui, ...(raw.ui || {}), bossWarning: false, bossRarityRank: null, captureResult: null, optimizeChanges: [] },
     settings: { ...base.settings, ...(raw.settings || {}) },
     exploration: { ...base.exploration, ...(raw.exploration || {}), auto: false, active: false },
     battle: null,
     log: Array.isArray(raw.log) ? raw.log.slice(-60) : [],
-    screen: ['village', 'plain', 'forest', 'stronghold', 'party', 'inventory', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
+    screen: dungeonSource && (rawDungeon.active || rawDungeon.warning) ? dungeonSource : ['village', 'plain', 'forest', 'stronghold', 'party', 'inventory', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
   };
 }
 

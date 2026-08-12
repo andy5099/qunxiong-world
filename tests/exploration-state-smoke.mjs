@@ -52,7 +52,8 @@ checks += 1;
 
 const warning = explorationState('警告');
 warning.progress.bossEncounterCount = 11;
-equal(createEncounter(warning, undefined, zero), null, 'boss pity interrupts encounter');
+let warningRoll = 0;
+equal(createEncounter(warning, undefined, () => warningRoll++ === 0 ? 0.99 : 0), null, 'boss pity interrupts encounter');
 check(warning.ui.bossWarning && !warning.battle && !warning.exploration.auto, 'boss warning is actionable stop state');
 check(retreatFromBoss(warning), 'boss retreat works');
 check(!warning.ui.bossWarning && !warning.battle && !warning.exploration.active, 'retreat clears transient state');

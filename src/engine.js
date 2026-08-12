@@ -1,5 +1,5 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js';
-import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v013-dungeon';
+import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v013-dungeon';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -76,6 +76,162 @@ export function checkBossEncounter(state, rng = Math.random, rarityRng = rng) {
   return true;
 }
 
+export function getDungeonEncounterChance(count) {
+  const safeCount = Math.max(0, Number(count) || 0);
+  return Math.min(0.28, DUNGEON.baseChance + Math.max(0, safeCount - DUNGEON.pityStart) * 0.025);
+}
+
+export function rollDungeonBossRarity(rng = Math.random) {
+  const roll = rng();
+  let cumulative = 0;
+  for (let rank = 1; rank <= 5; rank += 1) {
+    cumulative += DUNGEON.bossRarityChances[rank - 1];
+    if (roll < cumulative) return rank;
+  }
+  return 5;
+}
+
+export function checkDungeonEncounter(state, rng = Math.random) {
+  if (!['forest', 'stronghold'].includes(state.screen) || state.battle || state.ui.bossWarning || state.dungeon.warning || state.dungeon.active) return false;
+  state.dungeon.pity = Math.max(0, Number(state.dungeon.pity) || 0) + 1;
+  if (rng() >= getDungeonEncounterChance(state.dungeon.pity)) return false;
+  state.dungeon.warning = true;
+  state.dungeon.sourceScreen = state.screen;
+  state.dungeon.sourceLocation = state.location;
+  state.dungeon.pity = 0;
+  state.exploration.auto = false;
+  state.exploration.active = false;
+  state.ui.bossWarning = false;
+  state.ui.bossRarityRank = null;
+  state.notice = '空氣突然扭曲……發現未知秘境！';
+  return true;
+}
+
+function dungeonEnemy(baseId, elite, index) {
+  const base = ENEMIES[baseId];
+  if (elite) {
+    const enemy = createEliteEnemy({ ...base, areaId: 'stronghold' }, index);
+    enemy.maxHp = Math.round(enemy.maxHp * 1.15);
+    enemy.hp = enemy.maxHp;
+    enemy.might = Math.round(enemy.might * 1.12);
+    enemy.defense += 2;
+    return enemy;
+  }
+  return { ...base, instanceId: `dungeon-${baseId}-${index}`, hp: base.maxHp, guarding: false, side: 'enemy', danger: 4 };
+}
+
+export function createDungeonFloor(state, forcedRank, rng = Math.random) {
+  if (!state.dungeon.active || state.battle || state.dungeon.awaitingAdvance) return null;
+  const floor = state.dungeon.floor;
+  if (floor === 3) return openDungeonChest(state, rng);
+  let enemies;
+  if (floor === 4) {
+    const rank = forcedRank || rollDungeonBossRarity(rng);
+    const baseBoss = createRarityBoss(ENEMIES.blackwindLord, rank);
+    const boost = 1.15;
+    const boss = { ...baseBoss, maxHp: Math.round(baseBoss.maxHp * boost), might: Math.round(baseBoss.might * boost), defense: Math.round(baseBoss.defense * 1.12), speed: Math.round(baseBoss.speed * 1.1), exp: Math.round(baseBoss.exp * 1.25), gold: baseBoss.gold.map(value => Math.round(value * 1.25)), assaultMultiplier: baseBoss.assaultMultiplier * 1.12 };
+    boss.hp = boss.maxHp;
+    enemies = [{ ...boss, instanceId: 'dungeon-blackwindLord', mp: boss.maxMp, guarding: false, side: 'enemy' }];
+    state.battle = { enemies, round: 1, awaitingCommand: true, finished: false, areaId: state.dungeon.sourceScreen, boss: true, dungeon: true, dungeonFloor: 4, bossRarityRank: rank, awaitingRecruit: false, recommendedPower: Math.round(boss.recommendedPower * 1.15) };
+  } else {
+    const pool = floor === 1 ? ['blackwindWolf', 'forestBandit', 'yellowTurbanArcher'] : ['blackwindSwordsman', 'blackwindCaptain', 'yellowTurbanArcher'];
+    const count = floor === 1 ? 2 : 2;
+    enemies = Array.from({ length: count }, (_, index) => dungeonEnemy(pick(pool, rng), floor === 2 || rng() < 0.72, index));
+    state.battle = { enemies, round: 1, awaitingCommand: true, finished: false, areaId: state.dungeon.sourceScreen, boss: false, elite: enemies.some(enemy => enemy.elite), dungeon: true, dungeonFloor: floor };
+  }
+  state.party.filter(Boolean).forEach(member => { member.guarding = false; });
+  state.log = [];
+  appendLog(state, `${DUNGEON.name}・第 ${floor} 層戰鬥開始！`, floor === 4 ? 'epic' : 'rare');
+  return state.battle;
+}
+
+export function enterDungeon(state, rng = Math.random) {
+  if (!state.dungeon.warning || state.battle || state.ui.bossWarning) return false;
+  state.dungeon.warning = false;
+  state.dungeon.active = true;
+  state.dungeon.floor = 1;
+  state.dungeon.awaitingAdvance = false;
+  state.dungeon.completed = false;
+  state.dungeon.loot = { gold: 0, potion: 0, items: [], talismans: {} };
+  state.exploration.auto = false;
+  state.exploration.active = false;
+  state.notice = `進入${DUNGEON.name}，連戰期間兵力與技力不會自動恢復。`;
+  return Boolean(createDungeonFloor(state, null, rng));
+}
+
+export function declineDungeon(state) {
+  if (!state.dungeon.warning) return false;
+  state.dungeon.warning = false;
+  state.dungeon.active = false;
+  state.dungeon.floor = 0;
+  state.dungeon.awaitingAdvance = false;
+  state.battle = null;
+  state.exploration.auto = false;
+  state.exploration.active = false;
+  state.notice = '你放棄了血色洞窟，隨時可以重新探索。';
+  return true;
+}
+
+export function openDungeonChest(state, rng = Math.random) {
+  if (!state.dungeon.active || state.dungeon.floor !== 3 || state.battle) return null;
+  const gold = randomInt(180, 320, rng);
+  const potions = 1 + (rng() < 0.35 ? 1 : 0);
+  state.gold += gold;
+  state.inventory.potion = (state.inventory.potion || 0) + potions;
+  state.dungeon.loot.gold += gold;
+  state.dungeon.loot.potion += potions;
+  if (rng() < 0.22) {
+    const itemId = rng() < 0.18 ? 'overlordBlade' : pick(['greenEdgeSword', 'ironArmor', 'copperRing'], rng);
+    state.inventory[itemId] = (state.inventory[itemId] || 0) + 1;
+    state.dungeon.loot.items.push(itemId);
+  }
+  if (rng() < 0.18) {
+    const talismanId = rng() < 0.22 ? 'advanced' : 'intermediate';
+    state.bossProgress.talismans[talismanId] = (state.bossProgress.talismans[talismanId] || 0) + 1;
+    state.dungeon.loot.talismans[talismanId] = (state.dungeon.loot.talismans[talismanId] || 0) + 1;
+  }
+  state.dungeon.awaitingAdvance = true;
+  state.notice = `第 3 層寶箱：金錢 ${gold}、回復藥 ×${potions}。`;
+  return { gold, potions };
+}
+
+export function settleDungeonBattle(state) {
+  if (!state.battle?.dungeon || !state.battle.finished || state.battle.result !== 'victory' || state.battle.awaitingRecruit) return false;
+  state.battle = null;
+  state.log = [];
+  state.dungeon.awaitingAdvance = true;
+  state.notice = `第 ${state.dungeon.floor} 層已突破。可繼續深入或帶著戰利品撤離。`;
+  return true;
+}
+
+export function advanceDungeon(state, rng = Math.random) {
+  if (!state.dungeon.active || !state.dungeon.awaitingAdvance || state.battle || state.dungeon.floor >= DUNGEON.floors) return false;
+  state.dungeon.floor += 1;
+  state.dungeon.awaitingAdvance = false;
+  if (state.dungeon.floor === 3) return Boolean(openDungeonChest(state, rng));
+  return Boolean(createDungeonFloor(state, null, rng));
+}
+
+export function exitDungeon(state, completed = false) {
+  const sourceScreen = ['forest', 'stronghold'].includes(state.dungeon.sourceScreen) ? state.dungeon.sourceScreen : 'forest';
+  const sourceLocation = state.dungeon.sourceLocation || AREAS[sourceScreen].name;
+  state.battle = null;
+  state.log = [];
+  state.dungeon.warning = false;
+  state.dungeon.active = false;
+  state.dungeon.floor = 0;
+  state.dungeon.awaitingAdvance = false;
+  state.dungeon.completed = Boolean(completed);
+  state.screen = sourceScreen;
+  state.location = sourceLocation;
+  state.exploration.auto = false;
+  state.exploration.active = false;
+  state.ui.bossWarning = false;
+  state.ui.bossRarityRank = null;
+  state.notice = completed ? '秘境攻略完成！已帶著全部戰利品返回。' : '已安全撤離秘境，取得的戰利品全部保留。';
+  return true;
+}
+
 export function visitInn(state) {
   if (state.gold < INN_COST) return { ok: false, message: `金錢不足，客棧需要 ${INN_COST} 金。` };
   state.gold -= INN_COST;
@@ -131,8 +287,9 @@ export function enterArea(state, areaId) {
 }
 
 export function createEncounter(state, forcedId, rng = Math.random) {
-  if (state.battle || state.ui.bossWarning) return null;
+  if (state.battle || state.ui.bossWarning || state.dungeon.warning || state.dungeon.active) return null;
   const area = Object.values(AREAS).find(candidate => candidate.name === state.location) || AREAS.plain;
+  if (!forcedId && checkDungeonEncounter(state, rng)) return null;
   if (!forcedId && area.id === 'stronghold' && checkBossEncounter(state, rng)) return null;
   const id = forcedId || pick(area.enemies, rng);
   const base = ENEMIES[id];
@@ -152,7 +309,7 @@ export function createEncounter(state, forcedId, rng = Math.random) {
 }
 
 export function createBossEncounter(state, forcedRank) {
-  if ((!state.ui.bossWarning && !state.progress.bossUnlocked) || state.battle) return null;
+  if ((!state.ui.bossWarning && !state.progress.bossUnlocked) || state.battle || state.dungeon.warning || state.dungeon.active) return null;
   state.exploration.auto = false;
   state.exploration.active = false;
   state.ui.bossWarning = false;
@@ -268,6 +425,7 @@ function finishVictory(state, rng) {
   const gold = defeated.reduce((sum, enemy) => sum + randomInt(enemy.gold[0], enemy.gold[1], rng), 0);
   state.battle.rewardExp = exp;
   state.battle.rewardGold = gold;
+  if (state.battle.dungeon) state.dungeon.loot.gold += gold;
   state.party.filter(Boolean).forEach(member => gainExp(member, exp, state));
   state.gold += gold;
   state.progress.totalKills += defeated.length;
@@ -287,7 +445,11 @@ function finishVictory(state, rng) {
     state.progress.bossFirstKill = true;
   }
   refreshUnlocks(state);
-  const dropId = rollBattleDrop(defeated, rng, bossBattle, firstBossKill);
+  let dropId = rollBattleDrop(defeated, rng, bossBattle, firstBossKill);
+  if (state.battle.dungeon && bossBattle && !dropId && rng() < 0.55) {
+    const bossLoot = ENEMIES.blackwindLord.loot;
+    dropId = pick(rng() < 0.38 ? bossLoot.epic : bossLoot.rare, rng);
+  }
   if (dropId) {
     const item = ITEMS[dropId];
     state.inventory[dropId] = (state.inventory[dropId] || 0) + 1;
@@ -295,6 +457,7 @@ function finishVictory(state, rng) {
     if (bossBattle && item.quality === '史詩') appendLog(state, `★★★★★ 史詩戰利品！獲得【${item.name}】！`, 'epic');
     state.battle.dropId = dropId;
     state.battle.dropQuality = item.quality;
+    if (state.battle.dungeon) state.dungeon.loot.items.push(dropId);
   }
   if (bossBattle) {
     const rank = defeated.find(enemy => enemy.boss)?.rarityRank || 1;
@@ -303,12 +466,27 @@ function finishVictory(state, rng) {
     Object.entries(talismanDrops).forEach(([talismanId, amount]) => {
       state.bossProgress.talismans[talismanId] = (state.bossProgress.talismans[talismanId] || 0) + amount;
       appendLog(state, `獲得【${TALISMANS[talismanId].name}】×${amount}！`, 'epic');
+      if (state.battle.dungeon) state.dungeon.loot.talismans[talismanId] = (state.dungeon.loot.talismans[talismanId] || 0) + amount;
     });
+    if (state.battle.dungeon) {
+      const completionGold = 300 + rank * 120;
+      state.gold += completionGold;
+      state.inventory.potion = (state.inventory.potion || 0) + 2;
+      state.dungeon.loot.gold += completionGold;
+      state.dungeon.loot.potion += 2;
+      state.dungeon.completed = true;
+      state.battle.dungeonCompletionReward = { gold: completionGold, potion: 2 };
+      if (rng() < 0.12 + rank * 0.04) {
+        const bonusTalisman = rank >= 4 ? 'advanced' : 'intermediate';
+        state.bossProgress.talismans[bonusTalisman] = (state.bossProgress.talismans[bonusTalisman] || 0) + 1;
+        state.dungeon.loot.talismans[bonusTalisman] = (state.dungeon.loot.talismans[bonusTalisman] || 0) + 1;
+      }
+    }
   }
   state.battle.finished = true;
   state.battle.result = 'victory';
   state.battle.awaitingRecruit = bossBattle;
-  state.notice = bossBattle ? `黑風寨主已敗！全隊獲得 ${exp} EXP，取得 ${gold} 金。${dropId ? ` 獲得【${ITEMS[dropId].name}】！` : ''}` : `戰鬥勝利！全隊獲得 ${exp} EXP，取得 ${gold} 金。${dropId ? ` 獲得【${ITEMS[dropId].name}】！` : ''}`;
+  state.notice = state.battle.dungeon && bossBattle ? `秘境 Boss 已擊破！獲得 ${exp} EXP、${gold} 金與攻略完成獎勵。` : bossBattle ? `黑風寨主已敗！全隊獲得 ${exp} EXP，取得 ${gold} 金。${dropId ? ` 獲得【${ITEMS[dropId].name}】！` : ''}` : `戰鬥勝利！全隊獲得 ${exp} EXP，取得 ${gold} 金。${dropId ? ` 獲得【${ITEMS[dropId].name}】！` : ''}`;
   appendLog(state, state.notice, dropId ? 'drop' : '');
 }
 
@@ -322,6 +500,12 @@ function finishDefeat(state) {
   state.battle.finished = true;
   state.battle.result = 'defeat';
   state.exploration.auto = false;
+  if (state.dungeon.active || state.battle?.dungeon) {
+    state.dungeon.active = false;
+    state.dungeon.warning = false;
+    state.dungeon.floor = 0;
+    state.dungeon.awaitingAdvance = false;
+  }
   state.screen = 'village';
   state.location = '桃源村';
   state.notice = `全隊戰敗，被村民救回桃源村，損失 ${loss} 金。`;
@@ -490,6 +674,7 @@ export function optimizeEquipment(state) {
 
 export function recruitBlackwindLeader(state, rng = Math.random) {
   if (!state.battle?.awaitingRecruit) return false;
+  const dungeonVictory = Boolean(state.battle.dungeon);
   const dropId = state.battle.dropId;
   const rank = state.battle.bossRarityRank || 1;
   const firstRecruit = !state.progress.bossRecruited;
@@ -504,8 +689,8 @@ export function recruitBlackwindLeader(state, rng = Math.random) {
     state.ui.bossRarityRank = null;
     state.exploration.auto = false;
     state.exploration.active = false;
-    state.screen = 'stronghold';
-    state.location = AREAS.stronghold.name;
+    if (dungeonVictory) exitDungeon(state, true);
+    else { state.screen = 'stronghold'; state.location = AREAS.stronghold.name; }
     state.notice = `${getBossRarity(rank).stars} ${getBossRarity(rank).name}黑風寨主拒絕招降並離開。戰利品全部保留。`;
     return false;
   }
@@ -536,14 +721,15 @@ export function recruitBlackwindLeader(state, rng = Math.random) {
   state.ui.bossRarityRank = null;
   state.exploration.auto = false;
   state.exploration.active = false;
-  state.screen = 'stronghold';
-  state.location = AREAS.stronghold.name;
+  if (dungeonVictory) exitDungeon(state, true);
+  else { state.screen = 'stronghold'; state.location = AREAS.stronghold.name; }
   if (firstRecruit) state.notice = `${getBossRarity(rank).stars} ${getBossRarity(rank).name}黑風寨主願意追隨你！第一章完成！`;
   return true;
 }
 
 export function spareBlackwindLeader(state) {
   if (!state.battle?.awaitingRecruit) return false;
+  const dungeonVictory = Boolean(state.battle.dungeon);
   const dropId = state.battle.dropId;
   if (dropId && ['rare', 'epic'].includes(ITEMS[dropId]?.quality)) state.ui.quickEquipItem = dropId;
   state.battle = null;
@@ -551,8 +737,8 @@ export function spareBlackwindLeader(state) {
   state.ui.bossRarityRank = null;
   state.exploration.auto = false;
   state.exploration.active = false;
-  state.screen = 'stronghold';
-  state.location = AREAS.stronghold.name;
+  if (dungeonVictory) exitDungeon(state, true);
+  else { state.screen = 'stronghold'; state.location = AREAS.stronghold.name; }
   state.notice = '你放過了黑風寨主。之後仍可再次挑戰並招降。';
   return true;
 }

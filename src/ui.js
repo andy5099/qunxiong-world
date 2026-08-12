@@ -1,6 +1,6 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js';
-import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getTeamPower, recommendMemberForItem } from './engine.js';
-import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v013-dungeon';
+import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getTeamPower, recommendMemberForItem } from './engine.js?v=v013-dungeon';
+import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v013-dungeon';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
@@ -141,14 +141,28 @@ function battle(state) {
   const active = !battle.finished;
   const auto = state.settings.autoBattle || state.exploration.auto;
   const bossRarity = battle.boss ? getBossRarity(battle.bossRarityRank || 1) : null;
-  const quickDrop = battle.dropId && ['稀有', '史詩'].includes(ITEMS[battle.dropId]?.quality) && !battle.awaitingRecruit ? button('battle:quick-equip', '立即裝備', 'primary') : '';
+  const quickDrop = battle.dropId && ['稀有', '史詩'].includes(ITEMS[battle.dropId]?.quality) && !battle.awaitingRecruit && !battle.dungeon ? button('battle:quick-equip', '立即裝備', 'primary') : '';
   const currentLeader = state.party.find(member => member?.id === 'blackwind-lord');
   const captureLabel = bossRarity ? (!currentLeader ? '招降 Boss' : bossRarity.rank > (currentLeader.rarityRank || 1) ? '招降並升格' : '招降／升格') : '';
   const noDowngrade = bossRarity && currentLeader && bossRarity.rank <= (currentLeader.rarityRank || 1) ? '<small>敵方稀有度不高於現有武將；成功時不會降階，將轉化額外金錢。</small>' : '';
   const talismanLoot = Object.entries(battle.talismanDrops || {}).map(([id, amount]) => `${TALISMANS[id].name} ×${amount}`).join('、');
   const recruitPanel = battle.awaitingRecruit && bossRarity ? `<section class="boss-recruit-first"><p class="eyebrow">Boss Victory</p><h2>${bossRarity.stars} ${bossRarity.name}・黑風寨主</h2><strong>招降成功率 ${Math.round(bossRarity.captureRate * 100)}%</strong>${noDowngrade}<div class="battle-actions">${button('battle:recruit', captureLabel, 'primary recruit-primary')}${button('battle:spare', '放棄招降')}</div><div class="victory-loot"><b>戰利品</b><span>EXP ${battle.rewardExp || 0}</span><span>金錢 ${battle.rewardGold || 0}</span>${battle.dropId ? `<span>裝備 ${ITEMS[battle.dropId].name}</span>` : ''}${talismanLoot ? `<span>${talismanLoot}</span>` : ''}</div></section>` : '';
-  const finishedActions = battle.awaitingRecruit ? '' : `${quickDrop}${button('battle:close', battle.result === 'victory' ? (state.exploration.auto ? '自動繼續中' : '繼續探索') : '返回桃源村', 'primary')}`;
-  return `<div class="battle-overlay"><section class="battle-panel ${battle.boss ? `boss-battle boss-rank-${bossRarity.rank}` : battle.elite ? 'elite-battle' : ''}"><div class="battle-heading"><div><p class="eyebrow">${battle.boss ? `${bossRarity.stars} ${bossRarity.name}寨主決戰・` : battle.elite ? '精英遭遇・' : battle.areaId === 'stronghold' ? '黑風寨・' : battle.areaId === 'forest' ? '黑風森林・' : ''}回合 ${battle.round}</p><h2>${battle.finished ? (battle.boss && battle.result === 'victory' ? `${bossRarity.name}黑風寨主已敗！` : battle.elite && battle.result === 'victory' ? '精英敵人擊破！' : battle.result === 'victory' ? '戰鬥勝利' : '戰鬥失敗') : battle.boss ? `${bossRarity.stars} ${bossRarity.name}・黑風寨主戰` : battle.elite ? '精英遭遇戰' : '遭遇戰'}</h2></div><span>${auto ? 'AUTO ON' : '手動'}</span></div>${recruitPanel}<div class="enemy-row">${enemies}</div><div class="versus">交 戰</div><div class="party-battle-row">${members}</div><div class="battle-log">${battleLog(state.log)}</div><div class="battle-actions">${active ? `${button('battle:attack', '普通攻擊', 'primary')}${button('battle:slam', '猛擊・技力 6', '', state.party[0].mp < 6)}${button('battle:defend', '全隊防禦')}${button('battle:potion', `回復藥 ×${state.inventory.potion || 0}`, '', !state.inventory.potion)}${state.exploration.auto ? button('battle:stop-auto', '停止自動探索', 'danger') : ''}` : finishedActions}</div></section></div>`;
+  const finishedActions = battle.awaitingRecruit ? '' : `${quickDrop}${button('battle:close', battle.result === 'victory' ? (battle.dungeon ? '結束本層' : state.exploration.auto ? '自動繼續中' : '繼續探索') : '返回桃源村', 'primary')}`;
+  return `<div class="battle-overlay"><section class="battle-panel ${battle.dungeon ? 'dungeon-battle' : ''} ${battle.boss ? `boss-battle boss-rank-${bossRarity.rank}` : battle.elite ? 'elite-battle' : ''}"><div class="battle-heading"><div><p class="eyebrow">${battle.dungeon ? `${DUNGEON.name}・第 ${battle.dungeonFloor} / ${DUNGEON.floors} 層・` : ''}${battle.boss ? `${bossRarity.stars} ${bossRarity.name}寨主決戰・` : battle.elite ? '精英遭遇・' : battle.areaId === 'stronghold' ? '黑風寨・' : battle.areaId === 'forest' ? '黑風森林・' : ''}回合 ${battle.round}</p><h2>${battle.finished ? (battle.boss && battle.result === 'victory' ? `${bossRarity.name}黑風寨主已敗！` : battle.elite && battle.result === 'victory' ? '精英敵人擊破！' : battle.result === 'victory' ? '戰鬥勝利' : '戰鬥失敗') : battle.boss ? `${bossRarity.stars} ${bossRarity.name}・黑風寨主戰` : battle.elite ? '精英遭遇戰' : '遭遇戰'}</h2></div><span>${auto ? 'AUTO ON' : '手動'}</span></div>${recruitPanel}<div class="enemy-row">${enemies}</div><div class="versus">交 戰</div><div class="party-battle-row">${members}</div><div class="battle-log">${battleLog(state.log)}</div><div class="battle-actions">${active ? `${button('battle:attack', '普通攻擊', 'primary')}${button('battle:slam', '猛擊・技力 6', '', state.party[0].mp < 6)}${button('battle:defend', '全隊防禦')}${button('battle:potion', `回復藥 ×${state.inventory.potion || 0}`, '', !state.inventory.potion)}${state.exploration.auto ? button('battle:stop-auto', '停止自動探索', 'danger') : ''}` : finishedActions}</div></section></div>`;
+}
+
+function dungeonWarning(state) {
+  if (!state.dungeon.warning) return '';
+  const teamPower = getTeamPower(state);
+  const risky = teamPower < DUNGEON.recommendedPower;
+  return `<div class="danger-overlay dungeon-overlay"><section class="danger-card dungeon-card"><p class="eyebrow">空氣突然扭曲……</p><h2>發現未知秘境！</h2><h3>【${DUNGEON.name}】</h3><dl><div><dt>危險度</dt><dd>${dangerStars(DUNGEON.danger)}</dd></div><div><dt>建議戰力</dt><dd>${DUNGEON.recommendedPower.toLocaleString()}</dd></div><div><dt>目前隊伍</dt><dd>${teamPower.toLocaleString()}</dd></div><div><dt>層數</dt><dd>${DUNGEON.floors} 層連戰</dd></div></dl><p class="challenge-rating ${risky ? 'warning' : 'safe'}">${risky ? '⚠ 高風險・仍可進入' : '隊伍已具備挑戰實力'}</p><div class="action-grid">${button('dungeon:enter', '進入秘境', 'primary')}${button('dungeon:decline', '放棄')}</div></section></div>`;
+}
+
+function dungeonProgress(state) {
+  if (!state.dungeon.active || state.battle) return '';
+  const loot = state.dungeon.loot;
+  const items = loot.items.map(id => ITEMS[id]?.name).filter(Boolean).join('、') || '尚無';
+  return `<div class="danger-overlay dungeon-overlay"><section class="danger-card dungeon-card"><p class="eyebrow">隨機秘境</p><h2>${DUNGEON.name}</h2><div class="dungeon-floor">第 ${state.dungeon.floor} / ${DUNGEON.floors} 層</div><p>危險度 ${dangerStars(DUNGEON.danger)}・隊伍戰力 ${getTeamPower(state).toLocaleString()}</p>${state.dungeon.floor === 3 ? '<h3>古老寶箱已開啟</h3>' : '<h3>本層已突破</h3>'}<div class="dungeon-loot"><span>累積金錢 ${loot.gold}</span><span>回復藥 ×${loot.potion}</span><span>裝備：${esc(items)}</span></div><div class="action-grid">${button('dungeon:advance', state.dungeon.floor === 3 ? '前往最深處' : '繼續深入', 'primary')}${button('dungeon:retreat', '撤離秘境')}</div></section></div>`;
 }
 
 function bossWarning(state) {
@@ -168,7 +182,7 @@ function chapterComplete(state) {
 
 export function render(state) {
   const views = { village, plain, forest, stronghold, party, inventory, shop, settings };
-  return `<div class="app-shell">${header(state)}<main>${(views[state.screen] || village)(state)}</main>${nav(state)}${battle(state)}${bossWarning(state)}${chapterComplete(state)}</div>`;
+  return `<div class="app-shell">${header(state)}<main>${state.dungeon.active ? `<section class="dungeon-status"><strong>${DUNGEON.name}</strong><span>第 ${state.dungeon.floor} / ${DUNGEON.floors} 層</span><span>危險度 ${dangerStars(DUNGEON.danger)}</span><span>戰力 ${getTeamPower(state).toLocaleString()}</span></section>` : ''}${(views[state.screen] || village)(state)}</main>${nav(state)}${battle(state)}${bossWarning(state)}${dungeonWarning(state)}${dungeonProgress(state)}${chapterComplete(state)}</div>`;
 }
 
 export function renderCreation() {
