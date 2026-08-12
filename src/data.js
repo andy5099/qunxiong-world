@@ -1,4 +1,10 @@
-export const SAVE_VERSION = 8;
+export const SAVE_VERSION = 9;
+
+export const DUNGEON = {
+  id: 'bloodCavern', name: '血色洞窟', floors: 4, danger: 4, recommendedPower: 7500,
+  baseChance: 0.06, pityStart: 20,
+  bossRarityChances: [0.20, 0.25, 0.25, 0.20, 0.10]
+};
 
 export const ITEMS = {
   woodenSword: { id: 'woodenSword', name: '木劍', type: 'equipment', slot: 'weapon', quality: '普通', price: 60, sell: 18, stats: { might: 3 }, description: '武力 +3', shop: true },

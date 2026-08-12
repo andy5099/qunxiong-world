@@ -92,10 +92,10 @@ equal(lowPower.battle, null, 'failed capture clears battle state');
 
 const migrated7 = normalize({ ...createState('v7'), version: 7 });
 const migrated8 = normalize({ ...createState('v8'), version: 8 });
-equal(migrated7.version, 8, 'v7 migration');
-equal(migrated8.version, 8, 'v8 remains compatible');
+equal(migrated7.version, 9, 'v7 migration');
+equal(migrated8.version, 9, 'v8 remains compatible');
 
 const sw = readFileSync(new URL('../service-worker.js', import.meta.url), 'utf8');
-check(sw.includes('v012-'), 'service worker updated');
+check(sw.includes('v013-'), 'service worker updated');
 
 console.log(`V0.1.2 boss follow-up smoke test: ${checks} assertions passed`);

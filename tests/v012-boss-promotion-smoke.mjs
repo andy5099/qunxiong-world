@@ -11,7 +11,7 @@ const check = (value, message) => { assert.ok(value, message); checks += 1; };
 const equal = (actual, expected, message) => { assert.equal(actual, expected, message); checks += 1; };
 const rng = value => () => value;
 
-equal(SAVE_VERSION, 8, 'save version 8');
+equal(SAVE_VERSION, 9, 'save version 9');
 equal(rollBossRarity(rng(0)).rank, 1, 'normal rarity');
 equal(rollBossRarity(rng(.56)).rank, 2, 'elite rarity');
 equal(rollBossRarity(rng(.81)).rank, 3, 'rare rarity');
@@ -138,7 +138,7 @@ promotion.party[4].rarityName = '傳說';
 equal(attemptPromotion(promotion).reason, 'max', 'five star cannot promote');
 
 const migrated = normalize({ ...state, version: 7, bossProgress: undefined });
-equal(migrated.version, 8, 'version 7 migrates to 8');
+equal(migrated.version, 9, 'version 7 migrates to 9');
 equal(migrated.party[4].rarityRank, 4, 'leader rarity preserved');
 equal(migrated.equipment['blackwind-lord'].weapon, 'blackwindBlade', 'migration preserves equipment');
 check(Object.keys(migrated.bossProgress.talismans).length === 4, 'migration adds talismans');
@@ -155,7 +155,7 @@ check(partyHtml.includes('嘗試轉職'), 'party displays promotion button');
 check(partyHtml.includes('轉職兵符'), 'party displays talismans');
 
 const sw = readFileSync(new URL('../service-worker.js', import.meta.url), 'utf8');
-check(sw.includes('v012-'), 'service worker cache updated');
+check(sw.includes('v013-'), 'service worker cache updated');
 check(sw.includes('boss-progression.js'), 'service worker caches progression module');
 
 console.log(`V0.1.2 boss promotion smoke test: ${checks} assertions passed`);

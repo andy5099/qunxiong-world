@@ -1,7 +1,7 @@
-import { buyItem, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, enterArea, equipItem, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, spareBlackwindLeader, unequipItem, usePotion, visitInn } from './engine.js';
-import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js';
-import { clearSave, createState, load, save } from './store.js';
-import { render, renderCreation } from './ui.js?v=exploration-fix3';
+import { advanceDungeon, buyItem, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, unequipItem, usePotion, visitInn } from './engine.js?v=v013-dungeon';
+import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v013-dungeon';
+import { clearSave, createState, load, save } from './store.js?v=v013-dungeon';
+import { render, renderCreation } from './ui.js?v=v013-dungeon';
 
 const app = document.querySelector('#app');
 let state = load();
@@ -16,7 +16,7 @@ function schedule() {
   if (!state) return;
   const shouldAutoFight = state.battle && !state.battle.finished && (state.settings.autoBattle || state.exploration.auto);
   const shouldAutoContinue = state.battle?.finished && state.battle.result === 'victory' && !state.battle.awaitingRecruit && !state.battle.boss && state.exploration.auto;
-  const shouldAutoExplore = !state.battle && !state.ui.bossWarning && ['plain', 'forest', 'stronghold'].includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete;
+  const shouldAutoExplore = !state.battle && !state.ui.bossWarning && !state.dungeon.warning && !state.dungeon.active && ['plain', 'forest', 'stronghold'].includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete;
   if (!shouldAutoFight && !shouldAutoContinue && !shouldAutoExplore) { stopLoop(); return; }
   if (loopTimer !== null) return;
   loopTimer = window.setTimeout(() => {
@@ -24,7 +24,7 @@ function schedule() {
     if (!state) return;
     if (state.battle && !state.battle.finished && (state.settings.autoBattle || state.exploration.auto)) resolveRound(state, chooseAutoCommand(state));
     else if (state.battle?.finished && state.battle.result === 'victory' && !state.battle.awaitingRecruit && !state.battle.boss && state.exploration.auto) { leaveBattle(state); state.notice = '自動探索繼續前進。'; }
-    else if (!state.battle && !state.ui.bossWarning && ['plain', 'forest', 'stronghold'].includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete) createEncounter(state);
+    else if (!state.battle && !state.ui.bossWarning && !state.dungeon.warning && !state.dungeon.active && ['plain', 'forest', 'stronghold'].includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete) createEncounter(state);
     persistAndDraw();
   }, shouldAutoFight ? 680 : 950);
 }
@@ -63,11 +63,18 @@ app.addEventListener('click', event => {
   } else if (action === 'inn') visitInn(state);
   else if (action.startsWith('buy:')) buyItem(state, action.slice(4));
   else if (action === 'explore-once') createEncounter(state);
-  else if (action === 'auto-explore') { stopLoop(); state.battle = null; state.ui.bossWarning = false; state.ui.bossRarityRank = null; state.exploration.active = false; state.exploration.auto = true; state.notice = '開始自動探索。'; }
+  else if (action === 'auto-explore') {
+    if (state.dungeon.warning || state.dungeon.active) state.notice = '請先完成或離開目前秘境。';
+    else { stopLoop(); state.battle = null; state.ui.bossWarning = false; state.ui.bossRarityRank = null; state.exploration.active = false; state.exploration.auto = true; state.notice = '開始自動探索。'; }
+  }
   else if (action === 'stop-explore') { state.exploration.auto = false; stopLoop(); state.notice = '已停止探索。'; }
   else if (action === 'challenge-boss') { state.exploration.auto = false; stopLoop(); createBossEncounter(state); }
   else if (action === 'boss:engage') { state.exploration.auto = false; stopLoop(); createBossEncounter(state); }
   else if (action === 'boss:retreat') { stopLoop(); retreatFromBoss(state); }
+  else if (action === 'dungeon:enter') { stopLoop(); enterDungeon(state); }
+  else if (action === 'dungeon:decline') { stopLoop(); declineDungeon(state); }
+  else if (action === 'dungeon:advance') { stopLoop(); advanceDungeon(state); }
+  else if (action === 'dungeon:retreat') { stopLoop(); exitDungeon(state, false); }
   else if (action === 'battle:stop-auto') { state.exploration.auto = false; stopLoop(); state.notice = '已停止自動探索，本場戰鬥改為手動。'; }
   else if (action === 'battle:recruit') { stopLoop(); recruitBlackwindLeader(state); }
   else if (action === 'battle:spare') { stopLoop(); spareBlackwindLeader(state); }
@@ -80,7 +87,7 @@ app.addEventListener('click', event => {
     if (command === 'potion') usePotion(state); else resolveRound(state, command);
   } else if (action === 'battle:close') {
     const lost = state.battle?.result === 'defeat';
-    leaveBattle(state);
+    if (state.battle?.dungeon && !lost) settleDungeonBattle(state); else leaveBattle(state);
     if (!lost && state.exploration.auto) state.notice = '稍作整備後繼續探索。';
   } else if (action.startsWith('inspect:')) {
     state.ui.selectedItem = action.slice(8);

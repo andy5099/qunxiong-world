@@ -12,7 +12,7 @@ let assertions = 0;
 const check = (value, message) => { assert.ok(value, message); assertions += 1; };
 const equal = (actual, expected, message) => { assert.equal(actual, expected, message); assertions += 1; };
 
-equal(SAVE_VERSION, 8, 'save version is 8');
+equal(SAVE_VERSION, 9, 'save version is 9');
 equal(AREAS.plain.danger, 1, 'plain danger');
 equal(AREAS.forest.danger, 2, 'forest danger');
 equal(AREAS.stronghold.danger, 3, 'stronghold danger');
@@ -96,7 +96,7 @@ check(partyHtml.includes('更換'), 'party slot change UI');
 check(partyHtml.includes('隊伍戰力'), 'party power UI');
 
 const migrated = normalize({ ...createState('舊玩家'), version: 6, progress: { bossDefeated: true }, inventory: { blackwindBlade: 1 } });
-equal(migrated.version, 8, 'v6 save migrates');
+equal(migrated.version, 9, 'v6 save migrates');
 check(migrated.progress.bossFirstKill, 'old boss victory preserves first kill');
 equal(migrated.inventory.blackwindBlade, 1, 'old inventory preserved');
 equal(migrated.progress.bossEncounterCount, 0, 'new pity counter defaults safely');
