@@ -131,6 +131,7 @@ export function enterArea(state, areaId) {
 }
 
 export function createEncounter(state, forcedId, rng = Math.random) {
+  if (state.battle || state.ui.bossWarning) return null;
   const area = Object.values(AREAS).find(candidate => candidate.name === state.location) || AREAS.plain;
   if (!forcedId && area.id === 'stronghold' && checkBossEncounter(state, rng)) return null;
   const id = forcedId || pick(area.enemies, rng);
@@ -175,6 +176,7 @@ export function retreatFromBoss(state) {
   if (!state.ui.bossWarning) return false;
   state.ui.bossWarning = false;
   state.ui.bossRarityRank = null;
+  state.battle = null;
   state.progress.bossEncounterCount = 0;
   state.exploration.auto = false;
   state.exploration.active = false;
@@ -493,10 +495,17 @@ export function recruitBlackwindLeader(state, rng = Math.random) {
   const firstRecruit = !state.progress.bossRecruited;
   const success = firstRecruit && rank === 1 ? true : rng() < getCaptureRate(rank);
   if (!success) {
+    const dropId = state.battle.dropId;
     state.bossProgress.records.push({ type: 'capture', rank, success: false, at: Date.now() });
     state.bossProgress.records = state.bossProgress.records.slice(-80);
-    state.battle.awaitingRecruit = false;
-    state.battle.captureFailed = true;
+    if (dropId && ['rare', 'epic'].includes(ITEMS[dropId]?.quality)) state.ui.quickEquipItem = dropId;
+    state.battle = null;
+    state.ui.bossWarning = false;
+    state.ui.bossRarityRank = null;
+    state.exploration.auto = false;
+    state.exploration.active = false;
+    state.screen = 'stronghold';
+    state.location = AREAS.stronghold.name;
     state.notice = `${getBossRarity(rank).stars} ${getBossRarity(rank).name}黑風寨主拒絕招降並離開。戰利品全部保留。`;
     return false;
   }
@@ -523,6 +532,10 @@ export function recruitBlackwindLeader(state, rng = Math.random) {
   state.bossProgress.records = state.bossProgress.records.slice(-80);
   if (dropId && ['rare', 'epic'].includes(ITEMS[dropId]?.quality)) state.ui.quickEquipItem = dropId;
   state.battle = null;
+  state.ui.bossWarning = false;
+  state.ui.bossRarityRank = null;
+  state.exploration.auto = false;
+  state.exploration.active = false;
   state.screen = 'stronghold';
   state.location = AREAS.stronghold.name;
   if (firstRecruit) state.notice = `${getBossRarity(rank).stars} ${getBossRarity(rank).name}黑風寨主願意追隨你！第一章完成！`;
@@ -534,6 +547,10 @@ export function spareBlackwindLeader(state) {
   const dropId = state.battle.dropId;
   if (dropId && ['rare', 'epic'].includes(ITEMS[dropId]?.quality)) state.ui.quickEquipItem = dropId;
   state.battle = null;
+  state.ui.bossWarning = false;
+  state.ui.bossRarityRank = null;
+  state.exploration.auto = false;
+  state.exploration.active = false;
   state.screen = 'stronghold';
   state.location = AREAS.stronghold.name;
   state.notice = '你放過了黑風寨主。之後仍可再次挑戰並招降。';
@@ -549,4 +566,10 @@ export function continueAfterChapter(state) {
   state.notice = '第一章已完成，你可以繼續在現有地區冒險。';
 }
 
-export function leaveBattle(state) { state.battle = null; state.log = []; state.exploration.active = false; }
+export function leaveBattle(state) {
+  state.battle = null;
+  state.log = [];
+  state.ui.bossWarning = false;
+  state.ui.bossRarityRank = null;
+  state.exploration.active = false;
+}

@@ -52,10 +52,12 @@ createBossEncounter(failedCapture, 5);
 failedCapture.battle.finished = true;
 failedCapture.battle.result = 'victory';
 failedCapture.battle.awaitingRecruit = true;
-failedCapture.battle.loot = { id: 'kept-loot' };
+failedCapture.battle.dropId = 'greenEdgeSword';
+failedCapture.inventory.greenEdgeSword = 1;
 check(!recruitBlackwindLeader(failedCapture, rng(.99)), 'legendary capture can fail');
 equal(failedCapture.party.filter(Boolean).length, 4, 'failed capture does not recruit');
-equal(failedCapture.battle.loot.id, 'kept-loot', 'failed capture keeps battle loot');
+equal(failedCapture.inventory.greenEdgeSword, 1, 'failed capture keeps battle loot');
+equal(failedCapture.battle, null, 'failed capture clears finished battle');
 
 const firstDrops = variants.map(enemy => rollBattleDrop([enemy], rng(.5), true, true));
 check(firstDrops.every(Boolean), 'first kill always drops boss equipment');
@@ -153,7 +155,7 @@ check(partyHtml.includes('嘗試轉職'), 'party displays promotion button');
 check(partyHtml.includes('轉職兵符'), 'party displays talismans');
 
 const sw = readFileSync(new URL('../service-worker.js', import.meta.url), 'utf8');
-check(sw.includes('v012-boss-'), 'service worker cache updated');
+check(sw.includes('v012-'), 'service worker cache updated');
 check(sw.includes('boss-progression.js'), 'service worker caches progression module');
 
 console.log(`V0.1.2 boss promotion smoke test: ${checks} assertions passed`);

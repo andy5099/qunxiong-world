@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { AREAS, ENEMIES, ITEMS, SAVE_VERSION } from '../src/data.js';
 import {
   canEnterArea, compareItem, createEncounter, enterArea, equipItem,
-  equippedCount, getFinalStats, refreshUnlocks, resolveRound, sellItem, unequipItem
+  equippedCount, getFinalStats, leaveBattle, refreshUnlocks, resolveRound, sellItem, unequipItem
 } from '../src/engine.js';
 import { createState, normalize } from '../src/store.js';
 
@@ -27,6 +27,7 @@ for (const id of AREAS.forest.enemies) {
   createEncounter(state, id, zero);
   equal(state.battle.enemies[0].id, id, `${id} encounter`);
   check(state.battle.enemies.every(enemy => enemy.loot), `${id} has loot table`);
+  leaveBattle(state);
 }
 
 createEncounter(state, 'blackwindWolf', zero);

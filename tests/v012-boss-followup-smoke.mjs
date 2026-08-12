@@ -82,11 +82,13 @@ check(legendary.speed > ENEMIES.blackwindLord.speed, 'legendary speed increased'
 lowPower.battle.finished = true;
 lowPower.battle.result = 'victory';
 lowPower.battle.awaitingRecruit = true;
-lowPower.battle.loot = { id: 'all-kept' };
+lowPower.battle.dropId = 'greenEdgeSword';
+lowPower.inventory.greenEdgeSword = 1;
 lowPower.battle.talismanDrops = { advanced: 1, legendary: 1 };
 check(!recruitBlackwindLeader(lowPower, rng(.99)), 'legendary capture can fail');
-equal(lowPower.battle.loot.id, 'all-kept', 'failed capture keeps loot');
-equal(lowPower.battle.talismanDrops.legendary, 1, 'failed capture keeps talisman result');
+equal(lowPower.inventory.greenEdgeSword, 1, 'failed capture keeps loot');
+equal(lowPower.bossProgress.talismans.legendary, 0, 'capture resolution does not consume talismans');
+equal(lowPower.battle, null, 'failed capture clears battle state');
 
 const migrated7 = normalize({ ...createState('v7'), version: 7 });
 const migrated8 = normalize({ ...createState('v8'), version: 8 });
@@ -94,6 +96,6 @@ equal(migrated7.version, 8, 'v7 migration');
 equal(migrated8.version, 8, 'v8 remains compatible');
 
 const sw = readFileSync(new URL('../service-worker.js', import.meta.url), 'utf8');
-check(sw.includes('v012-boss-talisman-followup'), 'service worker updated');
+check(sw.includes('v012-'), 'service worker updated');
 
 console.log(`V0.1.2 boss follow-up smoke test: ${checks} assertions passed`);
