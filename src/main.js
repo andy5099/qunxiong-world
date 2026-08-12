@@ -13,17 +13,18 @@ function stopLoop() {
 }
 
 function schedule() {
-  stopLoop();
   if (!state) return;
   const shouldAutoFight = state.battle && !state.battle.finished && (state.settings.autoBattle || state.exploration.auto);
   const shouldAutoContinue = state.battle?.finished && state.battle.result === 'victory' && !state.battle.awaitingRecruit && !state.battle.boss && state.exploration.auto;
   const shouldAutoExplore = !state.battle && !state.ui.bossWarning && ['plain', 'forest', 'stronghold'].includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete;
-  if (!shouldAutoFight && !shouldAutoContinue && !shouldAutoExplore) return;
+  if (!shouldAutoFight && !shouldAutoContinue && !shouldAutoExplore) { stopLoop(); return; }
+  if (loopTimer !== null) return;
   loopTimer = window.setTimeout(() => {
     loopTimer = null;
-    if (shouldAutoFight) resolveRound(state, chooseAutoCommand(state));
-    else if (shouldAutoContinue) { leaveBattle(state); state.notice = '自動探索繼續前進。'; }
-    else if (shouldAutoExplore) createEncounter(state);
+    if (!state) return;
+    if (state.battle && !state.battle.finished && (state.settings.autoBattle || state.exploration.auto)) resolveRound(state, chooseAutoCommand(state));
+    else if (state.battle?.finished && state.battle.result === 'victory' && !state.battle.awaitingRecruit && !state.battle.boss && state.exploration.auto) { leaveBattle(state); state.notice = '自動探索繼續前進。'; }
+    else if (!state.battle && !state.ui.bossWarning && ['plain', 'forest', 'stronghold'].includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete) createEncounter(state);
     persistAndDraw();
   }, shouldAutoFight ? 680 : 950);
 }
@@ -62,7 +63,7 @@ app.addEventListener('click', event => {
   } else if (action === 'inn') visitInn(state);
   else if (action.startsWith('buy:')) buyItem(state, action.slice(4));
   else if (action === 'explore-once') createEncounter(state);
-  else if (action === 'auto-explore') { state.exploration.auto = true; state.notice = '開始自動探索。'; }
+  else if (action === 'auto-explore') { stopLoop(); state.battle = null; state.ui.bossWarning = false; state.ui.bossRarityRank = null; state.exploration.active = false; state.exploration.auto = true; state.notice = '開始自動探索。'; }
   else if (action === 'stop-explore') { state.exploration.auto = false; stopLoop(); state.notice = '已停止探索。'; }
   else if (action === 'challenge-boss') { state.exploration.auto = false; stopLoop(); createBossEncounter(state); }
   else if (action === 'boss:engage') { state.exploration.auto = false; stopLoop(); createBossEncounter(state); }
