@@ -1,7 +1,7 @@
 import { buyItem, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, enterArea, equipItem, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, spareBlackwindLeader, unequipItem, usePotion, visitInn } from './engine.js';
 import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js';
 import { clearSave, createState, load, save } from './store.js';
-import { render, renderCreation } from './ui.js';
+import { render, renderCreation } from './ui.js?v=exploration-fix3';
 
 const app = document.querySelector('#app');
 let state = load();
