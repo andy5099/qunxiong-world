@@ -1,4 +1,4 @@
-export const SAVE_VERSION = 9;
+export const SAVE_VERSION = 10;
 
 export const DUNGEON = {
   id: 'bloodCavern', name: '血色洞窟', floors: 4, danger: 4, recommendedPower: 7500,
@@ -25,6 +25,9 @@ export const ITEMS = {
   overlordBlade: { id: 'overlordBlade', name: '寨主霸王刀', type: 'equipment', slot: 'weapon', quality: '史詩', bossOnly: true, sell: 620, stats: { might: 18, speed: 4 }, description: '武力 +18・速度 +4' },
   blackwindWarArmor: { id: 'blackwindWarArmor', name: '黑風戰甲', type: 'equipment', slot: 'armor', quality: '史詩', bossOnly: true, sell: 580, stats: { defense: 15, maxHp: 48 }, description: '防禦 +15・最大兵力 +48' },
   leaderToken: { id: 'leaderToken', name: '寨主令牌', type: 'equipment', slot: 'accessory', quality: '史詩', bossOnly: true, sell: 560, stats: { might: 7, defense: 7, speed: 4 }, description: '武力 +7・防禦 +7・速度 +4' },
+  demonOverlordBlade: { id: 'demonOverlordBlade', name: '寨主霸王刀・鬼神', type: 'equipment', slot: 'weapon', quality: '傳說', bossOnly: true, bossGearFamily: 'blackwind', evolutionTier: 3, sell: 1180, stats: { might: 27, speed: 7 }, description: '武力 +27・速度 +7' },
+  tyrantWarArmor: { id: 'tyrantWarArmor', name: '黑風戰甲・霸者', type: 'equipment', slot: 'armor', quality: '傳說', bossOnly: true, bossGearFamily: 'blackwind', evolutionTier: 3, sell: 1120, stats: { defense: 23, maxHp: 78 }, description: '防禦 +23・最大兵力 +78' },
+  heavenlyLeaderToken: { id: 'heavenlyLeaderToken', name: '寨主令牌・天威', type: 'equipment', slot: 'accessory', quality: '傳說', bossOnly: true, bossGearFamily: 'blackwind', evolutionTier: 3, sell: 1080, stats: { might: 11, defense: 11, speed: 7 }, description: '武力 +11・防禦 +11・速度 +7' },
   potion: { id: 'potion', name: '回復藥', type: 'consumable', price: 20, heal: 45, description: '戰鬥中恢復 45 兵力' }
 };
 
@@ -71,7 +74,7 @@ export const BOSS_PITY_LIMIT = 20;
 
 export const SLOT_NAMES = { weapon: '武器', armor: '防具', accessory: '飾品' };
 export const STAT_NAMES = { might: '武力', defense: '防禦', maxHp: '最大兵力', speed: '速度' };
-export const QUALITY_ORDER = { '普通': 1, '稀有': 2, '史詩': 3 };
+export const QUALITY_ORDER = { '普通': 1, '稀有': 2, '史詩': 3, '傳說': 4 };
 
 export const EXP_TO_LEVEL = level => 45 + (level - 1) * 35;
 export const INN_COST = 18;

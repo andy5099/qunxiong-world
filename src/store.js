@@ -1,5 +1,5 @@
-import { SAVE_VERSION, createBlackwindLeader, createParty } from './data.js?v=v013-dungeon';
-import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v013-dungeon';
+import { SAVE_VERSION, createBlackwindLeader, createParty } from './data.js?v=v014-boss-gear';
+import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v014-boss-gear';
 
 export const STORAGE_KEY = 'qunxiong-world-v01';
 const LEGACY_KEY = 'qunxiong-world-v2';

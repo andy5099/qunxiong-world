@@ -1,7 +1,8 @@
-import { advanceDungeon, buyItem, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, unequipItem, usePotion, visitInn } from './engine.js?v=v013-dungeon';
-import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v013-dungeon';
-import { clearSave, createState, load, save } from './store.js?v=v013-dungeon';
-import { render, renderCreation } from './ui.js?v=v013-dungeon';
+import { advanceDungeon, buyItem, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, unequipItem, usePotion, visitInn } from './engine.js?v=v014-boss-gear';
+import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v014-boss-gear';
+import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v014-boss-gear';
+import { clearSave, createState, load, save } from './store.js?v=v014-boss-gear';
+import { render, renderCreation } from './ui.js?v=v014-boss-gear';
 
 const app = document.querySelector('#app');
 let state = load();
@@ -98,6 +99,9 @@ app.addEventListener('click', event => {
   else if (action === 'promote-leader') attemptPromotion(state);
   else if (action === 'combine-all-talismans') combineAllTalismans(state);
   else if (action.startsWith('combine-talisman:')) combineTalismans(state, action.slice(17));
+  else if (action === 'combine-all-divine') combineAllDivineTalismans(state);
+  else if (action.startsWith('combine-divine:')) combineDivineTalismans(state, action.slice(16));
+  else if (action.startsWith('evolve-boss-gear:')) evolveBossGear(state, action.slice(17));
   else if (action.startsWith('party-slot:')) {
     const [, memberId, slot] = action.split(':');
     state.ui.partyEquipMember = memberId;
