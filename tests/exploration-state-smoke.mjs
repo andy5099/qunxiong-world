@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { createState, normalize } from '../src/store.js';
 import { createBossEncounter, createEncounter, leaveBattle, prepareQuickEquip, recruitBlackwindLeader, resolveRound, retreatFromBoss, spareBlackwindLeader } from '../src/engine.js';
 import { attemptPromotion, combineTalismans } from '../src/boss-progression.js';
+import { render } from '../src/ui.js';
 
 let checks = 0;
 const check = (value, message) => { assert.ok(value, message); checks += 1; };
@@ -42,6 +43,12 @@ createEncounter(elite, 'strongholdCaptain', zero);
 winBattle(elite);
 leaveBattle(elite);
 check(elite.exploration.auto && !elite.battle, 'elite flow can continue');
+
+const recruitedNormalBattle = explorationState('normal-with-recruited-boss');
+recruitedNormalBattle.party[4] = { id: 'blackwind-lord', name: '黑風寨主', level: 5, exp: 0, maxHp: 160, hp: 160, maxMp: 26, mp: 26, might: 28, defense: 16, intelligence: 10, speed: 14, rarityRank: 3 };
+createEncounter(recruitedNormalBattle, 'strongholdSoldier', zero);
+assert.doesNotThrow(() => render(recruitedNormalBattle), 'normal battle UI must not read missing boss rarity');
+checks += 1;
 
 const warning = explorationState('警告');
 warning.progress.bossEncounterCount = 11;
