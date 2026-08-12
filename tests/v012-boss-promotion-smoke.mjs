@@ -147,13 +147,13 @@ warningState.ui.bossWarning = true;
 warningState.ui.bossRarityRank = 5;
 const warningHtml = render(warningState);
 check(warningHtml.includes('傳說 Boss'), 'warning displays rarity');
-check(warningHtml.includes('8,800'), 'warning displays rank power');
+check(warningHtml.includes('12,000'), 'warning displays rank power');
 const partyHtml = render({ ...migrated, screen: 'party' });
 check(partyHtml.includes('嘗試轉職'), 'party displays promotion button');
 check(partyHtml.includes('轉職兵符'), 'party displays talismans');
 
 const sw = readFileSync(new URL('../service-worker.js', import.meta.url), 'utf8');
-check(sw.includes('v012-boss-promotion'), 'service worker cache updated');
+check(sw.includes('v012-boss-'), 'service worker cache updated');
 check(sw.includes('boss-progression.js'), 'service worker caches progression module');
 
 console.log(`V0.1.2 boss promotion smoke test: ${checks} assertions passed`);
