@@ -1,4 +1,5 @@
 import { buyItem, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, enterArea, equipItem, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, spareBlackwindLeader, unequipItem, usePotion, visitInn } from './engine.js';
+import { attemptPromotion } from './boss-progression.js';
 import { clearSave, createState, load, save } from './store.js';
 import { render, renderCreation } from './ui.js';
 
@@ -86,6 +87,7 @@ app.addEventListener('click', event => {
   } else if (action.startsWith('quick:')) prepareQuickEquip(state, action.slice(6));
   else if (action === 'quick-confirm') confirmQuickEquip(state);
   else if (action === 'optimize-equipment') optimizeEquipment(state);
+  else if (action === 'promote-leader') attemptPromotion(state);
   else if (action.startsWith('party-slot:')) {
     const [, memberId, slot] = action.split(':');
     state.ui.partyEquipMember = memberId;

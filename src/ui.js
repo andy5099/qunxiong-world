@@ -1,5 +1,6 @@
 import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js';
 import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getTeamPower, recommendMemberForItem } from './engine.js';
+import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
@@ -54,7 +55,18 @@ function memberCard(state, member, index) {
   if (!member) return `<article class="member empty-slot"><span>第五格</span><strong>空位</strong></article>`;
   const stats = getFinalStats(state, member);
   const equipped = getEquippedSummary(state, member.id);
-  return `<article class="member"><div class="member-title"><span>${index + 1}</span><h3>${esc(member.name)}</h3><b>Lv.${member.level}</b></div>${hpBar(member.hp, stats.maxHp)}<p>兵力 ${member.hp}/${stats.maxHp}・技力 ${member.mp}/${member.maxMp}${member.id === 'blackwind-lord' ? '・技能 強襲' : ''}</p><dl><div><dt>武力</dt><dd>${stats.might}</dd></div><div><dt>智力</dt><dd>${member.intelligence}</dd></div><div><dt>防禦</dt><dd>${stats.defense}</dd></div><div><dt>速度</dt><dd>${stats.speed}</dd></div></dl><small>EXP ${member.exp}/${EXP_TO_LEVEL(member.level)}・戰力 ${getTeamPower({ ...state, party: [member] }).toLocaleString()}</small><div class="equipped-row">${equipped.map(entry => `<div class="slot-control"><span>${entry.slotName}：${entry.item ? `<b>${entry.item.name}</b>` : '無'}</span>${button(`party-slot:${member.id}:${entry.slot}`, `更換${entry.slotName}`, 'mini')}${entry.item ? button(`unequip:${member.id}:${entry.slot}`, '卸下', 'mini') : ''}</div>`).join('')}</div></article>`;
+  const rarity = member.id === 'blackwind-lord' ? getBossRarity(member.rarityRank) : null;
+  return `<article class="member ${rarity ? `boss-rank-${rarity.rank}` : ''}"><div class="member-title"><span>${index + 1}</span><h3>${esc(member.name)}</h3><b>Lv.${member.level}</b></div>${rarity ? `<div class="leader-rarity">${rarity.stars} ${rarity.name}</div>` : ''}${hpBar(member.hp, stats.maxHp)}<p>兵力 ${member.hp}/${stats.maxHp}・技力 ${member.mp}/${member.maxMp}${member.id === 'blackwind-lord' ? '・技能 強襲' : ''}</p><dl><div><dt>武力</dt><dd>${stats.might}</dd></div><div><dt>智力</dt><dd>${member.intelligence}</dd></div><div><dt>防禦</dt><dd>${stats.defense}</dd></div><div><dt>速度</dt><dd>${stats.speed}</dd></div></dl><small>EXP ${member.exp}/${EXP_TO_LEVEL(member.level)}・戰力 ${getTeamPower({ ...state, party: [member] }).toLocaleString()}</small>${rarity ? promotionPanel(state, member) : ''}<div class="equipped-row">${equipped.map(entry => `<div class="slot-control"><span>${entry.slotName}：${entry.item ? `<b>${entry.item.name}</b>` : '無'}</span>${button(`party-slot:${member.id}:${entry.slot}`, `更換${entry.slotName}`, 'mini')}${entry.item ? button(`unequip:${member.id}:${entry.slot}`, '卸下', 'mini') : ''}</div>`).join('')}</div></article>`;
+}
+
+function promotionPanel(state, member) {
+  const rank = member.rarityRank || 1;
+  const materials = Object.values(TALISMANS).map(item => `<span>${item.name.replace('轉職', '')} ×${state.bossProgress.talismans[item.id] || 0}</span>`).join('');
+  if (rank >= 5) return `<section class="promotion-box"><strong>已達目前最高階</strong><div class="talisman-list">${materials}</div></section>`;
+  const talismanId = RANK_TALISMAN[rank];
+  const blessing = state.bossProgress.blessings[rank] || 0;
+  const chance = getPromotionChance(rank, blessing);
+  return `<section class="promotion-box"><strong>下一階：${getBossRarity(rank + 1).stars} ${getBossRarity(rank + 1).name}</strong><p>需要：${TALISMANS[talismanId].name} ×1<br>成功率：${Math.round(chance * 100)}%${blessing ? `（祝福 +${Math.round(blessing * 100)}%）` : ''}</p>${button('promote-leader', '嘗試轉職', 'primary', !(state.bossProgress.talismans[talismanId] > 0))}<div class="talisman-list">${materials}</div></section>`;
 }
 
 function partyEquipmentPicker(state) {
@@ -123,20 +135,23 @@ function battleLog(log) {
 function battle(state) {
   const battle = state.battle;
   if (!battle) return '';
-  const enemies = battle.enemies.map(enemy => `<article class="enemy ${enemy.elite ? 'elite-enemy' : ''} ${enemy.hp <= 0 ? 'defeated' : ''}"><small>${dangerStars(enemy.boss ? 4 : enemy.elite ? Math.max(2, enemy.danger || 2) : enemy.danger || 1)}</small><h3>${esc(enemy.displayName || enemy.name)}</h3>${hpBar(enemy.hp, enemy.maxHp, 'enemy-hp')}<span>${enemy.hp}/${enemy.maxHp}</span></article>`).join('');
+  const enemies = battle.enemies.map(enemy => `<article class="enemy ${enemy.elite ? 'elite-enemy' : ''} ${enemy.boss ? `boss-rank-${enemy.rarityRank || 1}` : ''} ${enemy.hp <= 0 ? 'defeated' : ''}"><small>${enemy.boss ? enemy.rarityStars : dangerStars(enemy.elite ? Math.max(2, enemy.danger || 2) : enemy.danger || 1)}</small><h3>${esc(enemy.displayName || enemy.name)}</h3>${hpBar(enemy.hp, enemy.maxHp, 'enemy-hp')}<span>${enemy.hp}/${enemy.maxHp}</span></article>`).join('');
   const members = state.party.filter(Boolean).map(member => { const stats = getFinalStats(state, member); return `<article class="battle-member ${member.hp <= 0 ? 'defeated' : ''}"><strong>${esc(member.name)}</strong><span>兵 ${member.hp}/${stats.maxHp}</span><span>技 ${member.mp}/${member.maxMp}</span></article>`; }).join('');
   const active = !battle.finished;
   const auto = state.settings.autoBattle || state.exploration.auto;
+  const bossRarity = battle.boss ? getBossRarity(battle.bossRarityRank || 1) : null;
   const quickDrop = battle.dropId && ['稀有', '史詩'].includes(ITEMS[battle.dropId]?.quality) && !battle.awaitingRecruit ? button('battle:quick-equip', '立即裝備', 'primary') : '';
-  const finishedActions = battle.awaitingRecruit ? `${button('battle:recruit', '招降', 'primary')}${button('battle:spare', '放過')}` : `${quickDrop}${button('battle:close', battle.result === 'victory' ? (state.exploration.auto ? '自動繼續中' : '繼續探索') : '返回桃源村', 'primary')}`;
-  return `<div class="battle-overlay"><section class="battle-panel ${battle.boss ? 'boss-battle' : battle.elite ? 'elite-battle' : ''}"><div class="battle-heading"><div><p class="eyebrow">${battle.boss ? '★★★★ 寨主決戰・' : battle.elite ? '精英遭遇・' : battle.areaId === 'stronghold' ? '黑風寨・' : battle.areaId === 'forest' ? '黑風森林・' : ''}回合 ${battle.round}</p><h2>${battle.finished ? (battle.boss && battle.result === 'victory' ? '敵將・黑風寨主已敗！' : battle.elite && battle.result === 'victory' ? '精英敵人擊破！' : battle.result === 'victory' ? '戰鬥勝利' : '戰鬥失敗') : battle.boss ? '敵將・黑風寨主戰' : battle.elite ? '精英遭遇戰' : '遭遇戰'}</h2></div><span>${auto ? 'AUTO ON' : '手動'}</span></div><div class="enemy-row">${enemies}</div><div class="versus">交 戰</div><div class="party-battle-row">${members}</div><div class="battle-log">${battleLog(state.log)}</div>${battle.awaitingRecruit ? '<p class="recruit-copy">敵將・黑風寨主已敗。要招降他成為第五名武將嗎？</p>' : ''}<div class="battle-actions">${active ? `${button('battle:attack', '普通攻擊', 'primary')}${button('battle:slam', '猛擊・技力 6', '', state.party[0].mp < 6)}${button('battle:defend', '全隊防禦')}${button('battle:potion', `回復藥 ×${state.inventory.potion || 0}`, '', !state.inventory.potion)}${state.exploration.auto ? button('battle:stop-auto', '停止自動探索', 'danger') : ''}` : finishedActions}</div></section></div>`;
+  const finishedActions = battle.awaitingRecruit ? `${button('battle:recruit', state.progress.bossRecruited ? '嘗試升格招降' : '招降', 'primary')}${button('battle:spare', '放過')}` : `${quickDrop}${button('battle:close', battle.result === 'victory' ? (state.exploration.auto ? '自動繼續中' : '繼續探索') : '返回桃源村', 'primary')}`;
+  return `<div class="battle-overlay"><section class="battle-panel ${battle.boss ? `boss-battle boss-rank-${bossRarity.rank}` : battle.elite ? 'elite-battle' : ''}"><div class="battle-heading"><div><p class="eyebrow">${battle.boss ? `${bossRarity.stars} ${bossRarity.name}寨主決戰・` : battle.elite ? '精英遭遇・' : battle.areaId === 'stronghold' ? '黑風寨・' : battle.areaId === 'forest' ? '黑風森林・' : ''}回合 ${battle.round}</p><h2>${battle.finished ? (battle.boss && battle.result === 'victory' ? `${bossRarity.name}黑風寨主已敗！` : battle.elite && battle.result === 'victory' ? '精英敵人擊破！' : battle.result === 'victory' ? '戰鬥勝利' : '戰鬥失敗') : battle.boss ? `${bossRarity.stars} ${bossRarity.name}・黑風寨主戰` : battle.elite ? '精英遭遇戰' : '遭遇戰'}</h2></div><span>${auto ? 'AUTO ON' : '手動'}</span></div><div class="enemy-row">${enemies}</div><div class="versus">交 戰</div><div class="party-battle-row">${members}</div><div class="battle-log">${battleLog(state.log)}</div>${battle.awaitingRecruit ? `<p class="recruit-copy">${bossRarity.stars} ${bossRarity.name}黑風寨主已敗。本次可嘗試一次招降。</p>` : ''}<div class="battle-actions">${active ? `${button('battle:attack', '普通攻擊', 'primary')}${button('battle:slam', '猛擊・技力 6', '', state.party[0].mp < 6)}${button('battle:defend', '全隊防禦')}${button('battle:potion', `回復藥 ×${state.inventory.potion || 0}`, '', !state.inventory.potion)}${state.exploration.auto ? button('battle:stop-auto', '停止自動探索', 'danger') : ''}` : finishedActions}</div></section></div>`;
 }
 
 function bossWarning(state) {
   if (!state.ui.bossWarning) return '';
   const teamPower = getTeamPower(state);
-  const safe = teamPower >= BOSS_RECOMMENDED_POWER;
-  return `<div class="danger-overlay"><section class="danger-card"><p class="eyebrow">偵測到強大的氣息……</p><div class="danger-stars">★★★★</div><h2>強敵出現</h2><h3>敵將・黑風寨主率眾殺出！</h3><dl><div><dt>你的隊伍戰力</dt><dd>${teamPower.toLocaleString()}</dd></div><div><dt>建議戰力</dt><dd>${BOSS_RECOMMENDED_POWER.toLocaleString()}</dd></div></dl><p class="challenge-rating ${safe ? 'safe' : 'warning'}">${safe ? '適合挑戰' : '⚠ 危險'}</p><div class="action-grid">${button('boss:engage', '迎戰', 'boss-button')}${button('boss:retreat', '撤退')}</div></section></div>`;
+  const rarity = getBossRarity(state.ui.bossRarityRank || 1);
+  const safe = teamPower >= rarity.recommendedPower;
+  const rating = safe ? '適合挑戰' : teamPower < rarity.recommendedPower * 0.7 ? '⚠ 極度危險' : '⚠ 危險';
+  return `<div class="danger-overlay"><section class="danger-card boss-rank-${rarity.rank}"><p class="eyebrow">偵測到強大的氣息……</p><div class="danger-stars">${rarity.stars}</div><h2>${rarity.name} Boss</h2><h3>【黑風寨主】</h3><dl><div><dt>你的隊伍戰力</dt><dd>${teamPower.toLocaleString()}</dd></div><div><dt>建議戰力</dt><dd>${rarity.recommendedPower.toLocaleString()}</dd></div></dl><p class="challenge-rating ${safe ? 'safe' : 'warning'}">${rating}</p><div class="action-grid">${button('boss:engage', '迎戰', 'boss-button')}${button('boss:retreat', '撤退')}</div></section></div>`;
 }
 
 function chapterComplete(state) {

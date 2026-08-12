@@ -1,5 +1,5 @@
-const CACHE = 'qunxiong-world-v011-danger-loot';
-const ASSETS = ['./', './index.html', './style.css', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './src/main.js', './src/data.js', './src/store.js', './src/engine.js', './src/ui.js'];
+const CACHE = 'qunxiong-world-v012-boss-promotion';
+const ASSETS = ['./', './index.html', './style.css', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './src/main.js', './src/data.js', './src/store.js', './src/engine.js', './src/boss-progression.js', './src/ui.js'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));
 self.addEventListener('fetch', event => {
