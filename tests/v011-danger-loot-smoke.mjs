@@ -12,7 +12,7 @@ let assertions = 0;
 const check = (value, message) => { assert.ok(value, message); assertions += 1; };
 const equal = (actual, expected, message) => { assert.equal(actual, expected, message); assertions += 1; };
 
-equal(SAVE_VERSION, 7, 'save version is 7');
+equal(SAVE_VERSION, 8, 'save version is 8');
 equal(AREAS.plain.danger, 1, 'plain danger');
 equal(AREAS.forest.danger, 2, 'forest danger');
 equal(AREAS.stronghold.danger, 3, 'stronghold danger');
@@ -53,15 +53,16 @@ equal(pity.gold, goldBeforeRetreat, 'retreat has no resource penalty');
 check(!pity.ui.bossWarning, 'warning closes after retreat');
 
 pity.ui.bossWarning = true;
+pity.ui.bossRarityRank = 1;
 const warningHtml = render(pity);
-check(warningHtml.includes('強敵出現'), 'warning UI title');
+check(warningHtml.includes('普通 Boss'), 'warning UI title');
 check(warningHtml.includes('迎戰'), 'warning engage action');
 check(warningHtml.includes('撤退'), 'warning retreat action');
 check(warningHtml.includes(BOSS_RECOMMENDED_POWER.toLocaleString()), 'warning recommended power');
 check(createBossEncounter(pity), 'boss encounter starts');
 equal(pity.battle.enemies.length, 3, 'boss has two escorts');
 check(pity.battle.enemies[0].boss, 'first enemy is boss');
-equal(pity.battle.enemies[0].displayName, '敵將・黑風寨主', 'enemy boss identity clear');
+equal(pity.battle.enemies[0].displayName, '★ 普通・黑風寨主', 'enemy boss identity clear');
 
 const bossOnly = Object.values(ITEMS).filter(item => item.bossOnly);
 equal(bossOnly.length, 6, 'six boss-exclusive rewards');
@@ -95,7 +96,7 @@ check(partyHtml.includes('更換'), 'party slot change UI');
 check(partyHtml.includes('隊伍戰力'), 'party power UI');
 
 const migrated = normalize({ ...createState('舊玩家'), version: 6, progress: { bossDefeated: true }, inventory: { blackwindBlade: 1 } });
-equal(migrated.version, 7, 'v6 save migrates');
+equal(migrated.version, 8, 'v6 save migrates');
 check(migrated.progress.bossFirstKill, 'old boss victory preserves first kill');
 equal(migrated.inventory.blackwindBlade, 1, 'old inventory preserved');
 equal(migrated.progress.bossEncounterCount, 0, 'new pity counter defaults safely');

@@ -1,4 +1,4 @@
-export const SAVE_VERSION = 7;
+export const SAVE_VERSION = 8;
 
 export const ITEMS = {
   woodenSword: { id: 'woodenSword', name: '木劍', type: 'equipment', slot: 'weapon', quality: '普通', price: 60, sell: 18, stats: { might: 3 }, description: '武力 +3', shop: true },
@@ -39,7 +39,7 @@ export function createParty(playerName) {
 }
 
 export function createBlackwindLeader() {
-  return { ...officer('blackwind-lord', '黑風寨主', { hp: 160, mp: 26, might: 28, defense: 16, intelligence: 10, speed: 14 }), level: 5, skill: 'assault' };
+  return { ...officer('blackwind-lord', '黑風寨主', { hp: 160, mp: 26, might: 28, defense: 16, intelligence: 10, speed: 14 }), level: 5, skill: 'assault', rarityRank: 1, rarityName: '普通', growthMultiplier: 1 };
 }
 
 export const ENEMIES = {

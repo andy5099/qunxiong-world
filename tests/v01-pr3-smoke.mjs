@@ -21,7 +21,7 @@ function winCurrentBattle(state) {
   check(guard < 20, 'battle resolves safely');
 }
 
-equal(SAVE_VERSION, 7, 'save version upgraded');
+equal(SAVE_VERSION, 8, 'save version upgraded');
 const state = createState('寨主驗收');
 state.party[0].level = 4;
 state.progress.forestEntered = true;
@@ -128,7 +128,7 @@ state.battle = null;
 
 createBossEncounter(state);
 winCurrentBattle(state);
-equal(state.battle.awaitingRecruit, false, 'repeat boss victory does not recruit again');
+equal(state.battle.awaitingRecruit, true, 'repeat boss victory allows one upgrade capture attempt');
 equal(state.party.filter(member => member?.id === 'blackwind-lord').length, 1, 'repeat boss keeps one leader');
 
 const migrated = normalize({
@@ -137,7 +137,7 @@ const migrated = normalize({
   equipment: { ...createState('PR2存檔').equipment, hero: { weapon: 'greenEdgeSword', armor: null, accessory: null } },
   party: createState('PR2存檔').party
 });
-equal(migrated.version, 7, 'PR2 save migrates to current version');
+equal(migrated.version, 8, 'PR2 save migrates to current version');
 equal(migrated.inventory.greenEdgeSword, 1, 'migration preserves inventory');
 equal(migrated.equipment.hero.weapon, 'greenEdgeSword', 'migration preserves equipment');
 equal(migrated.progress.forestEntered, true, 'migration infers forest visit');
