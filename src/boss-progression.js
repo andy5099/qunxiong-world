@@ -1,9 +1,9 @@
 export const BOSS_RARITIES = {
-  1: { rank: 1, name: '普通', stars: '★', chance: 0.55, multiplier: 1, reward: 1, recommendedPower: 3200, captureRate: 1, assault: 1.55, intimidateRounds: 2 },
-  2: { rank: 2, name: '精英', stars: '★★', chance: 0.25, multiplier: 1.25, reward: 1.35, recommendedPower: 4300, captureRate: 0.7, assault: 1.7, intimidateRounds: 2 },
-  3: { rank: 3, name: '稀有', stars: '★★★', chance: 0.13, multiplier: 1.52, reward: 1.75, recommendedPower: 5600, captureRate: 0.45, assault: 1.82, intimidateRounds: 3 },
-  4: { rank: 4, name: '史詩', stars: '★★★★', chance: 0.06, multiplier: 1.9, reward: 2.3, recommendedPower: 6800, captureRate: 0.25, assault: 2.05, intimidateRounds: 3, aura: 0.12 },
-  5: { rank: 5, name: '傳說', stars: '★★★★★', chance: 0.01, multiplier: 2.4, reward: 3.1, recommendedPower: 8800, captureRate: 0.1, assault: 2.3, intimidateRounds: 3, aura: 0.22 }
+  1: { rank: 1, name: '普通', stars: '★', chance: 0.40, multiplier: 1, reward: 1, recommendedPower: 3200, captureRate: 1, assault: 1.55, intimidateRounds: 2 },
+  2: { rank: 2, name: '精英', stars: '★★', chance: 0.27, multiplier: 1.25, reward: 1.35, recommendedPower: 4300, captureRate: 0.7, assault: 1.7, intimidateRounds: 2 },
+  3: { rank: 3, name: '稀有', stars: '★★★', chance: 0.18, multiplier: 1.52, reward: 1.75, recommendedPower: 5600, captureRate: 0.45, assault: 1.82, intimidateRounds: 3 },
+  4: { rank: 4, name: '史詩', stars: '★★★★', chance: 0.10, multiplier: 2.05, reward: 2.55, recommendedPower: 7600, captureRate: 0.25, assault: 2.15, intimidateRounds: 3, aura: 0.14 },
+  5: { rank: 5, name: '傳說', stars: '★★★★★', chance: 0.05, multiplier: 3.35, reward: 4.5, recommendedPower: 12000, captureRate: 0.1, assault: 2.85, intimidateRounds: 4, aura: 0.35 }
 };
 
 export const TALISMANS = {
@@ -53,12 +53,56 @@ export function createRarityBoss(base, rank = 1) {
 export function getCaptureRate(rank = 1) { return getBossRarity(rank).captureRate; }
 
 export function rollTalisman(rank = 1, rng = Math.random) {
-  const roll = rng();
-  if (rank === 1) return roll < 0.38 ? 'novice' : null;
-  if (rank === 2) return roll < 0.22 ? 'intermediate' : roll < 0.62 ? 'novice' : null;
-  if (rank === 3) return roll < 0.16 ? 'advanced' : roll < 0.58 ? 'intermediate' : null;
-  if (rank === 4) return roll < 0.1 ? 'legendary' : roll < 0.58 ? 'advanced' : null;
-  return roll < 0.24 ? 'legendary' : roll < 0.82 ? 'advanced' : null;
+  return Object.keys(rollTalismanDrops(rank, rng)).pop();
+}
+
+export function rollTalismanDrops(rank = 1, rng = Math.random) {
+  const drops = {};
+  const add = (id, amount) => { if (amount > 0) drops[id] = (drops[id] || 0) + amount; };
+  if (rank === 1) {
+    add('novice', 1 + (rng() < 0.35 ? 1 : 0));
+    if (rng() < 0.12) add('intermediate', 1);
+  } else if (rank === 2) {
+    add('novice', 2 + Math.floor(rng() * 2));
+    if (rng() < 0.45) add('intermediate', 1);
+  } else if (rank === 3) {
+    add('intermediate', 1 + (rng() < 0.45 ? 1 : 0));
+    add('novice', 2 + Math.floor(rng() * 3));
+    if (rng() < 0.25) add('advanced', 1);
+  } else if (rank === 4) {
+    add('intermediate', 2);
+    if (rng() < 0.72) add('advanced', 1);
+    if (rng() < 0.12) add('legendary', 1);
+  } else {
+    add('advanced', 1 + (rng() < 0.55 ? 1 : 0));
+    if (rng() < 0.38) add('legendary', 1);
+  }
+  return drops;
+}
+
+const TALISMAN_RECIPES = {
+  intermediate: { source: 'novice', target: 'intermediate' },
+  advanced: { source: 'intermediate', target: 'advanced' },
+  legendary: { source: 'advanced', target: 'legendary' }
+};
+
+export function combineTalismans(state, targetId, all = false) {
+  const recipe = TALISMAN_RECIPES[targetId];
+  if (!recipe) return { ok: false, amount: 0 };
+  const available = Math.max(0, Math.floor(state.bossProgress.talismans[recipe.source] || 0));
+  const amount = all ? Math.floor(available / 5) : available >= 5 ? 1 : 0;
+  if (!amount) return { ok: false, amount: 0 };
+  state.bossProgress.talismans[recipe.source] -= amount * 5;
+  state.bossProgress.talismans[recipe.target] = (state.bossProgress.talismans[recipe.target] || 0) + amount;
+  state.notice = `兵符合成成功：${TALISMANS[recipe.target].name} ×${amount}`;
+  return { ok: true, amount };
+}
+
+export function combineAllTalismans(state) {
+  const results = ['intermediate', 'advanced', 'legendary'].map(target => combineTalismans(state, target, true));
+  const amount = results.reduce((sum, result) => sum + result.amount, 0);
+  if (!amount) state.notice = '目前沒有足夠的兵符可合成。';
+  return { ok: amount > 0, amount };
 }
 
 export function getPromotionChance(rank, blessing = 0) {

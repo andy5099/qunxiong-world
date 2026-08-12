@@ -1,5 +1,5 @@
 import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js';
-import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalisman, TALISMANS } from './boss-progression.js';
+import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -264,6 +264,8 @@ function finishVictory(state, rng) {
   const firstBossKill = bossBattle && !state.progress.bossFirstKill;
   const exp = defeated.reduce((sum, enemy) => sum + enemy.exp, 0);
   const gold = defeated.reduce((sum, enemy) => sum + randomInt(enemy.gold[0], enemy.gold[1], rng), 0);
+  state.battle.rewardExp = exp;
+  state.battle.rewardGold = gold;
   state.party.filter(Boolean).forEach(member => gainExp(member, exp, state));
   state.gold += gold;
   state.progress.totalKills += defeated.length;
@@ -294,12 +296,12 @@ function finishVictory(state, rng) {
   }
   if (bossBattle) {
     const rank = defeated.find(enemy => enemy.boss)?.rarityRank || 1;
-    const talismanId = rollTalisman(rank, rng);
-    if (talismanId) {
-      state.bossProgress.talismans[talismanId] = (state.bossProgress.talismans[talismanId] || 0) + 1;
-      state.battle.talismanId = talismanId;
-      appendLog(state, `獲得【${TALISMANS[talismanId].name}】！`, 'epic');
-    }
+    const talismanDrops = rollTalismanDrops(rank, rng);
+    state.battle.talismanDrops = talismanDrops;
+    Object.entries(talismanDrops).forEach(([talismanId, amount]) => {
+      state.bossProgress.talismans[talismanId] = (state.bossProgress.talismans[talismanId] || 0) + amount;
+      appendLog(state, `獲得【${TALISMANS[talismanId].name}】×${amount}！`, 'epic');
+    });
   }
   state.battle.finished = true;
   state.battle.result = 'victory';
