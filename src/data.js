@@ -1,4 +1,4 @@
-export const SAVE_VERSION = 10;
+export const SAVE_VERSION = 11;
 
 export const DUNGEON = {
   id: 'bloodCavern', name: '血色洞窟', floors: 4, danger: 4, recommendedPower: 7500,
@@ -28,6 +28,9 @@ export const ITEMS = {
   demonOverlordBlade: { id: 'demonOverlordBlade', name: '寨主霸王刀・鬼神', type: 'equipment', slot: 'weapon', quality: '傳說', bossOnly: true, bossGearFamily: 'blackwind', evolutionTier: 3, sell: 1180, stats: { might: 27, speed: 7 }, description: '武力 +27・速度 +7' },
   tyrantWarArmor: { id: 'tyrantWarArmor', name: '黑風戰甲・霸者', type: 'equipment', slot: 'armor', quality: '傳說', bossOnly: true, bossGearFamily: 'blackwind', evolutionTier: 3, sell: 1120, stats: { defense: 23, maxHp: 78 }, description: '防禦 +23・最大兵力 +78' },
   heavenlyLeaderToken: { id: 'heavenlyLeaderToken', name: '寨主令牌・天威', type: 'equipment', slot: 'accessory', quality: '傳說', bossOnly: true, bossGearFamily: 'blackwind', evolutionTier: 3, sell: 1080, stats: { might: 11, defense: 11, speed: 7 }, description: '武力 +11・防禦 +11・速度 +7' },
+  crimsonTigerClaw: { id: 'crimsonTigerClaw', name: '赤焰虎爪', type: 'equipment', slot: 'weapon', quality: '傳說', worldBossOnly: true, sell: 1600, stats: { might: 34, speed: 9 }, description: '武力 +34・速度 +9' },
+  crimsonWarArmor: { id: 'crimsonWarArmor', name: '赤焰戰甲', type: 'equipment', slot: 'armor', quality: '傳說', worldBossOnly: true, bossSkillReduction: .12, sell: 1540, stats: { defense: 27, maxHp: 110 }, description: '防禦 +27・最大兵力 +110・Boss 技能減傷 12%' },
+  crimsonTigerSeal: { id: 'crimsonTigerSeal', name: '赤焰虎符', type: 'equipment', slot: 'accessory', quality: '傳說', worldBossOnly: true, sell: 1480, stats: { might: 15, speed: 10, maxHp: 55 }, description: '武力 +15・速度 +10・最大兵力 +55' },
   potion: { id: 'potion', name: '回復藥', type: 'consumable', price: 20, heal: 45, description: '戰鬥中恢復 45 兵力' }
 };
 
@@ -49,6 +52,10 @@ export function createParty(playerName) {
 
 export function createBlackwindLeader() {
   return { ...officer('blackwind-lord', '黑風寨主', { hp: 160, mp: 26, might: 28, defense: 16, intelligence: 10, speed: 14 }), level: 5, skill: 'assault', rarityRank: 1, rarityName: '普通', growthMultiplier: 1 };
+}
+
+export function createCrimsonTiger() {
+  return { ...officer('crimson-tiger', '赤焰魔虎', { hp: 520, mp: 72, might: 82, defense: 48, intelligence: 14, speed: 38 }), level: 12, worldBoss: true, rarityRank: 5, rarityName: '世界王', growthMultiplier: 1.45, skills: ['flameRend', 'flameSweep', 'roar'] };
 }
 
 export const ENEMIES = {

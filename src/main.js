@@ -1,8 +1,9 @@
-import { advanceDungeon, buyItem, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, unequipItem, usePotion, visitInn } from './engine.js?v=v014-boss-gear';
+import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareWorldBoss, unequipItem, usePotion, visitInn } from './engine.js?v=v015-world-boss';
 import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v014-boss-gear';
 import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v014-boss-gear';
-import { clearSave, createState, load, save } from './store.js?v=v014-boss-gear';
-import { render, renderCreation } from './ui.js?v=v014-boss-gear';
+import { clearSave, createState, load, save } from './store.js?v=v015-world-boss';
+import { render, renderCreation } from './ui.js?v=v015-world-boss';
+import { deployRosterMember, withdrawPartyMember } from './world-boss-system.js?v=v015-world-boss';
 
 const app = document.querySelector('#app');
 let state = load();
@@ -60,7 +61,7 @@ app.addEventListener('click', event => {
     stopLoop();
     state.exploration.auto = false;
     if (screen === 'plain' || screen === 'forest' || screen === 'stronghold') enterArea(state, screen);
-    else { state.screen = screen; if (screen === 'village' || screen === 'shop') state.location = '桃源村'; }
+    else { state.screen = screen; if (screen === 'village' || screen === 'shop') state.location = '桃源村'; if(screen==='worldBoss')state.location='世界王祭壇'; }
   } else if (action === 'inn') visitInn(state);
   else if (action.startsWith('buy:')) buyItem(state, action.slice(4));
   else if (action === 'explore-once') createEncounter(state);
@@ -72,13 +73,16 @@ app.addEventListener('click', event => {
   else if (action === 'challenge-boss') { state.exploration.auto = false; stopLoop(); createBossEncounter(state); }
   else if (action === 'boss:engage') { state.exploration.auto = false; stopLoop(); createBossEncounter(state); }
   else if (action === 'boss:retreat') { stopLoop(); retreatFromBoss(state); }
+  else if (action === 'world-boss:challenge') { state.screen='worldBoss'; state.location='世界王祭壇'; state.ui.worldBossConfirm=true; }
+  else if (action === 'world-boss:engage') { state.ui.worldBossConfirm=false; stopLoop(); createWorldBossEncounter(state); }
+  else if (action === 'world-boss:cancel') state.ui.worldBossConfirm=false;
   else if (action === 'dungeon:enter') { stopLoop(); enterDungeon(state); }
   else if (action === 'dungeon:decline') { stopLoop(); declineDungeon(state); }
   else if (action === 'dungeon:advance') { stopLoop(); advanceDungeon(state); }
   else if (action === 'dungeon:retreat') { stopLoop(); exitDungeon(state, false); }
   else if (action === 'battle:stop-auto') { state.exploration.auto = false; stopLoop(); state.notice = '已停止自動探索，本場戰鬥改為手動。'; }
-  else if (action === 'battle:recruit') { stopLoop(); recruitBlackwindLeader(state); }
-  else if (action === 'battle:spare') { stopLoop(); spareBlackwindLeader(state); }
+  else if (action === 'battle:recruit') { stopLoop(); state.battle?.worldBoss ? captureWorldBoss(state) : recruitBlackwindLeader(state); }
+  else if (action === 'battle:spare') { stopLoop(); state.battle?.worldBoss ? spareWorldBoss(state) : spareBlackwindLeader(state); }
   else if (action === 'battle:quick-equip') {
     const dropId = state.battle?.dropId;
     if (dropId && !state.battle.awaitingRecruit) { leaveBattle(state); prepareQuickEquip(state, dropId); }
@@ -102,6 +106,8 @@ app.addEventListener('click', event => {
   else if (action === 'combine-all-divine') combineAllDivineTalismans(state);
   else if (action.startsWith('combine-divine:')) combineDivineTalismans(state, action.slice(16));
   else if (action.startsWith('evolve-boss-gear:')) evolveBossGear(state, action.slice(17));
+  else if (action.startsWith('roster-deploy:')) { const [,id,slot]=action.split(':'); deployRosterMember(state,id,slot); }
+  else if (action.startsWith('roster-withdraw:')) withdrawPartyMember(state,action.slice(16));
   else if (action.startsWith('party-slot:')) {
     const [, memberId, slot] = action.split(':');
     state.ui.partyEquipMember = memberId;
