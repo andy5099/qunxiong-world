@@ -13,7 +13,7 @@ const equal = (actual, expected, message) => { assert.equal(actual, expected, me
 const zero = () => 0;
 
 const state = createState('林野測試');
-equal(SAVE_VERSION, 11, 'save version');
+equal(SAVE_VERSION, 12, 'save version');
 equal(canEnterArea(state, 'forest'), false, 'forest starts locked');
 equal(enterArea(state, 'forest'), false, 'cannot enter early');
 equal(state.location, '桃源村', 'failed entry keeps location');
@@ -70,7 +70,7 @@ const migrated = normalize({
   inventory: { woodenSword: 1, clothArmor: 1, potion: 2 },
   equipment: { weapon: true, armor: true }
 });
-equal(migrated.version, 11, 'old save upgrades version');
+equal(migrated.version, 12, 'old save upgrades version');
 equal(migrated.equipment.hero.weapon, 'woodenSword', 'old weapon flag migrates');
 equal(migrated.equipment.hero.armor, 'clothArmor', 'old armor flag migrates');
 equal(migrated.party.length, 5, 'migration keeps party');

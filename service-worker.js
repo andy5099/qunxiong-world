@@ -1,5 +1,5 @@
-const CACHE = 'qunxiong-world-v015-world-boss';
-const ASSETS = ['./', './index.html', './style.css', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './src/main.js', './src/data.js', './src/store.js', './src/engine.js', './src/boss-progression.js', './src/boss-gear-system.js', './src/world-boss-system.js', './src/ui.js'];
+const CACHE = 'qunxiong-world-v016-boss-codex';
+const ASSETS = ['./', './index.html', './style.css', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './src/main.js', './src/data.js', './src/store.js', './src/engine.js', './src/boss-progression.js', './src/boss-gear-system.js', './src/world-boss-system.js', './src/boss-codex-system.js', './src/ui.js'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));
 self.addEventListener('fetch', event => {

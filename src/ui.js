@@ -1,8 +1,9 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v015-world-boss';
-import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getTeamPower, recommendMemberForItem } from './engine.js?v=v015-world-boss';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v016-boss-codex';
+import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getTeamPower, recommendMemberForItem } from './engine.js?v=v016-boss-codex';
 import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v014-boss-gear';
 import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v014-boss-gear';
 import { WORLD_BOSS, getWorldBossResonance } from './world-boss-system.js?v=v015-world-boss';
+import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v016-boss-codex';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
@@ -21,6 +22,7 @@ function nav(state) {
     ${button('screen:forest', state.unlocks.forest ? '黑風森林' : '森林 Lv.3', state.screen === 'forest' ? 'active' : '')}
     ${button('screen:stronghold', state.unlocks.stronghold ? '黑風寨' : '寨 Lv.5', state.screen === 'stronghold' ? 'active' : '')}
     ${state.worldBoss.unlocked ? button('screen:worldBoss', '世界王', state.screen === 'worldBoss' ? 'active' : '') : ''}
+    ${button('screen:bossCodex', 'Boss 圖鑑', state.screen === 'bossCodex' ? 'active' : '')}
     ${button('screen:party', '隊伍', state.screen === 'party' ? 'active' : '')}
     ${button('screen:inventory', '背包', state.screen === 'inventory' ? 'active' : '')}
     ${button('screen:shop', '商店', state.screen === 'shop' ? 'active' : '')}
@@ -31,7 +33,7 @@ function nav(state) {
 function village(state) {
   return `<section class="scene village-scene"><div class="scene-art" aria-hidden="true"><span class="roof"></span><span class="tree"></span></div><div class="scene-copy"><p class="eyebrow">第一章・桃園初行</p><h1>桃源村</h1><p>炊煙從茅舍升起，村外偶有野獸與山賊出沒。</p></div></section>
   <section class="panel"><h2>村內設施</h2><div class="action-grid">
-    ${button('screen:plain', '出村', 'primary')}${button('inn', `客棧・${INN_COST} 金`)}${button('screen:shop', '商店')}${button('screen:party', '隊伍')}${button('screen:inventory', '背包')}${state.worldBoss.unlocked?button('screen:worldBoss','世界王祭壇','boss-button'):''}${button('save', '存檔')}
+    ${button('screen:plain', '出村', 'primary')}${button('inn', `客棧・${INN_COST} 金`)}${button('screen:shop', '商店')}${button('screen:party', '隊伍')}${button('screen:inventory', '背包')}${button('screen:bossCodex','Boss 圖鑑')}${state.worldBoss.unlocked?button('screen:worldBoss','世界王祭壇','boss-button'):''}${button('save', '存檔')}
   </div><p class="notice">${esc(state.notice)}</p></section>`;
 }
 
@@ -61,8 +63,10 @@ function memberCard(state, member, index) {
   const rarity = member.id === 'blackwind-lord' ? getBossRarity(member.rarityRank) : member.id==='crimson-tiger'?{rank:5,stars:'★★★★★',name:'世界王'}:null;
   const resonance = ['blackwind-lord','crimson-tiger'].includes(member.id) ? resonancePanel(state, member) : '';
   const progression = member.id === 'blackwind-lord' ? promotionPanel(state, member) : member.id === 'crimson-tiger' ? '<section class="promotion-box"><strong>世界王武將</strong><p>已是特殊最高階，不使用一般 Boss 轉職。</p></section>' : '';
+  const mastery = member.id === 'crimson-tiger' ? getMasteryProfile(state) : null;
+  const masteryPanel = mastery ? `<section class="mastery-box"><strong>世界王熟練 Lv.${mastery.level}</strong><span>熟練：${mastery.exp}${mastery.next ? ` / ${mastery.next}` : '（MAX）'}</span><small>${mastery.level < 2 ? '下階：最大兵力 +3%' : mastery.level < 3 ? '下階：武力 +3%' : mastery.level < 4 ? '下階：烈焰撕裂 +5%' : mastery.level < 5 ? '下階：烈焰橫掃 +10%、最大兵力再 +5%' : '熟練度已達最高'}</small></section>` : '';
   const withdraw = member.id === 'crimson-tiger' ? button(`roster-withdraw:${member.id}`, '移至待命名冊', 'mini') : '';
-  return `<article class="member ${rarity ? `boss-rank-${rarity.rank}` : ''}"><div class="member-title"><span>${index + 1}</span><h3>${esc(member.name)}</h3><b>Lv.${member.level}</b></div>${rarity ? `<div class="leader-rarity">${rarity.stars} ${rarity.name}</div>` : ''}${hpBar(member.hp, stats.maxHp)}<p>兵力 ${member.hp}/${stats.maxHp}・技力 ${member.mp}/${member.maxMp}${member.id === 'blackwind-lord' ? '・技能 強襲' : member.id === 'crimson-tiger' ? '・技能 赤焰撕裂／虎嘯／橫掃' : ''}</p><dl><div><dt>武力</dt><dd>${stats.might}</dd></div><div><dt>智力</dt><dd>${member.intelligence}</dd></div><div><dt>防禦</dt><dd>${stats.defense}</dd></div><div><dt>速度</dt><dd>${stats.speed}</dd></div></dl><small>EXP ${member.exp}/${EXP_TO_LEVEL(member.level)}・戰力 ${getTeamPower({ ...state, party: [member] }).toLocaleString()}</small>${resonance}${progression}${withdraw}<div class="equipped-row">${equipped.map(entry => `<div class="slot-control"><span>${entry.slotName}：${entry.item ? `<b>${entry.item.name}</b>` : '無'}</span>${button(`party-slot:${member.id}:${entry.slot}`, `更換${entry.slotName}`, 'mini')}${entry.item ? button(`unequip:${member.id}:${entry.slot}`, '卸下', 'mini') : ''}</div>`).join('')}</div></article>`;
+  return `<article class="member ${rarity ? `boss-rank-${rarity.rank}` : ''}"><div class="member-title"><span>${index + 1}</span><h3>${esc(member.name)}</h3><b>Lv.${member.level}</b></div>${rarity ? `<div class="leader-rarity">${rarity.stars} ${rarity.name}</div>` : ''}${hpBar(member.hp, stats.maxHp)}<p>兵力 ${member.hp}/${stats.maxHp}・技力 ${member.mp}/${member.maxMp}${member.id === 'blackwind-lord' ? '・技能 強襲' : member.id === 'crimson-tiger' ? '・技能 赤焰撕裂／虎嘯／橫掃' : ''}</p><dl><div><dt>武力</dt><dd>${stats.might}</dd></div><div><dt>智力</dt><dd>${member.intelligence}</dd></div><div><dt>防禦</dt><dd>${stats.defense}</dd></div><div><dt>速度</dt><dd>${stats.speed}</dd></div></dl><small>EXP ${member.exp}/${EXP_TO_LEVEL(member.level)}・戰力 ${getTeamPower({ ...state, party: [member] }).toLocaleString()}</small>${masteryPanel}${resonance}${progression}${withdraw}<div class="equipped-row">${equipped.map(entry => `<div class="slot-control"><span>${entry.slotName}：${entry.item ? `<b>${entry.item.name}</b>` : '無'}</span>${button(`party-slot:${member.id}:${entry.slot}`, `更換${entry.slotName}`, 'mini')}${entry.item ? button(`unequip:${member.id}:${entry.slot}`, '卸下', 'mini') : ''}</div>`).join('')}</div></article>`;
 }
 
 function resonancePanel(state, member) {
@@ -94,11 +98,41 @@ function partyEquipmentPicker(state) {
 const getItemScoreForUi = item => (item.stats?.might || 0) * 7 + (item.stats?.defense || 0) * 6 + (item.stats?.maxHp || 0) * 0.65 + (item.stats?.speed || 0) * 4;
 
 function party(state) {
-  const roster=state.roster.length?`<section class="roster-box"><h2>武將名冊・候補</h2>${state.roster.map(member=>`<article><strong>${esc(member.name)}</strong><span>${member.worldBoss?'★★★★★ 世界王':'候補武將'}・Lv.${member.level}</span><div class="craft-actions">${state.party.map((slot,index)=>button(`roster-deploy:${member.id}:${index}`,`編入第 ${index+1} 位${slot?`（替換${slot.name}）`:''}`,'mini')).join('')}</div></article>`).join('')}</section>`:'';
+  const mastery = getMasteryProfile(state);
+  const roster=state.roster.length?`<section class="roster-box"><h2>武將名冊・候補</h2>${state.roster.map(member=>`<article><strong>${esc(member.name)}</strong><span>${member.worldBoss?'★★★★★ 世界王':'候補武將'}・Lv.${member.level}</span>${member.id === 'crimson-tiger' ? `<div class="mastery-box"><strong>世界王熟練 Lv.${mastery.level}</strong><span>${mastery.exp} / ${mastery.next ?? 'MAX'}</span><small>${mastery.label}</small></div>` : ''}<div class="craft-actions">${state.party.map((slot,index)=>button(`roster-deploy:${member.id}:${index}`,`編入第 ${index+1} 位${slot?`（替換${slot.name}）`:''}`,'mini')).join('')}</div></article>`).join('')}</section>`:'';
   return `<section class="panel"><p class="eyebrow">最多五人・能力已包含裝備</p><h1>隊伍</h1><div class="team-power">隊伍戰力 <b>${getTeamPower(state).toLocaleString()}</b></div>${partyEquipmentPicker(state)}<div class="party-list">${state.party.map((member, index) => memberCard(state, member, index)).join('')}</div>${roster}</section>`;
 }
 
-function worldBoss(state){const w=state.worldBoss;const phase=w.bestPhase?`第 ${w.bestPhase} 階段`:'尚未挑戰';return `<section class="scene world-boss-scene"><div class="scene-copy"><p class="eyebrow">第一章終局挑戰</p><h1>世界王祭壇</h1><p>烈焰深處傳來百獸之王的咆哮。</p></div></section><section class="panel world-boss-card"><div class="danger-stars">★★★★★</div><h2>世界王・赤焰魔虎</h2><div class="danger-line"><span>建議戰力 ${WORLD_BOSS.recommendedPower.toLocaleString()}</span><span>目前戰力 ${getTeamPower(state).toLocaleString()}</span></div><dl><div><dt>挑戰次數</dt><dd>${w.attempts}</dd></div><div><dt>最佳紀錄</dt><dd>${phase}</dd></div><div><dt>最低剩餘</dt><dd>${w.lowestHpPct}%</dd></div><div><dt>擊敗</dt><dd>${w.defeats?`已擊敗 ×${w.defeats}`:'未擊敗'}</dd></div><div><dt>收服</dt><dd>${w.captured?'已收服':'未收服'}</dd></div></dl>${button('world-boss:challenge','挑戰世界王','boss-button')}</section>`;}
+const rankLabel = rank => rank ? `${getBossRarity(rank).stars} ${getBossRarity(rank).name}` : '尚無';
+const codexMark = value => value ? '✓' : '✕';
+function milestonePanel(state, completion) {
+  return `<section class="codex-milestones"><h2>收集里程碑</h2>${Object.entries(COLLECTION_MILESTONES).map(([threshold, reward]) => { const claimed = state.collectionMilestones.claimed[threshold]; const ready = completion.overall >= Number(threshold); const labels = [...Object.entries(reward.talismans).map(([id, amount]) => `${TALISMANS[id].name} ×${amount}`), ...Object.entries(reward.divineTalismans).map(([id, amount]) => `${DIVINE_TALISMANS[id].name} ×${amount}`), ...(reward.gold ? [`金錢 ${reward.gold}`] : [])]; return `<article><strong>${threshold}%</strong><span>${labels.join('・')}</span>${button(`codex:claim:${threshold}`, claimed ? '已領取' : ready ? '領取' : '未達成', ready ? 'primary mini' : 'mini', claimed || !ready)}</article>`; }).join('')}</section>`;
+}
+
+function blackwindCodexDetail(state) {
+  const data = state.bossCodex.blackwind;
+  const ranks = [1,2,3,4,5].map(rank => { const record=data.ranks[rank]; return `<article class="codex-rank boss-rank-${rank}"><strong>${record.encountered ? rankLabel(rank) : '???'}</strong><span>遇過 ${codexMark(record.encountered)}</span><span>擊敗 ${codexMark(record.defeated)}</span><span>招降 ${codexMark(record.captured)}</span></article>`; }).join('');
+  const drops = BLACKWIND_DROPS.map(id => `<li class="${data.drops[id] ? qualityClass(ITEMS[id].quality) : ''}">${getKnownItemName(state,id)} ${data.drops[id]?'✓':''}</li>`).join('');
+  const talismans = CODEX_MATERIALS.map(id=>`<li>${data.talismans[id]?TALISMANS[id].name:'???'}</li>`).join('');
+  const divine = DIVINE_CODEX_MATERIALS.map(id=>`<li>${data.divineTalismans[id]?DIVINE_TALISMANS[id].name:'???'}</li>`).join('');
+  return `<section class="codex-detail"><div class="codex-title"><h2>黑風寨主</h2>${button('codex:back','返回總覽','mini')}</div><div class="codex-ranks">${ranks}</div><dl class="codex-stats"><div><dt>最高遭遇</dt><dd>${rankLabel(getHighestRank(data.ranks,'encountered'))}</dd></div><div><dt>最高擊敗</dt><dd>${rankLabel(getHighestRank(data.ranks,'defeated'))}</dd></div><div><dt>最高招降</dt><dd>${rankLabel(getHighestRank(data.ranks,'captured'))}</dd></div><div><dt>總遭遇</dt><dd>${data.encounters}</dd></div><div><dt>總擊敗</dt><dd>${data.defeats}</dd></div><div><dt>招降成功／失敗</dt><dd>${data.captures} / ${data.captureFailures}</dd></div></dl><h3>Boss 專屬裝</h3><ul class="codex-list">${drops}</ul><h3>轉職兵符</h3><ul class="codex-list">${talismans}</ul><h3>神兵符</h3><ul class="codex-list">${divine}</ul></section>`;
+}
+
+function worldCodexDetail(state) {
+  const data=state.worldBossCodex,w=state.worldBoss,r=state.worldBossRecords;
+  const drops=WORLD_BOSS_DROPS.map(id=>`<li class="${data.drops[id]?qualityClass(ITEMS[id].quality):''}">${getKnownItemName(state,id,true)} ${data.drops[id]?'✓':''}</li>`).join('');
+  return `<section class="codex-detail world-codex"><div class="codex-title"><h2>★★★★★ 世界王・赤焰魔虎</h2>${button('codex:back','返回總覽','mini')}</div><div class="world-codex-status"><span>發現 ${codexMark(data.discovered)}</span><span>挑戰 ${codexMark(data.challenged)}</span><span>擊敗 ${codexMark(data.defeated)}</span><span>收服 ${codexMark(data.captured)}</span></div><dl class="codex-stats"><div><dt>挑戰／擊敗</dt><dd>${w.attempts} / ${w.defeats}</dd></div><div><dt>招降成功／嘗試</dt><dd>${data.captureSuccesses} / ${data.captureAttempts}</dd></div><div><dt>最佳階段</dt><dd>${w.bestPhase?`第 ${w.bestPhase} 階段`:'尚無'}</dd></div><div><dt>最低 Boss HP</dt><dd>${w.lowestHpPct}%</dd></div><div><dt>最快擊敗</dt><dd>${r.fastestRound?`${r.fastestRound} 回合`:'尚無'}</dd></div><div><dt>最高單次傷害</dt><dd>${r.highestDamage}</dd></div></dl><h3>世界王專屬裝</h3><ul class="codex-list">${drops}</ul></section>`;
+}
+
+function bossCodex(state) {
+  const completion=getCodexCompletion(state),detail=state.ui.codexDetail;
+  if(detail==='blackwind') return `<section class="panel codex-panel">${blackwindCodexDetail(state)}</section>`;
+  if(detail==='worldBoss') return `<section class="panel codex-panel">${worldCodexDetail(state)}</section>`;
+  const blackwind=state.bossCodex.blackwind, world=state.worldBossCodex;
+  return `<section class="panel codex-panel"><p class="eyebrow">長期收集目標</p><h1>Boss 圖鑑</h1><div class="codex-overall"><strong>總完成度 ${completion.overall}%</strong>${hpBar(completion.overall,100,'codex-meter')}<span>${completion.done} / ${completion.total} 項</span></div><div class="codex-summary"><span>黑風寨主 ${completion.blackwind}%</span><span>赤焰魔虎 ${completion.worldBoss}%</span><span>裝備收集 ${completion.equipment}%</span><span>材料收集 ${completion.materials}%</span></div><div class="codex-cards"><article><h2>黑風寨主</h2><p>完成度 ${completion.blackwind}%</p><span>最高擊敗 ${rankLabel(getHighestRank(blackwind.ranks,'defeated'))}</span><span>最高招降 ${rankLabel(getHighestRank(blackwind.ranks,'captured'))}</span>${button('codex:view:blackwind','查看圖鑑','primary')}</article><article class="boss-rank-5"><h2>世界王・赤焰魔虎</h2><p>完成度 ${completion.worldBoss}%</p><span>${world.defeated?'已擊敗':'未擊敗'}</span><span>${world.captured?'已收服':'未收服'}</span>${button('codex:view:worldBoss','查看圖鑑','boss-button')}</article></div>${milestonePanel(state,completion)}<p class="notice">${esc(state.notice)}</p></section>`;
+}
+
+function worldBoss(state){const w=state.worldBoss,r=state.worldBossRecords;const phase=w.bestPhase?`第 ${w.bestPhase} 階段`:'尚未挑戰';return `<section class="scene world-boss-scene"><div class="scene-copy"><p class="eyebrow">第一章終局挑戰</p><h1>世界王祭壇</h1><p>烈焰深處傳來百獸之王的咆哮。</p></div></section><section class="panel world-boss-card"><div class="danger-stars">★★★★★</div><h2>世界王・赤焰魔虎</h2><div class="danger-line"><span>建議戰力 ${WORLD_BOSS.recommendedPower.toLocaleString()}</span><span>目前戰力 ${getTeamPower(state).toLocaleString()}</span></div><dl><div><dt>挑戰次數</dt><dd>${w.attempts}</dd></div><div><dt>最佳紀錄</dt><dd>${phase}</dd></div><div><dt>最低剩餘</dt><dd>${w.lowestHpPct}%</dd></div><div><dt>擊敗</dt><dd>${w.defeats?`已擊敗 ×${w.defeats}`:'未擊敗'}</dd></div><div><dt>最快擊敗</dt><dd>${r.fastestRound?`${r.fastestRound} 回合`:'尚無'}</dd></div><div><dt>最高傷害</dt><dd>${r.highestDamage}</dd></div><div><dt>收服</dt><dd>${w.captured?'已收服':'未收服'}</dd></div></dl>${button('world-boss:challenge','挑戰世界王','boss-button')}</section>`;}
 
 function shop(state) {
   const stock = Object.values(ITEMS).filter(item => item.shop || item.type === 'consumable');
@@ -215,7 +249,7 @@ function chapterComplete(state) {
 }
 
 export function render(state) {
-  const views = { village, plain, forest, stronghold, worldBoss, party, inventory, shop, settings };
+  const views = { village, plain, forest, stronghold, worldBoss, bossCodex, party, inventory, shop, settings };
   return `<div class="app-shell">${header(state)}<main>${state.dungeon.active ? `<section class="dungeon-status"><strong>${DUNGEON.name}</strong><span>第 ${state.dungeon.floor} / ${DUNGEON.floors} 層</span><span>危險度 ${dangerStars(DUNGEON.danger)}</span><span>戰力 ${getTeamPower(state).toLocaleString()}</span></section>` : ''}${(views[state.screen] || village)(state)}</main>${nav(state)}${battle(state)}${bossWarning(state)}${worldBossConfirm(state)}${dungeonWarning(state)}${dungeonProgress(state)}${chapterComplete(state)}</div>`;
 }
 

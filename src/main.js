@@ -1,9 +1,10 @@
-import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareWorldBoss, unequipItem, usePotion, visitInn } from './engine.js?v=v015-world-boss';
+import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareWorldBoss, unequipItem, usePotion, visitInn } from './engine.js?v=v016-boss-codex';
 import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v014-boss-gear';
 import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v014-boss-gear';
-import { clearSave, createState, load, save } from './store.js?v=v015-world-boss';
-import { render, renderCreation } from './ui.js?v=v015-world-boss';
+import { clearSave, createState, load, save } from './store.js?v=v016-boss-codex';
+import { render, renderCreation } from './ui.js?v=v016-boss-codex';
 import { deployRosterMember, withdrawPartyMember } from './world-boss-system.js?v=v015-world-boss';
+import { claimCollectionMilestone } from './boss-codex-system.js?v=v016-boss-codex';
 
 const app = document.querySelector('#app');
 let state = load();
@@ -61,7 +62,7 @@ app.addEventListener('click', event => {
     stopLoop();
     state.exploration.auto = false;
     if (screen === 'plain' || screen === 'forest' || screen === 'stronghold') enterArea(state, screen);
-    else { state.screen = screen; if (screen === 'village' || screen === 'shop') state.location = '桃源村'; if(screen==='worldBoss')state.location='世界王祭壇'; }
+    else { state.screen = screen; if (screen === 'village' || screen === 'shop') state.location = '桃源村'; if(screen==='worldBoss')state.location='世界王祭壇'; if(screen==='bossCodex'){state.location='Boss 圖鑑';state.ui.codexDetail=null;} }
   } else if (action === 'inn') visitInn(state);
   else if (action.startsWith('buy:')) buyItem(state, action.slice(4));
   else if (action === 'explore-once') createEncounter(state);
@@ -108,6 +109,9 @@ app.addEventListener('click', event => {
   else if (action.startsWith('evolve-boss-gear:')) evolveBossGear(state, action.slice(17));
   else if (action.startsWith('roster-deploy:')) { const [,id,slot]=action.split(':'); deployRosterMember(state,id,slot); }
   else if (action.startsWith('roster-withdraw:')) withdrawPartyMember(state,action.slice(16));
+  else if (action.startsWith('codex:view:')) state.ui.codexDetail=action.slice(11);
+  else if (action === 'codex:back') state.ui.codexDetail=null;
+  else if (action.startsWith('codex:claim:')) claimCollectionMilestone(state,Number(action.slice(12)));
   else if (action.startsWith('party-slot:')) {
     const [, memberId, slot] = action.split(':');
     state.ui.partyEquipMember = memberId;
