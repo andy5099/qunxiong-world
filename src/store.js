@@ -1,6 +1,7 @@
-import { SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createParty } from './data.js?v=v015-world-boss';
+import { SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createParty } from './data.js?v=v016-boss-codex';
 import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v014-boss-gear';
 import { normalizeWorldBoss } from './world-boss-system.js?v=v015-world-boss';
+import { normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v016-boss-codex';
 
 export const STORAGE_KEY = 'qunxiong-world-v01';
 const LEGACY_KEY = 'qunxiong-world-v2';
@@ -27,8 +28,13 @@ export function createState(playerName) {
     progress: { forestEntered: false, strongholdKills: 0, bossUnlocked: false, bossDefeated: false, bossFirstKill: false, bossRecruited: false, chapterOneComplete: false, totalKills: 0, elitesDefeated: 0, bossEncounterCount: 0, bossEncounters: 0 },
     bossProgress: normalizeBossProgress(),
     worldBoss: normalizeWorldBoss(),
+    bossCodex: normalizeBossCodex(),
+    worldBossCodex: normalizeWorldBossCodex(),
+    collectionMilestones: { claimed: { 25: false, 50: false, 75: false, 100: false } },
+    worldBossMastery: normalizeWorldBossMastery(),
+    worldBossRecords: { fastestRound: null, highestDamage: 0 },
     roster: [],
-    ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false, bossWarning: false, bossRarityRank: null, worldBossConfirm: false, captureResult: null, quickEquipItem: null, partyEquipMember: null, partyEquipSlot: null, optimizeChanges: [] },
+    ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false, bossWarning: false, bossRarityRank: null, worldBossConfirm: false, codexDetail: null, captureResult: null, quickEquipItem: null, partyEquipMember: null, partyEquipSlot: null, optimizeChanges: [] },
     settings: { autoBattle: false },
     exploration: { auto: false, active: false },
     dungeon: { warning: false, active: false, name: '血色洞窟', floor: 0, sourceScreen: null, sourceLocation: null, pity: 0, awaitingAdvance: false, completed: false, loot: { gold: 0, potion: 0, items: [], talismans: {} } },
@@ -108,7 +114,7 @@ export function normalize(raw) {
     dungeon.floor = 0;
     dungeon.awaitingAdvance = false;
   }
-  return {
+  const normalized = {
     ...base,
     ...raw,
     version: SAVE_VERSION,
@@ -126,6 +132,11 @@ export function normalize(raw) {
     progress,
     roster,
     worldBoss,
+    bossCodex: normalizeBossCodex(raw.bossCodex),
+    worldBossCodex: normalizeWorldBossCodex(raw.worldBossCodex),
+    collectionMilestones: { claimed: { ...base.collectionMilestones.claimed, ...(raw.collectionMilestones?.claimed || {}) } },
+    worldBossMastery: normalizeWorldBossMastery(raw.worldBossMastery),
+    worldBossRecords: { fastestRound: Number(raw.worldBossRecords?.fastestRound) > 0 ? Number(raw.worldBossRecords.fastestRound) : null, highestDamage: Math.max(0, Number(raw.worldBossRecords?.highestDamage) || 0) },
     dungeon,
     bossProgress: normalizeBossProgress(raw.bossProgress),
     ui: { ...base.ui, ...(raw.ui || {}), bossWarning: false, bossRarityRank: null, worldBossConfirm: false, captureResult: null, optimizeChanges: [] },
@@ -133,8 +144,9 @@ export function normalize(raw) {
     exploration: { ...base.exploration, ...(raw.exploration || {}), auto: false, active: false },
     battle: null,
     log: Array.isArray(raw.log) ? raw.log.slice(-60) : [],
-    screen: dungeonSource && (rawDungeon.active || rawDungeon.warning) ? dungeonSource : ['village', 'plain', 'forest', 'stronghold', 'worldBoss', 'party', 'inventory', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
+    screen: dungeonSource && (rawDungeon.active || rawDungeon.warning) ? dungeonSource : ['village', 'plain', 'forest', 'stronghold', 'worldBoss', 'bossCodex', 'party', 'inventory', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
   };
+  return syncCodexFromState(normalized);
 }
 
 function normalizeEquipment(rawEquipment, fallback) {

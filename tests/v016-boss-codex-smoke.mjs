@@ -1,0 +1,121 @@
+import { ITEMS, SAVE_VERSION, createCrimsonTiger } from '../src/data.js';
+import { captureWorldBoss, createBossEncounter, createDungeonFloor, createWorldBossEncounter, getFinalStats, recruitBlackwindLeader, resolveRound } from '../src/engine.js';
+import { createState, normalize } from '../src/store.js';
+import { BLACKWIND_DROPS, CODEX_MATERIALS, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, awardWorldBossMastery, claimCollectionMilestone, getCodexCompletion, getHighestRank, getMasteryLevel, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from '../src/boss-codex-system.js';
+import { addTigerToRoster, deployRosterMember } from '../src/world-boss-system.js';
+import { render } from '../src/ui.js';
+import fs from 'node:fs';
+
+let passed=0;
+const check=(value,label)=>{if(!value)throw new Error(label);passed+=1;};
+const equal=(actual,expected,label)=>check(actual===expected,`${label}: ${actual} !== ${expected}`);
+const rng=value=>()=>value;
+const unlocked=()=>{const s=createState('圖鑑測試');s.progress.chapterOneComplete=true;s.worldBoss.unlocked=true;return s;};
+
+equal(SAVE_VERSION,12,'save version 12');
+const fresh=unlocked(); fresh.screen='bossCodex';
+let html=render(fresh);
+check(html.includes('Boss 圖鑑'),'codex entry renders');
+check(html.includes('黑風寨主'),'blackwind card renders');
+check(html.includes('世界王・赤焰魔虎'),'world boss card renders');
+check(html.includes('總完成度'),'completion shown');
+
+fresh.ui.codexDetail='blackwind'; html=render(fresh);
+equal((html.match(/<article class="codex-rank/g)||[]).length,5,'five rarity rows');
+check(html.includes('???'),'unknown entries hidden');
+recordBlackwindEncounter(fresh,4);
+check(fresh.bossCodex.blackwind.ranks[4].encountered,'encounter recorded');
+recordBlackwindDefeat(fresh,4);
+check(fresh.bossCodex.blackwind.ranks[4].defeated,'defeat recorded');
+recordBlackwindCapture(fresh,4,true);
+check(fresh.bossCodex.blackwind.ranks[4].captured,'capture recorded');
+recordBlackwindCapture(fresh,5,false);
+equal(fresh.bossCodex.blackwind.captureFailures,1,'capture failure recorded');
+equal(getHighestRank(fresh.bossCodex.blackwind.ranks,'encountered'),5,'highest encountered');
+equal(getHighestRank(fresh.bossCodex.blackwind.ranks,'defeated'),4,'highest defeated');
+equal(getHighestRank(fresh.bossCodex.blackwind.ranks,'captured'),4,'highest captured');
+
+recordItemDrop(fresh,'blackwindBlade');
+check(fresh.bossCodex.blackwind.drops.blackwindBlade,'boss gear recorded');
+html=render(fresh);
+check(html.includes('黑風刀 ✓'),'known boss gear shown');
+check(html.includes('???'),'unknown boss gear remains hidden');
+recordMaterials(fresh,{novice:1,legendary:1},{advanced:1});
+check(fresh.bossCodex.blackwind.talismans.novice,'promotion material recorded');
+check(fresh.bossCodex.blackwind.talismans.legendary,'legendary material recorded');
+check(fresh.bossCodex.blackwind.divineTalismans.advanced,'divine material recorded');
+
+const encounter=unlocked(); encounter.progress.bossUnlocked=true; encounter.ui.bossWarning=true; encounter.ui.bossRarityRank=3;
+createBossEncounter(encounter,3);
+check(encounter.bossCodex.blackwind.ranks[3].encountered,'normal boss encounter integrates codex');
+const dungeon=unlocked(); dungeon.dungeon.active=true; dungeon.dungeon.floor=4; dungeon.dungeon.sourceScreen='forest';
+createDungeonFloor(dungeon,5,rng(0));
+check(dungeon.bossCodex.blackwind.ranks[5].encountered,'dungeon boss encounter integrates codex');
+
+const world=unlocked(); createWorldBossEncounter(world);
+check(world.worldBossCodex.discovered && world.worldBossCodex.challenged,'world challenge recorded');
+world.party.forEach(m=>{if(m){m.might=50000;m.speed=999;}}); world.battle.enemies[0].hp=1;
+resolveRound(world,'attack',rng(0));
+check(world.worldBossCodex.defeated,'world defeat recorded');
+check(world.worldBossRecords.fastestRound===1,'fastest round recorded');
+check(world.worldBossRecords.highestDamage>0,'highest damage recorded');
+equal(world.inventory.crimsonTigerClaw,1,'world item dropped');
+check(world.worldBossCodex.drops.crimsonTigerClaw,'world drop codex recorded');
+captureWorldBoss(world,rng(0));
+equal(world.worldBossCodex.captureAttempts,1,'world capture attempt recorded');
+equal(world.worldBossCodex.captureSuccesses,1,'world capture success recorded');
+check(world.worldBossCodex.captured,'world captured flag');
+
+const slower=unlocked(); slower.worldBossRecords.fastestRound=3; createWorldBossEncounter(slower); slower.battle.round=8; slower.party.forEach(m=>{if(m){m.might=50000;m.speed=999;}}); slower.battle.enemies[0].hp=1; resolveRound(slower,'attack',rng(0));
+equal(slower.worldBossRecords.fastestRound,3,'slower victory does not overwrite record');
+
+equal(getMasteryLevel(0),1,'mastery level one');
+equal(getMasteryLevel(100),2,'mastery level two');
+equal(getMasteryLevel(300),3,'mastery level three');
+equal(getMasteryLevel(700),4,'mastery level four');
+equal(getMasteryLevel(1500),5,'mastery level five');
+const mastery=unlocked(); addTigerToRoster(mastery);
+equal(awardWorldBossMastery(mastery,{boss:true,bossRarityRank:5}),0,'reserve tiger gains no mastery');
+deployRosterMember(mastery,'crimson-tiger',4);
+equal(awardWorldBossMastery(mastery,{boss:false,elite:false}),1,'normal fight gives little mastery');
+equal(awardWorldBossMastery(mastery,{boss:true,bossRarityRank:3}),8,'rare boss gives more mastery');
+equal(awardWorldBossMastery(mastery,{boss:true,bossRarityRank:4,dungeon:true}),15,'dungeon boss mastery bonus');
+mastery.worldBossMastery.exp=1500; mastery.worldBossMastery.level=5;
+const baseTiger=createCrimsonTiger();
+check(getFinalStats(mastery,'crimson-tiger').maxHp>baseTiger.maxHp,'mastery hp bonus applies');
+check(getFinalStats(mastery,'crimson-tiger').might>baseTiger.might,'mastery might bonus applies');
+const stableMight=mastery.party[4].might; getFinalStats(mastery,'crimson-tiger'); getFinalStats(mastery,'crimson-tiger');
+equal(mastery.party[4].might,stableMight,'mastery does not mutate base stats');
+equal(getMasteryProfile(mastery).skillPct,.15,'mastery skill bonus capped');
+
+const complete=unlocked();
+for(const rank of [1,2,3,4,5]) complete.bossCodex.blackwind.ranks[rank]={encountered:true,defeated:true,captured:true};
+for(const id of BLACKWIND_DROPS) complete.bossCodex.blackwind.drops[id]=true;
+for(const id of CODEX_MATERIALS) complete.bossCodex.blackwind.talismans[id]=true;
+for(const id of DIVINE_CODEX_MATERIALS) complete.bossCodex.blackwind.divineTalismans[id]=true;
+Object.assign(complete.worldBossCodex,{discovered:true,challenged:true,defeated:true,captured:true});
+for(const id of WORLD_BOSS_DROPS) complete.worldBossCodex.drops[id]=true;
+equal(getCodexCompletion(complete).overall,100,'total completion reaches 100');
+check(claimCollectionMilestone(complete,25),'25 milestone claim');
+check(!claimCollectionMilestone(complete,25),'milestone cannot repeat');
+check(claimCollectionMilestone(complete,50),'50 milestone claim');
+check(claimCollectionMilestone(complete,75),'75 milestone claim');
+const goldBefore=complete.gold; check(claimCollectionMilestone(complete,100),'100 milestone claim'); check(complete.gold>goldBefore,'100 milestone gold reward');
+
+const old=createState('舊存檔'); old.version=11; old.progress.bossRecruited=true; old.progress.bossDefeated=true; old.inventory.overlordBlade=1; old.inventory.crimsonWarArmor=1; old.bossProgress.talismans.advanced=2; old.worldBoss={...old.worldBoss,unlocked:true,attempts:4,defeated:true,captured:true}; old.roster=[createCrimsonTiger()];
+old.bossProgress.records=[{type:'capture',rank:4,success:true},{type:'capture',rank:5,success:false}];
+const migrated=normalize(old);
+equal(migrated.version,12,'old save migrated');
+check(migrated.bossCodex.blackwind.ranks[1].captured,'existing recruit migrates');
+check(migrated.bossCodex.blackwind.drops.overlordBlade,'existing blackwind gear migrates');
+check(migrated.worldBossCodex.drops.crimsonWarArmor,'existing world gear migrates');
+check(migrated.worldBossCodex.defeated && migrated.worldBossCodex.captured,'existing world state migrates');
+check(migrated.bossCodex.blackwind.ranks[4].captured,'historical capture rank migrates');
+equal(migrated.bossCodex.blackwind.captureFailures,1,'historical failed capture migrates');
+migrated.screen='party'; html=render(migrated); check(html.includes('世界王熟練 Lv.1'),'roster shows world boss mastery');
+const reload=normalize(migrated); equal(reload.worldBossMastery.exp,migrated.worldBossMastery.exp,'reload mastery stable'); check(reload.collectionMilestones.claimed['25']===migrated.collectionMilestones.claimed['25'],'claimed milestones stable');
+
+const sw=fs.readFileSync(new URL('../service-worker.js',import.meta.url),'utf8');
+check(sw.includes('v016-boss-codex'),'service worker cache updated');
+check(sw.includes('boss-codex-system.js'),'codex module cached');
+console.log(`V0.1.6 boss codex smoke: ${passed} assertions passed.`);

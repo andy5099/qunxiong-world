@@ -1,4 +1,4 @@
-import { createCrimsonTiger } from './data.js?v=v015-world-boss';
+import { createCrimsonTiger } from './data.js?v=v016-boss-codex';
 
 export const WORLD_BOSS = {
   id: 'crimsonTiger',
