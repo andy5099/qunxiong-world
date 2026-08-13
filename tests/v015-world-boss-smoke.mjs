@@ -1,0 +1,166 @@
+import { ITEMS, SAVE_VERSION, createCrimsonTiger } from '../src/data.js';
+import { captureWorldBoss, createWorldBossEncounter, equipItem, getFinalStats, getTeamPower, optimizeEquipment, performEnemyAction, resolveRound, spareWorldBoss } from '../src/engine.js';
+import { createState, normalize } from '../src/store.js';
+import { WORLD_BOSS, addTigerToRoster, createWorldBossEnemy, deployRosterMember, getWorldBossResonance, normalizeWorldBoss, withdrawPartyMember } from '../src/world-boss-system.js';
+import { render } from '../src/ui.js';
+import fs from 'node:fs';
+
+let passed = 0;
+const check = (value, label) => { if (!value) throw new Error(label); passed += 1; };
+const equal = (actual, expected, label) => check(actual === expected, `${label}: ${actual} !== ${expected}`);
+const rng = value => () => value;
+const unlockedState = () => { const state = createState('世界王測試'); state.progress.chapterOneComplete = true; state.worldBoss.unlocked = true; return state; };
+
+equal(SAVE_VERSION, 11, 'save version 11');
+equal(WORLD_BOSS.name, '赤焰魔虎', 'world boss name');
+equal(WORLD_BOSS.recommendedPower, 30000, 'recommended power');
+equal(WORLD_BOSS.captureRate, 0.05, 'capture rate');
+const enemy = createWorldBossEnemy();
+equal(enemy.maxHp, 12800, 'fixed world boss hp');
+equal(enemy.might, 310, 'fixed world boss might');
+equal(enemy.defense, 145, 'fixed world boss defense');
+equal(enemy.speed, 88, 'fixed world boss speed');
+check(enemy.worldBoss && enemy.boss, 'world boss identity');
+equal(enemy.phase, 1, 'starts phase one');
+
+const state = unlockedState();
+const powerBefore = getTeamPower(state);
+const battle = createWorldBossEncounter(state);
+check(Boolean(battle), 'world boss encounter created');
+equal(state.worldBoss.attempts, 1, 'attempt recorded');
+check(!state.exploration.auto && !state.exploration.active, 'exploration stopped');
+check(battle.source === 'worldBoss' && battle.areaId === 'worldBoss', 'independent battle source');
+equal(battle.enemies.length, 1, 'world boss fights alone');
+equal(getTeamPower(state), powerBefore, 'encounter does not scale player or boss');
+
+const locked = createState('未解鎖');
+equal(createWorldBossEncounter(locked), null, 'altar locked before chapter completion');
+const migrated = normalize({ ...createState('舊檔'), version: 10, progress: { ...createState('舊檔').progress, chapterOneComplete: true } });
+check(migrated.worldBoss.unlocked, 'old save unlocks altar after chapter one');
+equal(migrated.worldBoss.attempts, 0, 'migration adds attempts');
+equal(migrated.worldBoss.lowestHpPct, 100, 'migration adds lowest hp record');
+const rewardMigrated = normalize({ ...migrated, worldBoss: { ...migrated.worldBoss, firstRewardClaimed: true } });
+check(rewardMigrated.worldBoss.firstRewardClaimed, 'first reward claim persists');
+const normalized = normalizeWorldBoss({ attempts: -2, bestPhase: 9, lowestHpPct: -4 });
+equal(normalized.attempts, 0, 'invalid attempts clamped');
+equal(normalized.bestPhase, 3, 'phase clamped');
+equal(normalized.lowestHpPct, 0, 'hp record clamped');
+
+const phase = unlockedState();
+createWorldBossEncounter(phase);
+phase.party.forEach(member => { if (member) { member.might = 10000; member.speed = 999; } });
+phase.battle.enemies[0].hp = Math.round(phase.battle.enemies[0].maxHp * 0.69);
+resolveRound(phase, 'attack', rng(0));
+check(phase.worldBoss.bestPhase >= 2, '70 percent enters phase two');
+const phaseThree = unlockedState();
+createWorldBossEncounter(phaseThree);
+phaseThree.party.forEach(member => { if (member) { member.might = 10000; member.speed = 999; } });
+phaseThree.battle.enemies[0].hp = Math.round(phaseThree.battle.enemies[0].maxHp * 0.34);
+resolveRound(phaseThree, 'attack', rng(0));
+check(phaseThree.worldBoss.bestPhase >= 3, '35 percent enters phase three');
+
+const lowPower = unlockedState();
+createWorldBossEncounter(lowPower);
+lowPower.party.filter(Boolean).forEach(member => { member.hp = 1; member.speed = 0; });
+resolveRound(lowPower, 'attack', rng(0));
+for (let round = 0; round < 6 && !lowPower.battle.finished; round += 1) resolveRound(lowPower, 'attack', rng(0));
+equal(lowPower.screen, 'village', 'low power defeat returns to village');
+check(lowPower.battle.finished && lowPower.battle.result === 'defeat', 'low power team can be defeated');
+check(lowPower.worldBoss.bestPhase >= 1, 'defeat records best phase');
+
+const victory = unlockedState();
+createWorldBossEncounter(victory);
+victory.party.filter(Boolean).forEach(member => { member.might = 20000; member.speed = 999; });
+victory.battle.enemies[0].hp = 1;
+resolveRound(victory, 'attack', rng(0));
+check(victory.battle.finished && victory.battle.result === 'victory', 'high power team defeats world boss');
+check(victory.battle.awaitingRecruit, 'victory awaits capture choice');
+check(victory.worldBoss.defeated && victory.worldBoss.defeats === 1, 'victory record saved');
+equal(victory.inventory.crimsonTigerClaw, 1, 'first victory guarantees tiger claw');
+check(victory.bossProgress.talismans.advanced >= 2, 'high rank promotion talismans rewarded');
+check(victory.bossProgress.divineTalismans.advanced >= 2, 'high rank divine talismans rewarded');
+const inventoryAfterVictory = { ...victory.inventory };
+check(!captureWorldBoss(victory, rng(0.99)), 'victory capture failure path');
+equal(victory.inventory.crimsonTigerClaw, inventoryAfterVictory.crimsonTigerClaw, 'capture failure keeps loot');
+
+const roar = unlockedState();
+const roarEnemy = createWorldBossEnemy();
+roarEnemy.phase = 1;
+performEnemyAction(roar, roarEnemy, rng(0.99));
+check(roar.party.filter(Boolean).every(member => member.weakenedRounds === 2), 'roar weakens whole party');
+
+const armorA = unlockedState();
+const armorB = unlockedState();
+armorA.party[0].maxHp = 2000; armorA.party[0].hp = 2000;
+armorB.party[0].maxHp = 2000; armorB.party[0].hp = 2000;
+armorB.inventory.crimsonWarArmor = 1;
+equipItem(armorB, 'hero', 'crimsonWarArmor');
+const attackA = createWorldBossEnemy(); attackA.phase = 1;
+const attackB = createWorldBossEnemy(); attackB.phase = 1;
+const hpA = armorA.party.reduce((sum, member) => sum + (member?.hp || 0), 0);
+const hpB = armorB.party.reduce((sum, member) => sum + (member?.hp || 0), 0);
+performEnemyAction(armorA, attackA, rng(0));
+performEnemyAction(armorB, attackB, rng(0));
+const lossA = hpA - armorA.party.reduce((sum, member) => sum + (member?.hp || 0), 0);
+const lossB = hpB - armorB.party.reduce((sum, member) => sum + (member?.hp || 0), 0);
+check(lossB < lossA, 'world boss armor reduces boss skill damage');
+
+const tigerState = unlockedState();
+check(addTigerToRoster(tigerState), 'captured tiger added to roster');
+equal(tigerState.party.filter(Boolean).length, 4, 'full party not overwritten');
+equal(tigerState.roster[0].id, 'crimson-tiger', 'tiger waits in roster');
+check(!addTigerToRoster(tigerState), 'duplicate tiger rejected');
+check(deployRosterMember(tigerState, 'crimson-tiger', 4), 'deploy tiger to fifth slot');
+equal(tigerState.party[4].id, 'crimson-tiger', 'tiger occupies selected slot');
+check(withdrawPartyMember(tigerState, 'crimson-tiger'), 'withdraw tiger');
+equal(tigerState.party[4], null, 'withdraw clears party slot');
+equal(tigerState.roster[0].id, 'crimson-tiger', 'withdraw returns tiger to roster');
+
+deployRosterMember(tigerState, 'crimson-tiger', 4);
+Object.assign(tigerState.inventory, { crimsonTigerClaw: 1, crimsonWarArmor: 1, crimsonTigerSeal: 1 });
+equipItem(tigerState, 'crimson-tiger', 'crimsonTigerClaw');
+equipItem(tigerState, 'crimson-tiger', 'crimsonWarArmor');
+equipItem(tigerState, 'crimson-tiger', 'crimsonTigerSeal');
+equal(getWorldBossResonance(tigerState, 'crimson-tiger').set, '赤焰霸主', 'three-piece resonance active');
+check(getFinalStats(tigerState, 'crimson-tiger').might > createCrimsonTiger().might + ITEMS.crimsonTigerClaw.stats.might, 'resonance increases might');
+equal(getWorldBossResonance(tigerState, 'guan-yu').set, null, 'other officers do not trigger world boss resonance');
+const optimized = unlockedState(); addTigerToRoster(optimized); deployRosterMember(optimized, 'crimson-tiger', 4);
+Object.assign(optimized.inventory, { crimsonTigerClaw: 1, crimsonWarArmor: 1, crimsonTigerSeal: 1 });
+optimizeEquipment(optimized);
+equal(optimized.equipment['crimson-tiger'].weapon, 'crimsonTigerClaw', 'optimizer assigns tiger weapon');
+equal(optimized.equipment['crimson-tiger'].armor, 'crimsonWarArmor', 'optimizer assigns tiger armor');
+equal(optimized.equipment['crimson-tiger'].accessory, 'crimsonTigerSeal', 'optimizer assigns tiger accessory');
+
+const capture = unlockedState(); createWorldBossEncounter(capture); capture.battle.finished = true; capture.battle.awaitingRecruit = true;
+check(captureWorldBoss(capture, rng(0)), 'five percent capture can succeed');
+equal(capture.roster[0].id, 'crimson-tiger', 'capture stores tiger without overwrite');
+const failCapture = unlockedState(); createWorldBossEncounter(failCapture); failCapture.battle.finished = true; failCapture.battle.awaitingRecruit = true;
+check(!captureWorldBoss(failCapture, rng(0.99)), 'capture can fail');
+equal(failCapture.battle, null, 'failed capture closes battle safely');
+const spare = unlockedState(); createWorldBossEncounter(spare); spare.battle.finished = true; spare.battle.awaitingRecruit = true;
+check(spareWorldBoss(spare), 'world boss can be spared');
+equal(spare.battle, null, 'spare closes battle safely');
+
+const altar = unlockedState(); altar.screen = 'worldBoss';
+const altarHtml = render(altar);
+check(altarHtml.includes('世界王・赤焰魔虎'), 'altar renders world boss');
+check(altarHtml.includes('30,000'), 'altar renders recommendation');
+check(altarHtml.includes('挑戰世界王'), 'altar renders challenge action');
+altar.ui.worldBossConfirm = true;
+check(render(altar).includes('硬闖'), 'low power can still challenge');
+const rosterUi = unlockedState(); addTigerToRoster(rosterUi); rosterUi.screen = 'party';
+check(render(rosterUi).includes('武將名冊・候補'), 'roster UI rendered');
+check(render(rosterUi).includes('編入第 5 位'), 'roster deployment action rendered');
+const fullRosterSave = unlockedState();
+fullRosterSave.progress.bossRecruited = true;
+fullRosterSave.party[4] = createCrimsonTiger();
+fullRosterSave.roster = [{ ...createState('名冊').party[0], id: 'blackwind-lord', name: '黑風寨主' }];
+const restoredRoster = normalize(fullRosterSave);
+equal(restoredRoster.party[4].id, 'crimson-tiger', 'reload preserves deployed tiger');
+equal(restoredRoster.roster.filter(member => member.id === 'blackwind-lord').length, 1, 'reload does not duplicate displaced leader');
+
+const sw = fs.readFileSync(new URL('../service-worker.js', import.meta.url), 'utf8');
+check(sw.includes('v015-world-boss'), 'service worker cache updated');
+check(sw.includes('world-boss-system.js'), 'service worker caches world boss module');
+
+console.log(`V0.1.5 world boss smoke: ${passed} assertions passed.`);

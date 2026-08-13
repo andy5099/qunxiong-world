@@ -26,3 +26,6 @@
 
 /* V0.1.4: Boss gear evolution and divine talismans */
 .quality-legendary{color:#ffd86b;border-color:#f6c453!important;box-shadow:0 0 18px rgba(246,196,83,.35);background:linear-gradient(135deg,rgba(91,43,18,.88),rgba(41,24,68,.88))!important}.resonance-box,.divine-panel,.gear-evolution{display:grid;gap:.4rem;margin-top:.75rem;padding:.75rem;border:1px solid rgba(246,196,83,.45);border-radius:12px;background:rgba(16,26,51,.75)}.resonance-box span,.gear-evolution span{font-size:.82rem}.divine-panel{margin-bottom:1rem}.divine-loot{color:#ffd86b;font-weight:800}
+
+/* V0.1.5: Crimson Tiger world boss */
+.world-boss-scene{background:radial-gradient(circle at 70% 35%,#ff7b32 0 4%,transparent 20%),linear-gradient(#531a14 0 48%,#1e0a08 49%)}.world-boss-card{border-color:#ff6a32;box-shadow:0 0 30px #e6422844}.world-boss-card dl{display:grid;grid-template-columns:repeat(2,1fr);gap:.45rem}.world-boss-card dl div,.roster-box article{padding:.65rem;border:1px solid #8d4a2c;background:#190c08}.world-boss-card dd{margin:.2rem 0;color:#ffd86b;font-weight:800}.roster-box{display:grid;gap:.55rem;margin-top:1rem}.roster-box article{display:grid;gap:.4rem}.game-nav{grid-template-columns:repeat(9,minmax(72px,1fr))}@media(max-width:520px){.world-boss-card dl{grid-template-columns:1fr 1fr}}

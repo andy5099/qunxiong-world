@@ -1,5 +1,6 @@
-import { SAVE_VERSION, createBlackwindLeader, createParty } from './data.js?v=v014-boss-gear';
+import { SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createParty } from './data.js?v=v015-world-boss';
 import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v014-boss-gear';
+import { normalizeWorldBoss } from './world-boss-system.js?v=v015-world-boss';
 
 export const STORAGE_KEY = 'qunxiong-world-v01';
 const LEGACY_KEY = 'qunxiong-world-v2';
@@ -20,11 +21,14 @@ export function createState(playerName) {
       'guan-yu': { weapon: null, armor: null, accessory: null },
       'zhang-fei': { weapon: null, armor: null, accessory: null },
       'blackwind-lord': { weapon: null, armor: null, accessory: null }
+      ,'crimson-tiger': { weapon: null, armor: null, accessory: null }
     },
     unlocks: { forest: false, stronghold: false },
     progress: { forestEntered: false, strongholdKills: 0, bossUnlocked: false, bossDefeated: false, bossFirstKill: false, bossRecruited: false, chapterOneComplete: false, totalKills: 0, elitesDefeated: 0, bossEncounterCount: 0, bossEncounters: 0 },
     bossProgress: normalizeBossProgress(),
-    ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false, bossWarning: false, bossRarityRank: null, captureResult: null, quickEquipItem: null, partyEquipMember: null, partyEquipSlot: null, optimizeChanges: [] },
+    worldBoss: normalizeWorldBoss(),
+    roster: [],
+    ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false, bossWarning: false, bossRarityRank: null, worldBossConfirm: false, captureResult: null, quickEquipItem: null, partyEquipMember: null, partyEquipSlot: null, optimizeChanges: [] },
     settings: { autoBattle: false },
     exploration: { auto: false, active: false },
     dungeon: { warning: false, active: false, name: '血色洞窟', floor: 0, sourceScreen: null, sourceLocation: null, pity: 0, awaitingAdvance: false, completed: false, loot: { gold: 0, potion: 0, items: [], talismans: {} } },
@@ -75,8 +79,12 @@ export function normalize(raw) {
     progress.bossDefeated = true;
     progress.chapterOneComplete = true;
   }
-  if (progress.bossRecruited && !party[4]) party[4] = createBlackwindLeader();
   party[0].name = base.playerName;
+  const activeIds = new Set(party.filter(Boolean).map(member => member.id));
+  const roster = Array.isArray(raw.roster) ? raw.roster.map(member => normalizeMember(member, member?.id === 'crimson-tiger' ? createCrimsonTiger() : null)).filter(member => member && !activeIds.has(member.id)).slice(0,20) : [];
+  if (progress.bossRecruited && !party.some(member => member?.id === 'blackwind-lord') && !roster.some(member => member?.id === 'blackwind-lord')) roster.push(createBlackwindLeader());
+  const worldBoss = normalizeWorldBoss({ ...(raw.worldBoss || {}), unlocked: raw.worldBoss?.unlocked || progress.chapterOneComplete });
+  if (party.some(member=>member?.id==='crimson-tiger') || roster.some(member=>member?.id==='crimson-tiger')) worldBoss.captured=true;
   const rawDungeon = raw.dungeon || {};
   const dungeonSource = ['forest', 'stronghold'].includes(rawDungeon.sourceScreen) ? rawDungeon.sourceScreen : null;
   const dungeon = {
@@ -116,14 +124,16 @@ export function normalize(raw) {
       stronghold: Boolean(raw.unlocks?.stronghold || (party[0].level >= 5 && progress.forestEntered))
     },
     progress,
+    roster,
+    worldBoss,
     dungeon,
     bossProgress: normalizeBossProgress(raw.bossProgress),
-    ui: { ...base.ui, ...(raw.ui || {}), bossWarning: false, bossRarityRank: null, captureResult: null, optimizeChanges: [] },
+    ui: { ...base.ui, ...(raw.ui || {}), bossWarning: false, bossRarityRank: null, worldBossConfirm: false, captureResult: null, optimizeChanges: [] },
     settings: { ...base.settings, ...(raw.settings || {}) },
     exploration: { ...base.exploration, ...(raw.exploration || {}), auto: false, active: false },
     battle: null,
     log: Array.isArray(raw.log) ? raw.log.slice(-60) : [],
-    screen: dungeonSource && (rawDungeon.active || rawDungeon.warning) ? dungeonSource : ['village', 'plain', 'forest', 'stronghold', 'party', 'inventory', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
+    screen: dungeonSource && (rawDungeon.active || rawDungeon.warning) ? dungeonSource : ['village', 'plain', 'forest', 'stronghold', 'worldBoss', 'party', 'inventory', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
   };
 }
 

@@ -1,6 +1,7 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v014-boss-gear';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v015-world-boss';
 import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v014-boss-gear';
 import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo, rollDivineTalismanDrops } from './boss-gear-system.js?v=v014-boss-gear';
+import { WORLD_BOSS, addTigerToRoster, createWorldBossEnemy, getWorldBossResonance } from './world-boss-system.js?v=v015-world-boss';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -20,10 +21,11 @@ export function getFinalStats(state, memberOrId) {
     for (const [stat, value] of Object.entries(item.stats)) result[stat] = (result[stat] || 0) + value;
   }
   const resonance = getBlackwindResonance(state, member);
-  result.might = Math.round(result.might * (1 + resonance.mightPct));
-  result.defense = Math.round(result.defense * (1 + resonance.defensePct));
-  result.maxHp = Math.round(result.maxHp * (1 + resonance.hpPct));
-  result.speed = Math.round(result.speed * (1 + resonance.speedPct));
+  const worldResonance = getWorldBossResonance(state, member);
+  result.might = Math.round(result.might * (1 + resonance.mightPct + worldResonance.mightPct));
+  result.defense = Math.round(result.defense * (1 + resonance.defensePct + worldResonance.defensePct));
+  result.maxHp = Math.round(result.maxHp * (1 + resonance.hpPct + worldResonance.hpPct));
+  result.speed = Math.round(result.speed * (1 + resonance.speedPct + worldResonance.speedPct));
   return result;
 }
 
@@ -335,6 +337,16 @@ export function createBossEncounter(state, forcedRank) {
   return state.battle;
 }
 
+export function createWorldBossEncounter(state) {
+  if (!state.worldBoss?.unlocked || state.battle || state.dungeon.active || state.dungeon.warning || state.ui.bossWarning) return null;
+  state.exploration.auto=false; state.exploration.active=false; state.ui.bossWarning=false;
+  const boss=createWorldBossEnemy();
+  state.worldBoss.attempts+=1;
+  state.battle={enemies:[boss],round:1,awaitingCommand:true,finished:false,areaId:'worldBoss',source:'worldBoss',boss:true,worldBoss:true,bossRarityRank:5,awaitingRecruit:false,recommendedPower:WORLD_BOSS.recommendedPower};
+  state.party.filter(Boolean).forEach(member=>{member.guarding=false;}); state.log=[];
+  appendLog(state,'★★★★★ 世界王・赤焰魔虎降臨！','epic'); state.notice='世界王挑戰開始！'; return state.battle;
+}
+
 export function retreatFromBoss(state) {
   if (!state.ui.bossWarning) return false;
   state.ui.bossWarning = false;
@@ -348,7 +360,8 @@ export function retreatFromBoss(state) {
 }
 
 function attackPower(state, actor, multiplier = 1, rng = Math.random) {
-  const might = actor.side === 'enemy' ? actor.might : getFinalStats(state, actor).might;
+  const rawMight = actor.side === 'enemy' ? actor.might : getFinalStats(state, actor).might;
+  const might = actor.side === 'enemy' ? rawMight : rawMight * (actor.weakenedRounds > 0 ? 0.85 : 1);
   const variance = 0.9 + rng() * 0.2;
   return Math.round(might * multiplier * variance);
 }
@@ -357,7 +370,8 @@ function dealDamage(state, actor, target, skill = false, rng = Math.random, skil
   const baseDefense = target.side === 'enemy' ? target.defense : getFinalStats(state, target).defense;
   const targetDefense = Math.max(0, baseDefense - (target.intimidatedRounds > 0 ? 5 : 0));
   const reduced = target.guarding ? 0.48 : 1;
-  const damage = Math.max(1, Math.round((attackPower(state, actor, skill ? multiplier : 1, rng) - targetDefense * 0.45) * reduced));
+  const bossSkillReduction = actor.boss && skill && target.side !== 'enemy' && state.equipment?.[target.id]?.armor === 'crimsonWarArmor' ? 0.88 : 1;
+  const damage = Math.max(1, Math.round((attackPower(state, actor, skill ? multiplier : 1, rng) - targetDefense * 0.45) * reduced * bossSkillReduction));
   target.hp = Math.max(0, target.hp - damage);
   const actorName = actor.displayName || actor.name;
   const targetName = target.displayName || target.name;
@@ -369,6 +383,20 @@ export function performEnemyAction(state, enemy, rng = Math.random) {
   const targets = state.party.filter(alive);
   if (!targets.length) return null;
   const target = pick(targets, rng);
+  if (enemy.worldBoss) {
+    const phase=enemy.phase||1, roll=rng();
+    if(phase>=3 && roll<.42){
+      const damage=targets.reduce((sum,unit)=>sum+dealDamage(state,enemy,unit,true,rng,'焚天',2.35),0); return {type:'inferno',damage};
+    }
+    if(phase>=3 && roll<.72){
+      const hunted=[...targets].sort((a,b)=>a.hp/getFinalStats(state,a).maxHp-b.hp/getFinalStats(state,b).maxHp)[0]; return {type:'hunt',targetId:hunted.id,damage:dealDamage(state,enemy,hunted,true,rng,'獵殺',2.65)};
+    }
+    if(phase>=2 && roll<.55){
+      const damage=targets.reduce((sum,unit)=>sum+dealDamage(state,enemy,unit,true,rng,'烈焰橫掃',1.38),0); return {type:'sweep',damage};
+    }
+    if(roll<.78) return {type:'rend',damage:dealDamage(state,enemy,target,true,rng,'烈焰撕裂',1.9)};
+    targets.forEach(unit=>{unit.weakenedRounds=2;}); appendLog(state,'赤焰魔虎施展虎嘯，全隊武力暫時下降！','epic'); return {type:'roar'};
+  }
   if (enemy.boss) {
     const roll = rng();
     if (enemy.mp >= 7 && roll < 0.45) {
@@ -425,6 +453,7 @@ export function rollBattleDrop(enemies, rng = Math.random, bossBattle = false, f
 function finishVictory(state, rng) {
   const defeated = state.battle.enemies;
   const bossBattle = Boolean(state.battle.boss);
+  const worldBossBattle = Boolean(state.battle.worldBoss);
   const eliteBattle = defeated.some(enemy => enemy.elite);
   const firstBossKill = bossBattle && !state.progress.bossFirstKill;
   const exp = defeated.reduce((sum, enemy) => sum + enemy.exp, 0);
@@ -449,6 +478,17 @@ function finishVictory(state, rng) {
   if (bossBattle) {
     state.progress.bossDefeated = true;
     state.progress.bossFirstKill = true;
+  }
+  if (worldBossBattle) {
+    state.worldBoss.defeated=true; state.worldBoss.defeats+=1; state.worldBoss.bestPhase=3; state.worldBoss.lowestHpPct=0;
+    const guaranteed=!state.worldBoss.firstRewardClaimed;
+    const dropId=guaranteed?'crimsonTigerClaw':pick(['crimsonTigerClaw','crimsonWarArmor','crimsonTigerSeal'],rng);
+    state.inventory[dropId]=(state.inventory[dropId]||0)+1; state.battle.dropId=dropId; state.battle.dropQuality='傳說';
+    state.bossProgress.talismans.advanced=(state.bossProgress.talismans.advanced||0)+2;
+    if(rng()<.35) state.bossProgress.talismans.legendary=(state.bossProgress.talismans.legendary||0)+1;
+    state.bossProgress.divineTalismans.advanced=(state.bossProgress.divineTalismans.advanced||0)+2;
+    state.battle.worldBossLoot={advanced:2,divineAdvanced:2,itemId:dropId}; state.worldBoss.firstRewardClaimed=true;
+    state.battle.awaitingRecruit=true; state.notice='世界王・赤焰魔虎倒下了！你完成了目前最危險的挑戰！'; appendLog(state,state.notice,'epic');
   }
   refreshUnlocks(state);
   let dropId = rollBattleDrop(defeated, rng, bossBattle, firstBossKill);
@@ -499,7 +539,7 @@ function finishVictory(state, rng) {
   state.battle.finished = true;
   state.battle.result = 'victory';
   state.battle.awaitingRecruit = bossBattle;
-  state.notice = state.battle.dungeon && bossBattle ? `秘境 Boss 已擊破！獲得 ${exp} EXP、${gold} 金與攻略完成獎勵。` : bossBattle ? `黑風寨主已敗！全隊獲得 ${exp} EXP，取得 ${gold} 金。${dropId ? ` 獲得【${ITEMS[dropId].name}】！` : ''}` : `戰鬥勝利！全隊獲得 ${exp} EXP，取得 ${gold} 金。${dropId ? ` 獲得【${ITEMS[dropId].name}】！` : ''}`;
+  state.notice = worldBossBattle ? '世界王・赤焰魔虎倒下了！你完成了目前最危險的挑戰！' : state.battle.dungeon && bossBattle ? `秘境 Boss 已擊破！獲得 ${exp} EXP、${gold} 金與攻略完成獎勵。` : bossBattle ? `黑風寨主已敗！全隊獲得 ${exp} EXP，取得 ${gold} 金。${dropId ? ` 獲得【${ITEMS[dropId].name}】！` : ''}` : `戰鬥勝利！全隊獲得 ${exp} EXP，取得 ${gold} 金。${dropId ? ` 獲得【${ITEMS[dropId].name}】！` : ''}`;
   appendLog(state, state.notice, dropId ? 'drop' : '');
 }
 
@@ -522,6 +562,7 @@ function finishDefeat(state) {
   state.screen = 'village';
   state.location = '桃源村';
   state.notice = `全隊戰敗，被村民救回桃源村，損失 ${loss} 金。`;
+  if(state.battle?.worldBoss){const enemy=state.battle.enemies[0],pct=Math.max(0,Math.round(enemy.hp/enemy.maxHp*100));state.worldBoss.bestPhase=Math.max(state.worldBoss.bestPhase,enemy.phase||1);state.worldBoss.lowestHpPct=Math.min(state.worldBoss.lowestHpPct,pct);}
   appendLog(state, state.notice);
 }
 
@@ -554,12 +595,18 @@ export function resolveRound(state, command = 'attack', rng = Math.random) {
       const useSlam = turn.unit.isPlayer && command === 'slam' && turn.unit.mp >= 6;
       const leaderProfile = turn.unit.id === 'blackwind-lord' ? getBlackwindResonance(state, turn.unit) : null;
       const freeAssault = Boolean(turn.unit.id === 'blackwind-lord' && battle.freeLeaderAssault);
+      const tigerProfile=turn.unit.id==='crimson-tiger'?getWorldBossResonance(state,turn.unit):null;
+      const tigerSkill=turn.unit.id==='crimson-tiger'&&turn.unit.mp>=10&&rng()<.42;
       const leaderAssault = turn.unit.id === 'blackwind-lord' && (freeAssault || (turn.unit.mp >= 5 && rng() < 0.35));
       if (useSlam) turn.unit.mp -= 6;
       if (leaderAssault && !freeAssault) turn.unit.mp -= 5;
+      if(tigerSkill)turn.unit.mp-=10;
       if (freeAssault) battle.freeLeaderAssault = false;
       const leaderMultiplier = (1.55 + ((turn.unit.rarityRank || 1) - 1) * 0.13) * (1 + (leaderProfile?.assaultPct || 0));
-      dealDamage(state, turn.unit, targets[0], useSlam || leaderAssault, rng, leaderAssault ? '強襲' : '猛擊', leaderAssault ? leaderMultiplier : 1.65);
+      const tigerMultiplier=1.72*(1+(tigerProfile?.skillPct||0));
+      dealDamage(state, turn.unit, targets[0], useSlam || leaderAssault || tigerSkill, rng, leaderAssault ? '強襲' : tigerSkill?'烈焰撕裂':'猛擊', leaderAssault ? leaderMultiplier : tigerSkill?tigerMultiplier:1.65);
+      const worldTarget=targets[0];
+      if(worldTarget.worldBoss){const ratio=worldTarget.hp/worldTarget.maxHp;if(ratio<=.35&&worldTarget.phase<3){worldTarget.phase=3;worldTarget.might=Math.round(worldTarget.might*1.28);worldTarget.speed=Math.round(worldTarget.speed*1.18);appendLog(state,'赤焰魔虎徹底暴走！','epic');}else if(ratio<=.70&&worldTarget.phase<2){worldTarget.phase=2;worldTarget.might=Math.round(worldTarget.might*1.18);worldTarget.speed=Math.round(worldTarget.speed*1.15);appendLog(state,'赤焰魔虎進入狂暴！','epic');}state.worldBoss.bestPhase=Math.max(state.worldBoss.bestPhase,worldTarget.phase);state.worldBoss.lowestHpPct=Math.min(state.worldBoss.lowestHpPct,Math.max(0,Math.round(ratio*100)));}
     } else performEnemyAction(state, turn.unit, rng);
     if (!state.party.some(alive)) break;
   }
@@ -572,6 +619,16 @@ export function resolveRound(state, command = 'attack', rng = Math.random) {
   }
   return true;
 }
+
+export function captureWorldBoss(state,rng=Math.random){
+  if(!state.battle?.worldBoss||!state.battle.awaitingRecruit)return false;
+  const success=rng()<WORLD_BOSS.captureRate;
+  if(success)addTigerToRoster(state);
+  state.battle=null;state.screen='worldBoss';state.location='世界王祭壇';state.exploration.auto=false;state.exploration.active=false;state.ui.bossWarning=false;
+  state.notice=success?'世界王・赤焰魔虎臣服！已加入武將名冊。':'赤焰魔虎掙脫束縛，消失在烈焰之中。戰利品全部保留。';return success;
+}
+
+export function spareWorldBoss(state){if(!state.battle?.worldBoss||!state.battle.awaitingRecruit)return false;state.battle=null;state.screen='worldBoss';state.location='世界王祭壇';state.notice='你放棄收服，世界王戰利品全部保留。';return true;}
 
 export function chooseAutoCommand(state, rng = Math.random) {
   const hero = state.party[0];
@@ -642,7 +699,7 @@ export function recommendMemberForItem(state, itemId) {
     const currentId = state.equipment[member.id]?.[item.slot];
     const delta = getItemScore(item) - getItemScore(ITEMS[currentId]);
     const affinity = item.slot === 'weapon' ? member.might : item.slot === 'armor' ? member.defense + member.maxHp * 0.08 : member.speed + member.might * 0.2;
-    const resonanceBonus = member.id === 'blackwind-lord' && getBossGearInfo(itemId) ? getItemScore(item) * 0.7 : 0;
+    const resonanceBonus = (member.id === 'blackwind-lord' && getBossGearInfo(itemId)) || (member.id === 'crimson-tiger' && item.worldBossOnly) ? getItemScore(item) * 0.7 : 0;
     return { member, current: ITEMS[currentId] || null, delta: delta + resonanceBonus, affinity };
   });
   return candidates.sort((a, b) => b.delta - a.delta || b.affinity - a.affinity)[0] || null;
@@ -684,6 +741,14 @@ export function optimizeEquipment(state) {
     if (leaderIndex >= 0 && bossGearIndex >= 0) {
       const [leader] = memberOrder.splice(leaderIndex, 1); memberOrder.unshift(leader);
       const [gear] = pool.splice(bossGearIndex, 1); pool.unshift(gear);
+    }
+    const tigerIndex = memberOrder.findIndex(member => member.id === 'crimson-tiger');
+    const tigerGearIndex = pool.findIndex(item => item.worldBossOnly);
+    if (tigerIndex >= 0 && tigerGearIndex >= 0) {
+      const [tiger] = memberOrder.splice(tigerIndex, 1);
+      memberOrder.unshift(tiger);
+      const [gear] = pool.splice(tigerGearIndex, 1);
+      pool.unshift(gear);
     }
     memberOrder.forEach((member, index) => { next[member.id][slot] = pool[index]?.id || null; });
   }
@@ -742,6 +807,7 @@ export function recruitBlackwindLeader(state, rng = Math.random) {
   state.equipment['blackwind-lord'] ||= { weapon: null, armor: null, accessory: null };
   state.progress.bossRecruited = true;
   state.progress.chapterOneComplete = true;
+  state.worldBoss.unlocked = true;
   state.ui.chapterComplete = firstRecruit;
   state.bossProgress.records.push({ type: 'capture', rank, success: true, at: Date.now() });
   state.bossProgress.records = state.bossProgress.records.slice(-80);
