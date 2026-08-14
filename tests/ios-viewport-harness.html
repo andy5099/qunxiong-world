@@ -1,0 +1,21 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>iOS viewport hotfix harness</title>
+<style>body{font:14px sans-serif}iframe{position:absolute;left:-10000px;border:0}.pass{color:green}.fail{color:red}</style>
+<h1>iOS viewport hotfix harness</h1>
+<ol id="results"></ol>
+<script>
+const sizes=[[390,844],[393,852],[430,932]];
+const output=document.querySelector('#results');
+Promise.all(sizes.map(([width,height])=>new Promise(resolve=>{
+  const frame=document.createElement('iframe');
+  frame.width=width;frame.height=height;frame.src=`../?ios-harness=${width}`;
+  frame.onload=()=>setTimeout(()=>{
+    const doc=frame.contentDocument;
+    const result={width,height,innerWidth:frame.contentWindow.innerWidth,innerHeight:frame.contentWindow.innerHeight,scrollWidth:doc.documentElement.scrollWidth,hasApp:Boolean(doc.querySelector('#app')?.textContent.trim()),hasBootError:!doc.querySelector('#boot-error')?.hidden,marbleLayers:doc.querySelectorAll('.marble-overlay').length};
+    const pass=result.hasApp&&!result.hasBootError&&result.scrollWidth<=result.innerWidth&&result.marbleLayers===0;
+    const item=document.createElement('li');item.className=pass?'pass':'fail';item.textContent=`${width}×${height}: ${pass?'PASS':'FAIL'} ${JSON.stringify(result)}`;output.appendChild(item);frame.remove();resolve(pass);
+  },400);
+  document.body.appendChild(frame);
+}))).then(results=>{document.body.dataset.result=results.every(Boolean)?'pass':'fail';});
+</script>

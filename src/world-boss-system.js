@@ -1,5 +1,5 @@
-import { createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v020-yellow-turban';
-import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v020-yellow-turban';
+import { createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v021-ios-boot-hotfix-1';
+import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v021-ios-boot-hotfix-1';
 
 export const WORLD_BOSSES = {
   crimsonTiger: {

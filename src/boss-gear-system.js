@@ -1,4 +1,4 @@
-import { ITEMS } from './data.js?v=v014-boss-gear';
+import { ITEMS } from './data.js?v=v021-ios-boot-hotfix-1';
 
 export const DIVINE_TALISMANS = {
   novice: { id: 'novice', name: '初階神兵符' },
