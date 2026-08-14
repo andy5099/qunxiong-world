@@ -1,14 +1,14 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v021-ios-boot-hotfix-1';
-import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v021-ios-boot-hotfix-1';
-import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v021-ios-boot-hotfix-1';
-import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v021-ios-boot-hotfix-1';
-import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState } from './world-boss-system.js?v=v021-ios-boot-hotfix-1';
-import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v021-ios-boot-hotfix-1';
-import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v021-ios-boot-hotfix-1';
-import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v021-ios-boot-hotfix-1';
-import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v021-ios-boot-hotfix-1';
-import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v021-ios-boot-hotfix-1';
-import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v021-ios-boot-hotfix-1';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v022-pinball-prototype-1';
+import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v022-pinball-prototype-1';
+import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v022-pinball-prototype-1';
+import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v022-pinball-prototype-1';
+import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState } from './world-boss-system.js?v=v022-pinball-prototype-1';
+import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v022-pinball-prototype-1';
+import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v022-pinball-prototype-1';
+import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v022-pinball-prototype-1';
+import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v022-pinball-prototype-1';
+import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v022-pinball-prototype-1';
+import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v022-pinball-prototype-1';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
@@ -255,6 +255,10 @@ export function renderFormationPanel(state, battle) {
 
 export function renderMarblePanel(state,battle){
   if(!battle||battle.mode!=='marble'||battle.finished)return'';const marble=ensureMarbleBattle(battle,state.party),boss=battle.enemies.find(enemy=>enemy.boss&&enemy.hp>0)||battle.enemies.find(enemy=>enemy.hp>0);if(!boss)return'';
+  if(marble.phase==='pinball'){
+    const team=state.party.slice(0,3).map((unit,index)=>{if(!unit)return'';const slot=marble.skills[index]||{energy:0,armed:false};return `<span class="pinball-member"><b>${esc(unit.name)}</b><i><em style="width:${slot.energy}%"></em></i><button type="button" data-pinball-skill="${index}" ${slot.energy<100?'disabled':''}>${slot.armed?'技能已備妥':slot.energy>=100?'技能':'能量 '+slot.energy+'%'}</button></span>`;}).join('');
+    return `<div class="marble-overlay"><section class="marble-panel pinball-panel"><header><div><p class="eyebrow">Boss 彈射戰 Prototype</p><h2>${esc(boss.displayName||boss.name)}</h2></div><strong class="marble-hit">${marble.combo||0} HIT</strong></header><div class="marble-boss-hp"><span>Boss HP ${Math.max(0,boss.hp).toLocaleString()} / ${boss.maxHp.toLocaleString()}</span>${hpBar(boss.hp,boss.maxHp,'enemy-meter')}</div><div class="pinball-break" data-pinball-break>${marble.breakTime>0?'BREAK！傷害提升':'連續命中弱點可 BREAK'}</div><canvas class="marble-canvas" aria-label="三武將彈射 Boss 戰場"></canvas><p class="pinball-hint">點擊或觸控戰場，啟動左右彈板。</p><div class="pinball-team">${team}</div></section></div>`;
+  }
   const member=state.party[marble.turnIndex],stats=member?getFinalStats(state,member):null,skill=getMarbleSkill(member),ultimate=getMarbleUltimate(member),energy=getUltimateEnergy(member),phase=boss.worldBoss?`第 ${boss.phase||1} 階段`:`回合 ${battle.round}`;
   const party=state.party.map((unit,index)=>unit?`<span class="marble-party-member${index===marble.turnIndex?' active':''}${unit.hp<=0?' defeated':''}${getUltimateEnergy(unit)>=100?' ready':''}"><b>${index+1}・${esc(unit.name)}</b><small>${Math.max(0,unit.hp)}/${getFinalStats(state,unit).maxHp}</small><i><em style="width:${getUltimateEnergy(unit)}%"></em></i><small>${getUltimateEnergy(unit)>=100?'全力一擊 READY':`全力 ${getUltimateEnergy(unit)}%`}</small></span>`:'<span class="marble-party-member empty"><b>空位</b></span>').join('');
   return `<div class="marble-overlay"><section class="marble-panel"><header><div><p class="eyebrow">武將彈射 Boss 戰・${phase}</p><h2>${esc(boss.displayName||boss.name)}</h2></div><strong class="marble-hit">${marble.shot.hits||0} HIT</strong></header><div class="marble-boss-hp"><span>Boss HP ${Math.max(0,boss.hp).toLocaleString()} / ${boss.maxHp.toLocaleString()}</span>${hpBar(boss.hp,boss.maxHp,'enemy-meter')}</div><canvas class="marble-canvas" aria-label="武將彈射戰場"></canvas><div class="marble-controls"><div class="marble-current"><b>${esc(member?.name||'')}</b><small>兵 ${member?.hp||0}/${stats?.maxHp||0}・技 ${member?.mp||0}/${member?.maxMp||0}</small></div><div class="marble-action-buttons"><button type="button" data-marble-skill class="marble-skill" ${!member||member.mp<skill.cost?'disabled':''}>${esc(skill.name)}・技 ${skill.cost}</button><button type="button" data-marble-ultimate class="marble-ultimate" ${energy<100?'disabled':''}>${energy>=100?`全力一擊 READY・${esc(ultimate.name)}`:`全力一擊 ${energy}%`}</button></div><div class="marble-meter-row"><span>POWER</span><div class="marble-meter"><i class="marble-power-fill"></i></div><strong class="marble-time">6.0</strong></div><div class="marble-meter time"><i class="marble-time-fill"></i></div><small>全力一擊需先充滿並點選，再蓄力至少 30%；80% 以上為 MAX POWER。</small></div><div class="marble-party">${party}</div></section></div>`;

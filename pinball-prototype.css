@@ -1,0 +1,10 @@
+.pinball-panel{gap:6px;max-height:calc(100vh - 8px);max-height:calc(100dvh - 8px);padding:7px}
+.pinball-break{min-height:28px;padding:5px 8px;border:1px solid #ffd95b66;border-radius:8px;text-align:center;color:#ffe792;background:#39250c}
+.pinball-hint{margin:0;text-align:center;color:#b9d8eb;font-size:.74rem}
+.pinball-team{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.pinball-member{display:grid;gap:4px;padding:5px;border:1px solid #5da6d766;border-radius:8px;background:#091a2a}
+.pinball-member b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#e0f4ff;font-size:.68rem}
+.pinball-member>i{height:5px;overflow:hidden;border-radius:99px;background:#02060a}
+.pinball-member>i>em{display:block;height:100%;background:linear-gradient(90deg,#3bb6ff,#ffe25d)}
+.pinball-member button{min-height:34px;padding:4px;font-size:.66rem}.pinball-member button.armed{border-color:#ffe565;box-shadow:0 0 12px #ffd94f88}
+@media(max-width:430px){.pinball-panel .marble-canvas{max-height:62vh;max-height:62dvh}.pinball-panel header{gap:5px}.pinball-panel h2{font-size:.9rem}}

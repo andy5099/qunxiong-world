@@ -1,12 +1,12 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v021-ios-boot-hotfix-1';
-import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v021-ios-boot-hotfix-1';
-import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo, rollDivineTalismanDrops } from './boss-gear-system.js?v=v021-ios-boot-hotfix-1';
-import { WORLD_BOSS, WORLD_BOSSES, addWorldBossToRoster, createWorldBossEnemy, getWorldBossMasteryState, getWorldBossRecordState, getWorldBossResonance, getWorldBossState } from './world-boss-system.js?v=v021-ios-boot-hotfix-1';
-import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v021-ios-boot-hotfix-1';
-import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v021-ios-boot-hotfix-1';
-import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v021-ios-boot-hotfix-1';
-import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v021-ios-boot-hotfix-1';
-import { ensureMarbleBattle, getCurrentMarble, getMarbleSkill, getMarbleUltimate, getUltimateEnergy, hitMultiplier } from './marble-battle.js?v=v021-ios-boot-hotfix-1';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v022-pinball-prototype-1';
+import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v022-pinball-prototype-1';
+import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo, rollDivineTalismanDrops } from './boss-gear-system.js?v=v022-pinball-prototype-1';
+import { WORLD_BOSS, WORLD_BOSSES, addWorldBossToRoster, createWorldBossEnemy, getWorldBossMasteryState, getWorldBossRecordState, getWorldBossResonance, getWorldBossState } from './world-boss-system.js?v=v022-pinball-prototype-1';
+import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v022-pinball-prototype-1';
+import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v022-pinball-prototype-1';
+import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v022-pinball-prototype-1';
+import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v022-pinball-prototype-1';
+import { ensureMarbleBattle, getCurrentMarble, getMarbleSkill, getMarbleUltimate, getUltimateEnergy, hitMultiplier } from './marble-battle.js?v=v022-pinball-prototype-1';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -654,15 +654,20 @@ export function startFormation(state, rng = Math.random) {
   return started;
 }
 
-export function armMarbleSkill(state){
-  const battle=state.battle,marble=battle?.marble,member=state.party[marble?.turnIndex];
-  if(!battle||battle.mode!=='marble'||battle.finished||marble.phase!=='aim'||!member)return false;
+export function armMarbleSkill(state,index=null){
+  const battle=state.battle,marble=battle?.marble,memberIndex=index??marble?.turnIndex,member=state.party[memberIndex];
+  if(!battle||battle.mode!=='marble'||battle.finished||!member)return false;
+  if(marble.phase==='pinball'){
+    const slot=marble.skills?.[memberIndex];if(!slot||slot.energy<100)return false;
+    slot.armed=!slot.armed;return slot.armed;
+  }
+  if(marble.phase!=='aim')return false;
   const skill=getMarbleSkill(member);if(member.mp<skill.cost)return false;marble.skillArmed=!marble.skillArmed;return marble.skillArmed;
 }
 
 export function armMarbleUltimate(state){
   const battle=state.battle,marble=battle?.marble,member=state.party[marble?.turnIndex];
-  if(!battle||battle.mode!=='marble'||battle.finished||marble.phase!=='aim'||!member||getUltimateEnergy(member)<100)return false;
+  if(!battle||battle.mode!=='marble'||battle.finished||!['aim','pinball'].includes(marble.phase)||!member||getUltimateEnergy(member)<100)return false;
   marble.ultimateArmed=!marble.ultimateArmed;
   if(marble.ultimateArmed)marble.skillArmed=false;
   return marble.ultimateArmed;
@@ -670,7 +675,7 @@ export function armMarbleUltimate(state){
 
 export function commitMarbleLaunch(state,velocity){
   const battle=state.battle,marble=battle?.marble,entity=getCurrentMarble(battle),member=state.party[marble?.turnIndex];
-  if(!entity||!member||marble.phase!=='aim')return false;
+  if(!entity||!member||!['aim','pinball'].includes(marble.phase))return false;
   const skill=getMarbleSkill(member),ultimate=getMarbleUltimate(member),validUltimate=Boolean(marble.ultimateArmed&&getUltimateEnergy(member)>=100&&velocity.power>=.3);
   if(marble.ultimateArmed&&!validUltimate){marble.ultimateArmed=false;appendLog(state,'蓄力不足 30%，全力一擊未消耗。','rare');}
   if(validUltimate){member.ultimateEnergy=0;marble.skillArmed=false;if(ultimate.heal){for(const ally of state.party.filter(alive)){const stats=getFinalStats(state,ally);ally.hp=Math.min(stats.maxHp,ally.hp+Math.round(stats.maxHp*ultimate.heal));}}appendLog(state,`${member.name}發動【${ultimate.name}】！`,'epic');}
@@ -679,13 +684,22 @@ export function commitMarbleLaunch(state,velocity){
 }
 
 export function resolveMarbleEvent(state,event,rng=Math.random){
-  const battle=state.battle,marble=battle?.marble,member=state.party[marble?.turnIndex];if(!marble||!member||battle.finished)return null;
+  const battle=state.battle,marble=battle?.marble,memberIndex=event.entityIndex??marble?.turnIndex,member=state.party[memberIndex];if(!marble||!member||battle.finished)return null;
   if(event.type==='wall'){marble.shot.wallBounces++;return event;}
   if(event.type==='obstacle'){marble.shot.obstacleBounces++;return event;}
   if(event.type==='friend'){if(!marble.shot.ultimate)member.ultimateEnergy=Math.min(100,getUltimateEnergy(member)+5);if(member.id==='liu-bei'){const friend=state.party[event.index];if(friend){const stats=getFinalStats(state,friend);friend.hp=Math.min(stats.maxHp,friend.hp+Math.round(stats.maxHp*.05));}}return event;}
   if(event.type!=='boss')return event;
   const target=battle.enemies.find(enemy=>enemy.boss&&alive(enemy))||battle.enemies.find(alive);if(!target)return null;
-  marble.shot.hits++;const hit=marble.shot.hits,skill=getMarbleSkill(member),ultimate=getMarbleUltimate(member),stats=getFinalStats(state,member);let multiplier=hitMultiplier(hit);
+  marble.shot.hits++;const hit=marble.phase==='pinball'?(marble.combo=(marble.combo||0)+1):marble.shot.hits,skill=getMarbleSkill(member),ultimate=getMarbleUltimate(member),stats=getFinalStats(state,member);let multiplier=hitMultiplier(hit);
+  if(marble.phase==='pinball'){
+    marble.comboTime=1.35;
+    if(event.weak){marble.weakStreak=(marble.weakStreak||0)+1;if(marble.weakStreak>=3){marble.breakTime=2.5;marble.weakStreak=0;}}
+    else marble.weakStreak=0;
+    if(marble.breakTime>0)multiplier*=1.6;
+    const slot=marble.skills?.[memberIndex];
+    if(slot?.armed){multiplier*=2;slot.armed=false;slot.energy=0;}
+    else if(slot)slot.energy=Math.min(100,slot.energy+25+(event.weak?15:0));
+  }
   if(hit===1)multiplier*=1.08;
   if(marble.skillArmed&&hit===1)multiplier*=skill.firstHit||skill.damage||1;
   if(marble.skillArmed&&skill.weak&&event.weak)multiplier*=skill.weak;

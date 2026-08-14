@@ -30,7 +30,7 @@ const hp=boss.hp;const result=resolveMarbleEvent(normal,{type:'boss',weak:true,s
 const low=createState('低蓄力');low.screen='stronghold';low.unlocks.stronghold=true;low.ui.bossWarning=true;low.ui.bossRarityRank=1;createBossEncounter(low,1);low.party[0].ultimateEnergy=100;armMarbleUltimate(low);commitMarbleLaunch(low,{vx:0,vy:-100,power:.2});equal(low.party[0].ultimateEnergy,100,'low power does not consume ultimate');check(!low.battle.marble.shot.ultimate,'low power becomes normal shot');
 
 const charge=createState('充能');charge.screen='stronghold';charge.unlocks.stronghold=true;charge.ui.bossWarning=true;charge.ui.bossRarityRank=1;createBossEncounter(charge,1);resolveMarbleEvent(charge,{type:'boss',weak:true,speed:500},zero);equal(getUltimateEnergy(charge.party[0]),27,'boss and weak point energy stack');
-charge.battle.marble.shot.hits=2;resolveMarbleEvent(charge,{type:'boss',weak:false,speed:500},zero);equal(getUltimateEnergy(charge.party[0]),50,'three hit bonus energy');
+charge.battle.marble.combo=2;resolveMarbleEvent(charge,{type:'boss',weak:false,speed:500},zero);equal(getUltimateEnergy(charge.party[0]),50,'three hit bonus energy');
 
 const oneShot=createState('一擊擊破');oneShot.screen='stronghold';oneShot.unlocks.stronghold=true;oneShot.ui.bossWarning=true;oneShot.ui.bossRarityRank=1;createBossEncounter(oneShot,1);oneShot.party[0].might=99999;oneShot.party[0].ultimateEnergy=100;const weakBoss=oneShot.battle.enemies.find(e=>e.boss);weakBoss.hp=weakBoss.maxHp=50;armMarbleUltimate(oneShot);commitMarbleLaunch(oneShot,{vx:0,vy:-720,power:1});resolveMarbleEvent(oneShot,{type:'boss',weak:true,speed:720},zero);equal(weakBoss.hp,0,'normal boss can be one-shot by ultimate');
 
