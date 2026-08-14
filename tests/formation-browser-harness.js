@@ -1,10 +1,12 @@
 import { createState } from '../src/store.js';
+import { createBlackwindLeader } from '../src/data.js';
 import { createBossEncounter, resolveFormationAttack, startFormation } from '../src/engine.js';
 import { ensureFormation } from '../src/formation-puzzle.js';
 import { mountFormationPuzzle } from '../src/formation-puzzle-ui.js';
 import { renderFormationPanel } from '../src/ui.js';
 
 const app = document.querySelector('#app'), state = createState('Pointer 驗收');
+state.party[4] = createBlackwindLeader();
 state.screen = 'stronghold'; state.ui.bossWarning = true; state.ui.bossRarityRank = 3; createBossEncounter(state, 3);
 ensureFormation(state.battle).gauge = 100;
 function draw() { app.innerHTML = renderFormationPanel(state, state.battle); mountFormationPuzzle(app, state.battle, () => { resolveFormationAttack(state, () => .42); draw(); }); }

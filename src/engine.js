@@ -5,7 +5,7 @@ import { WORLD_BOSS, WORLD_BOSSES, addWorldBossToRoster, createWorldBossEnemy, g
 import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v017-growth';
 import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v017-growth';
 import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v020-yellow-turban';
-import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v021-boss-puzzle';
+import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v021-puzzle-polish';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -656,18 +656,13 @@ export function startFormation(state, rng = Math.random) {
 export function resolveFormationAttack(state, rng = Math.random) {
   const battle = state.battle, result = settleFormationPuzzle(battle, state.party, rng);
   if (!battle || battle.mode !== 'puzzle' || !result) return null;
-  const effects = result.effects, allies = state.party.filter(alive);
-  for (const member of allies) {
-    const stats = getFinalStats(state, member);
-    member.hp = Math.min(stats.maxHp, member.hp + Math.round(stats.maxHp * effects.healPct));
-    member.mp = Math.min(member.maxMp, member.mp + effects.mp);
-  }
-  battle.formationGuard = effects.defensePct;
+  const allies = state.party.filter(alive);
   const worldTarget = battle.enemies.find(enemy => enemy.worldBoss && alive(enemy));
   const damageCap = worldTarget ? Math.floor(worldTarget.maxHp * .23) : Infinity;
   let totalDamage = 0;
-  const formationPower = (effects.mightPct > 0 ? .72 + effects.mightPct : .46) * effects.comboMultiplier;
-  for (const member of allies) {
+  const characterResults = [];
+  for (const action of result.actions.filter(entry => entry.active && alive(entry.member))) {
+    const member = action.member;
     const target = battle.enemies.find(alive); if (!target || totalDamage >= damageCap) break;
     const stats = getFinalStats(state, member);
     let skillName = '', skillMultiplier = 1;
@@ -675,34 +670,27 @@ export function resolveFormationAttack(state, rng = Math.random) {
     else if (member.id === 'blackwind-lord' && member.mp >= 5 && rng() < .35) { member.mp -= 5; skillName = '強襲'; skillMultiplier = 1.55 + ((member.rarityRank || 1) - 1) * .13; }
     else if (member.worldBoss && member.mp >= 10 && rng() < .42) { member.mp -= 10; skillName = member.id === 'nether-thunder-beast' ? '幽雷爪' : '烈焰撕裂'; skillMultiplier = member.id === 'nether-thunder-beast' ? 1.95 : 1.72; }
     const variance = .92 + rng() * .16;
-    let damage = Math.max(1, Math.round((stats.might * skillMultiplier * formationPower - target.defense * .28) * variance));
+    let damage = Math.max(1, Math.round((stats.might * skillMultiplier * action.multiplier - target.defense * .28) * variance));
     damage = Math.min(damage, damageCap - totalDamage, target.hp);
     target.hp = Math.max(0, target.hp - damage); totalDamage += damage;
     if (target.worldBoss) { const records=getWorldBossRecordState(state,target.worldBossId||'crimsonTiger'); records.highestDamage=Math.max(records.highestDamage,damage); }
     appendLog(state, `${member.name}${skillName ? `施展${skillName}` : '攻擊'}，造成 ${damage} 傷害。`, skillName ? 'rare' : '');
+    characterResults.push({ slot: action.slot, name: member.name, groups: action.groups, matched: action.matched, damage, skillName });
     updateWorldBossPhase(state, target);
-  }
-  let extraHits = 0;
-  for (let attempt = 0; attempt < 3 && battle.enemies.some(alive); attempt++) if (rng() < effects.windChance) {
-    const target = battle.enemies.find(alive), striker = allies[attempt % Math.max(1, allies.length)]; if (!target || !striker) break;
-    const available = damageCap - totalDamage; if (available <= 0) break;
-    const damage = Math.min(target.hp, available, Math.max(1, Math.round(getFinalStats(state, striker).might * .55))); target.hp = Math.max(0, target.hp - damage); totalDamage += damage; extraHits++;
-    appendLog(state, `疾風追擊造成 ${damage} 傷害！`, 'rare'); updateWorldBossPhase(state, target);
   }
   if (result.burningRemaining) {
     for (const member of allies) { const damage = Math.max(1, Math.round(getFinalStats(state, member).maxHp * Math.min(.12, result.burningRemaining * .012))); member.hp = Math.max(1, member.hp - damage); }
     appendLog(state, `${result.burningRemaining} 格烈焰未消除，全隊受到灼燒！`, 'epic');
   }
-  result.totalDamage = totalDamage; result.extraHits = extraHits;
+  result.totalDamage = totalDamage; result.characterResults = characterResults;
   appendLog(state, `【戰陣總傷害：${totalDamage}】（${result.combos} Combo）`, 'epic');
   if (!battle.enemies.some(alive)) finishVictory(state, rng);
   else {
     for (const enemy of battle.enemies.filter(alive)) { performEnemyAction(state, enemy, rng); if (!state.party.some(alive)) break; }
-    battle.formationGuard = 0;
     if (!state.party.some(alive)) finishDefeat(state);
     else {
       state.party.filter(Boolean).forEach(member => { if (member.intimidatedRounds > 0) member.intimidatedRounds -= 1; if (member.slowedRounds > 0) member.slowedRounds -= 1; });
-      battle.round += 1; battle.awaitingCommand = false; battle.lastPuzzleResult = { combos: result.combos, totalDamage, extraHits, effects };
+      battle.round += 1; battle.awaitingCommand = false; battle.lastPuzzleResult = { combos: result.combos, totalDamage, characterResults };
       preparePuzzleTurn(battle, state.party, rng);
     }
   }
@@ -711,8 +699,12 @@ export function resolveFormationAttack(state, rng = Math.random) {
 
 export function resolveRound(state, command = 'attack', rng = Math.random) {
   const battle = state.battle;
-  // Internal automation/test hook only; the live puzzle UI exposes no text commands.
-  if (battle?.mode === 'puzzle') return Boolean(resolveFormationAttack(state, rng));
+  // Internal regression hook only. Live Boss play never calls this path: the puzzle UI settles directly.
+  if (battle?.mode === 'puzzle') {
+    const types=battle.formation?.activeTypes||[],board=battle.formation?.board||[];
+    if(types.length){board.forEach((cell,i)=>{cell.type=types[(Math.floor(i/6)*2+i%6)%types.length];});for(let col=0;col<3;col++)if(board[col])board[col].type=types[0];}
+    return Boolean(resolveFormationAttack(state, rng));
+  }
   const formation = ensureFormation(battle);
   if (!battle || battle.finished || !battle.awaitingCommand || formation?.active || formation?.result) return false;
   battle.awaitingCommand = false;
