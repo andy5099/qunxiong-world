@@ -1,7 +1,8 @@
-import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createParty } from './data.js?v=v017-growth';
+import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v020-yellow-turban';
 import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v014-boss-gear';
-import { normalizeWorldBoss } from './world-boss-system.js?v=v015-world-boss';
-import { normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v017-growth';
+import { normalizeWorldBoss } from './world-boss-system.js?v=v020-yellow-turban';
+import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v020-yellow-turban';
+import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v020-yellow-turban';
 
 export const STORAGE_KEY = 'qunxiong-world-v01';
 const LEGACY_KEY = 'qunxiong-world-v2';
@@ -22,22 +23,28 @@ export function createState(playerName) {
       'guan-yu': { weapon: null, armor: null, accessory: null },
       'zhang-fei': { weapon: null, armor: null, accessory: null },
       'blackwind-lord': { weapon: null, armor: null, accessory: null }
-      ,'crimson-tiger': { weapon: null, armor: null, accessory: null }
+      ,'crimson-tiger': { weapon: null, armor: null, accessory: null },'yellow-captain':{weapon:null,armor:null,accessory:null},'yellow-commander':{weapon:null,armor:null,accessory:null},'zhang-bao':{weapon:null,armor:null,accessory:null},'nether-thunder-beast':{weapon:null,armor:null,accessory:null}
     },
-    unlocks: { forest: false, stronghold: false },
-    progress: { forestEntered: false, strongholdKills: 0, bossUnlocked: false, bossDefeated: false, bossFirstKill: false, bossRecruited: false, chapterOneComplete: false, totalKills: 0, elitesDefeated: 0, bossEncounterCount: 0, bossEncounters: 0 },
+    unlocks: { forest: false, stronghold: false, chapter2: false },
+    progress: { forestEntered: false, strongholdKills: 0, bossUnlocked: false, bossDefeated: false, bossFirstKill: false, bossRecruited: false, chapterOneComplete: false, chapter2Unlocked:false, chapter2Cleared:false, totalKills: 0, elitesDefeated: 0, bossEncounterCount: 0, bossEncounters: 0 },
     bossProgress: normalizeBossProgress(),
     worldBoss: normalizeWorldBoss(),
+    worldBosses: { netherThunder: normalizeWorldBoss() },
     bossCodex: normalizeBossCodex(),
     worldBossCodex: normalizeWorldBossCodex(),
+    worldBossCodices: { netherThunder: normalizeWorldBossCodex({},NETHER_WORLD_BOSS_DROPS) },
     collectionMilestones: { claimed: { 25: false, 50: false, 75: false, 100: false } },
     worldBossMastery: normalizeWorldBossMastery(),
+    worldBossMasteries: { netherThunder: normalizeWorldBossMastery() },
     worldBossRecords: { fastestRound: null, highestDamage: 0 },
+    worldBossRecordsById: { netherThunder: { fastestRound:null,highestDamage:0 } },
+    chapter2: normalizeChapter2(),
+    chapter2Codex: normalizeChapter2Codex(),
     roster: [],
-    ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false, bossWarning: false, bossRarityRank: null, worldBossConfirm: false, codexDetail: null, captureResult: null, quickEquipItem: null, partyEquipMember: null, partyEquipSlot: null, optimizeChanges: [] },
+    ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false, chapter2Complete:false, bossWarning: false, bossRarityRank: null, bossKind:null, worldBossConfirm: false, selectedWorldBoss:'crimsonTiger', codexDetail: null, captureResult: null, quickEquipItem: null, partyEquipMember: null, partyEquipSlot: null, partySwapSlot:null, candidateSort:'power', optimizeChanges: [] },
     settings: { autoBattle: false },
     exploration: { auto: false, active: false },
-    dungeon: { warning: false, active: false, name: '血色洞窟', floor: 0, sourceScreen: null, sourceLocation: null, pity: 0, awaitingAdvance: false, completed: false, loot: { gold: 0, potion: 0, items: [], talismans: {} } },
+    dungeon: { warning: false, active: false, name: '血色洞窟', dungeonId:'bloodCavern', floor: 0, sourceScreen: null, sourceLocation: null, pity: 0, awaitingAdvance: false, completed: false, loot: { gold: 0, potion: 0, items: [], talismans: {} } },
     battle: null,
     notice: '桃源村的晨霧尚未散去，新的旅程正等待著你。',
     log: []
@@ -60,6 +67,9 @@ function normalizeMember(member, fallback) {
     safe.rarityRank = Math.max(1, Math.min(5, finite(safe.rarityRank, 1)));
     safe.rarityName = getBossRarity(safe.rarityRank).name;
     safe.growthMultiplier = Math.max(1, finite(safe.growthMultiplier, 1 + (safe.rarityRank - 1) * 0.12));
+  }
+  if (['yellow-captain','yellow-commander','zhang-bao'].includes(safe.id)) {
+    safe.rarityRank=Math.max(1,Math.min(5,finite(safe.rarityRank,1)));safe.rarityName=getBossRarity(safe.rarityRank).name;safe.growthMultiplier=Math.max(1,finite(safe.growthMultiplier,1.2));
   }
   return safe;
 }
@@ -87,16 +97,22 @@ export function normalize(raw) {
   }
   party[0].name = base.playerName;
   const activeIds = new Set(party.filter(Boolean).map(member => member.id));
-  const roster = Array.isArray(raw.roster) ? raw.roster.map(member => normalizeMember(member, member?.id === 'crimson-tiger' ? createCrimsonTiger() : null)).filter(member => member && !activeIds.has(member.id)).slice(0,20) : [];
+  const memberFallback=member=>member?.id==='crimson-tiger'?createCrimsonTiger():member?.id==='nether-thunder-beast'?createNetherThunderBeast():['yellow-captain','yellow-commander','zhang-bao'].includes(member?.id)?createYellowBossMember(member.id):null;
+  const roster = Array.isArray(raw.roster) ? raw.roster.map(member => normalizeMember(member, memberFallback(member))).filter(member => member && !activeIds.has(member.id)).slice(0,20) : [];
   if (progress.bossRecruited && !party.some(member => member?.id === 'blackwind-lord') && !roster.some(member => member?.id === 'blackwind-lord')) roster.push(createBlackwindLeader());
   const worldBoss = normalizeWorldBoss({ ...(raw.worldBoss || {}), unlocked: raw.worldBoss?.unlocked || progress.chapterOneComplete });
   if (party.some(member=>member?.id==='crimson-tiger') || roster.some(member=>member?.id==='crimson-tiger')) worldBoss.captured=true;
   const rawDungeon = raw.dungeon || {};
-  const dungeonSource = ['forest', 'stronghold'].includes(rawDungeon.sourceScreen) ? rawDungeon.sourceScreen : null;
+  const chapter2=normalizeChapter2({...(raw.chapter2||{}),unlocked:raw.chapter2?.unlocked||raw.unlocks?.chapter2||progress.chapterOneComplete,cleared:raw.chapter2?.cleared||progress.chapter2Cleared});
+  progress.chapter2Unlocked=Boolean(progress.chapter2Unlocked||chapter2.unlocked);progress.chapter2Cleared=Boolean(progress.chapter2Cleared||chapter2.cleared);
+  const netherThunder=normalizeWorldBoss(raw.worldBosses?.netherThunder,progress.chapter2Cleared);
+  if(party.some(member=>member?.id==='nether-thunder-beast')||roster.some(member=>member?.id==='nether-thunder-beast'))netherThunder.captured=true;
+  const dungeonSource = ['forest', 'stronghold','yellowCamp','yellowFortress'].includes(rawDungeon.sourceScreen) ? rawDungeon.sourceScreen : null;
   const dungeon = {
     ...base.dungeon,
     pity: Math.max(0, finite(rawDungeon.pity, 0)),
     sourceScreen: dungeonSource,
+    name: rawDungeon.dungeonId==='yellowTomb'?'黃巾古墓':'血色洞窟',dungeonId:rawDungeon.dungeonId==='yellowTomb'?'yellowTomb':'bloodCavern',
     sourceLocation: typeof rawDungeon.sourceLocation === 'string' ? rawDungeon.sourceLocation : null,
     loot: {
       ...base.dungeon.loot,
@@ -128,15 +144,21 @@ export function normalize(raw) {
       ...(raw.unlocks || {}),
       forest: Boolean(raw.unlocks?.forest || party[0].level >= 3),
       stronghold: Boolean(raw.unlocks?.stronghold || (party[0].level >= 5 && progress.forestEntered))
+      ,chapter2:Boolean(raw.unlocks?.chapter2||progress.chapterOneComplete)
     },
     progress,
     roster,
     worldBoss,
+    worldBosses:{netherThunder},
     bossCodex: normalizeBossCodex(raw.bossCodex),
     worldBossCodex: normalizeWorldBossCodex(raw.worldBossCodex),
+    worldBossCodices:{netherThunder:normalizeWorldBossCodex(raw.worldBossCodices?.netherThunder,NETHER_WORLD_BOSS_DROPS)},
     collectionMilestones: { claimed: { ...base.collectionMilestones.claimed, ...(raw.collectionMilestones?.claimed || {}) } },
     worldBossMastery: normalizeWorldBossMastery(raw.worldBossMastery),
+    worldBossMasteries:{netherThunder:normalizeWorldBossMastery(raw.worldBossMasteries?.netherThunder)},
     worldBossRecords: { fastestRound: Number(raw.worldBossRecords?.fastestRound) > 0 ? Number(raw.worldBossRecords.fastestRound) : null, highestDamage: Math.max(0, Number(raw.worldBossRecords?.highestDamage) || 0) },
+    worldBossRecordsById:{netherThunder:{fastestRound:Number(raw.worldBossRecordsById?.netherThunder?.fastestRound)>0?Number(raw.worldBossRecordsById.netherThunder.fastestRound):null,highestDamage:Math.max(0,Number(raw.worldBossRecordsById?.netherThunder?.highestDamage)||0)}},
+    chapter2,chapter2Codex:normalizeChapter2Codex(raw.chapter2Codex),
     dungeon,
     bossProgress: normalizeBossProgress(raw.bossProgress),
     ui: { ...base.ui, ...(raw.ui || {}), bossWarning: false, bossRarityRank: null, worldBossConfirm: false, captureResult: null, optimizeChanges: [] },
@@ -144,7 +166,7 @@ export function normalize(raw) {
     exploration: { ...base.exploration, ...(raw.exploration || {}), auto: false, active: false },
     battle: null,
     log: Array.isArray(raw.log) ? raw.log.slice(-60) : [],
-    screen: dungeonSource && (rawDungeon.active || rawDungeon.warning) ? dungeonSource : ['village', 'plain', 'forest', 'stronghold', 'worldBoss', 'bossCodex', 'party', 'inventory', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
+    screen: dungeonSource && (rawDungeon.active || rawDungeon.warning) ? dungeonSource : ['village', 'plain', 'forest', 'stronghold','yellowRoad','yellowCamp','yellowFortress', 'worldBoss', 'bossCodex', 'party', 'inventory', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
   };
   return syncCodexFromState(normalized);
 }

@@ -1,9 +1,10 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v017-growth';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v020-yellow-turban';
 import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v014-boss-gear';
 import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo, rollDivineTalismanDrops } from './boss-gear-system.js?v=v014-boss-gear';
-import { WORLD_BOSS, addTigerToRoster, createWorldBossEnemy, getWorldBossResonance } from './world-boss-system.js?v=v015-world-boss';
+import { WORLD_BOSS, WORLD_BOSSES, addWorldBossToRoster, createWorldBossEnemy, getWorldBossMasteryState, getWorldBossRecordState, getWorldBossResonance, getWorldBossState } from './world-boss-system.js?v=v020-yellow-turban';
 import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v017-growth';
 import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v017-growth';
+import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v020-yellow-turban';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -24,12 +25,14 @@ export function getFinalStats(state, memberOrId) {
   }
   const resonance = getBlackwindResonance(state, member);
   const worldResonance = getWorldBossResonance(state, member);
-  const mastery = member.id === 'crimson-tiger' ? getMasteryProfile(state) : { mightPct: 0, hpPct: 0 };
-  const breakthrough = member.id === 'crimson-tiger' ? getBreakthroughProfile(state.worldBoss.breakthroughLevel) : {mightPct:0,hpPct:0,defensePct:0,speedPct:0};
-  result.might = Math.round(result.might * (1 + resonance.mightPct + worldResonance.mightPct + mastery.mightPct + breakthrough.mightPct));
-  result.defense = Math.round(result.defense * (1 + resonance.defensePct + worldResonance.defensePct + breakthrough.defensePct));
-  result.maxHp = Math.round(result.maxHp * (1 + resonance.hpPct + worldResonance.hpPct + mastery.hpPct + breakthrough.hpPct));
-  result.speed = Math.round(result.speed * (1 + resonance.speedPct + worldResonance.speedPct + breakthrough.speedPct));
+  const chapterResonance=getChapter2Resonance(state,member);
+  const worldId=member.id==='nether-thunder-beast'?'netherThunder':member.id==='crimson-tiger'?'crimsonTiger':null;
+  const mastery = worldId ? getMasteryProfile(state,worldId) : { mightPct: 0, hpPct: 0 };
+  const breakthrough = worldId ? getBreakthroughProfile(getWorldBossState(state,worldId).breakthroughLevel) : {mightPct:0,hpPct:0,defensePct:0,speedPct:0};
+  result.might = Math.round(result.might * (1 + resonance.mightPct + worldResonance.mightPct + chapterResonance.mightPct + mastery.mightPct + breakthrough.mightPct));
+  result.defense = Math.round(result.defense * (1 + resonance.defensePct + worldResonance.defensePct + chapterResonance.defensePct + breakthrough.defensePct));
+  result.maxHp = Math.round(result.maxHp * (1 + resonance.hpPct + worldResonance.hpPct + chapterResonance.hpPct + mastery.hpPct + breakthrough.hpPct));
+  result.speed = Math.round(result.speed * (1 + resonance.speedPct + worldResonance.speedPct + chapterResonance.speedPct + breakthrough.speedPct));
   return result;
 }
 
@@ -74,16 +77,18 @@ export function getBossEncounterChance(count) {
   return Math.min(0.19, 0.05 + (count - 6) * 0.01);
 }
 
-export function checkBossEncounter(state, rng = Math.random, rarityRng = rng) {
-  state.progress.bossEncounterCount = Math.max(0, Number(state.progress.bossEncounterCount) || 0) + 1;
-  const chance = getBossEncounterChance(state.progress.bossEncounterCount);
+export function checkBossEncounter(state, rng = Math.random, rarityRng = rng, areaId=state.screen) {
+  const chapterArea=['yellowRoad','yellowCamp','yellowFortress'].includes(areaId),counter=chapterArea?state.chapter2.bossPity:state.progress;
+  const key=chapterArea?areaId:'bossEncounterCount';counter[key]=Math.max(0,Number(counter[key])||0)+1;
+  const chance = getBossEncounterChance(counter[key]);
   if (!chance || rng() >= chance) return false;
-  state.progress.bossEncounterCount = 0;
+  counter[key] = 0;
   state.progress.bossEncounters = (state.progress.bossEncounters || 0) + 1;
   state.exploration.auto = false;
   state.exploration.active = false;
   state.ui.bossWarning = true;
   state.ui.bossRarityRank = rollBossRarity(rarityRng).rank;
+  if(chapterArea)state.ui.bossKind=pick(AREAS[areaId].bossPool,rarityRng);
   state.notice = '偵測到強大的氣息……';
   return true;
 }
@@ -93,24 +98,27 @@ export function getDungeonEncounterChance(count) {
   return Math.min(0.28, DUNGEON.baseChance + Math.max(0, safeCount - DUNGEON.pityStart) * 0.025);
 }
 
-export function rollDungeonBossRarity(rng = Math.random) {
+export function rollDungeonBossRarity(rng = Math.random,chances=DUNGEON.bossRarityChances) {
   const roll = rng();
   let cumulative = 0;
   for (let rank = 1; rank <= 5; rank += 1) {
-    cumulative += DUNGEON.bossRarityChances[rank - 1];
+    cumulative += chances[rank - 1];
     if (roll < cumulative) return rank;
   }
   return 5;
 }
 
 export function checkDungeonEncounter(state, rng = Math.random) {
-  if (!['forest', 'stronghold'].includes(state.screen) || state.battle || state.ui.bossWarning || state.dungeon.warning || state.dungeon.active) return false;
+  if (!['forest', 'stronghold','yellowCamp','yellowFortress'].includes(state.screen) || state.battle || state.ui.bossWarning || state.dungeon.warning || state.dungeon.active) return false;
+  const config=['yellowCamp','yellowFortress'].includes(state.screen)?YELLOW_DUNGEON:DUNGEON;
   state.dungeon.pity = Math.max(0, Number(state.dungeon.pity) || 0) + 1;
-  if (rng() >= getDungeonEncounterChance(state.dungeon.pity)) return false;
+  const chance=Math.min(.30,config.baseChance+Math.max(0,state.dungeon.pity-config.pityStart)*.025);
+  if (rng() >= chance) return false;
   state.dungeon.warning = true;
   state.dungeon.sourceScreen = state.screen;
   state.dungeon.sourceLocation = state.location;
   state.dungeon.pity = 0;
+  state.dungeon.dungeonId=config.id;state.dungeon.name=config.name;
   state.exploration.auto = false;
   state.exploration.active = false;
   state.ui.bossWarning = false;
@@ -137,24 +145,26 @@ export function createDungeonFloor(state, forcedRank, rng = Math.random) {
   const floor = state.dungeon.floor;
   if (floor === 3) return openDungeonChest(state, rng);
   let enemies;
+  const yellow=state.dungeon.dungeonId==='yellowTomb',config=yellow?YELLOW_DUNGEON:DUNGEON;
   if (floor === 4) {
-    const rank = forcedRank || rollDungeonBossRarity(rng);
-    const baseBoss = createRarityBoss(ENEMIES.blackwindLord, rank);
+    const rank = forcedRank || rollDungeonBossRarity(rng,config.bossRarityChances);
+    const bossId=yellow?pick(AREAS[state.dungeon.sourceScreen]?.bossPool||['yellowCaptainBoss'],rng):'blackwindLord';
+    const baseBoss = createRarityBoss(ENEMIES[bossId], rank);
     const boost = 1.15;
     const boss = { ...baseBoss, maxHp: Math.round(baseBoss.maxHp * boost), might: Math.round(baseBoss.might * boost), defense: Math.round(baseBoss.defense * 1.12), speed: Math.round(baseBoss.speed * 1.1), exp: Math.round(baseBoss.exp * 1.25), gold: baseBoss.gold.map(value => Math.round(value * 1.25)), assaultMultiplier: baseBoss.assaultMultiplier * 1.12 };
     boss.hp = boss.maxHp;
-    enemies = [{ ...boss, instanceId: 'dungeon-blackwindLord', mp: boss.maxMp, guarding: false, side: 'enemy' }];
-    state.battle = { enemies, round: 1, awaitingCommand: true, finished: false, areaId: state.dungeon.sourceScreen, boss: true, dungeon: true, dungeonFloor: 4, bossRarityRank: rank, awaitingRecruit: false, recommendedPower: Math.round(boss.recommendedPower * 1.15) };
-    recordBlackwindEncounter(state, rank);
+    enemies = [{ ...boss, instanceId: `dungeon-${bossId}`, mp: boss.maxMp, guarding: false, side: 'enemy' }];
+    state.battle = { enemies, round: 1, awaitingCommand: true, finished: false, areaId: state.dungeon.sourceScreen, boss: true, bossKind:boss.bossKind||null, dungeon: true, dungeonFloor: 4, bossRarityRank: rank, awaitingRecruit: false, recommendedPower: Math.round(boss.recommendedPower * 1.15) };
+    if(yellow)recordChapter2Boss(state,boss.bossKind,rank,'encounter');else recordBlackwindEncounter(state, rank);
   } else {
-    const pool = floor === 1 ? ['blackwindWolf', 'forestBandit', 'yellowTurbanArcher'] : ['blackwindSwordsman', 'blackwindCaptain', 'yellowTurbanArcher'];
+    const pool = yellow?(floor===1?['yellowBladeSoldier','yellowShieldSoldier','yellowBowSoldier']:['yellowWarlock','yellowBrute','yellowBowSoldier']):(floor === 1 ? ['blackwindWolf', 'forestBandit', 'yellowTurbanArcher'] : ['blackwindSwordsman', 'blackwindCaptain', 'yellowTurbanArcher']);
     const count = floor === 1 ? 2 : 2;
     enemies = Array.from({ length: count }, (_, index) => dungeonEnemy(pick(pool, rng), floor === 2 || rng() < 0.72, index));
     state.battle = { enemies, round: 1, awaitingCommand: true, finished: false, areaId: state.dungeon.sourceScreen, boss: false, elite: enemies.some(enemy => enemy.elite), dungeon: true, dungeonFloor: floor };
   }
   state.party.filter(Boolean).forEach(member => { member.guarding = false; });
   state.log = [];
-  appendLog(state, `${DUNGEON.name}・第 ${floor} 層戰鬥開始！`, floor === 4 ? 'epic' : 'rare');
+  appendLog(state, `${config.name}・第 ${floor} 層戰鬥開始！`, floor === 4 ? 'epic' : 'rare');
   return state.battle;
 }
 
@@ -168,7 +178,7 @@ export function enterDungeon(state, rng = Math.random) {
   state.dungeon.loot = { gold: 0, potion: 0, items: [], talismans: {} };
   state.exploration.auto = false;
   state.exploration.active = false;
-  state.notice = `進入${DUNGEON.name}，連戰期間兵力與技力不會自動恢復。`;
+  state.notice = `進入${state.dungeon.name}，連戰期間兵力與技力不會自動恢復。`;
   return Boolean(createDungeonFloor(state, null, rng));
 }
 
@@ -181,7 +191,7 @@ export function declineDungeon(state) {
   state.battle = null;
   state.exploration.auto = false;
   state.exploration.active = false;
-  state.notice = '你放棄了血色洞窟，隨時可以重新探索。';
+  state.notice = `你放棄了${state.dungeon.name}，隨時可以重新探索。`;
   return true;
 }
 
@@ -228,7 +238,7 @@ export function advanceDungeon(state, rng = Math.random) {
 }
 
 export function exitDungeon(state, completed = false) {
-  const sourceScreen = ['forest', 'stronghold'].includes(state.dungeon.sourceScreen) ? state.dungeon.sourceScreen : 'forest';
+  const sourceScreen = ['forest', 'stronghold','yellowCamp','yellowFortress'].includes(state.dungeon.sourceScreen) ? state.dungeon.sourceScreen : 'forest';
   const sourceLocation = state.dungeon.sourceLocation || AREAS[sourceScreen].name;
   state.battle = null;
   state.log = [];
@@ -277,12 +287,14 @@ export function refreshUnlocks(state) {
     appendLog(state, '黑風寨已解鎖！', 'epic');
     return true;
   }
+  if(!state.unlocks.chapter2&&state.progress.chapterOneComplete){state.unlocks.chapter2=true;state.chapter2.unlocked=true;state.progress.chapter2Unlocked=true;state.notice='第二章・黃巾之亂已解鎖！';return true;}
   return false;
 }
 
 export function canEnterArea(state, areaId) {
   if (areaId === 'forest') return state.unlocks.forest || state.party[0]?.level >= AREAS.forest.level;
   if (areaId === 'stronghold') return Boolean(state.unlocks.stronghold);
+  if(['yellowRoad','yellowCamp','yellowFortress'].includes(areaId))return Boolean(state.unlocks.chapter2||state.progress.chapterOneComplete);
   return true;
 }
 
@@ -290,14 +302,15 @@ export function enterArea(state, areaId) {
   if (!AREAS[areaId]) return false;
   refreshUnlocks(state);
   if (!canEnterArea(state, areaId)) {
-    state.notice = areaId === 'stronghold' ? '黑風寨守衛森嚴，目前還不是進攻的時候。' : '需要 Lv.3 才能進入黑風森林。';
+    state.notice = ['yellowRoad','yellowCamp','yellowFortress'].includes(areaId)?'完成第一章後才能前往黃巾戰區。':areaId === 'stronghold' ? '黑風寨守衛森嚴，目前還不是進攻的時候。' : '需要 Lv.3 才能進入黑風森林。';
     return false;
   }
   state.screen = areaId;
   state.location = AREAS[areaId].name;
   if (areaId === 'forest') state.progress.forestEntered = true;
   refreshUnlocks(state);
-  state.notice = areaId === 'forest' ? '林間黑風盤旋，新的敵人與裝備正在等待。' : areaId === 'stronghold' ? '你已攻入黑風寨，危險敵將可能隨時現身。' : '你來到桃源村外的平原。';
+  if(areaId==='yellowRoad')state.chapter2.areas.yellowRoad=true;if(areaId==='yellowCamp')state.chapter2.areas.yellowCamp=true;if(areaId==='yellowFortress')state.chapter2.areas.yellowFortress=true;
+  state.notice = areaId === 'forest' ? '林間黑風盤旋，新的敵人與裝備正在等待。' : areaId === 'stronghold' ? '你已攻入黑風寨，危險敵將可能隨時現身。' : areaId.startsWith('yellow')?'黃巾軍席捲各地，更強的敵人正在前方集結。':'你來到桃源村外的平原。';
   return true;
 }
 
@@ -305,7 +318,7 @@ export function createEncounter(state, forcedId, rng = Math.random) {
   if (state.battle || state.ui.bossWarning || state.dungeon.warning || state.dungeon.active) return null;
   const area = Object.values(AREAS).find(candidate => candidate.name === state.location) || AREAS.plain;
   if (!forcedId && checkDungeonEncounter(state, rng)) return null;
-  if (!forcedId && area.id === 'stronghold' && checkBossEncounter(state, rng)) return null;
+  if (!forcedId && (area.id === 'stronghold'||area.bossPool) && checkBossEncounter(state, rng,rng,area.id)) return null;
   const id = forcedId || pick(area.enemies, rng);
   const base = ENEMIES[id];
   if (!base) return null;
@@ -329,31 +342,32 @@ export function createBossEncounter(state, forcedRank) {
   state.exploration.active = false;
   state.ui.bossWarning = false;
   const rarityRank = forcedRank || state.ui.bossRarityRank || 1;
+  const bossEnemyId=state.ui.bossKind||'blackwindLord';
   state.ui.bossRarityRank = null;
-  const boss = createRarityBoss(ENEMIES.blackwindLord, rarityRank);
-  const soldier = ENEMIES.strongholdSoldier;
-  const enemies = [
-    { ...boss, instanceId: 'blackwindLord-0', hp: boss.maxHp, mp: boss.maxMp, guarding: false, side: 'enemy' },
-    ...Array.from({ length: 2 }, (_, index) => ({ ...soldier, instanceId: `strongholdSoldier-${index}`, hp: soldier.maxHp, guarding: false, side: 'enemy' }))
-  ];
+  state.ui.bossKind=null;
+  const boss = createRarityBoss(ENEMIES[bossEnemyId]||ENEMIES.blackwindLord, rarityRank);
+  const chapterBoss=Boolean(boss.bossKind),soldier=chapterBoss?ENEMIES.yellowBladeSoldier:ENEMIES.strongholdSoldier;
+  if(rarityRank===5){if(boss.bossKind==='yellow-captain')boss.defense=Math.round(boss.defense*1.18);if(boss.bossKind==='yellow-commander')boss.assaultMultiplier=(boss.assaultMultiplier||1.55)*1.2;if(boss.bossKind==='zhang-bao')boss.skillMultiplier=1.22;}
+  const enemies = [{ ...boss, instanceId: `${bossEnemyId}-0`, hp: boss.maxHp, mp: boss.maxMp, guarding: false, side: 'enemy' },...Array.from({ length:chapterBoss?1:2 },(_,index)=>({ ...soldier,instanceId:`${soldier.id}-${index}`,hp:soldier.maxHp,guarding:false,side:'enemy' }))];
   state.party.filter(Boolean).forEach(member => { member.guarding = false; });
-  state.battle = { enemies, round: 1, awaitingCommand: true, finished: false, areaId: 'stronghold', boss: true, bossRarityRank: rarityRank, awaitingRecruit: false, recommendedPower: boss.recommendedPower };
-  recordBlackwindEncounter(state, rarityRank);
+  const areaId=chapterBoss?state.screen:'stronghold';
+  state.battle = { enemies, round: 1, awaitingCommand: true, finished: false, areaId, boss: true, bossKind:boss.bossKind||null,bossRarityRank: rarityRank, awaitingRecruit: false, recommendedPower: boss.recommendedPower };
+  if(chapterBoss)recordChapter2Boss(state,boss.bossKind,rarityRank,'encounter');else recordBlackwindEncounter(state, rarityRank);
   state.log = [];
-  appendLog(state, '黑風寨主率領兩名寨兵迎戰！', 'epic');
-  state.notice = '寨主挑戰開始！';
+  appendLog(state, `${boss.displayName||boss.name}率軍迎戰！`, 'epic');
+  state.notice = `${boss.name}挑戰開始！`;
   return state.battle;
 }
 
-export function createWorldBossEncounter(state) {
-  if (!state.worldBoss?.unlocked || state.battle || state.dungeon.active || state.dungeon.warning || state.ui.bossWarning) return null;
+export function createWorldBossEncounter(state,id='crimsonTiger') {
+  const profile=WORLD_BOSSES[id]||WORLD_BOSS,target=getWorldBossState(state,id);
+  if (!target?.unlocked || state.battle || state.dungeon.active || state.dungeon.warning || state.ui.bossWarning) return null;
   state.exploration.auto=false; state.exploration.active=false; state.ui.bossWarning=false;
-  const boss=createWorldBossEnemy();
-  state.worldBoss.attempts+=1;
-  state.worldBossCodex.discovered=true; state.worldBossCodex.challenged=true;
-  state.battle={enemies:[boss],round:1,awaitingCommand:true,finished:false,areaId:'worldBoss',source:'worldBoss',boss:true,worldBoss:true,bossRarityRank:5,awaitingRecruit:false,recommendedPower:WORLD_BOSS.recommendedPower};
+  const boss=createWorldBossEnemy(id),codex=id==='crimsonTiger'?state.worldBossCodex:state.worldBossCodices[id];
+  target.attempts+=1;codex.discovered=true;codex.challenged=true;
+  state.battle={enemies:[boss],round:1,awaitingCommand:true,finished:false,areaId:'worldBoss',source:'worldBoss',boss:true,worldBoss:true,worldBossId:id,bossRarityRank:5,awaitingRecruit:false,recommendedPower:profile.recommendedPower};
   state.party.filter(Boolean).forEach(member=>{member.guarding=false;}); state.log=[];
-  appendLog(state,'★★★★★ 世界王・赤焰魔虎降臨！','epic'); state.notice='世界王挑戰開始！'; return state.battle;
+  appendLog(state,`★★★★★ ${profile.title}降臨！`,'epic'); state.notice='世界王挑戰開始！'; return state.battle;
 }
 
 export function retreatFromBoss(state) {
@@ -382,7 +396,7 @@ function dealDamage(state, actor, target, skill = false, rng = Math.random, skil
   const bossSkillReduction = actor.boss && skill && target.side !== 'enemy' && state.equipment?.[target.id]?.armor === 'crimsonWarArmor' ? 0.88 : 1;
   const damage = Math.max(1, Math.round((attackPower(state, actor, skill ? multiplier : 1, rng) - targetDefense * 0.45) * reduced * bossSkillReduction));
   target.hp = Math.max(0, target.hp - damage);
-  if (target.worldBoss && actor.side !== 'enemy') state.worldBossRecords.highestDamage = Math.max(state.worldBossRecords.highestDamage, damage);
+  if (target.worldBoss && actor.side !== 'enemy') {const records=getWorldBossRecordState(state,target.worldBossId||'crimsonTiger');records.highestDamage=Math.max(records.highestDamage,damage);}
   const actorName = actor.displayName || actor.name;
   const targetName = target.displayName || target.name;
   appendLog(state, `${actorName}${skill ? `施展${skillName}` : '攻擊'} ${targetName}，造成 ${damage} 傷害。${target.hp ? '' : ` ${targetName}倒下了！`}`);
@@ -395,6 +409,14 @@ export function performEnemyAction(state, enemy, rng = Math.random) {
   const target = pick(targets, rng);
   if (enemy.worldBoss) {
     const phase=enemy.phase||1, roll=rng();
+    if(enemy.worldBossId==='netherThunder'){
+      if(phase>=3&&roll<.44){const damage=targets.reduce((sum,unit)=>sum+dealDamage(state,enemy,unit,true,rng,'天罰',2.7),0);return{type:'divine-punishment',damage};}
+      if(phase>=3&&roll<.78){const hunted=[...targets].sort((a,b)=>a.hp/getFinalStats(state,a).maxHp-b.hp/getFinalStats(state,b).maxHp)[0];return{type:'thunder-hunt',targetId:hunted.id,damage:dealDamage(state,enemy,hunted,true,rng,'雷獄獵殺',3.05)};}
+      if(phase>=2&&roll<.46){const damage=targets.reduce((sum,unit)=>sum+dealDamage(state,enemy,unit,true,rng,'九幽雷陣',1.72),0);return{type:'thunder-array',damage};}
+      if(phase>=2&&roll<.68){enemy.speed=Math.min(Math.round(WORLD_BOSSES.netherThunder.stats.speed*1.55),Math.round(enemy.speed*1.12));appendLog(state,'九幽雷獸化作雷影，速度大幅提升！','epic');if(rng()<.38){const extra=pick(targets,rng);dealDamage(state,enemy,extra,true,rng,'雷影追擊',1.4);}return{type:'thunder-shadow'};}
+      if(roll<.56)return{type:'thunder-claw',damage:dealDamage(state,enemy,target,true,rng,'幽雷爪',2.15)};
+      target.slowedRounds=2;appendLog(state,`九幽雷獸施展雷鳴，${target.name}速度下降！`,'epic');return{type:'thunder-roar'};
+    }
     if(phase>=3 && roll<.42){
       const damage=targets.reduce((sum,unit)=>sum+dealDamage(state,enemy,unit,true,rng,'焚天',2.35),0); return {type:'inferno',damage};
     }
@@ -409,6 +431,18 @@ export function performEnemyAction(state, enemy, rng = Math.random) {
   }
   if (enemy.boss) {
     const roll = rng();
+    if(enemy.bossKind==='yellow-captain'){
+      if(roll<.38){enemy.defense=Math.min(Math.round(ENEMIES.yellowCaptainBoss.defense*2),Math.round(enemy.defense*1.18));appendLog(state,'黃巾校尉施展鐵壁，防禦提高！','epic');return{type:'iron-wall'};}
+      const result={type:'shield-bash',damage:dealDamage(state,enemy,target,true,rng,'盾擊',1.65)};if(rng()<.4)target.slowedRounds=2;return result;
+    }
+    if(enemy.bossKind==='yellow-commander'){
+      const low=targets.sort((a,b)=>a.hp/getFinalStats(state,a).maxHp-b.hp/getFinalStats(state,b).maxHp)[0],bonus=low.hp/getFinalStats(state,low).maxHp<.4?2.45:2.05;return{type:'army-breaker',damage:dealDamage(state,enemy,low,true,rng,low===target?'破軍斬':'乘勝追擊',bonus)};
+    }
+    if(enemy.bossKind==='zhang-bao'){
+      if(roll<.42){const damage=targets.reduce((sum,unit)=>sum+dealDamage(state,enemy,unit,true,rng,'雷動九天',1.72*(enemy.skillMultiplier||1)),0);return{type:'nine-heavens',damage};}
+      if(roll<.67){targets.forEach(unit=>{unit.weakenedRounds=2;unit.slowedRounds=2;});appendLog(state,'張寶施展黃天咒，全隊武力與速度下降！','epic');return{type:'yellow-curse'};}
+      return{type:'demon-thunder',damage:dealDamage(state,enemy,target,true,rng,'妖雷',2.25*(enemy.skillMultiplier||1))};
+    }
     if (enemy.mp >= 7 && roll < 0.45) {
       enemy.mp -= 7;
       return { type: 'assault', damage: dealDamage(state, enemy, target, true, rng, '強襲', enemy.assaultMultiplier || 1.55) };
@@ -490,19 +524,20 @@ function finishVictory(state, rng) {
     state.progress.bossFirstKill = true;
   }
   if (worldBossBattle) {
-    state.worldBoss.defeated=true; state.worldBoss.defeats+=1; state.worldBoss.bestPhase=3; state.worldBoss.lowestHpPct=0;
-    const guaranteed=!state.worldBoss.firstRewardClaimed;
-    const dropId=guaranteed?'crimsonTigerClaw':pick(['crimsonTigerClaw','crimsonWarArmor','crimsonTigerSeal'],rng);
+    const worldId=state.battle.worldBossId||'crimsonTiger',profile=WORLD_BOSSES[worldId],targetState=getWorldBossState(state,worldId),codex=worldId==='crimsonTiger'?state.worldBossCodex:state.worldBossCodices[worldId],records=getWorldBossRecordState(state,worldId);
+    targetState.defeated=true; targetState.defeats+=1; targetState.bestPhase=3; targetState.lowestHpPct=0;
+    const guaranteed=!targetState.firstRewardClaimed;
+    const dropId=guaranteed?profile.drops[0]:pick(profile.drops,rng);
     state.inventory[dropId]=(state.inventory[dropId]||0)+1; state.battle.dropId=dropId; state.battle.dropQuality='傳說';
     state.bossProgress.talismans.advanced=(state.bossProgress.talismans.advanced||0)+2;
     if(rng()<.35) state.bossProgress.talismans.legendary=(state.bossProgress.talismans.legendary||0)+1;
     state.bossProgress.divineTalismans.advanced=(state.bossProgress.divineTalismans.advanced||0)+2;
-    state.battle.worldBossLoot={advanced:2,divineAdvanced:2,itemId:dropId}; state.worldBoss.firstRewardClaimed=true;
-    state.worldBossCodex.discovered=true; state.worldBossCodex.challenged=true; state.worldBossCodex.defeated=true;
+    state.battle.worldBossLoot={advanced:2,divineAdvanced:2,itemId:dropId}; targetState.firstRewardClaimed=true;
+    codex.discovered=true; codex.challenged=true; codex.defeated=true;
     recordItemDrop(state, dropId); recordMaterials(state, { advanced: 2, ...(state.bossProgress.talismans.legendary ? { legendary: 1 } : {}) }, { advanced: 2 });
-    const fastest = state.worldBossRecords.fastestRound;
-    state.worldBossRecords.fastestRound = fastest == null ? state.battle.round : Math.min(fastest, state.battle.round);
-    state.battle.awaitingRecruit=true; state.notice='世界王・赤焰魔虎倒下了！你完成了目前最危險的挑戰！'; appendLog(state,state.notice,'epic');
+    const fastest = records.fastestRound;
+    records.fastestRound = fastest == null ? state.battle.round : Math.min(fastest, state.battle.round);
+    state.battle.awaitingRecruit=true; state.notice=`${profile.title}倒下了！你完成了世界王挑戰！`; appendLog(state,state.notice,'epic');
   }
   refreshUnlocks(state);
   let dropId = rollBattleDrop(defeated, rng, bossBattle, firstBossKill);
@@ -541,7 +576,7 @@ function finishVictory(state, rng) {
       if (id === 'advanced' && rank === 5) appendLog(state, '高階神兵素材！', 'epic');
     });
     recordMaterials(state, talismanDrops, divineDrops);
-    if (!worldBossBattle) recordBlackwindDefeat(state, rank);
+    if (!worldBossBattle){if(state.battle.bossKind)recordChapter2Boss(state,state.battle.bossKind,rank,'defeat');else recordBlackwindDefeat(state, rank);}
     if (state.battle.dungeon) {
       const completionGold = 300 + rank * 120;
       state.gold += completionGold;
@@ -560,10 +595,12 @@ function finishVictory(state, rng) {
   state.battle.finished = true;
   state.battle.result = 'victory';
   state.battle.awaitingRecruit = bossBattle;
-  state.notice = worldBossBattle ? '世界王・赤焰魔虎倒下了！你完成了目前最危險的挑戰！' : state.battle.dungeon && bossBattle ? `秘境 Boss 已擊破！獲得 ${exp} EXP、${gold} 金與攻略完成獎勵。` : bossBattle ? `黑風寨主已敗！全隊獲得 ${exp} EXP，取得 ${gold} 金。${dropId ? ` 獲得【${ITEMS[dropId].name}】！` : ''}` : `戰鬥勝利！全隊獲得 ${exp} EXP，取得 ${gold} 金。${dropId ? ` 獲得【${ITEMS[dropId].name}】！` : ''}`;
+  if(state.battle.bossKind==='zhang-bao'){state.chapter2.cleared=true;state.progress.chapter2Cleared=true;state.worldBosses.netherThunder.unlocked=true;state.ui.chapter2Complete=true;}
+  const defeatedBossName=state.battle.bossKind?CHAPTER2_BOSSES[state.battle.bossKind].name:'黑風寨主';
+  state.notice = worldBossBattle ? `${WORLD_BOSSES[state.battle.worldBossId||'crimsonTiger'].title}倒下了！` : state.battle.dungeon && bossBattle ? `秘境 Boss 已擊破！獲得 ${exp} EXP、${gold} 金與攻略完成獎勵。` : bossBattle ? `${defeatedBossName}已敗！全隊獲得 ${exp} EXP，取得 ${gold} 金。${dropId ? ` 獲得【${ITEMS[dropId].name}】！` : ''}${state.battle.bossKind==='zhang-bao'?' 第二章・黃巾之亂完成！':''}` : `戰鬥勝利！全隊獲得 ${exp} EXP，取得 ${gold} 金。${dropId ? ` 獲得【${ITEMS[dropId].name}】！` : ''}`;
   appendLog(state, state.notice, dropId ? 'drop' : '');
   const masteryGain = awardWorldBossMastery(state, state.battle);
-  if (masteryGain) appendLog(state, `赤焰魔虎獲得世界王熟練 ${masteryGain}。`, 'rare');
+  if(masteryGain)for(const member of state.party.filter(unit=>unit?.worldBoss)){const id=member.id==='nether-thunder-beast'?'netherThunder':'crimsonTiger';appendLog(state,`${WORLD_BOSSES[id].name}獲得世界王熟練 ${masteryGain}。`,'rare');}
 }
 
 function finishDefeat(state) {
@@ -585,7 +622,7 @@ function finishDefeat(state) {
   state.screen = 'village';
   state.location = '桃源村';
   state.notice = `全隊戰敗，被村民救回桃源村，損失 ${loss} 金。`;
-  if(state.battle?.worldBoss){const enemy=state.battle.enemies[0],pct=Math.max(0,Math.round(enemy.hp/enemy.maxHp*100));state.worldBoss.bestPhase=Math.max(state.worldBoss.bestPhase,enemy.phase||1);state.worldBoss.lowestHpPct=Math.min(state.worldBoss.lowestHpPct,pct);}
+  if(state.battle?.worldBoss){const enemy=state.battle.enemies[0],pct=Math.max(0,Math.round(enemy.hp/enemy.maxHp*100)),targetState=getWorldBossState(state,state.battle.worldBossId||'crimsonTiger');targetState.bestPhase=Math.max(targetState.bestPhase,enemy.phase||1);targetState.lowestHpPct=Math.min(targetState.lowestHpPct,pct);}
   appendLog(state, state.notice);
 }
 
@@ -606,7 +643,7 @@ export function resolveRound(state, command = 'attack', rng = Math.random) {
   state.party.filter(Boolean).forEach(member => { member.guarding = false; });
   if (command === 'defend') allies.forEach(member => { member.guarding = true; });
   const turns = [
-    ...allies.map(unit => ({ unit, side: 'ally', speed: getFinalStats(state, unit).speed })),
+    ...allies.map(unit => ({ unit, side: 'ally', speed: Math.round(getFinalStats(state, unit).speed*(unit.slowedRounds>0?.72:1)) })),
     ...enemies.map(unit => ({ unit, side: 'enemy', speed: unit.speed }))
   ].sort((a, b) => b.speed - a.speed || rng() - 0.5);
   for (const turn of turns) {
@@ -618,26 +655,26 @@ export function resolveRound(state, command = 'attack', rng = Math.random) {
       const useSlam = turn.unit.isPlayer && command === 'slam' && turn.unit.mp >= 6;
       const leaderProfile = turn.unit.id === 'blackwind-lord' ? getBlackwindResonance(state, turn.unit) : null;
       const freeAssault = Boolean(turn.unit.id === 'blackwind-lord' && battle.freeLeaderAssault);
-      const tigerProfile=turn.unit.id==='crimson-tiger'?getWorldBossResonance(state,turn.unit):null;
-      const tigerSkill=turn.unit.id==='crimson-tiger'&&turn.unit.mp>=10&&rng()<.42;
+      const tigerProfile=turn.unit.worldBoss?getWorldBossResonance(state,turn.unit):null;
+      const tigerSkill=turn.unit.worldBoss&&turn.unit.mp>=10&&rng()<.42;
       const leaderAssault = turn.unit.id === 'blackwind-lord' && (freeAssault || (turn.unit.mp >= 5 && rng() < 0.35));
       if (useSlam) turn.unit.mp -= 6;
       if (leaderAssault && !freeAssault) turn.unit.mp -= 5;
       if(tigerSkill)turn.unit.mp-=10;
       if (freeAssault) battle.freeLeaderAssault = false;
       const leaderMultiplier = (1.55 + ((turn.unit.rarityRank || 1) - 1) * 0.13) * (1 + (leaderProfile?.assaultPct || 0));
-      const breakthrough=turn.unit.id==='crimson-tiger'?getBreakthroughProfile(state.worldBoss.breakthroughLevel):{rendPct:0,sweepPct:0,heavenPct:0};
-      const tigerMultiplier=1.72*(1+(tigerProfile?.skillPct||0)+(turn.unit.id==='crimson-tiger'?getMasteryProfile(state).skillPct+breakthrough.rendPct+breakthrough.sweepPct+breakthrough.heavenPct:0));
-      dealDamage(state, turn.unit, targets[0], useSlam || leaderAssault || tigerSkill, rng, leaderAssault ? '強襲' : tigerSkill?'烈焰撕裂':'猛擊', leaderAssault ? leaderMultiplier : tigerSkill?tigerMultiplier:1.65);
+      const allyWorldId=turn.unit.id==='nether-thunder-beast'?'netherThunder':'crimsonTiger',breakthrough=turn.unit.worldBoss?getBreakthroughProfile(getWorldBossState(state,allyWorldId).breakthroughLevel):{rendPct:0,sweepPct:0,heavenPct:0};
+      const tigerMultiplier=(turn.unit.id==='nether-thunder-beast'?1.95:1.72)*(1+(tigerProfile?.skillPct||0)+(turn.unit.worldBoss?getMasteryProfile(state,allyWorldId).skillPct+breakthrough.rendPct+breakthrough.sweepPct+breakthrough.heavenPct:0));
+      dealDamage(state, turn.unit, targets[0], useSlam || leaderAssault || tigerSkill, rng, leaderAssault ? '強襲' : tigerSkill?(turn.unit.id==='nether-thunder-beast'?'幽雷爪':'烈焰撕裂'):'猛擊', leaderAssault ? leaderMultiplier : tigerSkill?tigerMultiplier:1.65);
       const worldTarget=targets[0];
-      if(worldTarget.worldBoss){const ratio=worldTarget.hp/worldTarget.maxHp;if(ratio<=.35&&worldTarget.phase<3){worldTarget.phase=3;worldTarget.might=Math.round(worldTarget.might*1.28);worldTarget.speed=Math.round(worldTarget.speed*1.18);appendLog(state,'赤焰魔虎徹底暴走！','epic');}else if(ratio<=.70&&worldTarget.phase<2){worldTarget.phase=2;worldTarget.might=Math.round(worldTarget.might*1.18);worldTarget.speed=Math.round(worldTarget.speed*1.15);appendLog(state,'赤焰魔虎進入狂暴！','epic');}state.worldBoss.bestPhase=Math.max(state.worldBoss.bestPhase,worldTarget.phase);state.worldBoss.lowestHpPct=Math.min(state.worldBoss.lowestHpPct,Math.max(0,Math.round(ratio*100)));}
+      if(worldTarget.worldBoss){const ratio=worldTarget.hp/worldTarget.maxHp,id=worldTarget.worldBossId||'crimsonTiger',targetState=getWorldBossState(state,id);if(ratio<=.35&&worldTarget.phase<3){worldTarget.phase=3;worldTarget.might=Math.round(worldTarget.might*(id==='netherThunder'?1.32:1.28));worldTarget.speed=Math.round(worldTarget.speed*(id==='netherThunder'?1.25:1.18));appendLog(state,id==='netherThunder'?'九幽雷獸進入天雷暴走！':'赤焰魔虎徹底暴走！','epic');}else if(ratio<=.70&&worldTarget.phase<2){worldTarget.phase=2;worldTarget.might=Math.round(worldTarget.might*1.18);worldTarget.speed=Math.round(worldTarget.speed*(id==='netherThunder'?1.22:1.15));appendLog(state,id==='netherThunder'?'九幽雷獸引動天雷！':'赤焰魔虎進入狂暴！','epic');}targetState.bestPhase=Math.max(targetState.bestPhase,worldTarget.phase);targetState.lowestHpPct=Math.min(targetState.lowestHpPct,Math.max(0,Math.round(ratio*100)));}
     } else performEnemyAction(state, turn.unit, rng);
     if (!state.party.some(alive)) break;
   }
   if (!battle.enemies.some(alive)) finishVictory(state, rng);
   else if (!state.party.some(alive)) finishDefeat(state);
   else {
-    state.party.filter(Boolean).forEach(member => { if (member.intimidatedRounds > 0) member.intimidatedRounds -= 1; });
+    state.party.filter(Boolean).forEach(member => { if (member.intimidatedRounds > 0) member.intimidatedRounds -= 1;if(member.slowedRounds>0)member.slowedRounds-=1; });
     battle.round += 1;
     battle.awaitingCommand = true;
   }
@@ -646,12 +683,10 @@ export function resolveRound(state, command = 'attack', rng = Math.random) {
 
 export function captureWorldBoss(state,rng=Math.random){
   if(!state.battle?.worldBoss||!state.battle.awaitingRecruit)return false;
-  const success=rng()<WORLD_BOSS.captureRate;
-  state.worldBossCodex.captureAttempts+=1;
-  if(success)addTigerToRoster(state);
-  if(success){state.worldBossCodex.captured=true;state.worldBossCodex.captureSuccesses+=1;}
+  const id=state.battle.worldBossId||'crimsonTiger',profile=WORLD_BOSSES[id],codex=id==='crimsonTiger'?state.worldBossCodex:state.worldBossCodices[id],success=rng()<profile.captureRate;
+  codex.captureAttempts+=1;if(success)addWorldBossToRoster(state,id);if(success){codex.captured=true;codex.captureSuccesses+=1;}
   state.battle=null;state.screen='worldBoss';state.location='世界王祭壇';state.exploration.auto=false;state.exploration.active=false;state.ui.bossWarning=false;
-  state.notice=success?'世界王・赤焰魔虎臣服！已加入武將名冊。':'赤焰魔虎掙脫束縛，消失在烈焰之中。戰利品全部保留。';return success;
+  state.notice=success?`${profile.title}臣服！已加入武將名冊。`:`${profile.name}掙脫束縛並離去。戰利品全部保留。`;return success;
 }
 
 export function spareWorldBoss(state){if(!state.battle?.worldBoss||!state.battle.awaitingRecruit)return false;state.battle=null;state.screen='worldBoss';state.location='世界王祭壇';state.notice='你放棄收服，世界王戰利品全部保留。';return true;}
@@ -725,7 +760,8 @@ export function recommendMemberForItem(state, itemId) {
     const currentId = state.equipment[member.id]?.[item.slot];
     const delta = getItemScore(item) - getItemScore(ITEMS[currentId]);
     const affinity = item.slot === 'weapon' ? member.might : item.slot === 'armor' ? member.defense + member.maxHp * 0.08 : member.speed + member.might * 0.2;
-    const resonanceBonus = (member.id === 'blackwind-lord' && getBossGearInfo(itemId)) || (member.id === 'crimson-tiger' && item.worldBossOnly) ? getItemScore(item) * 0.7 : 0;
+    const correctWorldGear=(member.id==='crimson-tiger'&&item.worldBossOnly&&!item.worldBossFamily)||(member.id==='nether-thunder-beast'&&item.worldBossFamily==='nether-thunder');
+    const resonanceBonus = (member.id === 'blackwind-lord' && getBossGearInfo(itemId)) || correctWorldGear ? getItemScore(item) * 0.7 : 0;
     return { member, current: ITEMS[currentId] || null, delta: delta + resonanceBonus, affinity };
   });
   return candidates.sort((a, b) => b.delta - a.delta || b.affinity - a.affinity)[0] || null;
@@ -768,14 +804,7 @@ export function optimizeEquipment(state) {
       const [leader] = memberOrder.splice(leaderIndex, 1); memberOrder.unshift(leader);
       const [gear] = pool.splice(bossGearIndex, 1); pool.unshift(gear);
     }
-    const tigerIndex = memberOrder.findIndex(member => member.id === 'crimson-tiger');
-    const tigerGearIndex = pool.findIndex(item => item.worldBossOnly);
-    if (tigerIndex >= 0 && tigerGearIndex >= 0) {
-      const [tiger] = memberOrder.splice(tigerIndex, 1);
-      memberOrder.unshift(tiger);
-      const [gear] = pool.splice(tigerGearIndex, 1);
-      pool.unshift(gear);
-    }
+    for(const [memberId,family]of [['crimson-tiger',null],['nether-thunder-beast','nether-thunder']]){const memberIndex=memberOrder.findIndex(member=>member.id===memberId),gearIndex=pool.findIndex(item=>item.worldBossOnly&&(family?item.worldBossFamily===family:!item.worldBossFamily));if(memberIndex>=0&&gearIndex>=0){const[unit]=memberOrder.splice(memberIndex,1);memberOrder.unshift(unit);const[gear]=pool.splice(gearIndex,1);pool.unshift(gear);}}
     memberOrder.forEach((member, index) => { next[member.id][slot] = pool[index]?.id || null; });
   }
   const changes = [];
@@ -866,6 +895,8 @@ export function spareBlackwindLeader(state) {
   state.notice = '你放過了黑風寨主。之後仍可再次挑戰並招降。';
   return true;
 }
+
+export { recruitChapter2Boss, spareChapter2Boss };
 
 export function continueAfterChapter(state) {
   state.ui.chapterComplete = false;
