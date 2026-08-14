@@ -1,5 +1,5 @@
-import { ITEMS, createYellowBossMember } from './data.js?v=v020-yellow-turban';
-import { applyLeaderRarity, getBossRarity, getCaptureRate } from './boss-progression.js?v=v014-boss-gear';
+import { ITEMS, createYellowBossMember } from './data.js?v=v021-ios-boot-hotfix-1';
+import { applyLeaderRarity, getBossRarity, getCaptureRate } from './boss-progression.js?v=v021-ios-boot-hotfix-1';
 
 export const CHAPTER2_BOSSES={
   'yellow-captain':{name:'黃巾校尉',enemyId:'yellowCaptainBoss',role:'坦克',drops:['captainBlade','yellowHeavyArmor','captainToken'],resonance:'鐵壁統領'},

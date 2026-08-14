@@ -1,10 +1,18 @@
-import { MARBLE_ARENA, aimVelocity, getCurrentMarble, getMarbleSkill, stepMarblePhysics } from './marble-battle.js?v=v021-hotfix-ultimate';
-import { armMarbleSkill, armMarbleUltimate, commitMarbleLaunch, finishMarbleShot, resolveMarbleEvent } from './engine.js?v=v021-hotfix-ultimate';
+import { MARBLE_ARENA, aimVelocity, getCurrentMarble, getMarbleSkill, stepMarblePhysics } from './marble-battle.js?v=v021-ios-boot-hotfix-1';
+import { armMarbleSkill, armMarbleUltimate, commitMarbleLaunch, finishMarbleShot, resolveMarbleEvent } from './engine.js?v=v021-ios-boot-hotfix-1';
 
 let active=null;
 const palette={hero:['#d9efff','#1c67a4'],'liu-bei':['#f2d36a','#31734d'],'guan-yu':['#6fd29b','#174d39'],'zhang-fei':['#ef746f','#351923'],'blackwind-lord':['#c5a16a','#27232e'],'crimson-tiger':['#ffb13b','#6f1810'],'nether-thunder-beast':['#a88cff','#21155c'],'yellow-captain':['#e7c36c','#705820'],'yellow-commander':['#efb855','#6d2c16'],'zhang-bao':['#bc8cff','#3b1768']};
 
-function rounded(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);}
+function rounded(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  if(typeof ctx.roundRect==='function'){ctx.roundRect(x,y,w,h,r);return;}
+  const radius=Math.max(0,Math.min(r,Math.abs(w)/2,Math.abs(h)/2));
+  ctx.moveTo(x+radius,y);ctx.lineTo(x+w-radius,y);ctx.quadraticCurveTo(x+w,y,x+w,y+radius);
+  ctx.lineTo(x+w,y+h-radius);ctx.quadraticCurveTo(x+w,y+h,x+w-radius,y+h);
+  ctx.lineTo(x+radius,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-radius);
+  ctx.lineTo(x,y+radius);ctx.quadraticCurveTo(x,y,x+radius,y);ctx.closePath();
+}
 function drawScene(ctx,marble){
   const themes={crimson:['#43120d','#140d14','#ed5f25'],thunder:['#171339','#080d22','#805cff'],yellow:['#4b3518','#17140d','#c89535'],forest:['#153828','#081812','#63a86f'],stronghold:['#35281e','#111016','#9b7147']},[top,bottom,accent]=themes[marble.theme]||themes.stronghold;
   const g=ctx.createLinearGradient(0,0,0,MARBLE_ARENA.height);g.addColorStop(0,top);g.addColorStop(1,bottom);ctx.fillStyle=g;ctx.fillRect(0,0,MARBLE_ARENA.width,MARBLE_ARENA.height);
@@ -35,11 +43,17 @@ function syncHud(c){const battle=c.state.battle,marble=battle?.marble,boss=battl
 function tick(c,now){if(active!==c)return;const battle=c.state.battle,marble=battle?.marble;if(!battle||battle.finished||!marble){cleanupMarbleBattle();return;}const dt=c.last?Math.min(.032,(now-c.last)/1000):.016;c.last=now;if(marble.phase==='moving'){const events=stepMarblePhysics(marble,dt);for(const event of events){const result=resolveMarbleEvent(c.state,event);syncHud(c);if(result?.damage&&battle.enemies.find(e=>e.boss)?.hp<=0){const entity=getCurrentMarble(battle);entity.vx=entity.vy=0;marble.phase='settling';}if(event.type==='stop'||battle.enemies.find(e=>e.boss)?.hp<=0){finishMarbleShot(c.state);c.onComplete();return;}}}render(c);c.raf=requestAnimationFrame(next=>tick(c,next));}
 
 export function mountMarbleBattle(root,state,onComplete){cleanupMarbleBattle();const canvas=root.querySelector('.marble-canvas'),skillButton=root.querySelector('[data-marble-skill]'),ultimateButton=root.querySelector('[data-marble-ultimate]'),clock=root.querySelector('.marble-time'),timer=root.querySelector('.marble-time-fill'),power=root.querySelector('.marble-power-fill');if(!canvas||state.battle?.mode!=='marble'||state.battle.finished)return;canvas.width=MARBLE_ARENA.width;canvas.height=MARBLE_ARENA.height;const c={root,state,onComplete,canvas,ctx:canvas.getContext('2d'),skillButton,ultimateButton,clock,timer,power,hit:root.querySelector('.marble-hit'),hpText:root.querySelector('.marble-boss-hp>span'),hpFill:root.querySelector('.marble-boss-hp .meter i'),listeners:[],pointerId:null,dragging:false,deadline:0,raf:0,timerRaf:0,last:0};
+  if(!c.ctx)throw new Error('Canvas 2D unavailable');
   c.onSkill=()=>{if(armMarbleSkill(state)){skillButton.classList.add('armed');skillButton.textContent=`已啟動・${getMarbleSkill(state.party[state.battle.marble.turnIndex]).name}`;}else{skillButton.classList.remove('armed');skillButton.textContent=getMarbleSkill(state.party[state.battle.marble.turnIndex]).name;}};skillButton?.addEventListener('click',c.onSkill);
   c.onUltimate=()=>{const armed=armMarbleUltimate(state);ultimateButton.classList.toggle('armed',armed);ultimateButton.textContent=armed?'全力一擊已鎖定・拖曳發射':'全力一擊 READY';if(armed)skillButton?.classList.remove('armed');};ultimateButton?.addEventListener('click',c.onUltimate);
-  const down=event=>{const marble=state.battle.marble,entity=getCurrentMarble(state.battle);if(marble.phase!=='aim'||!entity)return;const p=canvasPoint(c,event);if(Math.hypot(p.x-entity.x,p.y-entity.y)>entity.radius+15)return;event.preventDefault();c.dragging=true;c.pointerId=event.pointerId;c.deadline=performance.now()+6000;canvas.setPointerCapture(event.pointerId);marble.aim={dx:0,dy:60,power:0,timeLeft:6};const timerTick=now=>{if(!c.dragging)return;const left=Math.max(0,c.deadline-now),ratio=left/6000;clock.textContent=(left/1000).toFixed(1);timer.style.transform=`scaleX(${ratio})`;clock.dataset.state=ratio<.2?'danger':ratio<.5?'warning':'normal';if(!left){launch(c);return;}c.timerRaf=requestAnimationFrame(timerTick);};c.timerRaf=requestAnimationFrame(timerTick);};
+  const down=event=>{const marble=state.battle.marble,entity=getCurrentMarble(state.battle);if(marble.phase!=='aim'||!entity)return;const p=canvasPoint(c,event);if(Math.hypot(p.x-entity.x,p.y-entity.y)>entity.radius+15)return;event.preventDefault();c.dragging=true;c.pointerId=event.pointerId;c.deadline=performance.now()+6000;if(canvas.setPointerCapture)try{canvas.setPointerCapture(event.pointerId);}catch{}marble.aim={dx:0,dy:60,power:0,timeLeft:6};const timerTick=now=>{if(!c.dragging)return;const left=Math.max(0,c.deadline-now),ratio=left/6000;clock.textContent=(left/1000).toFixed(1);timer.style.transform=`scaleX(${ratio})`;clock.dataset.state=ratio<.2?'danger':ratio<.5?'warning':'normal';if(!left){launch(c);return;}c.timerRaf=requestAnimationFrame(timerTick);};c.timerRaf=requestAnimationFrame(timerTick);};
   const move=event=>{if(!c.dragging||event.pointerId!==c.pointerId)return;event.preventDefault();const p=canvasPoint(c,event),entity=getCurrentMarble(state.battle),dx=p.x-entity.x,dy=p.y-entity.y,d=Math.hypot(dx,dy),scale=Math.min(115,d)/Math.max(1,d);state.battle.marble.aim={dx:dx*scale,dy:dy*scale,power:Math.min(1,d/115),timeLeft:Math.max(0,(c.deadline-performance.now())/1000)};power.style.transform=`scaleX(${state.battle.marble.aim.power})`;};
-  const up=event=>{if(!c.dragging||event.pointerId!==c.pointerId)return;event.preventDefault();try{canvas.releasePointerCapture(event.pointerId);}catch{}launch(c);};
-  for(const[type,fn]of[['pointerdown',down],['pointermove',move],['pointerup',up],['pointercancel',up]]){canvas.addEventListener(type,fn);c.listeners.push([type,fn]);}
+  const up=event=>{if(!c.dragging||event.pointerId!==c.pointerId)return;event.preventDefault();if(canvas.releasePointerCapture)try{canvas.releasePointerCapture(event.pointerId);}catch{}launch(c);};
+  if(window.PointerEvent){for(const[type,fn]of[['pointerdown',down],['pointermove',move],['pointerup',up],['pointercancel',up]]){canvas.addEventListener(type,fn);c.listeners.push([type,fn]);}}
+  else {
+    const touchEvent=event=>{const touch=event.changedTouches&&event.changedTouches[0];if(!touch)return event;return{clientX:touch.clientX,clientY:touch.clientY,pointerId:1,preventDefault:()=>event.preventDefault()};};
+    const touchDown=event=>down(touchEvent(event)),touchMove=event=>move(touchEvent(event)),touchUp=event=>up(touchEvent(event));
+    for(const[type,fn]of[['touchstart',touchDown],['touchmove',touchMove],['touchend',touchUp],['touchcancel',touchUp]]){canvas.addEventListener(type,fn,{passive:false});c.listeners.push([type,fn]);}
+  }
   c.onVisibility=()=>{if(document.hidden){if(c.dragging)launch(c);else if(state.battle?.marble?.phase==='moving'){finishMarbleShot(state);onComplete();}}};document.addEventListener('visibilitychange',c.onVisibility);active=c;c.raf=requestAnimationFrame(now=>tick(c,now));
 }

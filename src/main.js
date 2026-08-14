@@ -1,16 +1,23 @@
-import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v021-hotfix-ultimate';
-import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v014-boss-gear';
-import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v014-boss-gear';
-import { clearSave, createState, load, save } from './store.js?v=v020-yellow-turban';
-import { render, renderCreation, renderMarblePanel } from './ui.js?v=v021-hotfix-ultimate';
-import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v021-hotfix-ultimate';
-import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v020-yellow-turban';
-import { claimCollectionMilestone } from './boss-codex-system.js?v=v020-yellow-turban';
-import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v020-yellow-turban';
-import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v020-yellow-turban';
+import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v021-ios-boot-hotfix-1';
+import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v021-ios-boot-hotfix-1';
+import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v021-ios-boot-hotfix-1';
+import { clearSave, createState, load, save } from './store.js?v=v021-ios-boot-hotfix-1';
+import { render, renderCreation, renderMarblePanel } from './ui.js?v=v021-ios-boot-hotfix-1';
+import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v021-ios-boot-hotfix-1';
+import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v021-ios-boot-hotfix-1';
+import { claimCollectionMilestone } from './boss-codex-system.js?v=v021-ios-boot-hotfix-1';
+import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v021-ios-boot-hotfix-1';
+import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v021-ios-boot-hotfix-1';
 
 const app = document.querySelector('#app');
-let state = load();
+const boot = window.__QX_BOOT__ || { mark() {}, fail() {}, ready() {} };
+boot.mark('SAVE LOAD');
+let state = null;
+try {
+  state = load();
+} catch (error) {
+  boot.fail(error);
+}
 let loopTimer = null;
 
 function stopLoop() {
@@ -39,18 +46,38 @@ function schedule() {
 }
 
 function draw() {
-  if (state) refreshUnlocks(state);
+  let drawFailed = false;
+  boot.mark('UI INIT');
   cleanupMarbleBattle();
-  app.innerHTML = state ? render(state) : renderCreation();
-  if (state?.battle) {
-    app.insertAdjacentHTML('beforeend', renderMarblePanel(state, state.battle));
-    mountMarbleBattle(app, state, () => persistAndDraw());
+  app.querySelectorAll('.marble-overlay').forEach(layer => layer.remove());
+  try {
+    if (state) refreshUnlocks(state);
+    app.innerHTML = state ? render(state) : renderCreation();
+  } catch (error) {
+    boot.fail(error);
+    app.innerHTML = renderCreation();
+    stopLoop();
+    return;
+  }
+  if (state?.battle?.mode === 'marble' && !state.battle.finished) {
+    boot.mark('MARBLE INIT');
+    try {
+      app.insertAdjacentHTML('beforeend', renderMarblePanel(state, state.battle));
+      app.querySelector('.marble-overlay')?.classList.add('is-active');
+      mountMarbleBattle(app, state, () => persistAndDraw());
+    } catch (error) {
+      drawFailed = true;
+      cleanupMarbleBattle(state.battle, true);
+      app.querySelectorAll('.marble-overlay').forEach(layer => layer.remove());
+      boot.fail(error);
+    }
   }
   requestAnimationFrame(() => {
     const log = app.querySelector('.battle-log');
     if (log) log.scrollTop = log.scrollHeight;
   });
   schedule();
+  if (!drawFailed) boot.ready();
 }
 
 function persistAndDraw() { if (state) save(state); draw(); }
@@ -175,15 +202,18 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) { sto
 window.addEventListener('pagehide', () => { stopLoop(); cleanupMarbleBattle(state?.battle, true); if (state) save(state); });
 
 if ('serviceWorker' in navigator) {
-  const buildVersion = 'v021-hotfix-cache-1';
+  boot.mark('SW REGISTER');
+  const buildVersion = 'v021-ios-boot-hotfix-1';
   const reloadKey = `sw-reloaded-${buildVersion}`;
   let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (refreshing || sessionStorage.getItem(reloadKey)) return;
+    let alreadyReloaded = false;
+    try { alreadyReloaded = sessionStorage.getItem(reloadKey) === '1'; } catch {}
+    if (refreshing || alreadyReloaded) return;
     refreshing = true;
-    sessionStorage.setItem(reloadKey, '1');
+    try { sessionStorage.setItem(reloadKey, '1'); } catch {}
     window.location.reload();
   });
-  window.addEventListener('load', () => navigator.serviceWorker.register(`./service-worker.js?v=${buildVersion}`, { updateViaCache: 'none' }).then(registration => registration.update()).catch(() => {}));
+  window.addEventListener('load', () => navigator.serviceWorker.register(`./service-worker.js?v=${buildVersion}`, { updateViaCache: 'none' }).then(registration => registration.update()).catch(error => boot.fail(error)));
 }
-draw();
+try { draw(); } catch (error) { boot.fail(error); }

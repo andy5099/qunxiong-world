@@ -1,0 +1,10 @@
+.boot-fallback{display:grid;min-height:100vh;place-content:center;text-align:center;color:#f5d580;background:#100d0a}
+.boot-fallback h1{margin:0;font-size:2rem;letter-spacing:.12em}.boot-fallback p{color:#c8baa1}
+.boot-error{position:fixed;z-index:100;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));left:12px;max-width:520px;margin:auto;padding:16px;border:1px solid #d39b56;border-radius:12px;color:#fff3d0;background:#24170f;box-shadow:0 12px 40px #000}
+.boot-error[hidden]{display:none}.boot-error p{margin:.45rem 0 .8rem;color:#d8cbb5}
+.app-shell{min-height:100vh;min-height:100dvh}
+.status-bar,.game-nav{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.battle-panel,.chapter-card,.boss-puzzle,.marble-panel{max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px)}
+.marble-overlay{display:none;pointer-events:none}
+.marble-overlay.is-active{display:grid;pointer-events:auto}
+@media(max-width:430px){.marble-panel{max-height:calc(100vh - 6px);max-height:calc(100dvh - 6px)}.marble-canvas{max-height:55vh;max-height:55dvh}}
