@@ -96,6 +96,6 @@ equal(migrated7.version, 14, 'v7 migration');
 equal(migrated8.version, 14, 'v8 remains compatible');
 
 const sw = readFileSync(new URL('../service-worker.js', import.meta.url), 'utf8');
-check(sw.includes('v020-'), 'service worker updated');
+check(sw.includes('v021-'), 'service worker updated');
 
 console.log(`V0.1.2 boss follow-up smoke test: ${checks} assertions passed`);
