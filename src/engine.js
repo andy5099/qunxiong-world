@@ -6,7 +6,7 @@ import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recor
 import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v017-growth';
 import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v020-yellow-turban';
 import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v021-puzzle-polish';
-import { ensureMarbleBattle, getCurrentMarble, getMarbleSkill, hitMultiplier } from './marble-battle.js?v=v021-marble-boss';
+import { ensureMarbleBattle, getCurrentMarble, getMarbleSkill, getMarbleUltimate, getUltimateEnergy, hitMultiplier } from './marble-battle.js?v=v021-hotfix-ultimate';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -660,24 +660,36 @@ export function armMarbleSkill(state){
   const skill=getMarbleSkill(member);if(member.mp<skill.cost)return false;marble.skillArmed=!marble.skillArmed;return marble.skillArmed;
 }
 
+export function armMarbleUltimate(state){
+  const battle=state.battle,marble=battle?.marble,member=state.party[marble?.turnIndex];
+  if(!battle||battle.mode!=='marble'||battle.finished||marble.phase!=='aim'||!member||getUltimateEnergy(member)<100)return false;
+  marble.ultimateArmed=!marble.ultimateArmed;
+  if(marble.ultimateArmed)marble.skillArmed=false;
+  return marble.ultimateArmed;
+}
+
 export function commitMarbleLaunch(state,velocity){
   const battle=state.battle,marble=battle?.marble,entity=getCurrentMarble(battle),member=state.party[marble?.turnIndex];
   if(!entity||!member||marble.phase!=='aim')return false;
-  const skill=getMarbleSkill(member);if(marble.skillArmed){if(member.mp<skill.cost)marble.skillArmed=false;else{member.mp-=skill.cost;if(skill.heal){for(const ally of state.party.filter(alive)){const stats=getFinalStats(state,ally);ally.hp=Math.min(stats.maxHp,ally.hp+Math.round(stats.maxHp*skill.heal));}appendLog(state,`${member.name}施展仁德，全隊恢復兵力！`,'rare');}}}
-  const maxBoost=marble.skillArmed&&skill.power?skill.power:1;entity.vx=velocity.vx*maxBoost;entity.vy=velocity.vy*maxBoost;marble.phase='moving';marble.shot={hits:0,damage:0,wallBounces:0,obstacleBounces:0,friendHits:[]};return true;
+  const skill=getMarbleSkill(member),ultimate=getMarbleUltimate(member),validUltimate=Boolean(marble.ultimateArmed&&getUltimateEnergy(member)>=100&&velocity.power>=.3);
+  if(marble.ultimateArmed&&!validUltimate){marble.ultimateArmed=false;appendLog(state,'蓄力不足 30%，全力一擊未消耗。','rare');}
+  if(validUltimate){member.ultimateEnergy=0;marble.skillArmed=false;if(ultimate.heal){for(const ally of state.party.filter(alive)){const stats=getFinalStats(state,ally);ally.hp=Math.min(stats.maxHp,ally.hp+Math.round(stats.maxHp*ultimate.heal));}}appendLog(state,`${member.name}發動【${ultimate.name}】！`,'epic');}
+  if(marble.skillArmed){if(member.mp<skill.cost)marble.skillArmed=false;else{member.mp-=skill.cost;if(skill.heal){for(const ally of state.party.filter(alive)){const stats=getFinalStats(state,ally);ally.hp=Math.min(stats.maxHp,ally.hp+Math.round(stats.maxHp*skill.heal));}appendLog(state,`${member.name}施展仁德，全隊恢復兵力！`,'rare');}}}
+  const maxBoost=marble.skillArmed&&skill.power?skill.power:1;entity.vx=velocity.vx*maxBoost;entity.vy=velocity.vy*maxBoost;marble.phase='moving';marble.shot={hits:0,damage:0,wallBounces:0,obstacleBounces:0,friendHits:[],ultimate:validUltimate,power:Math.max(0,Math.min(1,velocity.power||0)),ultimateName:validUltimate?ultimate.name:null};return true;
 }
 
 export function resolveMarbleEvent(state,event,rng=Math.random){
   const battle=state.battle,marble=battle?.marble,member=state.party[marble?.turnIndex];if(!marble||!member||battle.finished)return null;
   if(event.type==='wall'){marble.shot.wallBounces++;return event;}
   if(event.type==='obstacle'){marble.shot.obstacleBounces++;return event;}
-  if(event.type==='friend'&&member.id==='liu-bei'){const friend=state.party[event.index];if(friend){const stats=getFinalStats(state,friend);friend.hp=Math.min(stats.maxHp,friend.hp+Math.round(stats.maxHp*.05));}return event;}
+  if(event.type==='friend'){if(!marble.shot.ultimate)member.ultimateEnergy=Math.min(100,getUltimateEnergy(member)+5);if(member.id==='liu-bei'){const friend=state.party[event.index];if(friend){const stats=getFinalStats(state,friend);friend.hp=Math.min(stats.maxHp,friend.hp+Math.round(stats.maxHp*.05));}}return event;}
   if(event.type!=='boss')return event;
   const target=battle.enemies.find(enemy=>enemy.boss&&alive(enemy))||battle.enemies.find(alive);if(!target)return null;
-  marble.shot.hits++;const hit=marble.shot.hits,skill=getMarbleSkill(member),stats=getFinalStats(state,member);let multiplier=hitMultiplier(hit);
+  marble.shot.hits++;const hit=marble.shot.hits,skill=getMarbleSkill(member),ultimate=getMarbleUltimate(member),stats=getFinalStats(state,member);let multiplier=hitMultiplier(hit);
   if(hit===1)multiplier*=1.08;
   if(marble.skillArmed&&hit===1)multiplier*=skill.firstHit||skill.damage||1;
   if(marble.skillArmed&&skill.weak&&event.weak)multiplier*=skill.weak;
+  if(marble.shot.ultimate){const powerScale=marble.shot.power>=.8?1:Math.max(.55,marble.shot.power);multiplier*=ultimate.damage*powerScale;if(ultimate.weak&&event.weak)multiplier*=ultimate.weak;if(ultimate.combo)multiplier*=hit===1?1.22:1.08;if(ultimate.bounces)multiplier*=1+Math.min(ultimate.bounces,marble.shot.wallBounces)*.12;}
   if(member.id==='zhang-fei'&&event.speed>500&&hit===1)multiplier*=1.18;
   if(member.id==='blackwind-lord'&&marble.shot.wallBounces)multiplier*=Math.min(1.35,1+marble.shot.wallBounces*.08);
   if(member.id==='yellow-commander'&&hit>=3)multiplier*=1.12;
@@ -685,16 +697,19 @@ export function resolveMarbleEvent(state,event,rng=Math.random){
   if(member.id==='zhang-bao'&&marble.shot.obstacleBounces)multiplier*=Math.min(1.4,1+marble.shot.obstacleBounces*.1);
   if(member.rarityRank)multiplier*=1+(member.rarityRank-1)*.04;
   if(event.weak)multiplier*=1.5;
-  const variance=.94+rng()*.12;let damage=Math.max(1,Math.round((stats.might*multiplier-target.defense*.24)*variance));
-  if(battle.worldBoss){const cap=Math.floor(target.maxHp*.18),remaining=Math.max(0,cap-marble.shot.damage);damage=Math.min(damage,remaining);}
+  const variance=.94+rng()*.12,defenseFactor=marble.shot.ultimate&&ultimate.pierce?.08:.24;let damage=Math.max(1,Math.round((stats.might*multiplier-target.defense*defenseFactor)*variance));
+  if(marble.shot.ultimate&&ultimate.lightning&&hit===1)damage=Math.round(damage*1.16);
+  if(battle.worldBoss){const cap=Math.floor(target.maxHp*(marble.shot.ultimate?.24:.18)),remaining=Math.max(0,cap-marble.shot.damage);damage=Math.min(damage,remaining);}
   damage=Math.min(target.hp,damage);target.hp=Math.max(0,target.hp-damage);marble.shot.damage+=damage;
   if(target.worldBoss){const records=getWorldBossRecordState(state,target.worldBossId||battle.worldBossId||'crimsonTiger');records.highestDamage=Math.max(records.highestDamage,damage);}
   if(marble.skillArmed&&skill.debuff&&hit===1)target.marbleDefenseDown=1;
   if(marble.skillArmed&&skill.burn&&hit===1){target.marbleBurn=2;const shotCap=battle.worldBoss?Math.floor(target.maxHp*.18):Infinity,remaining=Math.max(0,shotCap-marble.shot.damage),burn=Math.min(target.hp,remaining,Math.round(damage*.18));target.hp-=burn;marble.shot.damage+=burn;}
   if(marble.skillArmed&&skill.guard&&hit===1)member.marbleGuard=1;
+  if(marble.shot.ultimate&&hit===1){if(ultimate.burn)target.marbleBurn=Math.max(target.marbleBurn||0,3);if(ultimate.guard)member.marbleGuard=2;if(ultimate.stun)target.marbleStunned=1;}
+  if(!marble.shot.ultimate){const gain=15+(event.weak?12:0)+(hit>=3?8:0);member.ultimateEnergy=Math.min(100,getUltimateEnergy(member)+gain);}
   updateWorldBossPhase(state,target);
   const label=event.weak?'弱點 ':hit>1?`${hit} HIT! `:'';appendLog(state,`${member.name}${label}撞擊 ${target.name}，造成 ${damage} 傷害！`,event.weak||hit>=3?'epic':'rare');
-  marble.effects.push({type:'damage',x:marble.boss.x,y:marble.boss.y,text:`${event.weak?'弱點 ':''}-${damage}`,life:1});
+  marble.effects.push({type:marble.shot.ultimate?'ultimate':'damage',x:marble.boss.x,y:marble.boss.y,text:`${marble.shot.ultimate?'全力一擊 ':event.weak?'弱點 ':''}-${damage}`,life:1});
   return{damage,hit,weak:event.weak,total:marble.shot.damage};
 }
 
@@ -705,10 +720,11 @@ export function finishMarbleShot(state,rng=Math.random){
   let next=state.party.findIndex((member,index)=>member&&alive(member)&&!marble.acted.includes(member.id)&&marble.entities[index]);
   if(next<0){
     if(boss.marbleBurn>0){boss.marbleBurn--;const burn=Math.max(1,Math.round(boss.maxHp*.012));boss.hp=Math.max(0,boss.hp-burn);appendLog(state,`燃燒造成 ${burn} 傷害！`,'rare');if(!boss.hp){battle.enemies.forEach(enemy=>{enemy.hp=0;});finishVictory(state,rng);return true;}}
-    for(const enemy of battle.enemies.filter(alive)){const strikes=enemy.worldBoss?state.party.filter(alive).length:1;for(let strike=0;strike<strikes;strike++){performEnemyAction(state,enemy,rng);if(!state.party.some(alive))break;}if(!state.party.some(alive))break;}
+    if(boss.marbleStunned>0){boss.marbleStunned--;appendLog(state,'Boss 被全力一擊震懾，本回合無法行動！','epic');}
+    else for(const enemy of battle.enemies.filter(alive)){const strikes=enemy.worldBoss?state.party.filter(alive).length:1;for(let strike=0;strike<strikes;strike++){performEnemyAction(state,enemy,rng);if(!state.party.some(alive))break;}if(!state.party.some(alive))break;}
     if(!state.party.some(alive)){finishDefeat(state);return true;}battle.round++;marble.acted=[];next=state.party.findIndex(member=>member&&alive(member));
   }
-  marble.turnIndex=next;marble.phase='aim';marble.skillArmed=false;marble.aim={dx:0,dy:80,power:0,timeLeft:6};marble.shot={hits:0,damage:0,wallBounces:0,obstacleBounces:0,friendHits:[]};marble.effects=[];return true;
+  marble.turnIndex=next;marble.phase='aim';marble.skillArmed=false;marble.ultimateArmed=false;marble.aim={dx:0,dy:80,power:0,timeLeft:6};marble.shot={hits:0,damage:0,wallBounces:0,obstacleBounces:0,friendHits:[],ultimate:false,power:0};marble.effects=[];return true;
 }
 
 export function resolveMarbleAutoTurn(state,rng=Math.random){

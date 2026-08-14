@@ -62,6 +62,7 @@ function normalizeMember(member, fallback) {
   }
   safe.hp = Math.max(0, Math.min(safe.hp, safe.maxHp));
   safe.mp = Math.max(0, Math.min(safe.mp, safe.maxMp));
+  safe.ultimateEnergy = Math.max(0, Math.min(100, finite(safe.ultimateEnergy, 0)));
   safe.guarding = false;
   if (safe.id === 'blackwind-lord') {
     safe.rarityRank = Math.max(1, Math.min(5, finite(safe.rarityRank, 1)));
