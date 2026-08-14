@@ -1,9 +1,9 @@
-import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v021-boss-puzzle';
+import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v021-hotfix-ultimate';
 import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v014-boss-gear';
 import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v014-boss-gear';
 import { clearSave, createState, load, save } from './store.js?v=v020-yellow-turban';
-import { render, renderCreation, renderMarblePanel } from './ui.js?v=v021-marble-boss';
-import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v021-marble-boss';
+import { render, renderCreation, renderMarblePanel } from './ui.js?v=v021-hotfix-ultimate';
+import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v021-hotfix-ultimate';
 import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v020-yellow-turban';
 import { claimCollectionMilestone } from './boss-codex-system.js?v=v020-yellow-turban';
 import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v020-yellow-turban';
@@ -72,6 +72,8 @@ app.addEventListener('click', event => {
     const screen = action.slice(7);
     stopLoop();
     state.exploration.auto = false;
+    cleanupMarbleBattle(state.battle, true);
+    if (state.battle?.finished) state.battle = null;
     if (['plain','forest','stronghold','yellowRoad','yellowCamp','yellowFortress'].includes(screen)) enterArea(state, screen);
     else { state.screen = screen; if (screen === 'village' || screen === 'shop') state.location = '桃源村'; if(screen==='worldBoss')state.location='世界王祭壇'; if(screen==='bossCodex'){state.location='Boss 圖鑑';state.ui.codexDetail=null;} }
   } else if (action === 'inn') visitInn(state);

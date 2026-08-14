@@ -12,6 +12,24 @@ export const MARBLE_SKILLS={
   hero:{name:'猛擊',cost:6,firstHit:1.45,passive:'勇進'}
 };
 
+// Ultimate data is deliberately separate from the renderer and from MP skills.
+// `effect` is consumed by the battle engine; display names never drive logic.
+export const MARBLE_ULTIMATES={
+  hero:{name:'星刃・破軍一閃',effect:'power',damage:2.45},
+  'liu-bei':{name:'仁德・萬軍同心',effect:'heal',damage:1.75,heal:.12},
+  'guan-yu':{name:'武聖・青龍偃月',effect:'weak',damage:2.65,weak:1.2},
+  'zhang-fei':{name:'燕人・震天怒擊',effect:'stun',damage:2.55,stun:true},
+  'blackwind-lord':{name:'黑風・百裂旋刃',effect:'bounce',damage:2.35,bounces:2},
+  'crimson-tiger':{name:'赤焰・焚天虎嘯',effect:'burn',damage:2.7,burn:true},
+  'nether-thunder-beast':{name:'九幽・萬雷天劫',effect:'pierce',damage:2.6,pierce:true},
+  'yellow-captain':{name:'黃巾・鐵壁衝陣',effect:'guard',damage:2.2,guard:true},
+  'yellow-commander':{name:'蒼天・萬軍號令',effect:'combo',damage:2.35,combo:2},
+  'zhang-bao':{name:'地公・雷獄天罰',effect:'lightning',damage:2.6,lightning:true}
+};
+
+export function getMarbleUltimate(member){return MARBLE_ULTIMATES[member?.id]||MARBLE_ULTIMATES.hero;}
+export function getUltimateEnergy(member){return Math.max(0,Math.min(100,Number(member?.ultimateEnergy)||0));}
+
 export function getMarbleSkill(member){return MARBLE_SKILLS[member?.id]||{name:'猛擊',cost:6,firstHit:1.35,passive:'奮戰'};}
 export function hitMultiplier(hit){return hit<=1?1:hit===2?1.1:hit===3?1.2:hit===4?1.3:hit===5?1.45:Math.min(1.8,1.45+(hit-5)*.07);}
 export function getBossVisualKey(battle){if(battle.worldBoss)return battle.worldBossId==='netherThunder'?'thunder-beast':'crimson-tiger';if(battle.bossKind)return battle.bossKind;return'blackwind-lord';}
@@ -29,7 +47,7 @@ export function createMarbleBattleState(battle,party,rng=Math.random){
   const layouts=LAYOUTS[theme]||LAYOUTS.stronghold,layout=layouts[Math.floor(rng()*layouts.length)%layouts.length];
   const entities=party.map((member,i)=>member?{characterId:member.id,x:55+(i%3)*125,y:340+Math.floor(i/3)*52,vx:0,vy:0,radius:22,rarityRank:member.rarityRank||1,worldBoss:Boolean(member.worldBoss)}:null);
   const size=battle.worldBoss?58:Math.min(52,40+(battle.bossRarityRank||1)*2),boss={x:180,y:78,radius:size,visualKey:visual,weakAngle:Math.PI*.5};
-  return{entities,boss,obstacles:layout.map(item=>({...item})),turnIndex:party.findIndex(member=>member?.hp>0),acted:[],phase:'aim',skillArmed:false,aim:{dx:0,dy:80,power:0,timeLeft:6},shot:{hits:0,damage:0,wallBounces:0,obstacleBounces:0,friendHits:[]},effects:[],theme};
+  return{entities,boss,obstacles:layout.map(item=>({...item})),turnIndex:party.findIndex(member=>member?.hp>0),acted:[],phase:'aim',skillArmed:false,ultimateArmed:false,aim:{dx:0,dy:80,power:0,timeLeft:6},shot:{hits:0,damage:0,wallBounces:0,obstacleBounces:0,friendHits:[],ultimate:false,power:0},effects:[],theme};
 }
 
 export function ensureMarbleBattle(battle,party,rng=Math.random){if(!battle)return null;if(!battle.marble)battle.marble=createMarbleBattleState(battle,party,rng);return battle.marble;}
