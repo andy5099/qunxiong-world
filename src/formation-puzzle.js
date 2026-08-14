@@ -26,7 +26,7 @@ export function ensureFormation(battle) {
   battle.formation = {
     gauge: Math.max(0, Math.min(100, Number(old.gauge) || 0)), uses: Math.max(0, Number(old.uses) || 0),
     maxUses: getFormationMaxUses(battle), active: Boolean(old.active), board: Array.isArray(old.board) ? old.board : [],
-    result: old.result || null, startedAt: Number(old.startedAt) || 0
+    result: old.result || null, lastResult: old.lastResult || null, startedAt: Number(old.startedAt) || 0
   };
   return battle.formation;
 }
@@ -69,7 +69,8 @@ export function findMatches(board) {
 }
 
 export function swapBoardCells(board, from, to) {
-  if (!Number.isInteger(from) || !Number.isInteger(to) || !adjacent(from, to) || board[from]?.locked || board[to]?.locked) return false;
+  // A locked orb cannot start a drag, but may still be displaced by another orb.
+  if (!Number.isInteger(from) || !Number.isInteger(to) || !adjacent(from, to) || board[from]?.locked) return false;
   [board[from], board[to]] = [board[to], board[from]];
   return true;
 }
@@ -90,7 +91,7 @@ function interferenceFor(battle, rng) {
   if (!battle?.worldBoss || phase < 2) return result;
   const key = battle.worldBossId || battle.enemies?.[0]?.id;
   const target = key === 'netherThunder' ? result.locked : result.burning;
-  const count = 3 + Math.floor(rng() * 3);
+  const count = phase >= 3 ? 5 + Math.floor(rng() * 3) : 3 + Math.floor(rng() * 3);
   while (target.size < count) target.add(Math.floor(rng() * 30));
   return result;
 }
@@ -159,10 +160,18 @@ export function resolveFormationBoard(input, rng = Math.random) {
 
 export function startFormationPuzzle(battle, party, rng = Math.random) {
   const formation = ensureFormation(battle);
-  if (!formation || battle.finished || formation.active || formation.gauge < 100 || formation.uses >= formation.maxUses) return false;
+  if (!formation || battle.finished || formation.active || battle.mode !== 'puzzle') return false;
   formation.gauge = 0; formation.uses++; formation.active = true; formation.result = null;
   formation.board = createFormationBoard(battle, rng); formation.startedAt = Date.now();
   return true;
+}
+
+export function preparePuzzleTurn(battle, party, rng = Math.random) {
+  const formation = ensureFormation(battle);
+  if (!formation || battle?.mode !== 'puzzle' || battle.finished) return false;
+  formation.active = false;
+  formation.result = null;
+  return startFormationPuzzle(battle, party, rng);
 }
 
 export function settleFormationPuzzle(battle, party, rng = Math.random) {
@@ -172,5 +181,6 @@ export function settleFormationPuzzle(battle, party, rng = Math.random) {
   const effects = getFormationEffects(resolution, party);
   formation.active = false; formation.board = resolution.board;
   formation.result = { ...resolution, effects };
+  formation.lastResult = formation.result;
   return formation.result;
 }

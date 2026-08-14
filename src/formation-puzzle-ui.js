@@ -1,4 +1,4 @@
-import { FORMATION_ORBS, swapBoardCells } from './formation-puzzle.js?v=v021-formation-puzzle';
+import { FORMATION_ORBS, swapBoardCells } from './formation-puzzle.js?v=v021-boss-puzzle';
 
 let countdown = null;
 export function unmountFormationPuzzle() { if (countdown !== null) clearInterval(countdown); countdown = null; }
