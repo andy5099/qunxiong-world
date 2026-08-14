@@ -8,6 +8,7 @@ import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=
 import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v020-yellow-turban';
 import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v020-yellow-turban';
 import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v021-puzzle-polish';
+import { ensureMarbleBattle, getMarbleSkill } from './marble-battle.js?v=v021-marble-boss';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
@@ -250,6 +251,13 @@ export function renderFormationPanel(state, battle) {
     return `<div class="formation-overlay"><section class="formation-puzzle boss-puzzle"><header><div><p class="eyebrow">Boss 五色戰陣・${phase}</p><h2>${esc(bossName)}</h2></div><strong class="formation-time" aria-live="polite">6.0</strong></header><div class="puzzle-boss-hp"><span>Boss HP ${Math.max(0,boss.hp).toLocaleString()} / ${boss.maxHp.toLocaleString()}</span>${hpBar(boss.hp,boss.maxHp,'enemy-meter')}</div><div class="puzzle-party">${party}</div><div class="puzzle-timer-track" aria-label="轉珠剩餘時間"><i class="puzzle-timer-fill"></i></div>${summary}<p>拖曳對應編號角色珠；配對到的角色才會出手。放開或時間歸零即結算。</p><div class="formation-puzzle-board" role="grid">${cells}</div><div class="puzzle-log">${log}</div></section></div>`;
   }
   return '';
+}
+
+export function renderMarblePanel(state,battle){
+  if(!battle||battle.mode!=='marble'||battle.finished)return'';const marble=ensureMarbleBattle(battle,state.party),boss=battle.enemies.find(enemy=>enemy.boss&&enemy.hp>0)||battle.enemies.find(enemy=>enemy.hp>0);if(!boss)return'';
+  const member=state.party[marble.turnIndex],stats=member?getFinalStats(state,member):null,skill=getMarbleSkill(member),phase=boss.worldBoss?`第 ${boss.phase||1} 階段`:`回合 ${battle.round}`;
+  const party=state.party.map((unit,index)=>unit?`<span class="marble-party-member${index===marble.turnIndex?' active':''}${unit.hp<=0?' defeated':''}"><b>${index+1}・${esc(unit.name)}</b><small>${Math.max(0,unit.hp)}/${getFinalStats(state,unit).maxHp}</small></span>`:'<span class="marble-party-member empty"><b>空位</b></span>').join('');
+  return `<div class="marble-overlay"><section class="marble-panel"><header><div><p class="eyebrow">武將彈射 Boss 戰・${phase}</p><h2>${esc(boss.displayName||boss.name)}</h2></div><strong class="marble-hit">${marble.shot.hits||0} HIT</strong></header><div class="marble-boss-hp"><span>Boss HP ${Math.max(0,boss.hp).toLocaleString()} / ${boss.maxHp.toLocaleString()}</span>${hpBar(boss.hp,boss.maxHp,'enemy-meter')}</div><canvas class="marble-canvas" aria-label="武將彈射戰場"></canvas><div class="marble-controls"><div class="marble-current"><b>${esc(member?.name||'')}</b><small>兵 ${member?.hp||0}/${stats?.maxHp||0}・技 ${member?.mp||0}/${member?.maxMp||0}</small></div><button type="button" data-marble-skill class="marble-skill" ${!member||member.mp<skill.cost?'disabled':''}>${esc(skill.name)}・技 ${skill.cost}</button><div class="marble-meter-row"><span>POWER</span><div class="marble-meter"><i class="marble-power-fill"></i></div><strong class="marble-time">6.0</strong></div><div class="marble-meter time"><i class="marble-time-fill"></i></div><small>按住目前武將向後拉，放手朝反方向發射；命中發光部位造成弱點傷害。</small></div><div class="marble-party">${party}</div></section></div>`;
 }
 
 function battle(state) {

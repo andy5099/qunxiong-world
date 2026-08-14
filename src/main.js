@@ -2,8 +2,8 @@ import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQu
 import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v014-boss-gear';
 import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v014-boss-gear';
 import { clearSave, createState, load, save } from './store.js?v=v020-yellow-turban';
-import { render, renderCreation, renderFormationPanel } from './ui.js?v=v021-boss-puzzle';
-import { finishFormationPuzzle, mountFormationPuzzle, unmountFormationPuzzle } from './formation-puzzle-ui.js?v=v021-puzzle-polish';
+import { render, renderCreation, renderMarblePanel } from './ui.js?v=v021-marble-boss';
+import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v021-marble-boss';
 import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v020-yellow-turban';
 import { claimCollectionMilestone } from './boss-codex-system.js?v=v020-yellow-turban';
 import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v020-yellow-turban';
@@ -23,7 +23,7 @@ function schedule() {
   const baseExploreScreens = ['plain', 'forest', 'stronghold'];
   const exploreScreens=[...baseExploreScreens,'yellowRoad','yellowCamp','yellowFortress'];
   const formationPaused = state.battle?.formation?.active || state.battle?.formation?.result;
-  const shouldAutoFight = state.battle?.mode !== 'puzzle' && state.battle && !state.battle.finished && !formationPaused && (state.settings.autoBattle || state.exploration.auto);
+  const shouldAutoFight = !['puzzle', 'marble'].includes(state.battle?.mode) && state.battle && !state.battle.finished && !formationPaused && (state.settings.autoBattle || state.exploration.auto);
   const shouldAutoContinue = state.battle?.finished && state.battle.result === 'victory' && !state.battle.awaitingRecruit && !state.battle.boss && state.exploration.auto;
   const shouldAutoExplore = !state.battle && !state.ui.bossWarning && !state.dungeon.warning && !state.dungeon.active && exploreScreens.includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete&&!state.ui.chapter2Complete;
   if (!shouldAutoFight && !shouldAutoContinue && !shouldAutoExplore) { stopLoop(); return; }
@@ -31,7 +31,7 @@ function schedule() {
   loopTimer = window.setTimeout(() => {
     loopTimer = null;
     if (!state) return;
-    if (state.battle && !state.battle.finished && !state.battle.formation?.active && !state.battle.formation?.result && (state.settings.autoBattle || state.exploration.auto)) resolveRound(state, chooseAutoCommand(state));
+    if (state.battle && !['puzzle', 'marble'].includes(state.battle.mode) && !state.battle.finished && !state.battle.formation?.active && !state.battle.formation?.result && (state.settings.autoBattle || state.exploration.auto)) resolveRound(state, chooseAutoCommand(state));
     else if (state.battle?.finished && state.battle.result === 'victory' && !state.battle.awaitingRecruit && !state.battle.boss && state.exploration.auto) { leaveBattle(state); state.notice = '自動探索繼續前進。'; }
     else if (!state.battle && !state.ui.bossWarning && !state.dungeon.warning && !state.dungeon.active && exploreScreens.includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete&&!state.ui.chapter2Complete) createEncounter(state);
     persistAndDraw();
@@ -40,11 +40,11 @@ function schedule() {
 
 function draw() {
   if (state) refreshUnlocks(state);
-  unmountFormationPuzzle();
+  cleanupMarbleBattle();
   app.innerHTML = state ? render(state) : renderCreation();
   if (state?.battle) {
-    app.insertAdjacentHTML('beforeend', renderFormationPanel(state, state.battle));
-    mountFormationPuzzle(app, state.battle, () => { resolveFormationAttack(state); persistAndDraw(); });
+    app.insertAdjacentHTML('beforeend', renderMarblePanel(state, state.battle));
+    mountMarbleBattle(app, state, () => persistAndDraw());
   }
   requestAnimationFrame(() => {
     const log = app.querySelector('.battle-log');
@@ -169,8 +169,8 @@ app.addEventListener('change', event => {
   persistAndDraw();
 });
 
-document.addEventListener('visibilitychange', () => { if (document.hidden) { stopLoop(); if (state?.battle?.formation?.active) finishFormationPuzzle(); else unmountFormationPuzzle(); if (state) save(state); } else draw(); });
-window.addEventListener('pagehide', () => { stopLoop(); if (state) save(state); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) { stopLoop(); cleanupMarbleBattle(state?.battle, true); if (state) save(state); } else draw(); });
+window.addEventListener('pagehide', () => { stopLoop(); cleanupMarbleBattle(state?.battle, true); if (state) save(state); });
 
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(() => {}));
 draw();
