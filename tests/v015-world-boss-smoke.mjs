@@ -11,7 +11,7 @@ const equal = (actual, expected, label) => check(actual === expected, `${label}:
 const rng = value => () => value;
 const unlockedState = () => { const state = createState('世界王測試'); state.progress.chapterOneComplete = true; state.worldBoss.unlocked = true; return state; };
 
-equal(SAVE_VERSION, 12, 'save version 12');
+equal(SAVE_VERSION, 13, 'save version 13');
 equal(WORLD_BOSS.name, '赤焰魔虎', 'world boss name');
 equal(WORLD_BOSS.recommendedPower, 30000, 'recommended power');
 equal(WORLD_BOSS.captureRate, 0.05, 'capture rate');
@@ -160,7 +160,7 @@ equal(restoredRoster.party[4].id, 'crimson-tiger', 'reload preserves deployed ti
 equal(restoredRoster.roster.filter(member => member.id === 'blackwind-lord').length, 1, 'reload does not duplicate displaced leader');
 
 const sw = fs.readFileSync(new URL('../service-worker.js', import.meta.url), 'utf8');
-check(sw.includes('v016-boss-codex'), 'service worker cache updated');
+check(sw.includes('v017-growth'), 'service worker cache updated');
 check(sw.includes('world-boss-system.js'), 'service worker caches world boss module');
 
 console.log(`V0.1.5 world boss smoke: ${passed} assertions passed.`);

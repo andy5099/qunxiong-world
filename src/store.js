@@ -1,7 +1,7 @@
-import { SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createParty } from './data.js?v=v016-boss-codex';
+import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createParty } from './data.js?v=v017-growth';
 import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v014-boss-gear';
 import { normalizeWorldBoss } from './world-boss-system.js?v=v015-world-boss';
-import { normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v016-boss-codex';
+import { normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v017-growth';
 
 export const STORAGE_KEY = 'qunxiong-world-v01';
 const LEGACY_KEY = 'qunxiong-world-v2';
@@ -121,7 +121,7 @@ export function normalize(raw) {
     playerName: base.playerName,
     party,
     gold: Math.max(0, finite(raw.gold, base.gold)),
-    inventory: { ...base.inventory, ...(raw.inventory || {}) },
+    inventory: Object.fromEntries([...new Set([...Object.keys(ITEMS),...Object.keys(raw.inventory || {})])].map(id=>[id,Math.max(0,Math.floor(finite(raw.inventory?.[id],base.inventory[id]||0)))])),
     equipment: normalizeEquipment(raw.equipment, base.equipment),
     unlocks: {
       ...base.unlocks,

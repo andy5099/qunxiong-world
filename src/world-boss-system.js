@@ -1,4 +1,5 @@
-import { createCrimsonTiger } from './data.js?v=v016-boss-codex';
+import { createCrimsonTiger } from './data.js?v=v017-growth';
+import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v017-growth';
 
 export const WORLD_BOSS = {
   id: 'crimsonTiger',
@@ -46,7 +47,8 @@ export function normalizeWorldBoss(raw = {}) {
     defeated: Boolean(raw.defeated),
     defeats: Math.max(0, Number(raw.defeats) || 0),
     captured: Boolean(raw.captured),
-    firstRewardClaimed: Boolean(raw.firstRewardClaimed)
+    firstRewardClaimed: Boolean(raw.firstRewardClaimed),
+    breakthroughLevel: normalizeBreakthrough(raw.breakthroughLevel)
   };
 }
 

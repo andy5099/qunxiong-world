@@ -1,14 +1,16 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v016-boss-codex';
-import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getTeamPower, recommendMemberForItem } from './engine.js?v=v016-boss-codex';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v017-growth';
+import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getTeamPower, recommendMemberForItem } from './engine.js?v=v017-growth';
 import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v014-boss-gear';
 import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v014-boss-gear';
 import { WORLD_BOSS, getWorldBossResonance } from './world-boss-system.js?v=v015-world-boss';
-import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v016-boss-codex';
+import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v017-growth';
+import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v017-growth';
+import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v017-growth';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
 const hpBar = (value, max, type = '') => `<div class="meter ${type}"><i style="width:${Math.max(0, value / max * 100)}%"></i></div>`;
-const qualityClass = quality => `quality-${({ '普通': 'common', '稀有': 'rare', '史詩': 'epic', '傳說': 'legendary' })[quality] || 'common'}`;
+const qualityClass = quality => `quality-${({ '普通': 'common', '精良':'fine', '稀有': 'rare', '史詩': 'epic', '傳說': 'legendary' })[quality] || 'common'}`;
 const dangerStars = value => '★'.repeat(Math.max(1, Number(value) || 1));
 
 function header(state) {
@@ -62,7 +64,7 @@ function memberCard(state, member, index) {
   const equipped = getEquippedSummary(state, member.id);
   const rarity = member.id === 'blackwind-lord' ? getBossRarity(member.rarityRank) : member.id==='crimson-tiger'?{rank:5,stars:'★★★★★',name:'世界王'}:null;
   const resonance = ['blackwind-lord','crimson-tiger'].includes(member.id) ? resonancePanel(state, member) : '';
-  const progression = member.id === 'blackwind-lord' ? promotionPanel(state, member) : member.id === 'crimson-tiger' ? '<section class="promotion-box"><strong>世界王武將</strong><p>已是特殊最高階，不使用一般 Boss 轉職。</p></section>' : '';
+  const progression = member.id === 'blackwind-lord' ? promotionPanel(state, member) : member.id === 'crimson-tiger' ? breakthroughPanel(state) : '';
   const mastery = member.id === 'crimson-tiger' ? getMasteryProfile(state) : null;
   const masteryPanel = mastery ? `<section class="mastery-box"><strong>世界王熟練 Lv.${mastery.level}</strong><span>熟練：${mastery.exp}${mastery.next ? ` / ${mastery.next}` : '（MAX）'}</span><small>${mastery.level < 2 ? '下階：最大兵力 +3%' : mastery.level < 3 ? '下階：武力 +3%' : mastery.level < 4 ? '下階：烈焰撕裂 +5%' : mastery.level < 5 ? '下階：烈焰橫掃 +10%、最大兵力再 +5%' : '熟練度已達最高'}</small></section>` : '';
   const withdraw = member.id === 'crimson-tiger' ? button(`roster-withdraw:${member.id}`, '移至待命名冊', 'mini') : '';
@@ -87,6 +89,14 @@ function promotionPanel(state, member) {
   return `<section class="promotion-box"><strong>下一階：${getBossRarity(rank + 1).stars} ${getBossRarity(rank + 1).name}</strong><p>需要：${TALISMANS[talismanId].name} ×1<br>成功率：${Math.round(chance * 100)}%${blessing ? `（祝福 +${Math.round(blessing * 100)}%）` : ''}</p>${button('promote-leader', '嘗試轉職', 'primary', !(state.bossProgress.talismans[talismanId] > 0))}<div class="talisman-list">${materials}</div>${synthesis}</section>`;
 }
 
+function breakthroughPanel(state){
+  const level=state.worldBoss.breakthroughLevel||0;
+  if(level>=3)return `<section class="promotion-box breakthrough-box"><strong>世界王突破：Ⅲ / Ⅲ</strong><p>已達目前突破上限</p></section>`;
+  const next=level+1,cost=WORLD_BOSS_BREAKTHROUGH_COSTS[next],roman=['','Ⅰ','Ⅱ','Ⅲ'];
+  const legendary=state.bossProgress.talismans.legendary||0,divine=state.bossProgress.divineTalismans.advanced||0;
+  return `<section class="promotion-box breakthrough-box"><strong>世界王突破：${level?roman[level]:'未突破'} / Ⅲ</strong><p>下一階：突破${roman[next]}</p><span>傳說轉職兵符 ${legendary} / ${cost.legendary}</span><span>高階神兵符 ${divine} / ${cost.divineAdvanced}</span>${button('world-boss:breakthrough','突破','primary',!canBreakthrough(state))}</section>`;
+}
+
 function partyEquipmentPicker(state) {
   const member = state.party.find(candidate => candidate?.id === state.ui.partyEquipMember);
   const slot = state.ui.partyEquipSlot;
@@ -99,7 +109,7 @@ const getItemScoreForUi = item => (item.stats?.might || 0) * 7 + (item.stats?.de
 
 function party(state) {
   const mastery = getMasteryProfile(state);
-  const roster=state.roster.length?`<section class="roster-box"><h2>武將名冊・候補</h2>${state.roster.map(member=>`<article><strong>${esc(member.name)}</strong><span>${member.worldBoss?'★★★★★ 世界王':'候補武將'}・Lv.${member.level}</span>${member.id === 'crimson-tiger' ? `<div class="mastery-box"><strong>世界王熟練 Lv.${mastery.level}</strong><span>${mastery.exp} / ${mastery.next ?? 'MAX'}</span><small>${mastery.label}</small></div>` : ''}<div class="craft-actions">${state.party.map((slot,index)=>button(`roster-deploy:${member.id}:${index}`,`編入第 ${index+1} 位${slot?`（替換${slot.name}）`:''}`,'mini')).join('')}</div></article>`).join('')}</section>`:'';
+  const roster=state.roster.length?`<section class="roster-box"><h2>武將名冊・候補</h2>${state.roster.map(member=>`<article><strong>${member.id==='crimson-tiger'?'世界王・':''}${esc(member.name)}</strong><span>${member.worldBoss?'★★★★★ 世界王':'候補武將'}・Lv.${member.level}</span>${member.id === 'crimson-tiger' ? `<div class="mastery-box"><strong>世界王熟練 Lv.${mastery.level}</strong><span>${mastery.exp} / ${mastery.next ?? 'MAX'}</span><small>${mastery.label}</small></div>${breakthroughPanel(state)}` : ''}<div class="craft-actions">${state.party.map((slot,index)=>button(`roster-deploy:${member.id}:${index}`,`編入第 ${index+1} 位${slot?`（替換${slot.name}）`:''}`,'mini')).join('')}</div></article>`).join('')}</section>`:'';
   return `<section class="panel"><p class="eyebrow">最多五人・能力已包含裝備</p><h1>隊伍</h1><div class="team-power">隊伍戰力 <b>${getTeamPower(state).toLocaleString()}</b></div>${partyEquipmentPicker(state)}<div class="party-list">${state.party.map((member, index) => memberCard(state, member, index)).join('')}</div>${roster}</section>`;
 }
 
@@ -144,8 +154,14 @@ function inventoryCard(state, item) {
   const equipped = equippedCount(state, item.id);
   const available = owned - equipped;
   const gear = getBossGearInfo(item.id);
-  const evolution = gear?.nextId ? bossGearEvolution(state, item, gear) : '';
+  const evolution = gear?.nextId ? bossGearEvolution(state, item, gear) : item.generalGear ? generalGearEvolution(state,item) : '';
   return `<article class="inventory-item ${qualityClass(item.quality)} ${state.ui.selectedItem === item.id ? 'selected' : ''}"><div><span class="quality-label">${item.quality}</span><h3>${item.name}</h3><p>${item.description}</p><small>${SLOT_NAMES[item.slot]}・持有 ${owned}・可用 ${available}${equipped ? `・已裝備 ${equipped}` : ''}</small>${evolution}</div><div class="item-actions">${button(`quick:${item.id}`, '快速裝備', 'primary', available <= 0)}${button(`inspect:${item.id}`, '比較')}${button(`sell:${item.id}`, `出售 ${item.sell} 金`, '', available <= 0)}</div></article>`;
+}
+
+function generalGearEvolution(state,item){
+  const next=getNextGearTier(item.id);if(!next)return '<div class="gear-evolution"><strong>一般裝備最高階</strong><span>史詩不可再升階</span></div>';
+  const available=getAvailableGearCount(state,item.id),crafts=Math.floor(available/3);
+  return `<div class="gear-evolution"><strong>同名裝備升階</strong><span>可用 ${available}・可升階 ${crafts} 次</span><small>3 件${item.quality} → 1 件${next.quality}</small><div class="craft-actions">${button(`promote-gear:${item.id}`,'升階一次','mini',crafts<1)}${button(`promote-gear-all:${item.id}`,'全部升階','primary mini',crafts<1)}</div></div>`;
 }
 
 function bossGearEvolution(state, item, gear) {
@@ -183,7 +199,7 @@ function comparison(state) {
 function inventory(state) {
   const equipment = Object.values(ITEMS).filter(item => item.type === 'equipment' && (state.inventory[item.id] || 0) > 0).sort((a, b) => QUALITY_ORDER[b.quality] - QUALITY_ORDER[a.quality] || a.name.localeCompare(b.name, 'zh-Hant'));
   const changes = state.ui.optimizeChanges || [];
-  return `<section class="panel inventory-panel"><p class="eyebrow">共用背包</p><div class="inventory-heading"><h1>背包裝備</h1>${button('optimize-equipment', '一鍵最佳裝備', 'primary', !equipment.length)}</div>${divineTalismanPanel(state)}${quickEquipPanel(state)}${comparison(state)}${changes.length ? `<div class="optimize-result"><strong>最佳化結果</strong>${changes.slice(0, 12).map(change => `<span>${esc(change)}</span>`).join('')}</div>` : ''}<div class="inventory-list">${equipment.length ? equipment.map(item => inventoryCard(state, item)).join('') : '<p class="empty">尚未取得裝備。黑風森林的敵人有機會掉落裝備。</p>'}</div><p class="notice">${esc(state.notice)}</p></section>`;
+  return `<section class="panel inventory-panel"><p class="eyebrow">共用背包・同名同階堆疊</p><div class="inventory-heading"><h1>背包裝備</h1>${button('promote-all-gear','一鍵升階可合成裝備','primary',!equipment.some(item=>item.generalGear&&getAvailableGearCount(state,item.id)>=3))}${button('optimize-equipment', '一鍵最佳裝備', 'primary', !equipment.length)}</div>${divineTalismanPanel(state)}${quickEquipPanel(state)}${comparison(state)}${changes.length ? `<div class="optimize-result"><strong>最佳化結果</strong>${changes.slice(0, 12).map(change => `<span>${esc(change)}</span>`).join('')}</div>` : ''}<div class="inventory-list">${equipment.length ? equipment.map(item => inventoryCard(state, item)).join('') : '<p class="empty">尚未取得裝備。黑風森林的敵人有機會掉落裝備。</p>'}</div><p class="notice">${esc(state.notice)}</p></section>`;
 }
 
 function settings(state) {
