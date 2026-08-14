@@ -174,5 +174,16 @@ app.addEventListener('change', event => {
 document.addEventListener('visibilitychange', () => { if (document.hidden) { stopLoop(); cleanupMarbleBattle(state?.battle, true); if (state) save(state); } else draw(); });
 window.addEventListener('pagehide', () => { stopLoop(); cleanupMarbleBattle(state?.battle, true); if (state) save(state); });
 
-if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(() => {}));
+if ('serviceWorker' in navigator) {
+  const buildVersion = 'v021-hotfix-cache-1';
+  const reloadKey = `sw-reloaded-${buildVersion}`;
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing || sessionStorage.getItem(reloadKey)) return;
+    refreshing = true;
+    sessionStorage.setItem(reloadKey, '1');
+    window.location.reload();
+  });
+  window.addEventListener('load', () => navigator.serviceWorker.register(`./service-worker.js?v=${buildVersion}`, { updateViaCache: 'none' }).then(registration => registration.update()).catch(() => {}));
+}
 draw();
