@@ -1,8 +1,9 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v016-boss-codex';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v017-growth';
 import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v014-boss-gear';
 import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo, rollDivineTalismanDrops } from './boss-gear-system.js?v=v014-boss-gear';
 import { WORLD_BOSS, addTigerToRoster, createWorldBossEnemy, getWorldBossResonance } from './world-boss-system.js?v=v015-world-boss';
-import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v016-boss-codex';
+import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v017-growth';
+import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v017-growth';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -24,10 +25,11 @@ export function getFinalStats(state, memberOrId) {
   const resonance = getBlackwindResonance(state, member);
   const worldResonance = getWorldBossResonance(state, member);
   const mastery = member.id === 'crimson-tiger' ? getMasteryProfile(state) : { mightPct: 0, hpPct: 0 };
-  result.might = Math.round(result.might * (1 + resonance.mightPct + worldResonance.mightPct + mastery.mightPct));
-  result.defense = Math.round(result.defense * (1 + resonance.defensePct + worldResonance.defensePct));
-  result.maxHp = Math.round(result.maxHp * (1 + resonance.hpPct + worldResonance.hpPct + mastery.hpPct));
-  result.speed = Math.round(result.speed * (1 + resonance.speedPct + worldResonance.speedPct));
+  const breakthrough = member.id === 'crimson-tiger' ? getBreakthroughProfile(state.worldBoss.breakthroughLevel) : {mightPct:0,hpPct:0,defensePct:0,speedPct:0};
+  result.might = Math.round(result.might * (1 + resonance.mightPct + worldResonance.mightPct + mastery.mightPct + breakthrough.mightPct));
+  result.defense = Math.round(result.defense * (1 + resonance.defensePct + worldResonance.defensePct + breakthrough.defensePct));
+  result.maxHp = Math.round(result.maxHp * (1 + resonance.hpPct + worldResonance.hpPct + mastery.hpPct + breakthrough.hpPct));
+  result.speed = Math.round(result.speed * (1 + resonance.speedPct + worldResonance.speedPct + breakthrough.speedPct));
   return result;
 }
 
@@ -517,6 +519,10 @@ function finishVictory(state, rng) {
     state.battle.dropQuality = item.quality;
     if (state.battle.dungeon) state.dungeon.loot.items.push(dropId);
     recordItemDrop(state, dropId);
+    if(item.generalGear){
+      appendLog(state,`目前持有：${state.inventory[dropId]}`, 'drop');
+      if((state.inventory[dropId]||0)-equippedCount(state,dropId)>=3)appendLog(state,'可升階！可稍後前往背包合成。','rare');
+    }
   }
   if (bossBattle) {
     const rank = defeated.find(enemy => enemy.boss)?.rarityRank || 1;
@@ -620,7 +626,8 @@ export function resolveRound(state, command = 'attack', rng = Math.random) {
       if(tigerSkill)turn.unit.mp-=10;
       if (freeAssault) battle.freeLeaderAssault = false;
       const leaderMultiplier = (1.55 + ((turn.unit.rarityRank || 1) - 1) * 0.13) * (1 + (leaderProfile?.assaultPct || 0));
-      const tigerMultiplier=1.72*(1+(tigerProfile?.skillPct||0)+(turn.unit.id==='crimson-tiger'?getMasteryProfile(state).skillPct:0));
+      const breakthrough=turn.unit.id==='crimson-tiger'?getBreakthroughProfile(state.worldBoss.breakthroughLevel):{rendPct:0,sweepPct:0,heavenPct:0};
+      const tigerMultiplier=1.72*(1+(tigerProfile?.skillPct||0)+(turn.unit.id==='crimson-tiger'?getMasteryProfile(state).skillPct+breakthrough.rendPct+breakthrough.sweepPct+breakthrough.heavenPct:0));
       dealDamage(state, turn.unit, targets[0], useSlam || leaderAssault || tigerSkill, rng, leaderAssault ? '強襲' : tigerSkill?'烈焰撕裂':'猛擊', leaderAssault ? leaderMultiplier : tigerSkill?tigerMultiplier:1.65);
       const worldTarget=targets[0];
       if(worldTarget.worldBoss){const ratio=worldTarget.hp/worldTarget.maxHp;if(ratio<=.35&&worldTarget.phase<3){worldTarget.phase=3;worldTarget.might=Math.round(worldTarget.might*1.28);worldTarget.speed=Math.round(worldTarget.speed*1.18);appendLog(state,'赤焰魔虎徹底暴走！','epic');}else if(ratio<=.70&&worldTarget.phase<2){worldTarget.phase=2;worldTarget.might=Math.round(worldTarget.might*1.18);worldTarget.speed=Math.round(worldTarget.speed*1.15);appendLog(state,'赤焰魔虎進入狂暴！','epic');}state.worldBoss.bestPhase=Math.max(state.worldBoss.bestPhase,worldTarget.phase);state.worldBoss.lowestHpPct=Math.min(state.worldBoss.lowestHpPct,Math.max(0,Math.round(ratio*100)));}

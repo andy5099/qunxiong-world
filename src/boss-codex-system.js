@@ -1,4 +1,4 @@
-import { ITEMS } from './data.js?v=v016-boss-codex';
+import { ITEMS } from './data.js?v=v017-growth';
 
 export const BLACKWIND_DROPS = ['blackwindBlade', 'blackwindArmor', 'blackwindCharm', 'overlordBlade', 'blackwindWarArmor', 'leaderToken'];
 export const WORLD_BOSS_DROPS = ['crimsonTigerClaw', 'crimsonWarArmor', 'crimsonTigerSeal'];

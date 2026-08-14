@@ -1,10 +1,12 @@
-import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareWorldBoss, unequipItem, usePotion, visitInn } from './engine.js?v=v016-boss-codex';
+import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareWorldBoss, unequipItem, usePotion, visitInn } from './engine.js?v=v017-growth';
 import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v014-boss-gear';
 import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v014-boss-gear';
-import { clearSave, createState, load, save } from './store.js?v=v016-boss-codex';
-import { render, renderCreation } from './ui.js?v=v016-boss-codex';
+import { clearSave, createState, load, save } from './store.js?v=v017-growth';
+import { render, renderCreation } from './ui.js?v=v017-growth';
 import { deployRosterMember, withdrawPartyMember } from './world-boss-system.js?v=v015-world-boss';
-import { claimCollectionMilestone } from './boss-codex-system.js?v=v016-boss-codex';
+import { claimCollectionMilestone } from './boss-codex-system.js?v=v017-growth';
+import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v017-growth';
+import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v017-growth';
 
 const app = document.querySelector('#app');
 let state = load();
@@ -101,6 +103,10 @@ app.addEventListener('click', event => {
   } else if (action.startsWith('quick:')) prepareQuickEquip(state, action.slice(6));
   else if (action === 'quick-confirm') confirmQuickEquip(state);
   else if (action === 'optimize-equipment') optimizeEquipment(state);
+  else if(action==='promote-all-gear')promoteAllGear(state);
+  else if(action.startsWith('promote-gear-all:'))promoteGear(state,action.slice(17),true);
+  else if(action.startsWith('promote-gear:'))promoteGear(state,action.slice(13),false);
+  else if(action==='world-boss:breakthrough')breakthroughWorldBoss(state);
   else if (action === 'promote-leader') attemptPromotion(state);
   else if (action === 'combine-all-talismans') combineAllTalismans(state);
   else if (action.startsWith('combine-talisman:')) combineTalismans(state, action.slice(17));

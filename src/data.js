@@ -1,4 +1,4 @@
-export const SAVE_VERSION = 12;
+export const SAVE_VERSION = 13;
 
 export const DUNGEON = {
   id: 'bloodCavern', name: '血色洞窟', floors: 4, danger: 4, recommendedPower: 7500,
@@ -33,6 +33,27 @@ export const ITEMS = {
   crimsonTigerSeal: { id: 'crimsonTigerSeal', name: '赤焰虎符', type: 'equipment', slot: 'accessory', quality: '傳說', worldBossOnly: true, sell: 1480, stats: { might: 15, speed: 10, maxHp: 55 }, description: '武力 +15・速度 +10・最大兵力 +55' },
   potion: { id: 'potion', name: '回復藥', type: 'consumable', price: 20, heal: 45, description: '戰鬥中恢復 45 兵力' }
 };
+
+export const GENERAL_GEAR_IDS = ['woodenSword','ironSword','banditDagger','woodBow','clothArmor','leatherArmor','wolfBracers','clothShoes','ironArmor','woodRing','copperRing','greenEdgeSword'];
+export const GEAR_QUALITIES = ['普通','精良','稀有','史詩'];
+export const GEAR_MULTIPLIERS = { '普通': 1, '精良': 1.20, '稀有': 1.45, '史詩': 1.80 };
+export const GEAR_SELL_MULTIPLIERS = { '普通': 1, '精良': 1.5, '稀有': 2.5, '史詩': 4 };
+
+const qualitySuffix = { '精良': 'fine', '稀有': 'rare', '史詩': 'epic' };
+for (const baseId of GENERAL_GEAR_IDS) {
+  const source = ITEMS[baseId];
+  if (!source || source.bossOnly || source.worldBossOnly) continue;
+  const sourceRank = GEAR_QUALITIES.indexOf(source.quality);
+  const normalizedStats = Object.fromEntries(Object.entries(source.stats || {}).map(([key,value]) => [key, value / GEAR_MULTIPLIERS[source.quality]]));
+  Object.assign(source, { baseItemId: baseId, generalGear: true, gearTier: sourceRank, baseStats: normalizedStats });
+  for (let rank = sourceRank + 1; rank < GEAR_QUALITIES.length; rank += 1) {
+    const quality = GEAR_QUALITIES[rank], id = `${baseId}__${qualitySuffix[quality]}`;
+    const stats = Object.fromEntries(Object.entries(normalizedStats).map(([key,value]) => [key, Math.max(1, Math.round(value * GEAR_MULTIPLIERS[quality]))]));
+    const statLabels={might:'武力',defense:'防禦',maxHp:'最大兵力',speed:'速度'};
+    const description = Object.entries(stats).map(([key,value]) => `${statLabels[key]} +${value}`).join('・');
+    ITEMS[id] = { ...source, id, name: `${quality}${source.name}`, quality, sell: Math.round((source.sell || 1) / GEAR_SELL_MULTIPLIERS[source.quality] * GEAR_SELL_MULTIPLIERS[quality]), stats, description, baseItemId: baseId, generalGear: true, gearTier: rank, baseStats: normalizedStats, shop: false };
+  }
+}
 
 const officer = (id, name, stats) => ({
   id, name, level: 1, exp: 0, maxHp: stats.hp, hp: stats.hp,
@@ -81,7 +102,7 @@ export const BOSS_PITY_LIMIT = 20;
 
 export const SLOT_NAMES = { weapon: '武器', armor: '防具', accessory: '飾品' };
 export const STAT_NAMES = { might: '武力', defense: '防禦', maxHp: '最大兵力', speed: '速度' };
-export const QUALITY_ORDER = { '普通': 1, '稀有': 2, '史詩': 3, '傳說': 4 };
+export const QUALITY_ORDER = { '普通': 1, '精良': 2, '稀有': 3, '史詩': 4, '傳說': 5 };
 
 export const EXP_TO_LEVEL = level => 45 + (level - 1) * 35;
 export const INN_COST = 18;
