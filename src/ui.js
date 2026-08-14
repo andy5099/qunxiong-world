@@ -7,7 +7,7 @@ import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_M
 import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v017-growth';
 import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v020-yellow-turban';
 import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v020-yellow-turban';
-import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v021-boss-puzzle';
+import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v021-puzzle-polish';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
@@ -239,11 +239,15 @@ export function renderFormationPanel(state, battle) {
   const formation = ensureFormation(battle), boss = battle.enemies.find(enemy => enemy.boss && enemy.hp > 0) || battle.enemies.find(enemy => enemy.hp > 0);
   if (!boss) return '';
   const bossName = boss.displayName || boss.name, phase = boss.worldBoss ? `第 ${boss.phase || 1} 階段` : `回合 ${battle.round}`;
-  const party = state.party.filter(Boolean).map(member => { const stats=getFinalStats(state,member); return `<span class="puzzle-member${member.hp<=0?' defeated':''}"><b>${esc(member.name)}</b><small>兵 ${Math.max(0,member.hp)} / ${stats.maxHp}・技 ${member.mp} / ${member.maxMp}</small></span>`; }).join('');
-  const last=battle.lastPuzzleResult,summary=last?`<div class="puzzle-last"><b>${last.combos} Combo</b><span>戰陣傷害 ${last.totalDamage}</span><span>回復 ${Math.round(last.effects.healPct*100)}%</span><span>守護 ${Math.round(last.effects.defensePct*100)}%</span></div>`:'';
+  const party = state.party.map((member,slot) => {
+    if(!member)return `<span class="puzzle-member empty orb-slot-${slot+1}"><b>${slot+1}・空位</b><small>此色不會生成</small></span>`;
+    const stats=getFinalStats(state,member);return `<span class="puzzle-member orb-slot-${slot+1}${member.hp<=0?' defeated':''}"><b>${slot+1}・${esc(member.name)}</b><small>兵 ${Math.max(0,member.hp)} / ${stats.maxHp}</small></span>`;
+  }).join('');
+  const last=battle.lastPuzzleResult,summary=last?`<div class="puzzle-last"><b>${last.combos} Combo</b><span>總傷害 ${last.totalDamage}</span>${(last.characterResults||[]).map(item=>`<span>${esc(item.name)} ${item.damage}</span>`).join('')}</div>`:'';
   if (formation.active) {
     const cells = formation.board.map((cell, i) => `<button type="button" class="formation-orb orb-${cell.type}${cell.locked ? ' locked' : ''}${cell.burning ? ' burning' : ''}" data-orb-index="${i}" aria-label="${FORMATION_ORBS[cell.type].name}${cell.locked ? '，鎖定' : ''}"><i>${FORMATION_ORBS[cell.type].icon}</i></button>`).join('');
-    return `<div class="formation-overlay"><section class="formation-puzzle boss-puzzle"><header><div><p class="eyebrow">Boss Puzzle Battle・${phase}</p><h2>${esc(bossName)}</h2></div><strong class="formation-time">6.0</strong></header><div class="puzzle-boss-hp"><span>Boss HP ${Math.max(0,boss.hp).toLocaleString()} / ${boss.maxHp.toLocaleString()}</span>${hpBar(boss.hp,boss.maxHp,'enemy-meter')}</div><div class="puzzle-party">${party}</div>${summary}<p>按住一顆珠拖曳交換，放開即結算；鎖定珠不可作為起點。</p><div class="formation-puzzle-board" role="grid">${cells}</div><small>⚔武力・♥兵力・✦技力・盾防禦・➤疾風</small></section></div>`;
+    const log=state.log.slice(-5).map(entry=>`<span>${esc(typeof entry==='string'?entry:entry.text)}</span>`).join('');
+    return `<div class="formation-overlay"><section class="formation-puzzle boss-puzzle"><header><div><p class="eyebrow">Boss 五色戰陣・${phase}</p><h2>${esc(bossName)}</h2></div><strong class="formation-time" aria-live="polite">6.0</strong></header><div class="puzzle-boss-hp"><span>Boss HP ${Math.max(0,boss.hp).toLocaleString()} / ${boss.maxHp.toLocaleString()}</span>${hpBar(boss.hp,boss.maxHp,'enemy-meter')}</div><div class="puzzle-party">${party}</div><div class="puzzle-timer-track" aria-label="轉珠剩餘時間"><i class="puzzle-timer-fill"></i></div>${summary}<p>拖曳對應編號角色珠；配對到的角色才會出手。放開或時間歸零即結算。</p><div class="formation-puzzle-board" role="grid">${cells}</div><div class="puzzle-log">${log}</div></section></div>`;
   }
   return '';
 }

@@ -3,7 +3,7 @@ import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-
 import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v014-boss-gear';
 import { clearSave, createState, load, save } from './store.js?v=v020-yellow-turban';
 import { render, renderCreation, renderFormationPanel } from './ui.js?v=v021-boss-puzzle';
-import { mountFormationPuzzle, unmountFormationPuzzle } from './formation-puzzle-ui.js?v=v021-boss-puzzle';
+import { finishFormationPuzzle, mountFormationPuzzle, unmountFormationPuzzle } from './formation-puzzle-ui.js?v=v021-puzzle-polish';
 import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v020-yellow-turban';
 import { claimCollectionMilestone } from './boss-codex-system.js?v=v020-yellow-turban';
 import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v020-yellow-turban';
@@ -169,7 +169,7 @@ app.addEventListener('change', event => {
   persistAndDraw();
 });
 
-document.addEventListener('visibilitychange', () => { if (document.hidden) { stopLoop(); if (state?.battle?.formation?.active) resolveFormationAttack(state); unmountFormationPuzzle(); if (state) save(state); } else draw(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) { stopLoop(); if (state?.battle?.formation?.active) finishFormationPuzzle(); else unmountFormationPuzzle(); if (state) save(state); } else draw(); });
 window.addEventListener('pagehide', () => { stopLoop(); if (state) save(state); });
 
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(() => {}));
