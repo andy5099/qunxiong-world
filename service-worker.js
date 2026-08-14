@@ -1,10 +1,11 @@
-const BUILD_VERSION = 'v021-ios-boot-hotfix-1';
+const BUILD_VERSION = 'v022-pinball-prototype-1';
 const CACHE = `qunxiong-world-${BUILD_VERSION}`;
 // Upgrade source: v021-illustrated-marble-boss. Kept as a readable migration marker.
 const APP_SHELL = [
   './index.html',
   `./style.css?v=${BUILD_VERSION}`,
   `./ios-hotfix.css?v=${BUILD_VERSION}`,
+  `./pinball-prototype.css?v=${BUILD_VERSION}`,
   `./src/main.js?v=${BUILD_VERSION}`,
   `./src/boot.js?v=${BUILD_VERSION}`,
   `./src/data.js?v=${BUILD_VERSION}`,

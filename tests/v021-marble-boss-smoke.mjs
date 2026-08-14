@@ -11,7 +11,7 @@ const zero=()=>0;
 const state=()=>{const s=createState('彈射測試');s.screen='stronghold';s.location='黑風寨';s.unlocks.stronghold=true;s.ui.bossWarning=true;s.ui.bossRarityRank=3;return s;};
 
 const normal=state();normal.ui.bossWarning=false;createEncounter(normal,'strongholdSoldier',zero);equal(normal.battle.mode,'text','normal battle remains text');
-const boss=state();createBossEncounter(boss,3);equal(boss.battle.mode,'marble','formal boss uses marble');check(Boolean(boss.battle.marble),'marble state created');equal(boss.battle.marble.entities.filter(Boolean).length,4,'four starting members become marbles');equal(boss.battle.marble.phase,'aim','starts in aim phase');
+const boss=state();createBossEncounter(boss,3);equal(boss.battle.mode,'marble','formal boss uses marble');check(Boolean(boss.battle.marble),'marble state created');equal(boss.battle.marble.entities.filter(Boolean).length,3,'three starting members become marbles');equal(boss.battle.marble.phase,'pinball','starts in pinball phase');
 const world=state();world.ui.bossWarning=false;world.worldBoss.unlocked=true;createWorldBossEncounter(world,'crimsonTiger');equal(world.battle.mode,'marble','world boss uses marble');equal(world.battle.marble.boss.visualKey,'crimson-tiger','world boss visual selected');
 
 equal(MARBLE_ARENA.width,360,'arena width');equal(MARBLE_ARENA.height,430,'arena height');
@@ -28,7 +28,7 @@ for(let shot=0;shot<36;shot++){
   check(marble.phase==='settling','physical shot settles');
   check(entity.x>=MARBLE_ARENA.padding+entity.radius-1&&entity.x<=MARBLE_ARENA.width-MARBLE_ARENA.padding-entity.radius+1,'shot stays inside horizontal wall');
 }
-check(physicalHits>=20,'thirty-six real trajectories hit boss');check(wallHits>0,'wall collision exercised');check(obstacleHits>0,'obstacle collision exercised');
+check(physicalHits>=20,'thirty-six real trajectories hit boss');check(wallHits>0,'wall collision exercised');equal(obstacleHits,0,'prototype omits complex obstacles');
 
 const damageState=state();createBossEncounter(damageState,3);const marble=ensureMarbleBattle(damageState.battle,damageState.party,zero),target=damageState.battle.enemies.find(e=>e.boss);const before=target.hp;
 marble.skillArmed=true;const hit=resolveMarbleEvent(damageState,{type:'boss',weak:true,speed:600},zero);check(hit.damage>0&&target.hp<before,'weak-point hit deals real damage');check(marble.effects.length>0,'damage effect emitted');

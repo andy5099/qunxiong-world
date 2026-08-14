@@ -1,13 +1,13 @@
-import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v021-ios-boot-hotfix-1';
-import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v021-ios-boot-hotfix-1';
-import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v021-ios-boot-hotfix-1';
-import { clearSave, createState, load, save } from './store.js?v=v021-ios-boot-hotfix-1';
-import { render, renderCreation, renderMarblePanel } from './ui.js?v=v021-ios-boot-hotfix-1';
-import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v021-ios-boot-hotfix-1';
-import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v021-ios-boot-hotfix-1';
-import { claimCollectionMilestone } from './boss-codex-system.js?v=v021-ios-boot-hotfix-1';
-import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v021-ios-boot-hotfix-1';
-import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v021-ios-boot-hotfix-1';
+import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v022-pinball-prototype-1';
+import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v022-pinball-prototype-1';
+import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v022-pinball-prototype-1';
+import { clearSave, createState, load, save } from './store.js?v=v022-pinball-prototype-1';
+import { render, renderCreation, renderMarblePanel } from './ui.js?v=v022-pinball-prototype-1';
+import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v022-pinball-prototype-1';
+import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v022-pinball-prototype-1';
+import { claimCollectionMilestone } from './boss-codex-system.js?v=v022-pinball-prototype-1';
+import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v022-pinball-prototype-1';
+import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v022-pinball-prototype-1';
 
 const app = document.querySelector('#app');
 const boot = window.__QX_BOOT__ || { mark() {}, fail() {}, ready() {} };
@@ -203,7 +203,7 @@ window.addEventListener('pagehide', () => { stopLoop(); cleanupMarbleBattle(stat
 
 if ('serviceWorker' in navigator) {
   boot.mark('SW REGISTER');
-  const buildVersion = 'v021-ios-boot-hotfix-1';
+  const buildVersion = 'v022-pinball-prototype-1';
   const reloadKey = `sw-reloaded-${buildVersion}`;
   let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
