@@ -12,7 +12,7 @@ const equal=(actual,expected,label)=>check(actual===expected,`${label}: ${actual
 const rng=value=>()=>value;
 const unlocked=()=>{const s=createState('圖鑑測試');s.progress.chapterOneComplete=true;s.worldBoss.unlocked=true;return s;};
 
-equal(SAVE_VERSION,13,'save version 13');
+equal(SAVE_VERSION,14,'save version 14');
 const fresh=unlocked(); fresh.screen='bossCodex';
 let html=render(fresh);
 check(html.includes('Boss 圖鑑'),'codex entry renders');
@@ -105,7 +105,7 @@ const goldBefore=complete.gold; check(claimCollectionMilestone(complete,100),'10
 const old=createState('舊存檔'); old.version=11; old.progress.bossRecruited=true; old.progress.bossDefeated=true; old.inventory.overlordBlade=1; old.inventory.crimsonWarArmor=1; old.bossProgress.talismans.advanced=2; old.worldBoss={...old.worldBoss,unlocked:true,attempts:4,defeated:true,captured:true}; old.roster=[createCrimsonTiger()];
 old.bossProgress.records=[{type:'capture',rank:4,success:true},{type:'capture',rank:5,success:false}];
 const migrated=normalize(old);
-equal(migrated.version,13,'old save migrated');
+equal(migrated.version,14,'old save migrated');
 check(migrated.bossCodex.blackwind.ranks[1].captured,'existing recruit migrates');
 check(migrated.bossCodex.blackwind.drops.overlordBlade,'existing blackwind gear migrates');
 check(migrated.worldBossCodex.drops.crimsonWarArmor,'existing world gear migrates');
@@ -116,6 +116,6 @@ migrated.screen='party'; html=render(migrated); check(html.includes('世界王�
 const reload=normalize(migrated); equal(reload.worldBossMastery.exp,migrated.worldBossMastery.exp,'reload mastery stable'); check(reload.collectionMilestones.claimed['25']===migrated.collectionMilestones.claimed['25'],'claimed milestones stable');
 
 const sw=fs.readFileSync(new URL('../service-worker.js',import.meta.url),'utf8');
-check(sw.includes('v017-growth'),'service worker cache updated');
+check(sw.includes('v020-yellow-turban'),'service worker cache updated');
 check(sw.includes('boss-codex-system.js'),'codex module cached');
 console.log(`V0.1.6 boss codex smoke: ${passed} assertions passed.`);

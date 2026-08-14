@@ -1,9 +1,15 @@
-export const SAVE_VERSION = 13;
+export const SAVE_VERSION = 14;
 
 export const DUNGEON = {
   id: 'bloodCavern', name: '血色洞窟', floors: 4, danger: 4, recommendedPower: 7500,
   baseChance: 0.06, pityStart: 20,
   bossRarityChances: [0.20, 0.25, 0.25, 0.20, 0.10]
+};
+
+export const YELLOW_DUNGEON = {
+  id: 'yellowTomb', name: '黃巾古墓', floors: 4, danger: 5, recommendedPower: 15000,
+  baseChance: 0.065, pityStart: 18,
+  bossRarityChances: [0.14, 0.22, 0.28, 0.23, 0.13]
 };
 
 export const ITEMS = {
@@ -31,10 +37,28 @@ export const ITEMS = {
   crimsonTigerClaw: { id: 'crimsonTigerClaw', name: '赤焰虎爪', type: 'equipment', slot: 'weapon', quality: '傳說', worldBossOnly: true, sell: 1600, stats: { might: 34, speed: 9 }, description: '武力 +34・速度 +9' },
   crimsonWarArmor: { id: 'crimsonWarArmor', name: '赤焰戰甲', type: 'equipment', slot: 'armor', quality: '傳說', worldBossOnly: true, bossSkillReduction: .12, sell: 1540, stats: { defense: 27, maxHp: 110 }, description: '防禦 +27・最大兵力 +110・Boss 技能減傷 12%' },
   crimsonTigerSeal: { id: 'crimsonTigerSeal', name: '赤焰虎符', type: 'equipment', slot: 'accessory', quality: '傳說', worldBossOnly: true, sell: 1480, stats: { might: 15, speed: 10, maxHp: 55 }, description: '武力 +15・速度 +10・最大兵力 +55' },
+  yellowIronBlade: { id: 'yellowIronBlade', name: '黃巾鐵刀', type: 'equipment', slot: 'weapon', quality: '普通', sell: 58, stats: { might: 9 }, description: '武力 +9' },
+  yellowSpear: { id: 'yellowSpear', name: '黃巾長槍', type: 'equipment', slot: 'weapon', quality: '普通', sell: 64, stats: { might: 8, speed: 2 }, description: '武力 +8・速度 +2' },
+  yellowHardBow: { id: 'yellowHardBow', name: '黃巾硬弓', type: 'equipment', slot: 'weapon', quality: '普通', sell: 62, stats: { might: 7, speed: 3 }, description: '武力 +7・速度 +3' },
+  yellowBattleGarb: { id: 'yellowBattleGarb', name: '黃巾戰衣', type: 'equipment', slot: 'armor', quality: '普通', sell: 55, stats: { defense: 6, speed: 2 }, description: '防禦 +6・速度 +2' },
+  yellowIronArmor: { id: 'yellowIronArmor', name: '黃巾鐵甲', type: 'equipment', slot: 'armor', quality: '普通', sell: 72, stats: { defense: 9, maxHp: 24 }, description: '防禦 +9・最大兵力 +24' },
+  yellowCharm: { id: 'yellowCharm', name: '黃巾護符', type: 'equipment', slot: 'accessory', quality: '普通', sell: 60, stats: { might: 3, defense: 3, speed: 2 }, description: '武力 +3・防禦 +3・速度 +2' },
+  captainBlade: { id: 'captainBlade', name: '校尉戰刀', type: 'equipment', slot: 'weapon', quality: '史詩', bossOnly: true, bossGearFamily: 'yellow-captain', sell: 760, stats: { might: 22, defense: 4 }, description: '武力 +22・防禦 +4' },
+  yellowHeavyArmor: { id: 'yellowHeavyArmor', name: '黃巾重甲', type: 'equipment', slot: 'armor', quality: '史詩', bossOnly: true, bossGearFamily: 'yellow-captain', sell: 740, stats: { defense: 20, maxHp: 72 }, description: '防禦 +20・最大兵力 +72' },
+  captainToken: { id: 'captainToken', name: '校尉令牌', type: 'equipment', slot: 'accessory', quality: '史詩', bossOnly: true, bossGearFamily: 'yellow-captain', sell: 700, stats: { defense: 9, maxHp: 38 }, description: '防禦 +9・最大兵力 +38' },
+  commanderSpear: { id: 'commanderSpear', name: '渠帥長槍', type: 'equipment', slot: 'weapon', quality: '史詩', bossOnly: true, bossGearFamily: 'yellow-commander', sell: 790, stats: { might: 25, speed: 6 }, description: '武力 +25・速度 +6' },
+  breakerArmor: { id: 'breakerArmor', name: '破軍戰甲', type: 'equipment', slot: 'armor', quality: '史詩', bossOnly: true, bossGearFamily: 'yellow-commander', sell: 750, stats: { defense: 16, maxHp: 54, speed: 3 }, description: '防禦 +16・最大兵力 +54・速度 +3' },
+  commanderTalisman: { id: 'commanderTalisman', name: '渠帥兵符', type: 'equipment', slot: 'accessory', quality: '史詩', bossOnly: true, bossGearFamily: 'yellow-commander', sell: 730, stats: { might: 10, speed: 7 }, description: '武力 +10・速度 +7' },
+  earthLordSword: { id: 'earthLordSword', name: '地公法劍', type: 'equipment', slot: 'weapon', quality: '史詩', bossOnly: true, bossGearFamily: 'zhang-bao', sell: 860, stats: { might: 24, speed: 5 }, description: '武力 +24・速度 +5・技能增幅' },
+  yellowSkyRobe: { id: 'yellowSkyRobe', name: '黃天法袍', type: 'equipment', slot: 'armor', quality: '史詩', bossOnly: true, bossGearFamily: 'zhang-bao', sell: 820, stats: { defense: 18, maxHp: 68 }, description: '防禦 +18・最大兵力 +68' },
+  earthLordSeal: { id: 'earthLordSeal', name: '地公令', type: 'equipment', slot: 'accessory', quality: '史詩', bossOnly: true, bossGearFamily: 'zhang-bao', sell: 800, stats: { might: 12, speed: 8, maxHp: 38 }, description: '武力 +12・速度 +8・最大兵力 +38' },
+  netherThunderClaw: { id: 'netherThunderClaw', name: '九幽雷爪', type: 'equipment', slot: 'weapon', quality: '傳說', worldBossOnly: true, worldBossFamily: 'nether-thunder', sell: 2300, stats: { might: 46, speed: 16 }, description: '武力 +46・速度 +16' },
+  netherThunderArmor: { id: 'netherThunderArmor', name: '九幽雷甲', type: 'equipment', slot: 'armor', quality: '傳說', worldBossOnly: true, worldBossFamily: 'nether-thunder', sell: 2200, stats: { defense: 35, maxHp: 150 }, description: '防禦 +35・最大兵力 +150' },
+  thunderEmperorSeal: { id: 'thunderEmperorSeal', name: '雷帝之印', type: 'equipment', slot: 'accessory', quality: '傳說', worldBossOnly: true, worldBossFamily: 'nether-thunder', sell: 2150, stats: { might: 20, speed: 17, maxHp: 75 }, description: '武力 +20・速度 +17・最大兵力 +75' },
   potion: { id: 'potion', name: '回復藥', type: 'consumable', price: 20, heal: 45, description: '戰鬥中恢復 45 兵力' }
 };
 
-export const GENERAL_GEAR_IDS = ['woodenSword','ironSword','banditDagger','woodBow','clothArmor','leatherArmor','wolfBracers','clothShoes','ironArmor','woodRing','copperRing','greenEdgeSword'];
+export const GENERAL_GEAR_IDS = ['woodenSword','ironSword','banditDagger','woodBow','clothArmor','leatherArmor','wolfBracers','clothShoes','ironArmor','woodRing','copperRing','greenEdgeSword','yellowIronBlade','yellowSpear','yellowHardBow','yellowBattleGarb','yellowIronArmor','yellowCharm'];
 export const GEAR_QUALITIES = ['普通','精良','稀有','史詩'];
 export const GEAR_MULTIPLIERS = { '普通': 1, '精良': 1.20, '稀有': 1.45, '史詩': 1.80 };
 export const GEAR_SELL_MULTIPLIERS = { '普通': 1, '精良': 1.5, '稀有': 2.5, '史詩': 4 };
@@ -79,6 +103,20 @@ export function createCrimsonTiger() {
   return { ...officer('crimson-tiger', '赤焰魔虎', { hp: 520, mp: 72, might: 82, defense: 48, intelligence: 14, speed: 38 }), level: 12, worldBoss: true, rarityRank: 5, rarityName: '世界王', growthMultiplier: 1.45, skills: ['flameRend', 'flameSweep', 'roar'] };
 }
 
+export function createYellowBossMember(kind = 'yellow-captain') {
+  const profiles = {
+    'yellow-captain': ['黃巾校尉', { hp: 310, mp: 44, might: 42, defense: 35, intelligence: 14, speed: 18 }, '坦克'],
+    'yellow-commander': ['黃巾渠帥', { hp: 280, mp: 48, might: 51, defense: 24, intelligence: 18, speed: 27 }, '物理輸出'],
+    'zhang-bao': ['張寶', { hp: 265, mp: 76, might: 44, defense: 22, intelligence: 52, speed: 25 }, '群攻']
+  };
+  const [name, stats, role] = profiles[kind] || profiles['yellow-captain'];
+  return { ...officer(kind, name, stats), level: kind === 'zhang-bao' ? 18 : 14, bossRecruit: true, rarityRank: 1, rarityName: '普通', growthMultiplier: 1.2, role };
+}
+
+export function createNetherThunderBeast() {
+  return { ...officer('nether-thunder-beast', '九幽雷獸', { hp: 760, mp: 110, might: 112, defense: 68, intelligence: 36, speed: 70 }), level: 24, worldBoss: true, worldBossId: 'netherThunder', rarityRank: 5, rarityName: '世界王', growthMultiplier: 1.65, role: '世界王／高速', skills: ['thunderClaw', 'thunderArray', 'divinePunishment'] };
+}
+
 export const ENEMIES = {
   wolf: { id: 'wolf', name: '野狼', maxHp: 72, might: 14, defense: 5, speed: 18, exp: 24, gold: [8, 14] },
   bandit: { id: 'bandit', name: '山賊', maxHp: 105, might: 20, defense: 8, speed: 11, exp: 38, gold: [16, 25] },
@@ -89,12 +127,28 @@ export const ENEMIES = {
   blackwindSwordsman: { id: 'blackwindSwordsman', name: '黑風刀客', maxHp: 125, might: 31, defense: 10, speed: 16, exp: 72, gold: [36, 50], loot: { common: ['banditDagger', 'leatherArmor'], rare: ['ironArmor', 'copperRing'], epic: ['greenEdgeSword'], supply: ['potion'] } },
   blackwindCaptain: { id: 'blackwindCaptain', name: '黑風頭目', maxHp: 185, might: 29, defense: 17, speed: 12, exp: 88, gold: [45, 62], loot: { common: ['ironSword', 'leatherArmor'], rare: ['ironArmor', 'banditDagger'], epic: ['greenEdgeSword'], supply: ['potion'] } },
   blackwindLord: { id: 'blackwindLord', name: '黑風寨主', displayName: '敵將・黑風寨主', level: 9, maxHp: 620, maxMp: 48, mp: 48, might: 47, intelligence: 16, defense: 28, speed: 18, exp: 420, gold: [260, 360], boss: true, skills: ['assault', 'intimidate'], loot: { rare: ['blackwindBlade', 'blackwindArmor', 'blackwindCharm'], epic: ['overlordBlade', 'blackwindWarArmor', 'leaderToken'] } }
+  ,yellowBladeSoldier: { id: 'yellowBladeSoldier', name: '黃巾刀兵', maxHp: 205, might: 43, defense: 16, speed: 22, exp: 115, gold: [58, 82], loot: { common: ['yellowIronBlade','yellowBattleGarb'], rare: ['yellowIronArmor'], epic: ['yellowCharm'], supply: ['potion'] } }
+  ,yellowShieldSoldier: { id: 'yellowShieldSoldier', name: '黃巾盾兵', maxHp: 275, might: 34, defense: 31, speed: 13, exp: 128, gold: [62, 88], loot: { common: ['yellowIronArmor','yellowCharm'], rare: ['yellowIronBlade'], epic: ['yellowSpear'], supply: ['potion'] } }
+  ,yellowBowSoldier: { id: 'yellowBowSoldier', name: '黃巾弓兵', maxHp: 185, might: 39, defense: 15, speed: 34, exp: 122, gold: [60, 86], loot: { common: ['yellowHardBow','yellowBattleGarb'], rare: ['yellowCharm'], epic: ['yellowIronArmor'], supply: ['potion'] } }
+  ,yellowWarlock: { id: 'yellowWarlock', name: '黃巾術士', maxHp: 172, might: 46, defense: 12, speed: 27, exp: 142, gold: [70, 96], magicEnemy: true, loot: { common: ['yellowCharm','yellowBattleGarb'], rare: ['yellowHardBow'], epic: ['yellowIronBlade'], supply: ['potion'] } }
+  ,yellowBrute: { id: 'yellowBrute', name: '黃巾力士', maxHp: 335, might: 50, defense: 22, speed: 11, exp: 158, gold: [76, 104], loot: { common: ['yellowSpear','yellowIronArmor'], rare: ['yellowIronBlade'], epic: ['yellowCharm'], supply: ['potion'] } }
+  ,yellowCaptainBoss: { id: 'yellowCaptainBoss', bossKind: 'yellow-captain', name: '黃巾校尉', displayName: '敵將・黃巾校尉', level: 16, maxHp: 1650, maxMp: 76, mp: 76, might: 73, intelligence: 24, defense: 58, speed: 25, exp: 980, gold: [620, 820], boss: true, skills: ['ironWall','shieldBash'], loot: { rare: ['captainBlade','yellowHeavyArmor','captainToken'], epic: ['captainBlade','yellowHeavyArmor','captainToken'] } }
+  ,yellowCommanderBoss: { id: 'yellowCommanderBoss', bossKind: 'yellow-commander', name: '黃巾渠帥', displayName: '敵將・黃巾渠帥', level: 18, maxHp: 1750, maxMp: 82, mp: 82, might: 91, intelligence: 28, defense: 43, speed: 38, exp: 1220, gold: [760, 980], boss: true, skills: ['armyBreaker','pursuit'], loot: { rare: ['commanderSpear','breakerArmor','commanderTalisman'], epic: ['commanderSpear','breakerArmor','commanderTalisman'] } }
+  ,zhangBaoBoss: { id: 'zhangBaoBoss', bossKind: 'zhang-bao', name: '張寶', displayName: '地公將軍・張寶', level: 21, maxHp: 2200, maxMp: 140, mp: 140, might: 96, intelligence: 72, defense: 49, speed: 41, exp: 1800, gold: [1100, 1450], boss: true, skills: ['demonThunder','nineHeavens','yellowSkyCurse'], loot: { rare: ['earthLordSword','yellowSkyRobe','earthLordSeal'], epic: ['earthLordSword','yellowSkyRobe','earthLordSeal'] } }
 };
 
 export const AREAS = {
   plain: { id: 'plain', name: '村外平原', enemies: ['wolf', 'bandit'], level: 1, danger: 1, recommendedPower: 850 },
   forest: { id: 'forest', name: '黑風森林', enemies: ['blackwindWolf', 'forestBandit', 'yellowTurbanArcher'], level: 3, danger: 2, recommendedPower: 1650 },
   stronghold: { id: 'stronghold', name: '黑風寨', enemies: ['strongholdSoldier', 'blackwindSwordsman', 'blackwindCaptain'], level: 5, danger: 3, recommendedPower: 2450 }
+  ,yellowRoad: { id: 'yellowRoad', name: '黃巾荒道', enemies: ['yellowBladeSoldier','yellowShieldSoldier','yellowBowSoldier'], level: 8, danger: 3, recommendedPower: 6500, bossPool: ['yellowCaptainBoss'] }
+  ,yellowCamp: { id: 'yellowCamp', name: '黃巾營地', enemies: ['yellowShieldSoldier','yellowBowSoldier','yellowWarlock','yellowBrute'], level: 11, danger: 4, recommendedPower: 9200, bossPool: ['yellowCaptainBoss','yellowCommanderBoss'] }
+  ,yellowFortress: { id: 'yellowFortress', name: '黃巾主寨', enemies: ['yellowBladeSoldier','yellowWarlock','yellowBrute'], level: 14, danger: 5, recommendedPower: 12800, bossPool: ['yellowCommanderBoss','zhangBaoBoss'] }
+};
+
+export const CHARACTER_ROLES = {
+  hero:'均衡','liu-bei':'輔助／均衡','guan-yu':'物理輸出','zhang-fei':'前排／輸出','blackwind-lord':'爆發','crimson-tiger':'世界王／爆發',
+  'yellow-captain':'坦克','yellow-commander':'物理輸出','zhang-bao':'群攻','nether-thunder-beast':'世界王／高速'
 };
 
 export const BOSS_RECOMMENDED_POWER = 3200;

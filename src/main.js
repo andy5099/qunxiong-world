@@ -1,12 +1,12 @@
-import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareWorldBoss, unequipItem, usePotion, visitInn } from './engine.js?v=v017-growth';
+import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v020-yellow-turban';
 import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v014-boss-gear';
 import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v014-boss-gear';
-import { clearSave, createState, load, save } from './store.js?v=v017-growth';
-import { render, renderCreation } from './ui.js?v=v017-growth';
-import { deployRosterMember, withdrawPartyMember } from './world-boss-system.js?v=v015-world-boss';
-import { claimCollectionMilestone } from './boss-codex-system.js?v=v017-growth';
-import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v017-growth';
-import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v017-growth';
+import { clearSave, createState, load, save } from './store.js?v=v020-yellow-turban';
+import { render, renderCreation } from './ui.js?v=v020-yellow-turban';
+import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v020-yellow-turban';
+import { claimCollectionMilestone } from './boss-codex-system.js?v=v020-yellow-turban';
+import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v020-yellow-turban';
+import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v020-yellow-turban';
 
 const app = document.querySelector('#app');
 let state = load();
@@ -19,9 +19,11 @@ function stopLoop() {
 
 function schedule() {
   if (!state) return;
+  const baseExploreScreens = ['plain', 'forest', 'stronghold'];
+  const exploreScreens=[...baseExploreScreens,'yellowRoad','yellowCamp','yellowFortress'];
   const shouldAutoFight = state.battle && !state.battle.finished && (state.settings.autoBattle || state.exploration.auto);
   const shouldAutoContinue = state.battle?.finished && state.battle.result === 'victory' && !state.battle.awaitingRecruit && !state.battle.boss && state.exploration.auto;
-  const shouldAutoExplore = !state.battle && !state.ui.bossWarning && !state.dungeon.warning && !state.dungeon.active && ['plain', 'forest', 'stronghold'].includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete;
+  const shouldAutoExplore = !state.battle && !state.ui.bossWarning && !state.dungeon.warning && !state.dungeon.active && exploreScreens.includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete&&!state.ui.chapter2Complete;
   if (!shouldAutoFight && !shouldAutoContinue && !shouldAutoExplore) { stopLoop(); return; }
   if (loopTimer !== null) return;
   loopTimer = window.setTimeout(() => {
@@ -29,7 +31,7 @@ function schedule() {
     if (!state) return;
     if (state.battle && !state.battle.finished && (state.settings.autoBattle || state.exploration.auto)) resolveRound(state, chooseAutoCommand(state));
     else if (state.battle?.finished && state.battle.result === 'victory' && !state.battle.awaitingRecruit && !state.battle.boss && state.exploration.auto) { leaveBattle(state); state.notice = '自動探索繼續前進。'; }
-    else if (!state.battle && !state.ui.bossWarning && !state.dungeon.warning && !state.dungeon.active && ['plain', 'forest', 'stronghold'].includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete) createEncounter(state);
+    else if (!state.battle && !state.ui.bossWarning && !state.dungeon.warning && !state.dungeon.active && exploreScreens.includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete&&!state.ui.chapter2Complete) createEncounter(state);
     persistAndDraw();
   }, shouldAutoFight ? 680 : 950);
 }
@@ -63,7 +65,7 @@ app.addEventListener('click', event => {
     const screen = action.slice(7);
     stopLoop();
     state.exploration.auto = false;
-    if (screen === 'plain' || screen === 'forest' || screen === 'stronghold') enterArea(state, screen);
+    if (['plain','forest','stronghold','yellowRoad','yellowCamp','yellowFortress'].includes(screen)) enterArea(state, screen);
     else { state.screen = screen; if (screen === 'village' || screen === 'shop') state.location = '桃源村'; if(screen==='worldBoss')state.location='世界王祭壇'; if(screen==='bossCodex'){state.location='Boss 圖鑑';state.ui.codexDetail=null;} }
   } else if (action === 'inn') visitInn(state);
   else if (action.startsWith('buy:')) buyItem(state, action.slice(4));
@@ -76,16 +78,17 @@ app.addEventListener('click', event => {
   else if (action === 'challenge-boss') { state.exploration.auto = false; stopLoop(); createBossEncounter(state); }
   else if (action === 'boss:engage') { state.exploration.auto = false; stopLoop(); createBossEncounter(state); }
   else if (action === 'boss:retreat') { stopLoop(); retreatFromBoss(state); }
-  else if (action === 'world-boss:challenge') { state.screen='worldBoss'; state.location='世界王祭壇'; state.ui.worldBossConfirm=true; }
-  else if (action === 'world-boss:engage') { state.ui.worldBossConfirm=false; stopLoop(); createWorldBossEncounter(state); }
+  else if (action.startsWith('world-boss:view:')) state.ui.selectedWorldBoss=action.slice(16);
+  else if (action.startsWith('world-boss:challenge')) { const id=action.split(':')[2]||state.ui.selectedWorldBoss||'crimsonTiger';state.ui.selectedWorldBoss=id;state.screen='worldBoss'; state.location='世界王祭壇'; state.ui.worldBossConfirm=true; }
+  else if (action === 'world-boss:engage') { state.ui.worldBossConfirm=false; stopLoop(); createWorldBossEncounter(state,state.ui.selectedWorldBoss||'crimsonTiger'); }
   else if (action === 'world-boss:cancel') state.ui.worldBossConfirm=false;
   else if (action === 'dungeon:enter') { stopLoop(); enterDungeon(state); }
   else if (action === 'dungeon:decline') { stopLoop(); declineDungeon(state); }
   else if (action === 'dungeon:advance') { stopLoop(); advanceDungeon(state); }
   else if (action === 'dungeon:retreat') { stopLoop(); exitDungeon(state, false); }
   else if (action === 'battle:stop-auto') { state.exploration.auto = false; stopLoop(); state.notice = '已停止自動探索，本場戰鬥改為手動。'; }
-  else if (action === 'battle:recruit') { stopLoop(); state.battle?.worldBoss ? captureWorldBoss(state) : recruitBlackwindLeader(state); }
-  else if (action === 'battle:spare') { stopLoop(); state.battle?.worldBoss ? spareWorldBoss(state) : spareBlackwindLeader(state); }
+  else if (action === 'battle:recruit') { stopLoop(); state.battle?.worldBoss ? captureWorldBoss(state) : state.battle?.bossKind?recruitChapter2Boss(state):recruitBlackwindLeader(state); }
+  else if (action === 'battle:spare') { stopLoop(); state.battle?.worldBoss ? spareWorldBoss(state) : state.battle?.bossKind?spareChapter2Boss(state):spareBlackwindLeader(state); }
   else if (action === 'battle:quick-equip') {
     const dropId = state.battle?.dropId;
     if (dropId && !state.battle.awaitingRecruit) { leaveBattle(state); prepareQuickEquip(state, dropId); }
@@ -106,7 +109,7 @@ app.addEventListener('click', event => {
   else if(action==='promote-all-gear')promoteAllGear(state);
   else if(action.startsWith('promote-gear-all:'))promoteGear(state,action.slice(17),true);
   else if(action.startsWith('promote-gear:'))promoteGear(state,action.slice(13),false);
-  else if(action==='world-boss:breakthrough')breakthroughWorldBoss(state);
+  else if(action.startsWith('world-boss:breakthrough'))breakthroughWorldBoss(state,action.split(':')[2]||'crimsonTiger');
   else if (action === 'promote-leader') attemptPromotion(state);
   else if (action === 'combine-all-talismans') combineAllTalismans(state);
   else if (action.startsWith('combine-talisman:')) combineTalismans(state, action.slice(17));
@@ -114,6 +117,11 @@ app.addEventListener('click', event => {
   else if (action.startsWith('combine-divine:')) combineDivineTalismans(state, action.slice(16));
   else if (action.startsWith('evolve-boss-gear:')) evolveBossGear(state, action.slice(17));
   else if (action.startsWith('roster-deploy:')) { const [,id,slot]=action.split(':'); deployRosterMember(state,id,slot); }
+  else if(action.startsWith('party-swap-open:'))state.ui.partySwapSlot=Number(action.slice(16));
+  else if(action==='party-swap-close')state.ui.partySwapSlot=null;
+  else if(action.startsWith('party-swap:')){const[,slot,id]=action.split(':');deployRosterMember(state,id,Number(slot));state.ui.partySwapSlot=null;}
+  else if(action==='party-quick-best'){quickBestParty(state,getMemberPower);state.ui.partySwapSlot=null;}
+  else if(action.startsWith('party-sort:'))state.ui.candidateSort=action.slice(11);
   else if (action.startsWith('roster-withdraw:')) withdrawPartyMember(state,action.slice(16));
   else if (action.startsWith('codex:view:')) state.ui.codexDetail=action.slice(11);
   else if (action === 'codex:back') state.ui.codexDetail=null;
@@ -136,6 +144,7 @@ app.addEventListener('click', event => {
     sellItem(state, itemId);
     if (!(state.inventory[itemId] > 0)) state.ui.selectedItem = null;
   } else if (action === 'chapter:continue') continueAfterChapter(state);
+  else if(action==='chapter2:continue'){state.ui.chapter2Complete=false;state.screen='yellowFortress';state.location='黃巾主寨';state.notice='第二章已完成，黃巾主寨仍可繼續探索。';}
   else if (action === 'save') state.notice = save(state) ? '進度已保存。' : '無法寫入存檔。';
   else if (action === 'reset') {
     if (target.dataset.confirm === 'yes') { clearSave(); state = null; stopLoop(); draw(); return; }
