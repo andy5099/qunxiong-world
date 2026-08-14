@@ -161,7 +161,7 @@ equal(restoredRoster.party[4].id, 'crimson-tiger', 'reload preserves deployed ti
 equal(restoredRoster.roster.filter(member => member.id === 'blackwind-lord').length, 1, 'reload does not duplicate displaced leader');
 
 const sw = fs.readFileSync(new URL('../service-worker.js', import.meta.url), 'utf8');
-check(sw.includes('v020-yellow-turban'), 'service worker cache updated');
+check(sw.includes('v021-formation-puzzle'), 'service worker cache updated');
 check(sw.includes('world-boss-system.js'), 'service worker caches world boss module');
 
 console.log(`V0.1.5 world boss smoke: ${passed} assertions passed.`);

@@ -155,7 +155,7 @@ check(partyHtml.includes('嘗試轉職'), 'party displays promotion button');
 check(partyHtml.includes('轉職兵符'), 'party displays talismans');
 
 const sw = readFileSync(new URL('../service-worker.js', import.meta.url), 'utf8');
-check(sw.includes('v020-'), 'service worker cache updated');
+check(sw.includes('v021-'), 'service worker cache updated');
 check(sw.includes('boss-progression.js'), 'service worker caches progression module');
 
 console.log(`V0.1.2 boss promotion smoke test: ${checks} assertions passed`);

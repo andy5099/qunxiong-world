@@ -7,6 +7,7 @@ import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_M
 import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v017-growth';
 import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v020-yellow-turban';
 import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v020-yellow-turban';
+import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v021-formation-puzzle';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
@@ -231,6 +232,20 @@ function battleLog(log) {
     const normalized = typeof entry === 'string' ? { text: entry, emphasis: '' } : entry;
     return `<p class="log-${normalized.emphasis || 'normal'}">${esc(normalized.text)}</p>`;
   }).join('');
+}
+
+export function renderFormationPanel(state, battle) {
+  const formation = ensureFormation(battle), ready = formation.gauge >= 100 && formation.uses < formation.maxUses;
+  const gauge = `<section class="formation-gauge"><div><b>戰陣</b><span>${Math.round(formation.gauge)} / 100</span><small>${formation.uses} / ${formation.maxUses} 次</small></div><div class="meter formation-meter"><i style="width:${formation.gauge}%"></i></div>${button('battle:formation', ready ? '啟動戰陣' : formation.uses >= formation.maxUses ? '本戰已用盡' : '蓄力中', 'formation-trigger', !ready || state.exploration.auto || state.settings.autoBattle)}</section>`;
+  if (formation.active) {
+    const cells = formation.board.map((cell, i) => `<button type="button" class="formation-orb orb-${cell.type}${cell.locked ? ' locked' : ''}${cell.burning ? ' burning' : ''}" data-orb-index="${i}" aria-label="${FORMATION_ORBS[cell.type].name}${cell.locked ? '，鎖定' : ''}"><i>${FORMATION_ORBS[cell.type].icon}</i></button>`).join('');
+    return `${gauge}<div class="formation-overlay"><section class="formation-puzzle"><header><div><p class="eyebrow">Formation Burst</p><h2>戰陣轉珠</h2></div><strong class="formation-time">6.0</strong></header><p>按住任意珠拖曳交換，放開即結算。鎖定珠不可移動。</p><div class="formation-puzzle-board" role="grid">${cells}</div><small>武力攻擊・兵力回復・技力補充・防禦減傷・疾風追擊</small></section></div>`;
+  }
+  if (formation.result) {
+    const r = formation.result, e = r.effects;
+    return `${gauge}<div class="formation-overlay"><section class="formation-result"><p class="eyebrow">Formation Result</p><h2>${r.combos} Combo！</h2><strong>戰陣傷害 ${r.totalDamage || 0}</strong><div><span>回復 ${Math.round(e.healPct * 100)}%</span><span>技力 +${e.mp}</span><span>減傷 ${Math.round(e.defensePct * 100)}%</span><span>疾風追擊 ${r.extraHits || 0}</span></div>${button('battle:formation-continue', '返回戰鬥', 'primary')}</section></div>`;
+  }
+  return gauge;
 }
 
 function battle(state) {

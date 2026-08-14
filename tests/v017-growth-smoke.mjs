@@ -32,5 +32,5 @@ const gold=cascade.gold,epicSell=ITEMS[epic.id].sell;check(!sellItem(cascade,epi
 const old=normalize({...createState('舊檔'),version:12,inventory:{ironSword:7,blackwindBlade:2,crimsonTigerClaw:1},worldBoss:{captured:true}});equal(old.inventory.ironSword,7,'old inventory preserved');equal(old.inventory.blackwindBlade,2,'boss gear preserved');equal(old.inventory.crimsonTigerClaw,1,'world gear preserved');equal(old.worldBoss.breakthroughLevel,0,'old breakthrough defaults');
 old.screen='inventory';let html=render(old);check(html.includes('一鍵升階可合成裝備'),'one click UI');check(html.includes('可升階 2 次'),'stack craft count UI');old.roster=[createCrimsonTiger()];old.screen='party';html=render(old);check(html.includes('世界王突破'),'roster breakthrough UI');
 equal(WORLD_BOSS_BREAKTHROUGH_COSTS[3].divineAdvanced,6,'cost centralized');
-const sw=fs.readFileSync(new URL('../service-worker.js',import.meta.url),'utf8');check(sw.includes('v020-yellow-turban'),'cache bumped');check(sw.includes('gear-tier-system.js')&&sw.includes('world-boss-breakthrough.js'),'modules cached');
+const sw=fs.readFileSync(new URL('../service-worker.js',import.meta.url),'utf8');check(sw.includes('v021-formation-puzzle'),'cache bumped');check(sw.includes('gear-tier-system.js')&&sw.includes('world-boss-breakthrough.js'),'modules cached');
 console.log(`V0.1.7 growth smoke: ${passed} assertions passed.`);

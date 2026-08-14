@@ -1,8 +1,9 @@
-import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v020-yellow-turban';
+import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v021-formation-puzzle';
 import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v014-boss-gear';
 import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v014-boss-gear';
 import { clearSave, createState, load, save } from './store.js?v=v020-yellow-turban';
-import { render, renderCreation } from './ui.js?v=v020-yellow-turban';
+import { render, renderCreation, renderFormationPanel } from './ui.js?v=v021-formation-puzzle';
+import { mountFormationPuzzle, unmountFormationPuzzle } from './formation-puzzle-ui.js?v=v021-formation-puzzle';
 import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v020-yellow-turban';
 import { claimCollectionMilestone } from './boss-codex-system.js?v=v020-yellow-turban';
 import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v020-yellow-turban';
@@ -21,7 +22,8 @@ function schedule() {
   if (!state) return;
   const baseExploreScreens = ['plain', 'forest', 'stronghold'];
   const exploreScreens=[...baseExploreScreens,'yellowRoad','yellowCamp','yellowFortress'];
-  const shouldAutoFight = state.battle && !state.battle.finished && (state.settings.autoBattle || state.exploration.auto);
+  const formationPaused = state.battle?.formation?.active || state.battle?.formation?.result;
+  const shouldAutoFight = state.battle && !state.battle.finished && !formationPaused && (state.settings.autoBattle || state.exploration.auto);
   const shouldAutoContinue = state.battle?.finished && state.battle.result === 'victory' && !state.battle.awaitingRecruit && !state.battle.boss && state.exploration.auto;
   const shouldAutoExplore = !state.battle && !state.ui.bossWarning && !state.dungeon.warning && !state.dungeon.active && exploreScreens.includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete&&!state.ui.chapter2Complete;
   if (!shouldAutoFight && !shouldAutoContinue && !shouldAutoExplore) { stopLoop(); return; }
@@ -29,7 +31,7 @@ function schedule() {
   loopTimer = window.setTimeout(() => {
     loopTimer = null;
     if (!state) return;
-    if (state.battle && !state.battle.finished && (state.settings.autoBattle || state.exploration.auto)) resolveRound(state, chooseAutoCommand(state));
+    if (state.battle && !state.battle.finished && !state.battle.formation?.active && !state.battle.formation?.result && (state.settings.autoBattle || state.exploration.auto)) resolveRound(state, chooseAutoCommand(state));
     else if (state.battle?.finished && state.battle.result === 'victory' && !state.battle.awaitingRecruit && !state.battle.boss && state.exploration.auto) { leaveBattle(state); state.notice = '自動探索繼續前進。'; }
     else if (!state.battle && !state.ui.bossWarning && !state.dungeon.warning && !state.dungeon.active && exploreScreens.includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete&&!state.ui.chapter2Complete) createEncounter(state);
     persistAndDraw();
@@ -38,7 +40,12 @@ function schedule() {
 
 function draw() {
   if (state) refreshUnlocks(state);
+  unmountFormationPuzzle();
   app.innerHTML = state ? render(state) : renderCreation();
+  if (state?.battle) {
+    app.insertAdjacentHTML('beforeend', renderFormationPanel(state, state.battle));
+    mountFormationPuzzle(app, state.battle, () => { resolveFormationAttack(state); persistAndDraw(); });
+  }
   requestAnimationFrame(() => {
     const log = app.querySelector('.battle-log');
     if (log) log.scrollTop = log.scrollHeight;
@@ -87,6 +94,8 @@ app.addEventListener('click', event => {
   else if (action === 'dungeon:advance') { stopLoop(); advanceDungeon(state); }
   else if (action === 'dungeon:retreat') { stopLoop(); exitDungeon(state, false); }
   else if (action === 'battle:stop-auto') { state.exploration.auto = false; stopLoop(); state.notice = '已停止自動探索，本場戰鬥改為手動。'; }
+  else if (action === 'battle:formation') { stopLoop(); startFormation(state); }
+  else if (action === 'battle:formation-continue') { if (state.battle?.formation) state.battle.formation.result = null; }
   else if (action === 'battle:recruit') { stopLoop(); state.battle?.worldBoss ? captureWorldBoss(state) : state.battle?.bossKind?recruitChapter2Boss(state):recruitBlackwindLeader(state); }
   else if (action === 'battle:spare') { stopLoop(); state.battle?.worldBoss ? spareWorldBoss(state) : state.battle?.bossKind?spareChapter2Boss(state):spareBlackwindLeader(state); }
   else if (action === 'battle:quick-equip') {
@@ -160,7 +169,7 @@ app.addEventListener('change', event => {
   persistAndDraw();
 });
 
-document.addEventListener('visibilitychange', () => { if (document.hidden) { stopLoop(); if (state) save(state); } else schedule(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) { stopLoop(); if (state?.battle?.formation?.active) resolveFormationAttack(state); unmountFormationPuzzle(); if (state) save(state); } else draw(); });
 window.addEventListener('pagehide', () => { stopLoop(); if (state) save(state); });
 
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(() => {}));

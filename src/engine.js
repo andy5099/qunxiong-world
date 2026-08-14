@@ -5,6 +5,7 @@ import { WORLD_BOSS, WORLD_BOSSES, addWorldBossToRoster, createWorldBossEnemy, g
 import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v017-growth';
 import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v017-growth';
 import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v020-yellow-turban';
+import { addFormationGauge, ensureFormation, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v021-formation-puzzle';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -394,8 +395,12 @@ function dealDamage(state, actor, target, skill = false, rng = Math.random, skil
   const targetDefense = Math.max(0, baseDefense - (target.intimidatedRounds > 0 ? 5 : 0));
   const reduced = target.guarding ? 0.48 : 1;
   const bossSkillReduction = actor.boss && skill && target.side !== 'enemy' && state.equipment?.[target.id]?.armor === 'crimsonWarArmor' ? 0.88 : 1;
-  const damage = Math.max(1, Math.round((attackPower(state, actor, skill ? multiplier : 1, rng) - targetDefense * 0.45) * reduced * bossSkillReduction));
+  const formationGuard = actor.side === 'enemy' ? 1 - Math.max(0, Math.min(.45, Number(state.battle?.formationGuard) || 0)) : 1;
+  const damage = Math.max(1, Math.round((attackPower(state, actor, skill ? multiplier : 1, rng) - targetDefense * 0.45) * reduced * bossSkillReduction * formationGuard));
   target.hp = Math.max(0, target.hp - damage);
+  if (actor.boss && skill && target.side !== 'enemy' && state.battle?._formationBossChargeRound !== state.battle?.round) {
+    addFormationGauge(state.battle, 10); state.battle._formationBossChargeRound = state.battle.round;
+  }
   if (target.worldBoss && actor.side !== 'enemy') {const records=getWorldBossRecordState(state,target.worldBossId||'crimsonTiger');records.highestDamage=Math.max(records.highestDamage,damage);}
   const actorName = actor.displayName || actor.name;
   const targetName = target.displayName || target.name;
@@ -626,9 +631,63 @@ function finishDefeat(state) {
   appendLog(state, state.notice);
 }
 
+function updateWorldBossPhase(state, target) {
+  if (!target?.worldBoss || target.hp <= 0) return;
+  const ratio = target.hp / target.maxHp, id = target.worldBossId || 'crimsonTiger', targetState = getWorldBossState(state, id);
+  if (ratio <= .35 && target.phase < 3) {
+    target.phase = 3; target.might = Math.round(target.might * (id === 'netherThunder' ? 1.32 : 1.28)); target.speed = Math.round(target.speed * (id === 'netherThunder' ? 1.25 : 1.18));
+    appendLog(state, id === 'netherThunder' ? '九幽雷獸進入神罰階段！' : '赤焰魔虎進入焚天階段！', 'epic');
+  } else if (ratio <= .70 && target.phase < 2) {
+    target.phase = 2; target.might = Math.round(target.might * 1.18); target.speed = Math.round(target.speed * (id === 'netherThunder' ? 1.22 : 1.15));
+    appendLog(state, id === 'netherThunder' ? '九幽雷獸展開雷鎖領域！' : '赤焰魔虎進入烈焰狂暴！', 'epic');
+  }
+  targetState.bestPhase = Math.max(targetState.bestPhase, target.phase); targetState.lowestHpPct = Math.min(targetState.lowestHpPct, Math.max(0, Math.round(ratio * 100)));
+}
+
+export function startFormation(state, rng = Math.random) {
+  const battle = state.battle;
+  if (!battle || state.exploration.auto || state.settings.autoBattle) return false;
+  const started = startFormationPuzzle(battle, state.party, rng);
+  if (started) { battle.awaitingCommand = false; appendLog(state, '戰陣蓄力完成，開始轉珠！', 'epic'); }
+  return started;
+}
+
+export function resolveFormationAttack(state, rng = Math.random) {
+  const battle = state.battle, result = settleFormationPuzzle(battle, state.party, rng);
+  if (!battle || !result) return null;
+  const effects = result.effects, allies = state.party.filter(alive);
+  for (const member of allies) {
+    const stats = getFinalStats(state, member);
+    member.hp = Math.min(stats.maxHp, member.hp + Math.round(stats.maxHp * effects.healPct));
+    member.mp = Math.min(member.maxMp, member.mp + effects.mp);
+  }
+  battle.formationGuard = effects.defensePct;
+  const primary = battle.enemies.find(alive), teamMight = allies.reduce((sum, member) => sum + getFinalStats(state, member).might, 0);
+  let totalDamage = effects.mightPct > 0 ? Math.max(1, Math.round(teamMight * .52 * (1 + effects.mightPct) * effects.comboMultiplier)) : 0;
+  if (primary) {
+    const cap = primary.worldBoss ? primary.maxHp * .23 : primary.boss ? primary.maxHp * .35 : Infinity;
+    totalDamage = Math.min(totalDamage, Math.floor(cap)); primary.hp = Math.max(0, primary.hp - totalDamage);
+    appendLog(state, `戰陣爆發造成 ${totalDamage} 傷害（${result.combos} Combo）！`, 'epic'); updateWorldBossPhase(state, primary);
+  }
+  let extraHits = 0;
+  for (let attempt = 0; attempt < 3 && battle.enemies.some(alive); attempt++) if (rng() < effects.windChance) {
+    const target = battle.enemies.find(alive), striker = allies[attempt % Math.max(1, allies.length)]; if (!target || !striker) break;
+    const damage = Math.max(1, Math.round(getFinalStats(state, striker).might * .55)); target.hp = Math.max(0, target.hp - damage); extraHits++;
+    appendLog(state, `疾風追擊造成 ${damage} 傷害！`, 'rare'); updateWorldBossPhase(state, target);
+  }
+  if (result.burningRemaining) {
+    for (const member of allies) { const damage = Math.max(1, Math.round(getFinalStats(state, member).maxHp * Math.min(.12, result.burningRemaining * .012))); member.hp = Math.max(1, member.hp - damage); }
+    appendLog(state, `${result.burningRemaining} 格烈焰未消除，全隊受到灼燒！`, 'epic');
+  }
+  result.totalDamage = totalDamage; result.extraHits = extraHits;
+  if (!battle.enemies.some(alive)) finishVictory(state, rng); else { battle.awaitingCommand = true; battle.round += 1; }
+  return result;
+}
+
 export function resolveRound(state, command = 'attack', rng = Math.random) {
   const battle = state.battle;
-  if (!battle || battle.finished || !battle.awaitingCommand) return false;
+  const formation = ensureFormation(battle);
+  if (!battle || battle.finished || !battle.awaitingCommand || formation?.active || formation?.result) return false;
   battle.awaitingCommand = false;
   const leader = state.party.find(unit => unit?.id === 'blackwind-lord');
   const leaderResonance = getBlackwindResonance(state, leader);
@@ -671,6 +730,8 @@ export function resolveRound(state, command = 'attack', rng = Math.random) {
     } else performEnemyAction(state, turn.unit, rng);
     if (!state.party.some(alive)) break;
   }
+  battle.formationGuard = 0;
+  addFormationGauge(battle, command === 'slam' ? 12 : command === 'attack' ? 8 : 0);
   if (!battle.enemies.some(alive)) finishVictory(state, rng);
   else if (!state.party.some(alive)) finishDefeat(state);
   else {
