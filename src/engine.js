@@ -6,6 +6,7 @@ import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recor
 import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v017-growth';
 import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v020-yellow-turban';
 import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v021-puzzle-polish';
+import { ensureMarbleBattle, getCurrentMarble, getMarbleSkill, hitMultiplier } from './marble-battle.js?v=v021-marble-boss';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -155,8 +156,8 @@ export function createDungeonFloor(state, forcedRank, rng = Math.random) {
     const boss = { ...baseBoss, maxHp: Math.round(baseBoss.maxHp * boost), might: Math.round(baseBoss.might * boost), defense: Math.round(baseBoss.defense * 1.12), speed: Math.round(baseBoss.speed * 1.1), exp: Math.round(baseBoss.exp * 1.25), gold: baseBoss.gold.map(value => Math.round(value * 1.25)), assaultMultiplier: baseBoss.assaultMultiplier * 1.12 };
     boss.hp = boss.maxHp;
     enemies = [{ ...boss, instanceId: `dungeon-${bossId}`, mp: boss.maxMp, guarding: false, side: 'enemy' }];
-    state.battle = { enemies, round: 1, awaitingCommand: false, finished: false, mode:'puzzle', areaId: state.dungeon.sourceScreen, boss: true, bossKind:boss.bossKind||null, dungeon: true, dungeonFloor: 4, bossRarityRank: rank, awaitingRecruit: false, recommendedPower: Math.round(boss.recommendedPower * 1.15) };
-    preparePuzzleTurn(state.battle,state.party,rng);
+    state.battle = { enemies, round: 1, awaitingCommand: false, finished: false, mode:'marble', areaId: state.dungeon.sourceScreen, boss: true, bossKind:boss.bossKind||null, dungeon: true, dungeonFloor: 4, bossRarityRank: rank, awaitingRecruit: false, recommendedPower: Math.round(boss.recommendedPower * 1.15) };
+    ensureMarbleBattle(state.battle,state.party,rng);
     if(yellow)recordChapter2Boss(state,boss.bossKind,rank,'encounter');else recordBlackwindEncounter(state, rank);
   } else {
     const pool = yellow?(floor===1?['yellowBladeSoldier','yellowShieldSoldier','yellowBowSoldier']:['yellowWarlock','yellowBrute','yellowBowSoldier']):(floor === 1 ? ['blackwindWolf', 'forestBandit', 'yellowTurbanArcher'] : ['blackwindSwordsman', 'blackwindCaptain', 'yellowTurbanArcher']);
@@ -353,8 +354,8 @@ export function createBossEncounter(state, forcedRank) {
   const enemies = [{ ...boss, instanceId: `${bossEnemyId}-0`, hp: boss.maxHp, mp: boss.maxMp, guarding: false, side: 'enemy' },...Array.from({ length:chapterBoss?1:2 },(_,index)=>({ ...soldier,instanceId:`${soldier.id}-${index}`,hp:soldier.maxHp,guarding:false,side:'enemy' }))];
   state.party.filter(Boolean).forEach(member => { member.guarding = false; });
   const areaId=chapterBoss?state.screen:'stronghold';
-  state.battle = { enemies, round: 1, awaitingCommand: false, finished: false, mode:boss.battleMode||'puzzle', areaId, boss: true, bossKind:boss.bossKind||null,bossRarityRank: rarityRank, awaitingRecruit: false, recommendedPower: boss.recommendedPower };
-  preparePuzzleTurn(state.battle,state.party);
+  state.battle = { enemies, round: 1, awaitingCommand: false, finished: false, mode:'marble', areaId, boss: true, bossKind:boss.bossKind||null,bossRarityRank: rarityRank, awaitingRecruit: false, recommendedPower: boss.recommendedPower };
+  ensureMarbleBattle(state.battle,state.party);
   if(chapterBoss)recordChapter2Boss(state,boss.bossKind,rarityRank,'encounter');else recordBlackwindEncounter(state, rarityRank);
   state.log = [];
   appendLog(state, `${boss.displayName||boss.name}率軍迎戰！`, 'epic');
@@ -368,8 +369,8 @@ export function createWorldBossEncounter(state,id='crimsonTiger') {
   state.exploration.auto=false; state.exploration.active=false; state.ui.bossWarning=false;
   const boss=createWorldBossEnemy(id),codex=id==='crimsonTiger'?state.worldBossCodex:state.worldBossCodices[id];
   target.attempts+=1;codex.discovered=true;codex.challenged=true;
-  state.battle={enemies:[boss],round:1,awaitingCommand:false,finished:false,mode:'puzzle',areaId:'worldBoss',source:'worldBoss',boss:true,worldBoss:true,worldBossId:id,bossRarityRank:5,awaitingRecruit:false,recommendedPower:profile.recommendedPower};
-  preparePuzzleTurn(state.battle,state.party);
+  state.battle={enemies:[boss],round:1,awaitingCommand:false,finished:false,mode:'marble',areaId:'worldBoss',source:'worldBoss',boss:true,worldBoss:true,worldBossId:id,bossRarityRank:5,awaitingRecruit:false,recommendedPower:profile.recommendedPower};
+  ensureMarbleBattle(state.battle,state.party);
   state.party.filter(Boolean).forEach(member=>{member.guarding=false;}); state.log=[];
   appendLog(state,`★★★★★ ${profile.title}降臨！`,'epic'); state.notice='世界王挑戰開始！'; return state.battle;
 }
@@ -653,6 +654,67 @@ export function startFormation(state, rng = Math.random) {
   return started;
 }
 
+export function armMarbleSkill(state){
+  const battle=state.battle,marble=battle?.marble,member=state.party[marble?.turnIndex];
+  if(!battle||battle.mode!=='marble'||battle.finished||marble.phase!=='aim'||!member)return false;
+  const skill=getMarbleSkill(member);if(member.mp<skill.cost)return false;marble.skillArmed=!marble.skillArmed;return marble.skillArmed;
+}
+
+export function commitMarbleLaunch(state,velocity){
+  const battle=state.battle,marble=battle?.marble,entity=getCurrentMarble(battle),member=state.party[marble?.turnIndex];
+  if(!entity||!member||marble.phase!=='aim')return false;
+  const skill=getMarbleSkill(member);if(marble.skillArmed){if(member.mp<skill.cost)marble.skillArmed=false;else{member.mp-=skill.cost;if(skill.heal){for(const ally of state.party.filter(alive)){const stats=getFinalStats(state,ally);ally.hp=Math.min(stats.maxHp,ally.hp+Math.round(stats.maxHp*skill.heal));}appendLog(state,`${member.name}施展仁德，全隊恢復兵力！`,'rare');}}}
+  const maxBoost=marble.skillArmed&&skill.power?skill.power:1;entity.vx=velocity.vx*maxBoost;entity.vy=velocity.vy*maxBoost;marble.phase='moving';marble.shot={hits:0,damage:0,wallBounces:0,obstacleBounces:0,friendHits:[]};return true;
+}
+
+export function resolveMarbleEvent(state,event,rng=Math.random){
+  const battle=state.battle,marble=battle?.marble,member=state.party[marble?.turnIndex];if(!marble||!member||battle.finished)return null;
+  if(event.type==='wall'){marble.shot.wallBounces++;return event;}
+  if(event.type==='obstacle'){marble.shot.obstacleBounces++;return event;}
+  if(event.type==='friend'&&member.id==='liu-bei'){const friend=state.party[event.index];if(friend){const stats=getFinalStats(state,friend);friend.hp=Math.min(stats.maxHp,friend.hp+Math.round(stats.maxHp*.05));}return event;}
+  if(event.type!=='boss')return event;
+  const target=battle.enemies.find(enemy=>enemy.boss&&alive(enemy))||battle.enemies.find(alive);if(!target)return null;
+  marble.shot.hits++;const hit=marble.shot.hits,skill=getMarbleSkill(member),stats=getFinalStats(state,member);let multiplier=hitMultiplier(hit);
+  if(hit===1)multiplier*=1.08;
+  if(marble.skillArmed&&hit===1)multiplier*=skill.firstHit||skill.damage||1;
+  if(marble.skillArmed&&skill.weak&&event.weak)multiplier*=skill.weak;
+  if(member.id==='zhang-fei'&&event.speed>500&&hit===1)multiplier*=1.18;
+  if(member.id==='blackwind-lord'&&marble.shot.wallBounces)multiplier*=Math.min(1.35,1+marble.shot.wallBounces*.08);
+  if(member.id==='yellow-commander'&&hit>=3)multiplier*=1.12;
+  if(member.id==='yellow-commander'&&skill.execute)multiplier*=Math.min(1.5,1+(1-target.hp/target.maxHp)*.5);
+  if(member.id==='zhang-bao'&&marble.shot.obstacleBounces)multiplier*=Math.min(1.4,1+marble.shot.obstacleBounces*.1);
+  if(member.rarityRank)multiplier*=1+(member.rarityRank-1)*.04;
+  if(event.weak)multiplier*=1.5;
+  const variance=.94+rng()*.12;let damage=Math.max(1,Math.round((stats.might*multiplier-target.defense*.24)*variance));
+  if(battle.worldBoss){const cap=Math.floor(target.maxHp*.18),remaining=Math.max(0,cap-marble.shot.damage);damage=Math.min(damage,remaining);}
+  damage=Math.min(target.hp,damage);target.hp=Math.max(0,target.hp-damage);marble.shot.damage+=damage;
+  if(target.worldBoss){const records=getWorldBossRecordState(state,target.worldBossId||battle.worldBossId||'crimsonTiger');records.highestDamage=Math.max(records.highestDamage,damage);}
+  if(marble.skillArmed&&skill.debuff&&hit===1)target.marbleDefenseDown=1;
+  if(marble.skillArmed&&skill.burn&&hit===1){target.marbleBurn=2;const shotCap=battle.worldBoss?Math.floor(target.maxHp*.18):Infinity,remaining=Math.max(0,shotCap-marble.shot.damage),burn=Math.min(target.hp,remaining,Math.round(damage*.18));target.hp-=burn;marble.shot.damage+=burn;}
+  if(marble.skillArmed&&skill.guard&&hit===1)member.marbleGuard=1;
+  updateWorldBossPhase(state,target);
+  const label=event.weak?'弱點 ':hit>1?`${hit} HIT! `:'';appendLog(state,`${member.name}${label}撞擊 ${target.name}，造成 ${damage} 傷害！`,event.weak||hit>=3?'epic':'rare');
+  marble.effects.push({type:'damage',x:marble.boss.x,y:marble.boss.y,text:`${event.weak?'弱點 ':''}-${damage}`,life:1});
+  return{damage,hit,weak:event.weak,total:marble.shot.damage};
+}
+
+export function finishMarbleShot(state,rng=Math.random){
+  const battle=state.battle,marble=battle?.marble;if(!battle||battle.mode!=='marble'||battle.finished||!marble)return false;
+  const boss=battle.enemies.find(enemy=>enemy.boss);if(!boss||boss.hp<=0){battle.enemies.forEach(enemy=>{enemy.hp=0;});finishVictory(state,rng);return true;}
+  const current=state.party[marble.turnIndex];if(current)marble.acted.push(current.id);
+  let next=state.party.findIndex((member,index)=>member&&alive(member)&&!marble.acted.includes(member.id)&&marble.entities[index]);
+  if(next<0){
+    if(boss.marbleBurn>0){boss.marbleBurn--;const burn=Math.max(1,Math.round(boss.maxHp*.012));boss.hp=Math.max(0,boss.hp-burn);appendLog(state,`燃燒造成 ${burn} 傷害！`,'rare');if(!boss.hp){battle.enemies.forEach(enemy=>{enemy.hp=0;});finishVictory(state,rng);return true;}}
+    for(const enemy of battle.enemies.filter(alive)){const strikes=enemy.worldBoss?state.party.filter(alive).length:1;for(let strike=0;strike<strikes;strike++){performEnemyAction(state,enemy,rng);if(!state.party.some(alive))break;}if(!state.party.some(alive))break;}
+    if(!state.party.some(alive)){finishDefeat(state);return true;}battle.round++;marble.acted=[];next=state.party.findIndex(member=>member&&alive(member));
+  }
+  marble.turnIndex=next;marble.phase='aim';marble.skillArmed=false;marble.aim={dx:0,dy:80,power:0,timeLeft:6};marble.shot={hits:0,damage:0,wallBounces:0,obstacleBounces:0,friendHits:[]};marble.effects=[];return true;
+}
+
+export function resolveMarbleAutoTurn(state,rng=Math.random){
+  const battle=state.battle;if(battle?.mode!=='marble'||battle.finished)return false;const marble=ensureMarbleBattle(battle,state.party,rng);commitMarbleLaunch(state,{vx:0,vy:-520});resolveMarbleEvent(state,{type:'boss',weak:false,speed:520},rng);finishMarbleShot(state,rng);return true;
+}
+
 export function resolveFormationAttack(state, rng = Math.random) {
   const battle = state.battle, result = settleFormationPuzzle(battle, state.party, rng);
   if (!battle || battle.mode !== 'puzzle' || !result) return null;
@@ -699,6 +761,7 @@ export function resolveFormationAttack(state, rng = Math.random) {
 
 export function resolveRound(state, command = 'attack', rng = Math.random) {
   const battle = state.battle;
+  if(battle?.mode==='marble')return resolveMarbleAutoTurn(state,rng);
   // Internal regression hook only. Live Boss play never calls this path: the puzzle UI settles directly.
   if (battle?.mode === 'puzzle') {
     const types=battle.formation?.activeTypes||[],board=battle.formation?.board||[];

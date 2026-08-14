@@ -69,7 +69,7 @@ check(!engage.ui.bossWarning && Boolean(engage.battle), 'engage clears warning')
 const defeated = explorationState('戰敗');
 defeated.ui.bossWarning = true;
 createBossEncounter(defeated, 5);
-defeated.party.filter(Boolean).forEach(member => { member.hp = 1; member.defense = 0; member.speed = 0; });
+defeated.party.filter(Boolean).forEach(member => { member.hp = 1; member.might = 1; member.defense = 0; member.speed = 0; });
 defeated.battle.enemies.forEach(enemy => { enemy.might = 99999; enemy.speed = 9999; });
 let defeatGuard = 0;
 while (!defeated.battle.finished && defeatGuard++ < 10) resolveRound(defeated, 'attack', zero);
