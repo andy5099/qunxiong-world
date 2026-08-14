@@ -1,9 +1,9 @@
-import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v021-formation-puzzle';
+import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v021-boss-puzzle';
 import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v014-boss-gear';
 import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v014-boss-gear';
 import { clearSave, createState, load, save } from './store.js?v=v020-yellow-turban';
-import { render, renderCreation, renderFormationPanel } from './ui.js?v=v021-formation-puzzle';
-import { mountFormationPuzzle, unmountFormationPuzzle } from './formation-puzzle-ui.js?v=v021-formation-puzzle';
+import { render, renderCreation, renderFormationPanel } from './ui.js?v=v021-boss-puzzle';
+import { mountFormationPuzzle, unmountFormationPuzzle } from './formation-puzzle-ui.js?v=v021-boss-puzzle';
 import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v020-yellow-turban';
 import { claimCollectionMilestone } from './boss-codex-system.js?v=v020-yellow-turban';
 import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v020-yellow-turban';
@@ -23,7 +23,7 @@ function schedule() {
   const baseExploreScreens = ['plain', 'forest', 'stronghold'];
   const exploreScreens=[...baseExploreScreens,'yellowRoad','yellowCamp','yellowFortress'];
   const formationPaused = state.battle?.formation?.active || state.battle?.formation?.result;
-  const shouldAutoFight = state.battle && !state.battle.finished && !formationPaused && (state.settings.autoBattle || state.exploration.auto);
+  const shouldAutoFight = state.battle?.mode !== 'puzzle' && state.battle && !state.battle.finished && !formationPaused && (state.settings.autoBattle || state.exploration.auto);
   const shouldAutoContinue = state.battle?.finished && state.battle.result === 'victory' && !state.battle.awaitingRecruit && !state.battle.boss && state.exploration.auto;
   const shouldAutoExplore = !state.battle && !state.ui.bossWarning && !state.dungeon.warning && !state.dungeon.active && exploreScreens.includes(state.screen) && state.exploration.auto && !state.ui.chapterComplete&&!state.ui.chapter2Complete;
   if (!shouldAutoFight && !shouldAutoContinue && !shouldAutoExplore) { stopLoop(); return; }

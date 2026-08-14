@@ -17,7 +17,7 @@ export const WORLD_BOSS = WORLD_BOSSES.crimsonTiger;
 
 export function createWorldBossEnemy(id = 'crimsonTiger') {
   const profile = WORLD_BOSSES[id] || WORLD_BOSS;
-  return { id: `${profile.id}Boss`, worldBossId: profile.id, instanceId: `world-boss-${profile.id}`, name: profile.name, displayName: profile.title, ...profile.stats, hp: profile.stats.maxHp, mp: profile.stats.maxMp, side:'enemy', boss:true, worldBoss:true, phase:1, rarityRank:5, rarityStars:'★★★★★', assaultMultiplier:id==='netherThunder'?2.45:2.2 };
+  return { id: `${profile.id}Boss`, worldBossId: profile.id, instanceId: `world-boss-${profile.id}`, name: profile.name, displayName: profile.title, ...profile.stats, hp: profile.stats.maxHp, mp: profile.stats.maxMp, side:'enemy', boss:true, worldBoss:true, battleMode:'puzzle', phase:1, rarityRank:5, rarityStars:'★★★★★', assaultMultiplier:id==='netherThunder'?2.45:2.2 };
 }
 
 export function normalizeWorldBoss(raw = {}, unlocked = false) {
