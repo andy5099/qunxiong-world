@@ -33,6 +33,8 @@ export function getUltimateEnergy(member){return Math.max(0,Math.min(100,Number(
 export function getMarbleSkill(member){return MARBLE_SKILLS[member?.id]||{name:'猛擊',cost:6,firstHit:1.35,passive:'奮戰'};}
 export function hitMultiplier(hit){return hit<=1?1:hit===2?1.1:hit===3?1.2:hit===4?1.3:hit===5?1.45:Math.min(1.8,1.45+(hit-5)*.07);}
 export function getBossVisualKey(battle){if(battle.worldBoss)return battle.worldBossId==='netherThunder'?'thunder-beast':'crimson-tiger';if(battle.bossKind)return battle.bossKind;return'blackwind-lord';}
+export function getFormationTier(combo){return combo>=50?4:combo>=35?3:combo>=20?2:combo>=10?1:0;}
+export function getFormationRole(member){const id=member?.id;if(['guan-yu','yellow-commander'].includes(id))return'vanguard';if(id==='zhang-fei')return'breaker';if(['liu-bei','yellow-captain'].includes(id))return'support';if(id==='zhang-bao')return'mage';if(['crimson-tiger','nether-thunder-beast'].includes(id))return'world';return'vanguard';}
 
 const LAYOUTS={
   forest:[[{type:'rock',shape:'circle',x:180,y:205,r:27}],[{type:'stump',shape:'rect',x:72,y:208,w:38,h:82}]],
@@ -47,7 +49,7 @@ export function createMarbleBattleState(battle,party,rng=Math.random){
   const layouts=LAYOUTS[theme]||LAYOUTS.stronghold,layout=layouts[Math.floor(rng()*layouts.length)%layouts.length];
   const entities=party.slice(0,3).map((member,i)=>member?{characterId:member.id,x:85+i*95,y:185+i*26,vx:(i-1)*45,vy:0,radius:20,rarityRank:member.rarityRank||1,worldBoss:Boolean(member.worldBoss)}:null);
   const size=battle.worldBoss?58:Math.min(52,40+(battle.bossRarityRank||1)*2),boss={x:180,y:78,radius:size,visualKey:visual,weakAngle:Math.PI*.5};
-  return{entities,boss,obstacles:layout.map(item=>({...item})),turnIndex:0,acted:[],phase:'pinball',flippers:{left:0,right:0},combo:0,comboTime:0,breakGauge:0,breakTime:0,breakImmunity:0,skills:entities.map(()=>({energy:0,armed:false})),skillQueue:[],ultimateGauge:0,formationGauge:0,skillArmed:false,ultimateArmed:false,aim:{dx:0,dy:80,power:0,timeLeft:6},shot:{hits:0,damage:0,wallBounces:0,obstacleBounces:0,friendHits:[],ultimate:false,power:0},effects:[],theme,lastProgressAt:Date.now()};
+  return{entities,boss,obstacles:layout.map(item=>({...item})),turnIndex:0,acted:[],phase:'pinball',flippers:{left:0,right:0},combo:0,comboTime:0,breakGauge:0,breakTime:0,breakImmunity:0,skills:entities.map(()=>({energy:0,armed:false,queued:false})),supports:party.slice(3,5).map((member,index)=>member?{index:index+3,energy:0,ready:false,queued:false}:null),skillQueue:[],schedulerCooldown:0,ultimateGauge:0,formationReady:0,formationActive:null,leadRole:getFormationRole(party[0]),bossAttackIn:7,fieldPulseIn:5,skillArmed:false,ultimateArmed:false,aim:{dx:0,dy:80,power:0,timeLeft:6},shot:{hits:0,damage:0,wallBounces:0,obstacleBounces:0,friendHits:[],ultimate:false,power:0},effects:[],theme,lastProgressAt:Date.now()};
 }
 
 export function ensureMarbleBattle(battle,party,rng=Math.random){if(!battle)return null;if(!battle.marble)battle.marble=createMarbleBattleState(battle,party,rng);return battle.marble;}
@@ -79,10 +81,12 @@ export function activateMarbleFlippers(marble,side='both'){
   if(!marble.flippers)marble.flippers={left:0,right:0};
   if(side==='left'||side==='both')marble.flippers.left=.16;
   if(side==='right'||side==='both')marble.flippers.right=.16;
+  const formation=marble.formationReady||0,leadRole=marble.leadRole||'vanguard',formationBoost=formation?1+formation*.1:1;let launched=false;
   for(const entity of marble.entities.filter(Boolean)){
     const entitySide=entity.x<MARBLE_ARENA.width/2?'left':'right';
-    if(entity.y>MARBLE_ARENA.height-145&&(side==='both'||side===entitySide)){const edge=entitySide==='left'?-1:1,center=(entitySide==='left'?118:242),angle=Math.max(-1,Math.min(1,(entity.x-center)/80));entity.vy=-610-Math.abs(angle)*70;entity.vx+=edge*90-angle*170;}
+    if(entity.y>MARBLE_ARENA.height-145&&(side==='both'||side===entitySide)){const edge=entitySide==='left'?-1:1,center=(entitySide==='left'?118:242),angle=Math.max(-1,Math.min(1,(entity.x-center)/80)),roleBoost=leadRole==='world'?1.08:leadRole==='vanguard'?1.04:1;entity.vy=(-590-Math.abs(angle)*65)*formationBoost*roleBoost;entity.vx+=(edge*90-angle*170)*formationBoost;launched=true;}
   }
+  if(formation&&launched){marble.formationActive={tier:formation,role:leadRole,hits:0,time:5};marble.formationReady=0;marble.effects.push({type:'formation',x:180,y:335,text:`戰陣彈射 ${formation===4?'MAX':['','I','II','III'][formation]}！`,life:1});}
   marble.lastProgressAt=Date.now();
   return true;
 }
@@ -93,6 +97,7 @@ function stepPinballPhysics(marble,dt){
   marble.comboTime=Math.max(0,(marble.comboTime||0)-dt);if(!marble.comboTime)marble.combo=0;
   marble.breakTime=Math.max(0,(marble.breakTime||0)-dt);
   marble.breakImmunity=Math.max(0,(marble.breakImmunity||0)-dt);if(!marble.breakTime&&marble.breakGauge>=100){marble.breakGauge=0;marble.breakImmunity=2;}
+  if(marble.formationActive){marble.formationActive.time-=dt;if(marble.formationActive.time<=0)marble.formationActive=null;}
   const p=MARBLE_ARENA.padding,w=MARBLE_ARENA.width,h=MARBLE_ARENA.height,boss=marble.boss;
   marble.entities.forEach((entity,index)=>{
     if(!entity)return;entity.vy+=520*dt;entity.x+=entity.vx*dt;entity.y+=entity.vy*dt;
@@ -106,7 +111,7 @@ function stepPinballPhysics(marble,dt){
     const contactKey=`contact${index}`;
     if(overlap&&!marble[contactKey]){const angle=Math.atan2(entity.y-boss.y,entity.x-boss.x),weak=Math.abs(Math.atan2(Math.sin(angle-boss.weakAngle),Math.cos(angle-boss.weakAngle)))<.5;events.push({type:'boss',entityIndex:index,weak,speed:Math.hypot(entity.vx,entity.vy)});marble[contactKey]=true;reflectCircle(entity,boss.x,boss.y,boss.radius,.9);}
     if(!overlap)marble[contactKey]=false;
-    entity.vx*=Math.pow(.997,dt*60);if(Math.hypot(entity.vx,entity.vy)<65&&entity.y<h-150){const dx=boss.x-entity.x,dy=boss.y-entity.y,d=Math.max(1,Math.hypot(dx,dy));entity.vx+=dx/d*25*dt;entity.vy+=dy/d*25*dt;}
+    entity.vx*=Math.pow(marble.formationActive?.role==='world' ? .9992 : .997,dt*60);if(Math.hypot(entity.vx,entity.vy)<65&&entity.y<h-150){const dx=boss.x-entity.x,dy=boss.y-entity.y,d=Math.max(1,Math.hypot(dx,dy));entity.vx+=dx/d*25*dt;entity.vy+=dy/d*25*dt;}
   });
   for(let i=0;i<marble.entities.length;i++)for(let j=i+1;j<marble.entities.length;j++){
     const a=marble.entities[i],b=marble.entities[j];if(!a||!b)continue;

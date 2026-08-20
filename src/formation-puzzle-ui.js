@@ -1,4 +1,4 @@
-import { FORMATION_ORBS, swapBoardCells } from './formation-puzzle.js?v=v022-flipper-final-1';
+import { FORMATION_ORBS, swapBoardCells } from './formation-puzzle.js?v=v023-flipper-chain-1';
 
 const TURN_MS = 6000;
 let activePuzzle = null;
