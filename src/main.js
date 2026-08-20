@@ -1,20 +1,27 @@
-import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, retreatFromBoss, retreatFlipperBattle, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v023-flipper-chain-1';
-import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v023-flipper-chain-1';
-import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v023-flipper-chain-1';
-import { clearSave, createState, load, save } from './store.js?v=v023-flipper-chain-1';
-import { render, renderCreation, renderMarblePanel } from './ui.js?v=v023-flipper-chain-1';
-import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v023-flipper-chain-1';
-import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v023-flipper-chain-1';
-import { claimCollectionMilestone } from './boss-codex-system.js?v=v023-flipper-chain-1';
-import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v023-flipper-chain-1';
-import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v023-flipper-chain-1';
+import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, retreatFromBoss, retreatFlipperBattle, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v023-prototype-v21';
+import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v023-prototype-v21';
+import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v023-prototype-v21';
+import { clearSave, createState, load, save } from './store.js?v=v023-prototype-v21';
+import { render, renderCreation, renderMarblePanel } from './ui.js?v=v023-prototype-v21';
+import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v023-prototype-v21';
+import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v023-prototype-v21';
+import { claimCollectionMilestone } from './boss-codex-system.js?v=v023-prototype-v21';
+import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v023-prototype-v21';
+import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v023-prototype-v21';
 
 const app = document.querySelector('#app');
+const isBlackwindPreview = window.location.pathname.includes('/prototype-blackwind-v2/');
 const boot = window.__QX_BOOT__ || { mark() {}, fail() {}, ready() {} };
 boot.mark('SAVE LOAD');
 let state = null;
 try {
   state = load();
+  if (isBlackwindPreview) {
+    state = createState('Prototype 試玩者');
+    state.screen = 'stronghold'; state.location = '黑風寨'; state.unlocks.stronghold = true;
+    state.progress.bossUnlocked = true; state.ui.bossWarning = true; state.ui.bossRarityRank = 4;
+    createBossEncounter(state, 4);
+  }
 } catch (error) {
   boot.fail(error);
 }
@@ -202,9 +209,9 @@ app.addEventListener('change', event => {
 document.addEventListener('visibilitychange', () => { if (document.hidden) { stopLoop(); cleanupMarbleBattle(state?.battle, true); if (state) save(state); } else draw(); });
 window.addEventListener('pagehide', () => { stopLoop(); cleanupMarbleBattle(state?.battle, true); if (state) save(state); });
 
-if ('serviceWorker' in navigator) {
+if (!isBlackwindPreview && 'serviceWorker' in navigator) {
   boot.mark('SW REGISTER');
-  const buildVersion = 'v023-flipper-chain-1';
+  const buildVersion = 'v023-prototype-v21';
   const reloadKey = `sw-reloaded-${buildVersion}`;
   let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
