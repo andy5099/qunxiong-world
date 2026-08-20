@@ -27,5 +27,6 @@ const html=fs.readFileSync(new URL('../prototype-blackwind-v3/index.html',import
 check(html.includes('touch-action:none')===false&&html.includes('game.js?v=v3-30s-1'),'preview loads a versioned standalone module');
 check(game.includes("qunxiong-world-blackwind-prototype-v3"),'preview uses an isolated localStorage key');
 check(!html.includes('serviceWorker')&&!game.includes('serviceWorker'),'preview registers no service worker');
+check(game.includes('hudIn=.1')&&game.includes('dataset.fps'),'HUD is throttled while Canvas tracks observable FPS');
 const summary=rounds.map((r,index)=>({run:index+1,combo:r.highestCombo,dashes:r.dashes,dashHitRate:r.dashes?Number((r.dashHits/r.dashes*100).toFixed(1)):0,power:r.powerFlips,skills:r.skills}));
 console.log(`Blackwind Flipper Prototype V3: ${passed} assertions passed.`);console.table(summary);
