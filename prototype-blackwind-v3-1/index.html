@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#070b12">
+  <title>黑風寨主 Flipper Prototype V3.1</title>
+  <link rel="stylesheet" href="style.css?v=v31-core-1">
+</head>
+<body>
+<main class="app">
+  <header><h1>黑風寨主・30 秒爽感核心</h1><button type="button" data-restart>重試</button></header>
+  <section class="hud">
+    <div><small>TIME</small><b data-time>30.0</b></div>
+    <div><small>COMBO</small><b data-combo>0 HIT</b><em data-rank></em></div>
+    <div><small>POWER</small><div class="meter"><i data-power></i></div><em data-power-label>蓄力中</em></div>
+    <div><small>BREAK</small><div class="meter break"><i data-break></i></div><em data-break-label>弱點：上</em></div>
+  </section>
+  <section class="stage">
+    <canvas aria-label="黑風寨主三人彈射戰"></canvas>
+    <p class="boss-move" data-boss-move></p>
+    <p class="hint" data-hint>底部點擊：FLIP</p>
+    <div class="result" aria-live="polite"></div>
+  </section>
+  <p class="note">單鍵操作：底部 FLIP・空中 DASH・紅色預警 COUNTER・滿蓄力 POWER FLIP</p>
+</main>
+<script type="module" src="game.js?v=v31-core-1"></script>
+</body>
+</html>
