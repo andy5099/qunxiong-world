@@ -1,13 +1,13 @@
-import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, retreatFromBoss, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v022-pinball-prototype-1';
-import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v022-pinball-prototype-1';
-import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v022-pinball-prototype-1';
-import { clearSave, createState, load, save } from './store.js?v=v022-pinball-prototype-1';
-import { render, renderCreation, renderMarblePanel } from './ui.js?v=v022-pinball-prototype-1';
-import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v022-pinball-prototype-1';
-import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v022-pinball-prototype-1';
-import { claimCollectionMilestone } from './boss-codex-system.js?v=v022-pinball-prototype-1';
-import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v022-pinball-prototype-1';
-import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v022-pinball-prototype-1';
+import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, retreatFromBoss, retreatFlipperBattle, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v022-flipper-final-1';
+import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v022-flipper-final-1';
+import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v022-flipper-final-1';
+import { clearSave, createState, load, save } from './store.js?v=v022-flipper-final-1';
+import { render, renderCreation, renderMarblePanel } from './ui.js?v=v022-flipper-final-1';
+import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v022-flipper-final-1';
+import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v022-flipper-final-1';
+import { claimCollectionMilestone } from './boss-codex-system.js?v=v022-flipper-final-1';
+import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v022-flipper-final-1';
+import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v022-flipper-final-1';
 
 const app = document.querySelector('#app');
 const boot = window.__QX_BOOT__ || { mark() {}, fail() {}, ready() {} };
@@ -114,6 +114,7 @@ app.addEventListener('click', event => {
   else if (action === 'challenge-boss') { state.exploration.auto = false; stopLoop(); createBossEncounter(state); }
   else if (action === 'boss:engage') { state.exploration.auto = false; stopLoop(); createBossEncounter(state); }
   else if (action === 'boss:retreat') { stopLoop(); retreatFromBoss(state); }
+  else if (action === 'battle:retreat-flipper') { stopLoop(); cleanupMarbleBattle(state.battle); retreatFlipperBattle(state); }
   else if (action.startsWith('world-boss:view:')) state.ui.selectedWorldBoss=action.slice(16);
   else if (action.startsWith('world-boss:challenge')) { const id=action.split(':')[2]||state.ui.selectedWorldBoss||'crimsonTiger';state.ui.selectedWorldBoss=id;state.screen='worldBoss'; state.location='世界王祭壇'; state.ui.worldBossConfirm=true; }
   else if (action === 'world-boss:engage') { state.ui.worldBossConfirm=false; stopLoop(); createWorldBossEncounter(state,state.ui.selectedWorldBoss||'crimsonTiger'); }
@@ -203,7 +204,7 @@ window.addEventListener('pagehide', () => { stopLoop(); cleanupMarbleBattle(stat
 
 if ('serviceWorker' in navigator) {
   boot.mark('SW REGISTER');
-  const buildVersion = 'v022-pinball-prototype-1';
+  const buildVersion = 'v022-flipper-final-1';
   const reloadKey = `sw-reloaded-${buildVersion}`;
   let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
