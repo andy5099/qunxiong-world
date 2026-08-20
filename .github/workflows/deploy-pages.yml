@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 取得遊戲檔案
-        if: github.ref != 'refs/heads/agent/blackwind-flipper-prototype-v3-1' && github.ref != 'refs/heads/agent/blackwind-flipper-prototype-v3-2'
+        if: github.ref != 'refs/heads/agent/blackwind-flipper-prototype-v3-1' && github.ref != 'refs/heads/agent/blackwind-flipper-prototype-v3-2' && github.ref != 'refs/heads/agent/blackwind-flipper-prototype-v3-3'
         uses: actions/checkout@v6
       - name: 取得正式 master 網站
         if: github.ref == 'refs/heads/agent/blackwind-flipper-prototype-v3-1'
@@ -59,12 +59,29 @@ jobs:
         run: |
           rm -rf site/prototype-blackwind-v3-2
           cp -R prototype-source/prototype-blackwind-v3-2 site/prototype-blackwind-v3-2
+      - name: 取得正式 master 網站（V3.3）
+        if: github.ref == 'refs/heads/agent/blackwind-flipper-prototype-v3-3'
+        uses: actions/checkout@v6
+        with:
+          ref: master
+          path: site
+      - name: 取得 V3.3 Prototype 分支
+        if: github.ref == 'refs/heads/agent/blackwind-flipper-prototype-v3-3'
+        uses: actions/checkout@v6
+        with:
+          ref: agent/blackwind-flipper-prototype-v3-3
+          path: prototype-source
+      - name: 組裝 V3.3 獨立 Preview
+        if: github.ref == 'refs/heads/agent/blackwind-flipper-prototype-v3-3'
+        run: |
+          rm -rf site/prototype-blackwind-v3-3
+          cp -R prototype-source/prototype-blackwind-v3-3 site/prototype-blackwind-v3-3
       - name: 設定 GitHub Pages
         uses: actions/configure-pages@v5
       - name: 上傳靜態網站
         uses: actions/upload-pages-artifact@v4
         with:
-          path: ${{ (github.ref == 'refs/heads/agent/blackwind-flipper-prototype-v3-1' || github.ref == 'refs/heads/agent/blackwind-flipper-prototype-v3-2') && 'site' || '.' }}
+          path: ${{ (github.ref == 'refs/heads/agent/blackwind-flipper-prototype-v3-1' || github.ref == 'refs/heads/agent/blackwind-flipper-prototype-v3-2' || github.ref == 'refs/heads/agent/blackwind-flipper-prototype-v3-3') && 'site' || '.' }}
       - name: 發布網站
         id: deployment
         uses: actions/deploy-pages@v4
