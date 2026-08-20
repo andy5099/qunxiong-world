@@ -10,3 +10,10 @@
 .pinball-supports{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.pinball-support{display:grid;gap:3px;padding:4px 6px;border:1px solid #805fd566;border-radius:8px;background:#150e29;font-size:.65rem}.pinball-support.ready{border-color:#ffe365;box-shadow:0 0 10px #ffd94f55}.pinball-support b,.pinball-support small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pinball-support>i{height:4px;overflow:hidden;border-radius:99px;background:#04020a}.pinball-support>i>em{display:block;height:100%;background:linear-gradient(90deg,#8d63ff,#ffe56b)}
 .pinball-member button{min-height:34px;padding:4px;font-size:.66rem}.pinball-member button.armed{border-color:#ffe565;box-shadow:0 0 12px #ffd94f88}
 @media(max-width:430px){.pinball-panel .marble-canvas{max-height:62vh;max-height:62dvh}.pinball-panel header{gap:5px}.pinball-panel h2{font-size:.9rem}}
+.blackwind-prototype-v2 .pinball-panel{background:linear-gradient(180deg,#17111e 0%,#080d16 100%)}
+.blackwind-prototype-v2 .marble-canvas{border-color:#d3a758;box-shadow:inset 0 0 28px #05070bcc,0 0 16px #d09a3c33;touch-action:none}
+.blackwind-prototype-v2 .pinball-battle-status{border-color:#d6aa555f;background:#21160d;color:#f4dfad}
+.blackwind-prototype-v2 .pinball-hint{color:#ffe59a;font-weight:700}
+.blackwind-prototype-v2 .pinball-team{margin-bottom:1px}
+.blackwind-prototype-v2 [data-action="battle:retreat-flipper"]{position:relative;z-index:3;min-height:42px}
+@media(max-width:430px){.blackwind-prototype-v2 .pinball-panel .marble-canvas{max-height:60vh;max-height:60dvh}.blackwind-prototype-v2 .pinball-hint{font-size:.7rem}.blackwind-prototype-v2 .pinball-member{padding:4px}}
