@@ -10,11 +10,18 @@ import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v023-flippe
 import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v023-flipper-chain-1';
 
 const app = document.querySelector('#app');
+const isBlackwindPreview = window.location.pathname.includes('/prototype-blackwind-v2/');
 const boot = window.__QX_BOOT__ || { mark() {}, fail() {}, ready() {} };
 boot.mark('SAVE LOAD');
 let state = null;
 try {
   state = load();
+  if (isBlackwindPreview) {
+    state = createState('Prototype 試玩者');
+    state.screen = 'stronghold'; state.location = '黑風寨'; state.unlocks.stronghold = true;
+    state.progress.bossUnlocked = true; state.ui.bossWarning = true; state.ui.bossRarityRank = 4;
+    createBossEncounter(state, 4);
+  }
 } catch (error) {
   boot.fail(error);
 }
@@ -202,7 +209,7 @@ app.addEventListener('change', event => {
 document.addEventListener('visibilitychange', () => { if (document.hidden) { stopLoop(); cleanupMarbleBattle(state?.battle, true); if (state) save(state); } else draw(); });
 window.addEventListener('pagehide', () => { stopLoop(); cleanupMarbleBattle(state?.battle, true); if (state) save(state); });
 
-if ('serviceWorker' in navigator) {
+if (!isBlackwindPreview && 'serviceWorker' in navigator) {
   boot.mark('SW REGISTER');
   const buildVersion = 'v023-flipper-chain-1';
   const reloadKey = `sw-reloaded-${buildVersion}`;

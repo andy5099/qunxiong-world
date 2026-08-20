@@ -4,7 +4,8 @@ import { normalizeWorldBoss } from './world-boss-system.js?v=v023-flipper-chain-
 import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v023-flipper-chain-1';
 import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v023-flipper-chain-1';
 
-export const STORAGE_KEY = 'qunxiong-world-v01';
+const IS_BLACKWIND_PREVIEW = globalThis.location?.pathname?.includes('/prototype-blackwind-v2/') === true;
+export const STORAGE_KEY = IS_BLACKWIND_PREVIEW ? 'qunxiong-world-blackwind-prototype-v2' : 'qunxiong-world-v01';
 const LEGACY_KEY = 'qunxiong-world-v2';
 
 export function createState(playerName) {

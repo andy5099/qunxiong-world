@@ -22,14 +22,29 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: 取得遊戲檔案
+      - name: 取得正式 master 網站
         uses: actions/checkout@v6
+        with:
+          ref: master
+          path: site
+      - name: 取得黑風寨主 Prototype 分支
+        if: github.ref == 'refs/heads/agent/blackwind-flipper-prototype-v2'
+        uses: actions/checkout@v6
+        with:
+          ref: agent/blackwind-flipper-prototype-v2
+          path: prototype-source
+      - name: 組裝獨立 Preview 路徑
+        if: github.ref == 'refs/heads/agent/blackwind-flipper-prototype-v2'
+        shell: bash
+        run: |
+          mkdir -p site/prototype-blackwind-v2
+          rsync -a --delete --exclude='.git' --exclude='.github' --exclude='astral-wings' --exclude='js/data' prototype-source/ site/prototype-blackwind-v2/
       - name: 設定 GitHub Pages
         uses: actions/configure-pages@v5
       - name: 上傳靜態網站
         uses: actions/upload-pages-artifact@v4
         with:
-          path: .
+          path: site
       - name: 發布網站
         id: deployment
         uses: actions/deploy-pages@v4

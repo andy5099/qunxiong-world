@@ -1,6 +1,7 @@
 import { createState } from '../src/store.js';
 import { createBossEncounter, resolveMarbleEvent, updateFlipperSystems } from '../src/engine.js';
 import { activateMarbleFlippers, createMarbleBattleState, getFormationTier, stepMarblePhysics } from '../src/marble-battle.js';
+import fs from 'node:fs';
 
 let passed=0;
 const check=(condition,message)=>{if(!condition)throw new Error(message);passed++;};
@@ -69,5 +70,13 @@ supportSkill.party.forEach(unit=>{if(unit)unit.hp=Math.max(1,Math.floor(unit.hp*
 const hpBefore=liu.hp;liuSlot.energy=100;liuSlot.queued=true;supportSkill.battle.marble.skillQueue.push({type:'main',index:1,priority:1});
 updateFlipperSystems(supportSkill,.4,()=>.5);
 check(liu.hp>hpBefore&&liuSlot.energy===0&&!liuSlot.armed,'support skill heals automatically without pausing physics');
+
+const mainSource=fs.readFileSync(new URL('../src/main.js',import.meta.url),'utf8');
+const storeSource=fs.readFileSync(new URL('../src/store.js',import.meta.url),'utf8');
+const workflow=fs.readFileSync(new URL('../.github/workflows/deploy-pages.yml',import.meta.url),'utf8');
+check(mainSource.includes("!isBlackwindPreview && 'serviceWorker' in navigator"),'preview never registers the formal service worker');
+check(mainSource.includes("createBossEncounter(state, 4)"),'preview opens directly into blackwind prototype');
+check(storeSource.includes('qunxiong-world-blackwind-prototype-v2'),'preview uses isolated LocalStorage key');
+check(workflow.includes('site/prototype-blackwind-v2')&&workflow.includes('ref: master'),'preview artifact preserves master at the root path');
 
 console.log(`Blackwind Flipper Prototype V2: ${passed} assertions passed; 10 runs, ${totalHits} hits, ${totalDashes} dashes, max combo ${maxCombo}.`);
