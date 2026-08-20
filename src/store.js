@@ -1,8 +1,8 @@
-import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v022-pinball-prototype-1';
-import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v022-pinball-prototype-1';
-import { normalizeWorldBoss } from './world-boss-system.js?v=v022-pinball-prototype-1';
-import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v022-pinball-prototype-1';
-import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v022-pinball-prototype-1';
+import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v022-flipper-final-1';
+import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v022-flipper-final-1';
+import { normalizeWorldBoss } from './world-boss-system.js?v=v022-flipper-final-1';
+import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v022-flipper-final-1';
+import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v022-flipper-final-1';
 
 export const STORAGE_KEY = 'qunxiong-world-v01';
 const LEGACY_KEY = 'qunxiong-world-v2';

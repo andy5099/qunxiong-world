@@ -28,7 +28,7 @@ for(let shot=0;shot<36;shot++){
   check(marble.phase==='settling','physical shot settles');
   check(entity.x>=MARBLE_ARENA.padding+entity.radius-1&&entity.x<=MARBLE_ARENA.width-MARBLE_ARENA.padding-entity.radius+1,'shot stays inside horizontal wall');
 }
-check(physicalHits>=20,'thirty-six real trajectories hit boss');check(wallHits>0,'wall collision exercised');equal(obstacleHits,0,'prototype omits complex obstacles');
+check(physicalHits>=20,'thirty-six real trajectories hit boss');check(wallHits>0,'wall collision exercised');check(obstacleHits>0,'compact fixed obstacles are active');
 
 const damageState=state();createBossEncounter(damageState,3);const marble=ensureMarbleBattle(damageState.battle,damageState.party,zero),target=damageState.battle.enemies.find(e=>e.boss);const before=target.hp;
 marble.skillArmed=true;const hit=resolveMarbleEvent(damageState,{type:'boss',weak:true,speed:600},zero);check(hit.damage>0&&target.hp<before,'weak-point hit deals real damage');check(marble.effects.length>0,'damage effect emitted');

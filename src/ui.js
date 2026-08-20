@@ -1,14 +1,14 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v022-pinball-prototype-1';
-import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v022-pinball-prototype-1';
-import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v022-pinball-prototype-1';
-import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v022-pinball-prototype-1';
-import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState } from './world-boss-system.js?v=v022-pinball-prototype-1';
-import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v022-pinball-prototype-1';
-import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v022-pinball-prototype-1';
-import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v022-pinball-prototype-1';
-import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v022-pinball-prototype-1';
-import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v022-pinball-prototype-1';
-import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v022-pinball-prototype-1';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v022-flipper-final-1';
+import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v022-flipper-final-1';
+import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v022-flipper-final-1';
+import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v022-flipper-final-1';
+import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState } from './world-boss-system.js?v=v022-flipper-final-1';
+import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v022-flipper-final-1';
+import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v022-flipper-final-1';
+import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v022-flipper-final-1';
+import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v022-flipper-final-1';
+import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v022-flipper-final-1';
+import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v022-flipper-final-1';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
@@ -256,8 +256,8 @@ export function renderFormationPanel(state, battle) {
 export function renderMarblePanel(state,battle){
   if(!battle||battle.mode!=='marble'||battle.finished)return'';const marble=ensureMarbleBattle(battle,state.party),boss=battle.enemies.find(enemy=>enemy.boss&&enemy.hp>0)||battle.enemies.find(enemy=>enemy.hp>0);if(!boss)return'';
   if(marble.phase==='pinball'){
-    const team=state.party.slice(0,3).map((unit,index)=>{if(!unit)return'';const slot=marble.skills[index]||{energy:0,armed:false};return `<span class="pinball-member"><b>${esc(unit.name)}</b><i><em style="width:${slot.energy}%"></em></i><button type="button" data-pinball-skill="${index}" ${slot.energy<100?'disabled':''}>${slot.armed?'技能已備妥':slot.energy>=100?'技能':'能量 '+slot.energy+'%'}</button></span>`;}).join('');
-    return `<div class="marble-overlay"><section class="marble-panel pinball-panel"><header><div><p class="eyebrow">Boss 彈射戰 Prototype</p><h2>${esc(boss.displayName||boss.name)}</h2></div><strong class="marble-hit">${marble.combo||0} HIT</strong></header><div class="marble-boss-hp"><span>Boss HP ${Math.max(0,boss.hp).toLocaleString()} / ${boss.maxHp.toLocaleString()}</span>${hpBar(boss.hp,boss.maxHp,'enemy-meter')}</div><div class="pinball-break" data-pinball-break>${marble.breakTime>0?'BREAK！傷害提升':'連續命中弱點可 BREAK'}</div><canvas class="marble-canvas" aria-label="三武將彈射 Boss 戰場"></canvas><p class="pinball-hint">點擊或觸控戰場，啟動左右彈板。</p><div class="pinball-team">${team}</div></section></div>`;
+    const team=state.party.slice(0,3).map((unit,index)=>{if(!unit)return'';const slot=marble.skills[index]||{energy:0,armed:false};return `<span class="pinball-member"><b>${esc(unit.name)}</b><i><em style="width:${slot.energy}%"></em></i><small>${slot.armed?'自動技能 READY':`技能 ${slot.energy}%`}</small></span>`;}).join('');
+    return `<div class="marble-overlay"><section class="marble-panel pinball-panel"><header><div><p class="eyebrow">Boss 彈射戰</p><h2>${esc(boss.displayName||boss.name)}</h2></div><strong class="marble-hit">${marble.combo||0} HIT</strong></header><div class="marble-boss-hp"><span>Boss HP ${Math.max(0,boss.hp).toLocaleString()} / ${boss.maxHp.toLocaleString()}</span>${hpBar(boss.hp,boss.maxHp,'enemy-meter')}</div><div class="pinball-break" data-pinball-break>${marble.breakTime>0?'BREAK！傷害提升':`弱點 BREAK ${marble.breakGauge||0}%`}</div><canvas class="marble-canvas" aria-label="三武將彈射 Boss 戰場"></canvas><p class="pinball-hint">點擊左／右半場，分別啟動左右彈板；技能與奧義會自動施放。</p><div class="pinball-team">${team}</div><button type="button" class="button danger" data-action="battle:retreat-flipper">安全撤退</button></section></div>`;
   }
   const member=state.party[marble.turnIndex],stats=member?getFinalStats(state,member):null,skill=getMarbleSkill(member),ultimate=getMarbleUltimate(member),energy=getUltimateEnergy(member),phase=boss.worldBoss?`第 ${boss.phase||1} 階段`:`回合 ${battle.round}`;
   const party=state.party.map((unit,index)=>unit?`<span class="marble-party-member${index===marble.turnIndex?' active':''}${unit.hp<=0?' defeated':''}${getUltimateEnergy(unit)>=100?' ready':''}"><b>${index+1}・${esc(unit.name)}</b><small>${Math.max(0,unit.hp)}/${getFinalStats(state,unit).maxHp}</small><i><em style="width:${getUltimateEnergy(unit)}%"></em></i><small>${getUltimateEnergy(unit)>=100?'全力一擊 READY':`全力 ${getUltimateEnergy(unit)}%`}</small></span>`:'<span class="marble-party-member empty"><b>空位</b></span>').join('');
