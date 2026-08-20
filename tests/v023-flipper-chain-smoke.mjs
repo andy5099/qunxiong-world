@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { createState } from '../src/store.js';
+import { createBossEncounter, createWorldBossEncounter, resolveMarbleEvent, retreatFlipperBattle, updateFlipperSystems } from '../src/engine.js';
+import { activateMarbleFlippers, createMarbleBattleState, getFormationRole, getFormationTier, stepMarblePhysics } from '../src/marble-battle.js';
+
+let passed=0;const check=(value,label)=>{assert.ok(value,label);passed++;};const equal=(a,b,label)=>{assert.deepEqual(a,b,label);passed++;};
+equal(getFormationTier(9),0,'formation locked below 10');equal(getFormationTier(10),1,'10 hit tier I');equal(getFormationTier(20),2,'20 hit tier II');equal(getFormationTier(35),3,'35 hit tier III');equal(getFormationTier(50),4,'50 hit MAX');
+equal(getFormationRole({id:'guan-yu'}),'vanguard','vanguard role');equal(getFormationRole({id:'zhang-fei'}),'breaker','breaker role');equal(getFormationRole({id:'liu-bei'}),'support','support role');equal(getFormationRole({id:'zhang-bao'}),'mage','mage role');equal(getFormationRole({id:'crimson-tiger'}),'world','world boss role');
+
+const state=createState('連鎖測試');state.screen='stronghold';state.unlocks.stronghold=true;state.ui.bossWarning=true;state.ui.bossRarityRank=4;createBossEncounter(state,4);const marble=state.battle.marble,boss=state.battle.enemies[0];boss.maxHp=boss.hp=1000000000;
+for(let i=0;i<50;i++)resolveMarbleEvent(state,{type:'boss',entityIndex:0,weak:i%4===0,speed:620},()=>.5);
+equal(marble.formationReady,4,'highest formation ready retained');marble.combo=0;check(marble.formationReady===4,'combo timeout does not discard ready');marble.entities[0].y=390;activateMarbleFlippers(marble,'left');equal(marble.formationReady,0,'next valid flipper consumes ready');check(marble.formationActive?.tier===4,'formation activation recorded');
+for(let i=0;i<330;i++)stepMarblePhysics(marble,.016);check(!marble.formationActive,'formation boost expires');
+
+const support={...state.party[1],id:'liu-bei',name:'劉備',hp:1};state.party[3]=support;state.party[4]={...state.party[2],id:'zhang-bao',name:'張寶'};state.battle.marble.skillQueue=[];state.battle.marble.skills.forEach(slot=>{slot.queued=false;});state.battle.marble.supports=[{index:3,energy:100,ready:true,queued:false},{index:4,energy:100,ready:true,queued:false}];state.party[0].hp=1;updateFlipperSystems(state,.016,()=>.5);updateFlipperSystems(state,.4,()=>.5);check(state.party[0].hp>1,'Liu Bei support heals low HP');check(state.battle.marble.supports[0].energy<5,'support gauge consumed');
+state.battle.marble.skillQueue=[];state.battle.marble.schedulerCooldown=0;state.battle.marble.supports[1]={index:4,energy:100,ready:true,queued:false};state.battle.marble.breakTime=3;updateFlipperSystems(state,.016,()=>.5);check(state.battle.marble.effects.some(effect=>effect.text==='黃天雷援'),'Zhang Bao support triggers during break');check(state.battle.marble.entities.filter(Boolean).length===3,'supports never enter canvas');
+
+for(const id of ['crimsonTiger','netherThunder']){const world=createState(id);world.worldBoss.unlocked=true;world.worldBosses.netherThunder.unlocked=true;createWorldBossEncounter(world,id);const target=world.battle.enemies[0],m=world.battle.marble,damage=[];for(let i=0;i<130&&target.hp>1;i++){if(i===20)target.hp=Math.floor(target.maxHp*.69);if(i===70)target.hp=Math.floor(target.maxHp*.34);damage.push(resolveMarbleEvent(world,{type:'boss',entityIndex:i%3,weak:i%4===0,speed:650},()=>.5).damage);updateFlipperSystems(world,.31,()=>.5);}check(damage.every(value=>Number.isFinite(value)&&value>0),`${id} long battle never reaches zero damage`);check(target.phase===3,`${id} reaches phase three`);check(m.breakTime>=0&&m.ultimateGauge>=0,`${id} break and ultimate remain finite`);check(retreatFlipperBattle(world),`${id} can retreat`);}
+
+const ui=fs.readFileSync(new URL('../src/ui.js',import.meta.url),'utf8'),main=fs.readFileSync(new URL('../src/main.js',import.meta.url),'utf8'),sw=fs.readFileSync(new URL('../service-worker.js',import.meta.url),'utf8');check(ui.includes('主戰 1')||ui.includes('`主戰 ${index+1}`'),'party UI labels main slots');check(ui.includes('pinball-supports')&&ui.includes('data-formation-ready'),'support and formation HUD connected');check(main.includes('cleanupMarbleBattle'),'canvas cleanup retained');check(!sw.includes('localStorage'),'service worker never clears saves');
+console.log(`V0.2.3 flipper chain smoke: ${passed} assertions passed.`);
