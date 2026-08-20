@@ -1,11 +1,11 @@
 export const MARBLE_ARENA={width:360,height:430,padding:22};
 export const MARBLE_SKILLS={
-  'guan-yu':{name:'青龍斬',cost:8,firstHit:1.65,weak:1.25,passive:'武聖'},
-  'zhang-fei':{name:'震地猛擊',cost:8,firstHit:1.45,debuff:true,passive:'豪膽'},
-  'liu-bei':{name:'仁德',cost:7,heal:.08,passive:'皇叔之援'},
-  'blackwind-lord':{name:'強襲',cost:5,power:1.18,damage:1.22,passive:'黑風追擊'},
-  'crimson-tiger':{name:'烈焰突襲',cost:10,firstHit:1.45,burn:true,passive:'赤焰本能'},
-  'nether-thunder-beast':{name:'雷霆穿擊',cost:10,firstHit:1.4,pierce:true,passive:'雷影'},
+  'guan-yu':{name:'青龍偃月',cost:8,firstHit:1.65,weak:1.25,passive:'武聖'},
+  'zhang-fei':{name:'萬軍震破',cost:8,firstHit:1.45,debuff:true,passive:'豪膽'},
+  'liu-bei':{name:'仁德天下',cost:7,heal:.08,passive:'皇叔之援'},
+  'blackwind-lord':{name:'黑風亂舞',cost:5,power:1.18,damage:1.22,passive:'黑風追擊'},
+  'crimson-tiger':{name:'焚天滅世',cost:10,firstHit:1.45,burn:true,passive:'赤焰本能'},
+  'nether-thunder-beast':{name:'九幽天罰',cost:10,firstHit:1.4,pierce:true,passive:'雷影'},
   'yellow-captain':{name:'鐵壁衝鋒',cost:8,firstHit:1.35,guard:true,passive:'重甲'},
   'yellow-commander':{name:'破軍',cost:9,execute:true,passive:'乘勝追擊'},
   'zhang-bao':{name:'妖雷',cost:10,firstHit:1.5,lightning:true,passive:'雷引'},
@@ -51,7 +51,7 @@ export function createMarbleBattleState(battle,party,rng=Math.random){
   const size=battle.worldBoss?58:Math.min(52,40+(battle.bossRarityRank||1)*2),boss={x:180,y:78,radius:size,visualKey:visual,weakAngle:Math.PI*.5};
   const prototypeV2=visual==='blackwind-lord';
   entities.forEach((entity,index)=>{if(entity){entity.dashCooldown=.35+index*.18;entity.dashTime=0;entity.inLaunchZone=false;}});
-  return{entities,boss,obstacles:prototypeV2?[]:layout.map(item=>({...item})),turnIndex:0,acted:[],phase:'pinball',prototypeV2,flippers:{left:0,right:0},combo:0,comboTime:0,comboMilestone:0,breakGauge:0,breakTime:0,breakImmunity:0,skills:entities.map(()=>({energy:0,armed:false,queued:false})),supports:party.slice(3,5).map((member,index)=>member?{index:index+3,energy:0,ready:false,queued:false}:null),skillQueue:[],schedulerCooldown:0,ultimateGauge:0,formationReady:0,formationActive:null,leadRole:getFormationRole(party[0]),bossAttackIn:7,fieldPulseIn:5,weakShiftIn:4,bossDirection:rng()<.5?-1:1,hitStop:0,perfectFlip:false,skillArmed:false,ultimateArmed:false,aim:{dx:0,dy:80,power:0,timeLeft:6},shot:{hits:0,damage:0,wallBounces:0,obstacleBounces:0,friendHits:[],ultimate:false,power:0},effects:[],theme,lastProgressAt:Date.now()};
+  return{entities,boss,obstacles:prototypeV2?[]:layout.map(item=>({...item})),turnIndex:0,acted:[],phase:'pinball',prototypeV2,flippers:{left:0,right:0},combo:0,comboTime:0,comboMilestone:0,breakGauge:0,breakTime:0,breakImmunity:0,skills:entities.map(()=>({energy:0,armed:false,queued:false})),supports:party.slice(3,5).map((member,index)=>member?{index:index+3,energy:0,ready:false,queued:false}:null),skillQueue:[],schedulerCooldown:0,ultimateGauge:0,formationReady:0,formationActive:null,leadRole:getFormationRole(party[0]),bossAttackIn:7,fieldPulseIn:5,weakShiftIn:4,bossDirection:rng()<.5?-1:1,hitStop:0,shakeTime:0,flashTime:0,skillCinematic:null,perfectFlip:false,skillArmed:false,ultimateArmed:false,aim:{dx:0,dy:80,power:0,timeLeft:6},shot:{hits:0,damage:0,wallBounces:0,obstacleBounces:0,friendHits:[],ultimate:false,power:0},effects:[],theme,lastProgressAt:Date.now()};
 }
 
 export function ensureMarbleBattle(battle,party,rng=Math.random){if(!battle)return null;if(!battle.marble)battle.marble=createMarbleBattleState(battle,party,rng);return battle.marble;}

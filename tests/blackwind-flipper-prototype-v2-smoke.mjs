@@ -1,6 +1,7 @@
 import { createState } from '../src/store.js';
 import { createBossEncounter, resolveMarbleEvent, updateFlipperSystems } from '../src/engine.js';
 import { activateMarbleFlippers, createMarbleBattleState, getFormationTier, stepMarblePhysics } from '../src/marble-battle.js';
+import { createBlackwindLeader } from '../src/data.js';
 import fs from 'node:fs';
 
 let passed=0;
@@ -70,13 +71,37 @@ supportSkill.party.forEach(unit=>{if(unit)unit.hp=Math.max(1,Math.floor(unit.hp*
 const hpBefore=liu.hp;liuSlot.energy=100;liuSlot.queued=true;supportSkill.battle.marble.skillQueue.push({type:'main',index:1,priority:1});
 updateFlipperSystems(supportSkill,.4,()=>.5);
 check(liu.hp>hpBefore&&liuSlot.energy===0&&!liuSlot.armed,'support skill heals automatically without pausing physics');
+check(supportSkill.battle.marble.skillCinematic?.characterId==='liu-bei','Liu Bei starts a readable team-heal cinematic');
+check(supportSkill.battle.marble.effects.some(effect=>effect.type==='team-buff'),'Liu Bei creates team-wide golden after effect');
+
+function skillVfxState(member){
+  const state=createState('VFX');state.party=[member,...state.party.filter(unit=>unit&&unit.id!==member.id).slice(0,2),null,null];
+  state.screen='stronghold';state.unlocks.stronghold=true;state.progress.bossUnlocked=true;state.ui.bossWarning=true;state.ui.bossRarityRank=4;
+  check(createBossEncounter(state,4,zero),`${member.name} VFX battle starts`);const marble=state.battle.marble,slot=marble.skills[0];slot.energy=100;slot.queued=true;marble.skillQueue.push({type:'main',index:0,priority:1});updateFlipperSystems(state,.4,()=>.5);return state;
+}
+for(const member of [isolated.party[2],isolated.party[3],createBlackwindLeader()]){
+  const state=skillVfxState(member),marble=state.battle.marble;
+  check(marble.skillCinematic?.characterId===member.id,`${member.name} owns its skill intro`);
+  check(marble.skillCinematic?.duration<=1.3,`${member.name} skill remains under 1.3 seconds`);
+  const impact=resolveMarbleEvent(state,{type:'boss',entityIndex:0,weak:member.id==='guan-yu',speed:650,prototypeV2:true},()=>.5);
+  check(impact?.damage>0,`${member.name} skill impact still deals combat damage`);
+  check(marble.effects.some(effect=>effect.type==='skill-impact'&&effect.characterId===member.id),`${member.name} gets a distinct impact VFX`);
+  check(marble.hitStop>=.09&&marble.shakeTime>0,`${member.name} impact uses graded hit stop and shake`);
+}
+
+const ultimateVfx=blackwindState();ultimateVfx.battle.marble.ultimateGauge=100;ultimateVfx.battle.marble.breakTime=2;ultimateVfx.battle.marble.ultimateQueued=true;ultimateVfx.battle.marble.skillQueue.push({type:'ultimate',index:0,priority:1});updateFlipperSystems(ultimateVfx,.4,()=>.5);
+check(ultimateVfx.battle.marble.skillCinematic?.ultimate===true,'ultimate starts a higher-tier cinematic');
+check(ultimateVfx.battle.marble.skillCinematic?.duration===2,'ultimate presentation lasts two seconds');
 
 const mainSource=fs.readFileSync(new URL('../src/main.js',import.meta.url),'utf8');
 const storeSource=fs.readFileSync(new URL('../src/store.js',import.meta.url),'utf8');
 const workflow=fs.readFileSync(new URL('../.github/workflows/deploy-pages.yml',import.meta.url),'utf8');
+const vfxSource=fs.readFileSync(new URL('../src/marble-battle-ui.js',import.meta.url),'utf8');
 check(mainSource.includes("!isBlackwindPreview && 'serviceWorker' in navigator"),'preview never registers the formal service worker');
 check(mainSource.includes("createBossEncounter(state, 4)"),'preview opens directly into blackwind prototype');
 check(storeSource.includes('qunxiong-world-blackwind-prototype-v2'),'preview uses isolated LocalStorage key');
 check(workflow.includes('site/prototype-blackwind-v2')&&workflow.includes('ref: master'),'preview artifact preserves master at the root path');
+check(vfxSource.includes('VFX_PARTICLE_LIMIT=96'),'mobile particle pool has a strict 96-object cap');
+for(const marker of ['drawSkillCinematic','drawImpact','drawParticle','skillColors'])check(vfxSource.includes(marker),`${marker} visual layer exists`);
 
 console.log(`Blackwind Flipper Prototype V2: ${passed} assertions passed; 10 runs, ${totalHits} hits, ${totalDashes} dashes, max combo ${maxCombo}.`);

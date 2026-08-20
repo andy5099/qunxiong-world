@@ -1,8 +1,8 @@
-import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v023-flipper-chain-1';
-import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v023-flipper-chain-1';
-import { normalizeWorldBoss } from './world-boss-system.js?v=v023-flipper-chain-1';
-import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v023-flipper-chain-1';
-import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v023-flipper-chain-1';
+import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v023-prototype-v21';
+import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v023-prototype-v21';
+import { normalizeWorldBoss } from './world-boss-system.js?v=v023-prototype-v21';
+import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v023-prototype-v21';
+import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v023-prototype-v21';
 
 const IS_BLACKWIND_PREVIEW = globalThis.location?.pathname?.includes('/prototype-blackwind-v2/') === true;
 export const STORAGE_KEY = IS_BLACKWIND_PREVIEW ? 'qunxiong-world-blackwind-prototype-v2' : 'qunxiong-world-v01';
