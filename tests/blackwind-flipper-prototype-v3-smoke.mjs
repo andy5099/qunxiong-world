@@ -24,7 +24,7 @@ const timing=createPrototypeState();timing.core.y=ARENA.floor-timing.core.r;timi
 const power=createPrototypeState();power.power=100;power.powerReady=true;power.core.y=ARENA.floor-power.core.r;power.core.bottomTime=.2;const powerTap=tapPrototype(power);check(powerTap.type==='power-flip'&&power.core.powerAttack,'POWER READY changes the next launch state');
 
 const html=fs.readFileSync(new URL('../prototype-blackwind-v3/index.html',import.meta.url),'utf8'),game=fs.readFileSync(new URL('../prototype-blackwind-v3/game.js',import.meta.url),'utf8');
-check(html.includes('touch-action:none')===false&&html.includes('game.js?v=v3-30s-1'),'preview loads a versioned standalone module');
+check(html.includes('touch-action:none')===false&&html.includes('game.js?v=v3-30s-2'),'preview loads a versioned standalone module');
 check(game.includes("qunxiong-world-blackwind-prototype-v3"),'preview uses an isolated localStorage key');
 check(!html.includes('serviceWorker')&&!game.includes('serviceWorker'),'preview registers no service worker');
 check(game.includes('hudIn=.1')&&game.includes('dataset.fps'),'HUD is throttled while Canvas tracks observable FPS');

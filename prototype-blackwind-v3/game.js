@@ -1,4 +1,4 @@
-import{ARENA,createPrototypeState,getFormation,getResults,stepPrototype,tapPrototype}from'./physics.js?v=v3-30s-1';
+import{ARENA,createPrototypeState,getFormation,getResults,stepPrototype,tapPrototype}from'./physics.js?v=v3-30s-2';
 const SAVE_KEY='qunxiong-world-blackwind-prototype-v3',canvas=document.querySelector('canvas'),ctx=canvas.getContext('2d'),hud={time:document.querySelector('[data-time]'),combo:document.querySelector('[data-combo]'),power:document.querySelector('[data-power]'),skill:document.querySelector('[data-skill]'),hint:document.querySelector('[data-hint]')},result=document.querySelector('.result');
 canvas.width=ARENA.width;canvas.height=ARENA.height;let state=createPrototypeState(),last=0,raf=0,audio=null,hudIn=0,fpsIn=0,frames=0;
 const colors=[['#69c99a','#123f32'],['#ed665e','#441b20'],['#efd369','#3c5736']];
