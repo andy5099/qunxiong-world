@@ -1,4 +1,4 @@
-export const SAVE_VERSION = 15;
+export const SAVE_VERSION = 16;
 
 export const DUNGEON = {
   id: 'bloodCavern', name: '血色洞窟', floors: 4, danger: 4, recommendedPower: 7500,

@@ -66,3 +66,15 @@ body:has(.formation-gauge) .battle-panel{padding-top:92px}
 
 /* V0.2.5: world-boss collection, talents and safe individual comparison. */
 .world-individual,.talent-codex{display:grid;gap:.35rem;margin:.55rem 0;padding:.7rem;border:1px solid #dbad5966;border-radius:10px;background:#0b1425aa}.world-individual small{color:#c6d3df}.talent-codex{grid-template-columns:repeat(2,minmax(0,1fr))}.talent-codex strong{grid-column:1/-1}.talent-codex span{overflow-wrap:anywhere}.legendary-variant{box-shadow:0 0 44px #ffd24f77,inset 0 0 32px #8b431c44}.legendary-alert{margin:0;color:#ffe580;font-size:1.05rem;font-weight:950;animation:legendary-pulse .65s ease-in-out 2 alternate}.individual-compare{width:min(100%,520px)}.individual-compare-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}.individual-compare-grid article{display:grid;gap:.35rem;min-width:0;padding:.8rem;border:1px solid #ffffff2d;border-radius:10px;background:#07111f}.individual-compare-grid small{overflow-wrap:anywhere}@keyframes legendary-pulse{to{transform:scale(1.04);filter:brightness(1.25)}}@media(max-width:430px){.talent-codex,.individual-compare-grid{grid-template-columns:1fr}.individual-compare .action-grid button{min-height:46px;width:100%}}
+/* V0.2.6 character bonds */
+.bond-summary,.bond-codex{margin:14px 0;padding:14px;border:1px solid #d6aa55;border-radius:14px;background:linear-gradient(145deg,#17263d,#101827)}
+.bond-chip-list,.pinball-bonds{display:flex;gap:7px;flex-wrap:wrap}
+.bond-chip,.pinball-bonds span{display:flex;flex-direction:column;padding:7px 10px;border:1px solid #ffd66b;border-radius:999px;background:#172b43;color:#ffe69b;font-weight:800}
+.bond-chip small{font-weight:500;color:#dce9f7;white-space:normal}
+.bond-formable{display:block;margin-top:5px;color:#ffe47c}
+.member-bonds{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.member-bonds strong{width:100%;color:#ffe69b}.member-bonds span{padding:3px 7px;border-radius:8px;background:#253954;color:#dfefff;font-size:12px}
+.bond-codex-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.bond-card{display:flex;min-width:0;flex-direction:column;gap:5px;padding:13px;border:1px solid #577394;border-radius:12px;background:#152237;overflow-wrap:anywhere}
+.bond-card.discovered{border-color:#dfb95d;box-shadow:inset 0 0 16px #e8b94b18}.bond-card.unknown{filter:saturate(.45);color:#a8b4c6}
+.pinball-bonds{position:relative;z-index:2;margin:5px 0}.pinball-bonds span{padding:3px 7px;font-size:11px}.pinball-bonds .cooldown{opacity:.42}
+@media(max-width:430px){.bond-codex-grid{grid-template-columns:1fr}.bond-chip-list{align-items:stretch}.bond-chip{width:100%;border-radius:10px}.pinball-bonds{max-height:38px;overflow:hidden}.pinball-bonds span{width:auto}}
