@@ -1,4 +1,4 @@
-export const SAVE_VERSION = 17;
+export const SAVE_VERSION = 18;
 
 export const DUNGEON = {
   id: 'bloodCavern', name: '血色洞窟', floors: 4, danger: 4, recommendedPower: 7500,
@@ -55,10 +55,25 @@ export const ITEMS = {
   netherThunderClaw: { id: 'netherThunderClaw', name: '九幽雷爪', type: 'equipment', slot: 'weapon', quality: '傳說', worldBossOnly: true, worldBossFamily: 'nether-thunder', sell: 2300, stats: { might: 46, speed: 16 }, description: '武力 +46・速度 +16' },
   netherThunderArmor: { id: 'netherThunderArmor', name: '九幽雷甲', type: 'equipment', slot: 'armor', quality: '傳說', worldBossOnly: true, worldBossFamily: 'nether-thunder', sell: 2200, stats: { defense: 35, maxHp: 150 }, description: '防禦 +35・最大兵力 +150' },
   thunderEmperorSeal: { id: 'thunderEmperorSeal', name: '雷帝之印', type: 'equipment', slot: 'accessory', quality: '傳說', worldBossOnly: true, worldBossFamily: 'nether-thunder', sell: 2150, stats: { might: 20, speed: 17, maxHp: 75 }, description: '武力 +20・速度 +17・最大兵力 +75' },
+  yellowHeavenBlade:{id:'yellowHeavenBlade',name:'黃天斬刀',type:'equipment',slot:'weapon',quality:'普通',sell:120,stats:{might:14},description:'武力 +14',generalGear:true},
+  thunderBow:{id:'thunderBow',name:'雷紋弓',type:'equipment',slot:'weapon',quality:'稀有',sell:260,stats:{might:17,speed:5},description:'武力 +17・速度 +5',generalGear:true},
+  earthBreakerHammer:{id:'earthBreakerHammer',name:'鎮地錘',type:'equipment',slot:'weapon',quality:'史詩',sell:520,stats:{might:25,defense:5},description:'武力 +25・BREAK 強化',generalGear:true},
+  dustRobe:{id:'dustRobe',name:'荒塵戰衣',type:'equipment',slot:'armor',quality:'普通',sell:110,stats:{defense:10,maxHp:32},description:'防禦 +10・最大兵力 +32',generalGear:true},
+  thunderArmor:{id:'thunderArmor',name:'雷鳴甲',type:'equipment',slot:'armor',quality:'稀有',sell:270,stats:{defense:17,maxHp:58},description:'防禦 +17・最大兵力 +58',generalGear:true},
+  skyRitualArmor:{id:'skyRitualArmor',name:'黃天祭甲',type:'equipment',slot:'armor',quality:'史詩',sell:540,stats:{defense:24,maxHp:90},description:'防禦 +24・Counter 強化',generalGear:true},
+  dustCharm:{id:'dustCharm',name:'荒村護符',type:'equipment',slot:'accessory',quality:'普通',sell:105,stats:{speed:4,maxHp:22},description:'速度 +4・最大兵力 +22',generalGear:true},
+  thunderBead:{id:'thunderBead',name:'雷靈珠',type:'equipment',slot:'accessory',quality:'稀有',sell:250,stats:{might:7,speed:7},description:'武力 +7・Skill Gauge 強化',generalGear:true},
+  yellowHeavenSeal:{id:'yellowHeavenSeal',name:'黃天秘印',type:'equipment',slot:'accessory',quality:'史詩',sell:510,stats:{might:12,defense:8,speed:8},description:'武力 +12・防禦 +8・Combo 強化',generalGear:true},
+  basaltShell:{id:'basaltShell',name:'玄武神甲',type:'equipment',slot:'armor',quality:'傳說',worldBossOnly:true,worldBossFamily:'basalt-turtle',sell:2600,stats:{defense:44,maxHp:210},description:'防禦 +44・最大兵力 +210'},
+  mountainStone:{id:'mountainStone',name:'鎮岳神石',type:'equipment',slot:'weapon',quality:'傳說',worldBossOnly:true,worldBossFamily:'basalt-turtle',sell:2700,stats:{might:49,defense:12},description:'武力 +49・BREAK 強化'},
+  mysticTurtleCharm:{id:'mysticTurtleCharm',name:'玄靈護符',type:'equipment',slot:'accessory',quality:'傳說',worldBossOnly:true,worldBossFamily:'basalt-turtle',sell:2550,stats:{defense:22,speed:12,maxHp:95},description:'防禦 +22・速度 +12・最大兵力 +95'},
+  phoenixFeatherBlade:{id:'phoenixFeatherBlade',name:'幽冥鳳羽刃',type:'equipment',slot:'weapon',quality:'史詩',bossOnly:true,bossGearFamily:'nether-phoenix',sell:980,stats:{might:31,speed:10},description:'武力 +31・速度 +10'},
+  phoenixRobe:{id:'phoenixRobe',name:'涅槃冥火衣',type:'equipment',slot:'armor',quality:'史詩',bossOnly:true,bossGearFamily:'nether-phoenix',sell:940,stats:{defense:24,maxHp:105},description:'防禦 +24・最大兵力 +105'},
+  phoenixEmber:{id:'phoenixEmber',name:'幽冥火種',type:'equipment',slot:'accessory',quality:'史詩',bossOnly:true,bossGearFamily:'nether-phoenix',sell:920,stats:{might:13,speed:12},description:'武力 +13・速度 +12'},
   potion: { id: 'potion', name: '回復藥', type: 'consumable', price: 20, heal: 45, description: '戰鬥中恢復 45 兵力' }
 };
 
-export const GENERAL_GEAR_IDS = ['woodenSword','ironSword','banditDagger','woodBow','clothArmor','leatherArmor','wolfBracers','clothShoes','ironArmor','woodRing','copperRing','greenEdgeSword','yellowIronBlade','yellowSpear','yellowHardBow','yellowBattleGarb','yellowIronArmor','yellowCharm'];
+export const GENERAL_GEAR_IDS = ['woodenSword','ironSword','banditDagger','woodBow','clothArmor','leatherArmor','wolfBracers','clothShoes','ironArmor','woodRing','copperRing','greenEdgeSword','yellowIronBlade','yellowSpear','yellowHardBow','yellowBattleGarb','yellowIronArmor','yellowCharm','yellowHeavenBlade','thunderBow','earthBreakerHammer','dustRobe','thunderArmor','skyRitualArmor','dustCharm','thunderBead','yellowHeavenSeal'];
 export const GEAR_QUALITIES = ['普通','精良','稀有','史詩'];
 export const GEAR_MULTIPLIERS = { '普通': 1, '精良': 1.20, '稀有': 1.45, '史詩': 1.80 };
 export const GEAR_SELL_MULTIPLIERS = { '普通': 1, '精良': 1.5, '稀有': 2.5, '史詩': 4 };
@@ -117,6 +132,13 @@ export function createNetherThunderBeast() {
   return { ...officer('nether-thunder-beast', '九幽雷獸', { hp: 760, mp: 110, might: 112, defense: 68, intelligence: 36, speed: 70 }), level: 24, worldBoss: true, worldBossId: 'netherThunder', rarityRank: 5, rarityName: '世界王', growthMultiplier: 1.65, role: '世界王／高速', skills: ['thunderClaw', 'thunderArray', 'divinePunishment'] };
 }
 
+export function createBasaltTurtle(){return{...officer('basalt-turtle','玄武巨龜',{hp:980,mp:130,might:124,defense:108,intelligence:34,speed:32}),level:30,worldBoss:true,worldBossId:'basaltTurtle',rarityRank:5,rarityName:'世界王',growthMultiplier:1.72,role:'世界王／BREAK',skills:['basaltCrush','heavenWard']};}
+export function createChapter3BossMember(kind='yellow-demon-general'){const p={
+  'storm-warden':['雷谷守將',{hp:410,mp:70,might:68,defense:43,intelligence:28,speed:35},'Counter'],
+  'earth-brute':['黃天力帥',{hp:520,mp:54,might:75,defense:61,intelligence:18,speed:21},'BREAK'],
+  'yellow-demon-general':['黃巾妖將・程遠志',{hp:470,mp:92,might:88,defense:49,intelligence:44,speed:40},'階段／Combo'],
+  'nether-phoenix':['幽冥鳳凰',{hp:420,mp:108,might:92,defense:38,intelligence:60,speed:58},'涅槃／追擊']};const[name,stats,role]=p[kind]||p['yellow-demon-general'];return{...officer(kind,name,stats),level:kind==='nether-phoenix'?32:25,bossRecruit:true,rarityRank:1,rarityName:'普通',growthMultiplier:1.35,role};}
+
 export const ENEMIES = {
   wolf: { id: 'wolf', name: '野狼', maxHp: 72, might: 14, defense: 5, speed: 18, exp: 24, gold: [8, 14] },
   bandit: { id: 'bandit', name: '山賊', maxHp: 105, might: 20, defense: 8, speed: 11, exp: 38, gold: [16, 25] },
@@ -135,6 +157,10 @@ export const ENEMIES = {
   ,yellowCaptainBoss: { id: 'yellowCaptainBoss', bossKind: 'yellow-captain', name: '黃巾校尉', displayName: '敵將・黃巾校尉', level: 16, maxHp: 1650, maxMp: 76, mp: 76, might: 73, intelligence: 24, defense: 58, speed: 25, exp: 980, gold: [620, 820], boss: true, battleMode: 'puzzle', skills: ['ironWall','shieldBash'], loot: { rare: ['captainBlade','yellowHeavyArmor','captainToken'], epic: ['captainBlade','yellowHeavyArmor','captainToken'] } }
   ,yellowCommanderBoss: { id: 'yellowCommanderBoss', bossKind: 'yellow-commander', name: '黃巾渠帥', displayName: '敵將・黃巾渠帥', level: 18, maxHp: 1750, maxMp: 82, mp: 82, might: 91, intelligence: 28, defense: 43, speed: 38, exp: 1220, gold: [760, 980], boss: true, battleMode: 'puzzle', skills: ['armyBreaker','pursuit'], loot: { rare: ['commanderSpear','breakerArmor','commanderTalisman'], epic: ['commanderSpear','breakerArmor','commanderTalisman'] } }
   ,zhangBaoBoss: { id: 'zhangBaoBoss', bossKind: 'zhang-bao', name: '張寶', displayName: '地公將軍・張寶', level: 21, maxHp: 2200, maxMp: 140, mp: 140, might: 96, intelligence: 72, defense: 49, speed: 41, exp: 1800, gold: [1100, 1450], boss: true, battleMode: 'puzzle', skills: ['demonThunder','nineHeavens','yellowSkyCurse'], loot: { rare: ['earthLordSword','yellowSkyRobe','earthLordSeal'], epic: ['earthLordSword','yellowSkyRobe','earthLordSeal'] } }
+  ,stormWardenBoss:{id:'stormWardenBoss',bossKind:'storm-warden',name:'雷谷守將',displayName:'雷谷守將・韓忠',level:25,maxHp:3200,maxMp:120,mp:120,might:128,intelligence:58,defense:72,speed:62,exp:2600,gold:[1550,1950],boss:true,battleMode:'marble',skills:['stormCounter','thunderCharge'],loot:{rare:['thunderBow','thunderArmor','thunderBead'],epic:['earthBreakerHammer','skyRitualArmor','yellowHeavenSeal']}}
+  ,earthBruteBoss:{id:'earthBruteBoss',bossKind:'earth-brute',name:'黃天力帥',displayName:'黃天力帥・鄧茂',level:27,maxHp:3900,maxMp:100,mp:100,might:142,intelligence:32,defense:98,speed:38,exp:2950,gold:[1750,2200],boss:true,battleMode:'marble',skills:['earthGuard','breakRoar'],loot:{rare:['thunderArmor','thunderBead'],epic:['earthBreakerHammer','skyRitualArmor']}}
+  ,yellowDemonGeneralBoss:{id:'yellowDemonGeneralBoss',bossKind:'yellow-demon-general',name:'黃巾妖將・程遠志',displayName:'黃天妖將・程遠志',level:30,maxHp:5200,maxMp:180,mp:180,might:168,intelligence:86,defense:92,speed:68,exp:4200,gold:[2500,3200],boss:true,battleMode:'marble',skills:['weakShift','yellowHeavenRise','demonCharge'],loot:{rare:['thunderBow','thunderArmor','thunderBead'],epic:['earthBreakerHammer','skyRitualArmor','yellowHeavenSeal']}}
+  ,netherPhoenixBoss:{id:'netherPhoenixBoss',bossKind:'nether-phoenix',name:'幽冥鳳凰',displayName:'隱藏Boss・幽冥鳳凰',level:34,maxHp:6800,maxMp:220,mp:220,might:205,intelligence:120,defense:84,speed:96,exp:6000,gold:[3600,4600],boss:true,battleMode:'marble',captureRate:.12,phoenix:true,skills:['netherDive','nirvana'],loot:{rare:['phoenixFeatherBlade','phoenixRobe','phoenixEmber'],epic:['phoenixFeatherBlade','phoenixRobe','phoenixEmber']}}
 };
 
 export const AREAS = {
@@ -144,11 +170,15 @@ export const AREAS = {
   ,yellowRoad: { id: 'yellowRoad', name: '黃巾荒道', enemies: ['yellowBladeSoldier','yellowShieldSoldier','yellowBowSoldier'], level: 8, danger: 3, recommendedPower: 6500, bossPool: ['yellowCaptainBoss'] }
   ,yellowCamp: { id: 'yellowCamp', name: '黃巾營地', enemies: ['yellowShieldSoldier','yellowBowSoldier','yellowWarlock','yellowBrute'], level: 11, danger: 4, recommendedPower: 9200, bossPool: ['yellowCaptainBoss','yellowCommanderBoss'] }
   ,yellowFortress: { id: 'yellowFortress', name: '黃巾主寨', enemies: ['yellowBladeSoldier','yellowWarlock','yellowBrute'], level: 14, danger: 5, recommendedPower: 12800, bossPool: ['yellowCommanderBoss','zhangBaoBoss'] }
+  ,desolateVillage:{id:'desolateVillage',name:'荒村',enemies:['yellowBladeSoldier','yellowBowSoldier','yellowWarlock'],level:18,danger:5,recommendedPower:17000,bossPool:['stormWardenBoss']}
+  ,loessSlope:{id:'loessSlope',name:'黃土坡',enemies:['yellowBladeSoldier','yellowBrute','yellowShieldSoldier'],level:21,danger:5,recommendedPower:21500,bossPool:['earthBruteBoss']}
+  ,thunderValley:{id:'thunderValley',name:'雷鳴谷',enemies:['yellowWarlock','yellowBowSoldier','yellowBrute'],level:24,danger:6,recommendedPower:27000,bossPool:['stormWardenBoss','earthBruteBoss']}
+  ,yellowHeavenAltar:{id:'yellowHeavenAltar',name:'黃天祭壇',enemies:['yellowWarlock','yellowBrute','yellowBladeSoldier'],level:27,danger:7,recommendedPower:34000,bossPool:['yellowDemonGeneralBoss']}
 };
 
 export const CHARACTER_ROLES = {
   hero:'均衡','liu-bei':'輔助／均衡','guan-yu':'物理輸出','zhang-fei':'前排／輸出','blackwind-lord':'爆發','crimson-tiger':'世界王／爆發',
-  'yellow-captain':'坦克','yellow-commander':'物理輸出','zhang-bao':'群攻','nether-thunder-beast':'世界王／高速'
+  'yellow-captain':'坦克','yellow-commander':'物理輸出','zhang-bao':'群攻','nether-thunder-beast':'世界王／高速','basalt-turtle':'世界王／BREAK','storm-warden':'Counter','earth-brute':'BREAK','yellow-demon-general':'Combo','nether-phoenix':'涅槃／追擊'
 };
 
 export const BOSS_RECOMMENDED_POWER = 3200;

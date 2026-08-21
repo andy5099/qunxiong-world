@@ -1,15 +1,16 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v027-divine-awakening-1';
-import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v027-divine-awakening-1';
-import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo, rollDivineTalismanDrops } from './boss-gear-system.js?v=v027-divine-awakening-1';
-import { WORLD_BOSS, WORLD_BOSSES, addWorldBossToRoster, applyCapturedWorldBossIndividual, createWorldBossEnemy, getWorldBossMasteryState, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v027-divine-awakening-1';
-import { applyWorldBossVariant, compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, recordWorldBossVariant, rollWorldBossVariant } from './world-boss-collection.js?v=v027-divine-awakening-1';
-import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v027-divine-awakening-1';
-import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v027-divine-awakening-1';
-import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v027-divine-awakening-1';
-import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v027-divine-awakening-1';
-import { ensureMarbleBattle, getCurrentMarble, getFormationRole, getFormationTier, getMarbleSkill, getMarbleUltimate, getUltimateEnergy, hitMultiplier } from './marble-battle.js?v=v027-divine-awakening-1';
-import { initializeBondRuntime, noteBondEvent, updateBondScheduler } from './bond-system.js?v=v027-divine-awakening-1';
-import { getMemberAwakening, isEquipmentLocked } from './equipment-awakening.js?v=v027-divine-awakening-1';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v030-yellow-heaven-1';
+import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v030-yellow-heaven-1';
+import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo, rollDivineTalismanDrops } from './boss-gear-system.js?v=v030-yellow-heaven-1';
+import { WORLD_BOSS, WORLD_BOSSES, addWorldBossToRoster, applyCapturedWorldBossIndividual, createWorldBossEnemy, getWorldBossMasteryState, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v030-yellow-heaven-1';
+import { applyWorldBossVariant, compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, recordWorldBossVariant, rollWorldBossVariant } from './world-boss-collection.js?v=v030-yellow-heaven-1';
+import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v030-yellow-heaven-1';
+import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v030-yellow-heaven-1';
+import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v030-yellow-heaven-1';
+import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v030-yellow-heaven-1';
+import { ensureMarbleBattle, getCurrentMarble, getFormationRole, getFormationTier, getMarbleSkill, getMarbleUltimate, getUltimateEnergy, hitMultiplier } from './marble-battle.js?v=v030-yellow-heaven-1';
+import { initializeBondRuntime, noteBondEvent, updateBondScheduler } from './bond-system.js?v=v030-yellow-heaven-1';
+import { getMemberAwakening, isEquipmentLocked } from './equipment-awakening.js?v=v030-yellow-heaven-1';
+import { CHAPTER3_BOSSES, ensureWorldAnomaly, isChapter3Area, isChapter3BossKind, recordChapter3Boss, recruitChapter3Boss, rollWorldBossIntrusion, spareChapter3Boss } from './chapter3-system.js?v=v030-yellow-heaven-1';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -84,7 +85,7 @@ export function getBossEncounterChance(count) {
 }
 
 export function checkBossEncounter(state, rng = Math.random, rarityRng = rng, areaId=state.screen) {
-  const chapterArea=['yellowRoad','yellowCamp','yellowFortress'].includes(areaId),counter=chapterArea?state.chapter2.bossPity:state.progress;
+  const chapter2Area=['yellowRoad','yellowCamp','yellowFortress'].includes(areaId),chapter3Area=isChapter3Area(areaId),chapterArea=chapter2Area||chapter3Area,counter=chapter3Area?state.chapter3.bossPity:chapter2Area?state.chapter2.bossPity:state.progress;
   const key=chapterArea?areaId:'bossEncounterCount';counter[key]=Math.max(0,Number(counter[key])||0)+1;
   const chance = getBossEncounterChance(counter[key]);
   if (!chance || rng() >= chance) return false;
@@ -295,6 +296,7 @@ export function refreshUnlocks(state) {
     return true;
   }
   if(!state.unlocks.chapter2&&state.progress.chapterOneComplete){state.unlocks.chapter2=true;state.chapter2.unlocked=true;state.progress.chapter2Unlocked=true;state.notice='第二章・黃巾之亂已解鎖！';return true;}
+  if(!state.unlocks.chapter3&&state.progress.chapter2Cleared){state.unlocks.chapter3=true;state.chapter3.unlocked=true;state.progress.chapter3Unlocked=true;state.notice='第三章・黃天崛起已解鎖！';return true;}
   return false;
 }
 
@@ -302,6 +304,7 @@ export function canEnterArea(state, areaId) {
   if (areaId === 'forest') return state.unlocks.forest || state.party[0]?.level >= AREAS.forest.level;
   if (areaId === 'stronghold') return Boolean(state.unlocks.stronghold);
   if(['yellowRoad','yellowCamp','yellowFortress'].includes(areaId))return Boolean(state.unlocks.chapter2||state.progress.chapterOneComplete);
+  if(isChapter3Area(areaId))return Boolean(state.unlocks.chapter3||state.progress.chapter2Cleared);
   return true;
 }
 
@@ -309,7 +312,7 @@ export function enterArea(state, areaId) {
   if (!AREAS[areaId]) return false;
   refreshUnlocks(state);
   if (!canEnterArea(state, areaId)) {
-    state.notice = ['yellowRoad','yellowCamp','yellowFortress'].includes(areaId)?'完成第一章後才能前往黃巾戰區。':areaId === 'stronghold' ? '黑風寨守衛森嚴，目前還不是進攻的時候。' : '需要 Lv.3 才能進入黑風森林。';
+    state.notice = isChapter3Area(areaId)?'完成第二章後才能前往天地異變區域。':['yellowRoad','yellowCamp','yellowFortress'].includes(areaId)?'完成第一章後才能前往黃巾戰區。':areaId === 'stronghold' ? '黑風寨守衛森嚴，目前還不是進攻的時候。' : '需要 Lv.3 才能進入黑風森林。';
     return false;
   }
   state.screen = areaId;
@@ -317,13 +320,16 @@ export function enterArea(state, areaId) {
   if (areaId === 'forest') state.progress.forestEntered = true;
   refreshUnlocks(state);
   if(areaId==='yellowRoad')state.chapter2.areas.yellowRoad=true;if(areaId==='yellowCamp')state.chapter2.areas.yellowCamp=true;if(areaId==='yellowFortress')state.chapter2.areas.yellowFortress=true;
+  if(isChapter3Area(areaId))state.chapter3.areas[areaId]=true;
   state.notice = areaId === 'forest' ? '林間黑風盤旋，新的敵人與裝備正在等待。' : areaId === 'stronghold' ? '你已攻入黑風寨，危險敵將可能隨時現身。' : areaId.startsWith('yellow')?'黃巾軍席捲各地，更強的敵人正在前方集結。':'你來到桃源村外的平原。';
   return true;
 }
 
 export function createEncounter(state, forcedId, rng = Math.random) {
-  if (state.battle || state.ui.bossWarning || state.dungeon.warning || state.dungeon.active) return null;
+  if (state.battle || state.ui.bossWarning || state.ui.worldBossIntrusion || state.dungeon.warning || state.dungeon.active) return null;
   const area = Object.values(AREAS).find(candidate => candidate.name === state.location) || AREAS.plain;
+  ensureWorldAnomaly(state);if(!forcedId&&isChapter3Area(area.id)&&rollWorldBossIntrusion(state,rng))return null;
+  if(!forcedId&&state.chapter3.phoenixUnlocked&&!state.chapter3.phoenixDefeated&&isChapter3Area(area.id)&&rng()<.018){state.ui.bossWarning=true;state.ui.bossKind='netherPhoenixBoss';state.ui.bossRarityRank=5;state.exploration.auto=false;state.notice='冥火重燃，幽冥鳳凰降臨！';return null;}
   if (!forcedId && checkDungeonEncounter(state, rng)) return null;
   if (!forcedId && (area.id === 'stronghold'||area.bossPool) && checkBossEncounter(state, rng,rng,area.id)) return null;
   const id = forcedId || pick(area.enemies, rng);
@@ -360,7 +366,7 @@ export function createBossEncounter(state, forcedRank) {
   const areaId=chapterBoss?state.screen:'stronghold';
   state.battle = { enemies, round: 1, awaitingCommand: false, finished: false, mode:'marble', areaId, boss: true, bossKind:boss.bossKind||null,bossRarityRank: rarityRank, awaitingRecruit: false, recommendedPower: boss.recommendedPower };
   ensureMarbleBattle(state.battle,state.party);
-  if(chapterBoss)recordChapter2Boss(state,boss.bossKind,rarityRank,'encounter');else recordBlackwindEncounter(state, rarityRank);
+  if(isChapter3BossKind(boss.bossKind))recordChapter3Boss(state,boss.bossKind,rarityRank,'encounter');else if(chapterBoss)recordChapter2Boss(state,boss.bossKind,rarityRank,'encounter');else recordBlackwindEncounter(state, rarityRank);
   state.log = [];
   appendLog(state, `${boss.displayName||boss.name}率軍迎戰！`, 'epic');
   state.notice = `${boss.name}挑戰開始！`;
@@ -433,6 +439,13 @@ export function performEnemyAction(state, enemy, rng = Math.random) {
   const target = pick(targets, rng);
   if (enemy.worldBoss) {
     const phase=enemy.phase||1, roll=rng();
+    if(enemy.worldBossId==='basaltTurtle'){
+      if(phase>=3&&roll<.45){const damage=targets.reduce((sum,unit)=>sum+dealDamage(state,enemy,unit,true,rng,'天地鎮壓',2.85),0);return{type:'earth-suppression',damage};}
+      if(phase>=3&&roll<.76){enemy.defense=Math.round(enemy.defense*1.08);appendLog(state,'玄武巨龜喚醒玄武神脈，防禦與反擊提升！','epic');return{type:'basalt-divinity'};}
+      if(phase>=2&&roll<.55){const damage=targets.reduce((sum,unit)=>sum+dealDamage(state,enemy,unit,true,rng,'地脈震波',1.85),0);return{type:'earth-wave',damage};}
+      if(roll<.62)return{type:'mountain-crush',damage:dealDamage(state,enemy,target,true,rng,'鎮岳重擊',2.35)};
+      enemy.defense=Math.round(enemy.defense*1.04);appendLog(state,'玄武守護凝成厚重岩甲！','rare');return{type:'turtle-guard'};
+    }
     if(enemy.worldBossId==='netherThunder'){
       if(phase>=3&&roll<.44){const damage=targets.reduce((sum,unit)=>sum+dealDamage(state,enemy,unit,true,rng,'天罰',2.7),0);return{type:'divine-punishment',damage};}
       if(phase>=3&&roll<.78){const hunted=[...targets].sort((a,b)=>a.hp/getFinalStats(state,a).maxHp-b.hp/getFinalStats(state,b).maxHp)[0];return{type:'thunder-hunt',targetId:hunted.id,damage:dealDamage(state,enemy,hunted,true,rng,'雷獄獵殺',3.05)};}
@@ -600,7 +613,7 @@ function finishVictory(state, rng) {
       if (id === 'advanced' && rank === 5) appendLog(state, '高階神兵素材！', 'epic');
     });
     recordMaterials(state, talismanDrops, divineDrops);
-    if (!worldBossBattle){if(state.battle.bossKind)recordChapter2Boss(state,state.battle.bossKind,rank,'defeat');else recordBlackwindDefeat(state, rank);}
+    if (!worldBossBattle){if(isChapter3BossKind(state.battle.bossKind))recordChapter3Boss(state,state.battle.bossKind,rank,'defeat');else if(state.battle.bossKind)recordChapter2Boss(state,state.battle.bossKind,rank,'defeat');else recordBlackwindDefeat(state, rank);}
     if (state.battle.dungeon) {
       const completionGold = 300 + rank * 120;
       state.gold += completionGold;
@@ -620,11 +633,13 @@ function finishVictory(state, rng) {
   state.battle.result = 'victory';
   state.battle.awaitingRecruit = bossBattle;
   if(state.battle.bossKind==='zhang-bao'){state.chapter2.cleared=true;state.progress.chapter2Cleared=true;state.worldBosses.netherThunder.unlocked=true;state.ui.chapter2Complete=true;}
-  const defeatedBossName=state.battle.bossKind?CHAPTER2_BOSSES[state.battle.bossKind].name:'黑風寨主';
+  if(state.battle.bossKind==='yellow-demon-general'){state.chapter3.cleared=true;state.chapter3.phoenixUnlocked=true;state.progress.chapter3Cleared=true;state.worldBosses.basaltTurtle.unlocked=true;state.ui.chapter3Complete=true;}
+  if(state.battle.bossKind==='nether-phoenix')state.chapter3.phoenixDefeated=true;
+  const defeatedBossName=state.battle.bossKind?(CHAPTER3_BOSSES[state.battle.bossKind]?.name||CHAPTER2_BOSSES[state.battle.bossKind]?.name||'敵將'):'黑風寨主';
   state.notice = worldBossBattle ? `${WORLD_BOSSES[state.battle.worldBossId||'crimsonTiger'].title}倒下了！` : state.battle.dungeon && bossBattle ? `秘境 Boss 已擊破！獲得 ${exp} EXP、${gold} 金與攻略完成獎勵。` : bossBattle ? `${defeatedBossName}已敗！全隊獲得 ${exp} EXP，取得 ${gold} 金。${dropId ? ` 獲得【${ITEMS[dropId].name}】！` : ''}${state.battle.bossKind==='zhang-bao'?' 第二章・黃巾之亂完成！':''}` : `戰鬥勝利！全隊獲得 ${exp} EXP，取得 ${gold} 金。${dropId ? ` 獲得【${ITEMS[dropId].name}】！` : ''}`;
   appendLog(state, state.notice, dropId ? 'drop' : '');
   const masteryGain = awardWorldBossMastery(state, state.battle);
-  if(masteryGain)for(const member of state.party.filter(unit=>unit?.worldBoss)){const id=member.id==='nether-thunder-beast'?'netherThunder':'crimsonTiger';appendLog(state,`${WORLD_BOSSES[id].name}獲得世界王熟練 ${masteryGain}。`,'rare');}
+  if(masteryGain)for(const member of state.party.filter(unit=>unit?.worldBoss)){const id=member.id==='basalt-turtle'?'basaltTurtle':member.id==='nether-thunder-beast'?'netherThunder':'crimsonTiger';appendLog(state,`${WORLD_BOSSES[id].name}獲得世界王熟練 ${masteryGain}。`,'rare');}
 }
 
 function finishDefeat(state) {
@@ -654,11 +669,11 @@ function updateWorldBossPhase(state, target) {
   if (!target?.worldBoss || target.hp <= 0) return;
   const ratio = target.hp / target.maxHp, id = target.worldBossId || 'crimsonTiger', targetState = getWorldBossState(state, id);
   if (ratio <= .35 && target.phase < 3) {
-    target.phase = 3; target.might = Math.round(target.might * (id === 'netherThunder' ? 1.32 : 1.28)); target.speed = Math.round(target.speed * (id === 'netherThunder' ? 1.25 : 1.18));
-    appendLog(state, id === 'netherThunder' ? '九幽雷獸進入神罰階段！' : '赤焰魔虎進入焚天階段！', 'epic');
+    target.phase = 3; target.might = Math.round(target.might * (id === 'basaltTurtle'?1.25:id === 'netherThunder' ? 1.32 : 1.28)); target.speed = Math.round(target.speed * (id === 'basaltTurtle'?1.08:id === 'netherThunder' ? 1.25 : 1.18));
+    appendLog(state, id==='basaltTurtle'?'玄武巨龜進入天地鎮壓階段！':id === 'netherThunder' ? '九幽雷獸進入神罰階段！' : '赤焰魔虎進入焚天階段！', 'epic');
   } else if (ratio <= .70 && target.phase < 2) {
-    target.phase = 2; target.might = Math.round(target.might * 1.18); target.speed = Math.round(target.speed * (id === 'netherThunder' ? 1.22 : 1.15));
-    appendLog(state, id === 'netherThunder' ? '九幽雷獸展開雷鎖領域！' : '赤焰魔虎進入烈焰狂暴！', 'epic');
+    target.phase = 2; target.might = Math.round(target.might * 1.18); target.speed = Math.round(target.speed * (id==='basaltTurtle'?1.05:id === 'netherThunder' ? 1.22 : 1.15));if(id==='basaltTurtle')target.defense=Math.round(target.defense*1.18);
+    appendLog(state, id==='basaltTurtle'?'玄武巨龜展開玄武守護！':id === 'netherThunder' ? '九幽雷獸展開雷鎖領域！' : '赤焰魔虎進入烈焰狂暴！', 'epic');
   }
   targetState.bestPhase = Math.max(targetState.bestPhase, target.phase); targetState.lowestHpPct = Math.min(targetState.lowestHpPct, Math.max(0, Math.round(ratio * 100)));
 }
@@ -739,7 +754,7 @@ export function resolveMarbleEvent(state,event,rng=Math.random){
   if(battle.worldBoss){const eventCapRate=marble.shot.ultimate?.24:(marble.ultimateGauge===0?.12:.055);damage=Math.min(damage,Math.max(1,Math.floor(target.maxHp*eventCapRate)));}
   if(!Number.isFinite(damage)||damage<1)damage=1;
   if(aw.extraHits){damage=Math.round(damage*(1+Math.min(2,aw.extraHits)*.16));marble.combo=(marble.combo||0)+aw.extraHits;marble.effects.push({type:'awakening',x:marble.boss.x,y:marble.boss.y+24,text:`神裝追擊 ${aw.extraHits} HIT`,life:.75});}
-  damage=Math.min(target.hp,damage);target.hp=Math.max(0,target.hp-damage);marble.shot.damage+=damage;if(marble.phase==='pinball'){marble.hitStop=Math.max(marble.hitStop,event.weak?.04:.02);marble.camera.shake=Math.max(marble.camera.shake,event.weak?.14:.04);marble.camera.nudgeX=(event.x||marble.boss.x)<marble.boss.x?4:-4;marble.boss.flash=.1;marble.boss.recoilX=((event.x||marble.boss.x)<marble.boss.x?1:-1)*(event.weak?12:5);}
+  damage=Math.min(target.hp,damage);target.hp=Math.max(0,target.hp-damage);marble.shot.damage+=damage;if(target.phoenix&&target.hp<=0&&!target.nirvanaUsed){target.nirvanaUsed=true;target.hp=Math.round(target.maxHp*.6);target.might=Math.round(target.might*1.22);target.speed=Math.round(target.speed*1.18);marble.effects.push({type:'ultimate',x:marble.boss.x,y:marble.boss.y,text:'涅槃重生！',life:1.4});appendLog(state,'幽冥鳳凰浴火涅槃，冥火力量全面提升！','epic');}if(marble.phase==='pinball'){marble.hitStop=Math.max(marble.hitStop,event.weak?.04:.02);marble.camera.shake=Math.max(marble.camera.shake,event.weak?.14:.04);marble.camera.nudgeX=(event.x||marble.boss.x)<marble.boss.x?4:-4;marble.boss.flash=.1;marble.boss.recoilX=((event.x||marble.boss.x)<marble.boss.x?1:-1)*(event.weak?12:5);}
   if(target.worldBoss){const records=getWorldBossRecordState(state,target.worldBossId||battle.worldBossId||'crimsonTiger');records.highestDamage=Math.max(records.highestDamage,damage);}
   if(marble.skillArmed&&skill.debuff&&hit===1)target.marbleDefenseDown=1;
   if((marble.skillArmed||member.id==='crimson-tiger')&&skill.burn&&hit===1){target.marbleBurn=2;const burn=Math.min(target.hp,Math.max(1,Math.round(damage*.18)));target.hp-=burn;marble.shot.damage+=burn;}
@@ -1118,7 +1133,7 @@ export function spareBlackwindLeader(state) {
   return true;
 }
 
-export { recruitChapter2Boss, spareChapter2Boss };
+export { recruitChapter2Boss, spareChapter2Boss,recruitChapter3Boss,spareChapter3Boss };
 
 export function continueAfterChapter(state) {
   state.ui.chapterComplete = false;

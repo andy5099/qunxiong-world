@@ -1,4 +1,4 @@
-import { ITEMS } from './data.js?v=v027-divine-awakening-1';
+import { ITEMS } from './data.js?v=v030-yellow-heaven-1';
 
 export const AWAKENING_COSTS = Object.freeze({
   1: { copies: 1, talisman: 'novice', amount: 1 },
@@ -19,7 +19,10 @@ export const EQUIPMENT_AWAKENING_DATA = Object.freeze({
   commanderSpear: stages('破軍追魂槍・神','yellow-commander','破軍追殺',[{mightPct:.05,executeBonus:.08},{mightPct:.09,executeBonus:.14,extraHits:1},{mightPct:.14,executeBonus:.22,extraHits:2}],['yellow-heaven','yellow-vanguard']),
   earthLordSword: stages('黃天神雷劍','zhang-bao','黃天雷陣',[{mightPct:.05,lightningBonus:.08},{mightPct:.09,lightningBonus:.14,extraHits:1},{mightPct:.14,lightningBonus:.22,extraHits:2}],['yellow-heaven','blackwind-thunder','saint-thunder']),
   crimsonTigerClaw: stages('赤焰天災爪・神','crimson-tiger','焚天狂襲',[{mightPct:.05,burnBonus:.08},{mightPct:.1,burnBonus:.15,extraHits:1},{mightPct:.16,burnBonus:.24,extraHits:2,ultimateBonus:.12}],['fire-thunder']),
-  netherThunderClaw: stages('九幽天罰爪・神','nether-thunder-beast','雷影穿界',[{mightPct:.05,lightningBonus:.08},{mightPct:.1,lightningBonus:.15,extraHits:1},{mightPct:.16,lightningBonus:.24,extraHits:2,ultimateBonus:.12}],['fire-thunder'])
+  netherThunderClaw: stages('九幽天罰爪・神','nether-thunder-beast','雷影穿界',[{mightPct:.05,lightningBonus:.08},{mightPct:.1,lightningBonus:.15,extraHits:1},{mightPct:.16,lightningBonus:.24,extraHits:2,ultimateBonus:.12}],['fire-thunder']),
+  mountainStone:stages('鎮岳神石・神','basalt-turtle','天地鎮壓',[{defensePct:.06,breakBonus:10},{defensePct:.11,breakBonus:18,extraHits:1},{defensePct:.17,breakBonus:28,extraHits:2,ultimateBonus:.12}],['earth-thunder']),
+  phoenixFeatherBlade:stages('幽冥鳳羽刃・神','nether-phoenix','涅槃穿焰',[{mightPct:.05,burnBonus:.08},{mightPct:.1,burnBonus:.15,extraHits:1},{mightPct:.16,burnBonus:.24,extraHits:2}],['phoenix-fire']),
+  yellowHeavenSeal:stages('黃天秘印・神','yellow-demon-general','黃天祭雷',[{mightPct:.04,lightningBonus:.07},{mightPct:.08,lightningBonus:.13,extraHits:1},{mightPct:.13,lightningBonus:.2,extraHits:2}],['yellow-demon'])
 });
 
 export function normalizeEquipmentAwakening(raw = {}, inventory = {}) {

@@ -1,10 +1,11 @@
-import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v027-divine-awakening-1';
-import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v027-divine-awakening-1';
-import { WORLD_BOSSES, normalizeWorldBoss } from './world-boss-system.js?v=v027-divine-awakening-1';
-import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v027-divine-awakening-1';
-import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v027-divine-awakening-1';
-import { discoverActiveBonds, normalizeBondState } from './bond-system.js?v=v027-divine-awakening-1';
-import { normalizeEquipmentAwakening } from './equipment-awakening.js?v=v027-divine-awakening-1';
+import { ITEMS, SAVE_VERSION, createBasaltTurtle, createBlackwindLeader, createChapter3BossMember, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v030-yellow-heaven-1';
+import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v030-yellow-heaven-1';
+import { WORLD_BOSSES, normalizeWorldBoss } from './world-boss-system.js?v=v030-yellow-heaven-1';
+import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v030-yellow-heaven-1';
+import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v030-yellow-heaven-1';
+import { discoverActiveBonds, normalizeBondState } from './bond-system.js?v=v030-yellow-heaven-1';
+import { normalizeEquipmentAwakening } from './equipment-awakening.js?v=v030-yellow-heaven-1';
+import { ensureWorldAnomaly, normalizeChapter3, normalizeChapter3Codex, normalizeWorldAnomaly } from './chapter3-system.js?v=v030-yellow-heaven-1';
 
 export const STORAGE_KEY = 'qunxiong-world-v01';
 const LEGACY_KEY = 'qunxiong-world-v2';
@@ -25,27 +26,27 @@ export function createState(playerName) {
       'guan-yu': { weapon: null, armor: null, accessory: null },
       'zhang-fei': { weapon: null, armor: null, accessory: null },
       'blackwind-lord': { weapon: null, armor: null, accessory: null }
-      ,'crimson-tiger': { weapon: null, armor: null, accessory: null },'yellow-captain':{weapon:null,armor:null,accessory:null},'yellow-commander':{weapon:null,armor:null,accessory:null},'zhang-bao':{weapon:null,armor:null,accessory:null},'nether-thunder-beast':{weapon:null,armor:null,accessory:null}
+      ,'crimson-tiger': { weapon: null, armor: null, accessory: null },'yellow-captain':{weapon:null,armor:null,accessory:null},'yellow-commander':{weapon:null,armor:null,accessory:null},'zhang-bao':{weapon:null,armor:null,accessory:null},'nether-thunder-beast':{weapon:null,armor:null,accessory:null},'basalt-turtle':{weapon:null,armor:null,accessory:null},'storm-warden':{weapon:null,armor:null,accessory:null},'earth-brute':{weapon:null,armor:null,accessory:null},'yellow-demon-general':{weapon:null,armor:null,accessory:null},'nether-phoenix':{weapon:null,armor:null,accessory:null}
     },
-    unlocks: { forest: false, stronghold: false, chapter2: false },
-    progress: { forestEntered: false, strongholdKills: 0, bossUnlocked: false, bossDefeated: false, bossFirstKill: false, bossRecruited: false, chapterOneComplete: false, chapter2Unlocked:false, chapter2Cleared:false, totalKills: 0, elitesDefeated: 0, bossEncounterCount: 0, bossEncounters: 0 },
+    unlocks: { forest: false, stronghold: false, chapter2: false,chapter3:false },
+    progress: { forestEntered: false, strongholdKills: 0, bossUnlocked: false, bossDefeated: false, bossFirstKill: false, bossRecruited: false, chapterOneComplete: false, chapter2Unlocked:false, chapter2Cleared:false,chapter3Unlocked:false,chapter3Cleared:false, totalKills: 0, elitesDefeated: 0, bossEncounterCount: 0, bossEncounters: 0 },
     bossProgress: normalizeBossProgress(),
     worldBoss: normalizeWorldBoss(),
-    worldBosses: { netherThunder: normalizeWorldBoss() },
+    worldBosses: { netherThunder: normalizeWorldBoss(),basaltTurtle:normalizeWorldBoss() },
     bossCodex: normalizeBossCodex(),
     worldBossCodex: normalizeWorldBossCodex(),
-    worldBossCodices: { netherThunder: normalizeWorldBossCodex({},NETHER_WORLD_BOSS_DROPS) },
+    worldBossCodices: { netherThunder: normalizeWorldBossCodex({},NETHER_WORLD_BOSS_DROPS),basaltTurtle:normalizeWorldBossCodex({},['basaltShell','mountainStone','mysticTurtleCharm']) },
     collectionMilestones: { claimed: { 25: false, 50: false, 75: false, 100: false } },
     worldBossMastery: normalizeWorldBossMastery(),
-    worldBossMasteries: { netherThunder: normalizeWorldBossMastery() },
+    worldBossMasteries: { netherThunder: normalizeWorldBossMastery(),basaltTurtle:normalizeWorldBossMastery() },
     worldBossRecords: { fastestRound: null, highestDamage: 0 },
-    worldBossRecordsById: { netherThunder: { fastestRound:null,highestDamage:0 } },
+    worldBossRecordsById: { netherThunder: { fastestRound:null,highestDamage:0 },basaltTurtle:{fastestRound:null,highestDamage:0} },
     chapter2: normalizeChapter2(),
-    chapter2Codex: normalizeChapter2Codex(),
+    chapter2Codex: normalizeChapter2Codex(),chapter3:normalizeChapter3(),chapter3Codex:normalizeChapter3Codex(),worldAnomaly:normalizeWorldAnomaly(),
     bonds: normalizeBondState(),
     equipmentAwakening: normalizeEquipmentAwakening(),
     roster: [],
-    ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false, chapter2Complete:false, bossWarning: false, bossRarityRank: null, bossKind:null, worldBossConfirm: false, worldBossCandidate:null, selectedWorldBoss:'crimsonTiger', codexDetail: null, captureResult: null, worldBossComparison:null, quickEquipItem: null, partyEquipMember: null, partyEquipSlot: null, partySwapSlot:null, candidateSort:'power', optimizeChanges: [], awakeningItem:null, awakeningConfirm:false },
+    ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false, chapter2Complete:false,chapter3Complete:false,worldBossIntrusion:null, bossWarning: false, bossRarityRank: null, bossKind:null, worldBossConfirm: false, worldBossCandidate:null, selectedWorldBoss:'crimsonTiger', codexDetail: null, captureResult: null, worldBossComparison:null, quickEquipItem: null, partyEquipMember: null, partyEquipSlot: null, partySwapSlot:null, candidateSort:'power', optimizeChanges: [], awakeningItem:null, awakeningConfirm:false },
     settings: { autoBattle: false },
     exploration: { auto: false, active: false },
     dungeon: { warning: false, active: false, name: '血色洞窟', dungeonId:'bloodCavern', floor: 0, sourceScreen: null, sourceLocation: null, pity: 0, awaitingAdvance: false, completed: false, loot: { gold: 0, potion: 0, items: [], talismans: {} } },
@@ -102,7 +103,7 @@ export function normalize(raw) {
   }
   party[0].name = base.playerName;
   const activeIds = new Set(party.filter(Boolean).map(member => member.id));
-  const memberFallback=member=>member?.id==='crimson-tiger'?createCrimsonTiger():member?.id==='nether-thunder-beast'?createNetherThunderBeast():['yellow-captain','yellow-commander','zhang-bao'].includes(member?.id)?createYellowBossMember(member.id):null;
+  const memberFallback=member=>member?.id==='crimson-tiger'?createCrimsonTiger():member?.id==='nether-thunder-beast'?createNetherThunderBeast():member?.id==='basalt-turtle'?createBasaltTurtle():['storm-warden','earth-brute','yellow-demon-general','nether-phoenix'].includes(member?.id)?createChapter3BossMember(member.id):['yellow-captain','yellow-commander','zhang-bao'].includes(member?.id)?createYellowBossMember(member.id):null;
   const roster = Array.isArray(raw.roster) ? raw.roster.map(member => normalizeMember(member, memberFallback(member))).filter(member => member && !activeIds.has(member.id)).slice(0,20) : [];
   if (progress.bossRecruited && !party.some(member => member?.id === 'blackwind-lord') && !roster.some(member => member?.id === 'blackwind-lord')) roster.push(createBlackwindLeader());
   const worldBoss = normalizeWorldBoss({ ...(raw.worldBoss || {}), unlocked: raw.worldBoss?.unlocked || progress.chapterOneComplete });
@@ -112,7 +113,9 @@ export function normalize(raw) {
   progress.chapter2Unlocked=Boolean(progress.chapter2Unlocked||chapter2.unlocked);progress.chapter2Cleared=Boolean(progress.chapter2Cleared||chapter2.cleared);
   const netherThunder=normalizeWorldBoss(raw.worldBosses?.netherThunder,progress.chapter2Cleared);
   if(party.some(member=>member?.id==='nether-thunder-beast')||roster.some(member=>member?.id==='nether-thunder-beast'))netherThunder.captured=true;
-  for(const [id,record] of Object.entries({crimsonTiger:worldBoss,netherThunder})){
+  const chapter3=normalizeChapter3({...(raw.chapter3||{}),unlocked:raw.chapter3?.unlocked||progress.chapter2Cleared,cleared:raw.chapter3?.cleared||progress.chapter3Cleared});progress.chapter3Unlocked=Boolean(progress.chapter3Unlocked||chapter3.unlocked);progress.chapter3Cleared=Boolean(progress.chapter3Cleared||chapter3.cleared);
+  const basaltTurtle=normalizeWorldBoss(raw.worldBosses?.basaltTurtle,progress.chapter3Cleared);if(party.some(member=>member?.id==='basalt-turtle')||roster.some(member=>member?.id==='basalt-turtle'))basaltTurtle.captured=true;
+  for(const [id,record] of Object.entries({crimsonTiger:worldBoss,netherThunder,basaltTurtle})){
     const profile=WORLD_BOSSES[id],member=[...party,...roster].find(candidate=>candidate?.id===profile.memberId);
     if(member){record.captured=true;record.currentIndividual||={quality:member.individualQuality||'normal',talentId:member.individualTalent||null};record.highestCapturedQuality=record.highestCapturedQuality||record.currentIndividual.quality;member.individualQuality=record.currentIndividual.quality;member.individualTalent=record.currentIndividual.talentId;}
   }
@@ -153,33 +156,33 @@ export function normalize(raw) {
       ...(raw.unlocks || {}),
       forest: Boolean(raw.unlocks?.forest || party[0].level >= 3),
       stronghold: Boolean(raw.unlocks?.stronghold || (party[0].level >= 5 && progress.forestEntered))
-      ,chapter2:Boolean(raw.unlocks?.chapter2||progress.chapterOneComplete)
+      ,chapter2:Boolean(raw.unlocks?.chapter2||progress.chapterOneComplete),chapter3:Boolean(raw.unlocks?.chapter3||progress.chapter2Cleared)
     },
     progress,
     roster,
     worldBoss,
-    worldBosses:{netherThunder},
+    worldBosses:{netherThunder,basaltTurtle},
     bossCodex: normalizeBossCodex(raw.bossCodex),
     worldBossCodex: normalizeWorldBossCodex(raw.worldBossCodex),
-    worldBossCodices:{netherThunder:normalizeWorldBossCodex(raw.worldBossCodices?.netherThunder,NETHER_WORLD_BOSS_DROPS)},
+    worldBossCodices:{netherThunder:normalizeWorldBossCodex(raw.worldBossCodices?.netherThunder,NETHER_WORLD_BOSS_DROPS),basaltTurtle:normalizeWorldBossCodex(raw.worldBossCodices?.basaltTurtle,['basaltShell','mountainStone','mysticTurtleCharm'])},
     collectionMilestones: { claimed: { ...base.collectionMilestones.claimed, ...(raw.collectionMilestones?.claimed || {}) } },
     worldBossMastery: normalizeWorldBossMastery(raw.worldBossMastery),
-    worldBossMasteries:{netherThunder:normalizeWorldBossMastery(raw.worldBossMasteries?.netherThunder)},
+    worldBossMasteries:{netherThunder:normalizeWorldBossMastery(raw.worldBossMasteries?.netherThunder),basaltTurtle:normalizeWorldBossMastery(raw.worldBossMasteries?.basaltTurtle)},
     worldBossRecords: { fastestRound: Number(raw.worldBossRecords?.fastestRound) > 0 ? Number(raw.worldBossRecords.fastestRound) : null, highestDamage: Math.max(0, Number(raw.worldBossRecords?.highestDamage) || 0) },
-    worldBossRecordsById:{netherThunder:{fastestRound:Number(raw.worldBossRecordsById?.netherThunder?.fastestRound)>0?Number(raw.worldBossRecordsById.netherThunder.fastestRound):null,highestDamage:Math.max(0,Number(raw.worldBossRecordsById?.netherThunder?.highestDamage)||0)}},
-    chapter2,chapter2Codex:normalizeChapter2Codex(raw.chapter2Codex),
+    worldBossRecordsById:{netherThunder:{fastestRound:Number(raw.worldBossRecordsById?.netherThunder?.fastestRound)>0?Number(raw.worldBossRecordsById.netherThunder.fastestRound):null,highestDamage:Math.max(0,Number(raw.worldBossRecordsById?.netherThunder?.highestDamage)||0)},basaltTurtle:{fastestRound:Number(raw.worldBossRecordsById?.basaltTurtle?.fastestRound)>0?Number(raw.worldBossRecordsById.basaltTurtle.fastestRound):null,highestDamage:Math.max(0,Number(raw.worldBossRecordsById?.basaltTurtle?.highestDamage)||0)}},
+    chapter2,chapter2Codex:normalizeChapter2Codex(raw.chapter2Codex),chapter3,chapter3Codex:normalizeChapter3Codex(raw.chapter3Codex),worldAnomaly:normalizeWorldAnomaly(raw.worldAnomaly),
     bonds:normalizeBondState(raw.bonds),
     equipmentAwakening:normalizeEquipmentAwakening(raw.equipmentAwakening,raw.inventory),
     dungeon,
     bossProgress: normalizeBossProgress(raw.bossProgress),
-    ui: { ...base.ui, ...(raw.ui || {}), bossWarning: false, bossRarityRank: null, worldBossConfirm: false, worldBossCandidate:null, captureResult: null, worldBossComparison:null, optimizeChanges: [], awakeningItem:null, awakeningConfirm:false },
+    ui: { ...base.ui, ...(raw.ui || {}), bossWarning: false, bossRarityRank: null, worldBossConfirm: false, worldBossCandidate:null,worldBossIntrusion:null, captureResult: null, worldBossComparison:null, optimizeChanges: [], awakeningItem:null, awakeningConfirm:false },
     settings: { ...base.settings, ...(raw.settings || {}) },
     exploration: { ...base.exploration, ...(raw.exploration || {}), auto: false, active: false },
     battle: null,
     log: Array.isArray(raw.log) ? raw.log.slice(-60) : [],
-    screen: dungeonSource && (rawDungeon.active || rawDungeon.warning) ? dungeonSource : ['village', 'plain', 'forest', 'stronghold','yellowRoad','yellowCamp','yellowFortress', 'worldBoss', 'bossCodex', 'bonds', 'party', 'inventory', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
+    screen: dungeonSource && (rawDungeon.active || rawDungeon.warning) ? dungeonSource : ['village', 'plain', 'forest', 'stronghold','yellowRoad','yellowCamp','yellowFortress','desolateVillage','loessSlope','thunderValley','yellowHeavenAltar', 'worldBoss', 'bossCodex', 'bonds', 'party', 'inventory', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
   };
-  discoverActiveBonds(normalized);
+  ensureWorldAnomaly(normalized);discoverActiveBonds(normalized);
   return syncCodexFromState(normalized);
 }
 

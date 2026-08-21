@@ -16,7 +16,8 @@ export const WORLD_BOSS_VARIANT_CONFIG = {
       rare:[{id:'thunderRush',name:'雷迅',description:'Dash 後保留更多速度。'}],
       epic:[{id:'thunderChain',name:'雷鏈',description:'穿透 Boss 後追加雷鏈 Hit。'},{id:'thunderField',name:'雷域',description:'Power Flip 後短時間追加雷擊。'}],
       legendary:[{id:'netherLightning',name:'九幽神雷',description:'Power MAX 後進入雷化，獲得穿透與追加天雷。'}]
-    }
+    },
+    basaltTurtle:{rare:[{id:'stoneGuard',name:'磐石',description:'防禦與 BREAK 抗性小幅提高。'}],epic:[{id:'mountainSoul',name:'山魂',description:'受擊後強化鎮岳反擊。'},{id:'earthPulse',name:'地脈',description:'Power Flip 時追加地脈衝擊。'}],legendary:[{id:'basaltDivinity',name:'玄武神脈',description:'Power MAX 後強化天地鎮壓與護體。'}]}
   }
 };
 

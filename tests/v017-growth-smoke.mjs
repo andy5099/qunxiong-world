@@ -7,7 +7,7 @@ import { WORLD_BOSS_BREAKTHROUGH_COSTS, breakthroughWorldBoss, canBreakthrough, 
 import { render } from '../src/ui.js';
 
 let passed=0;const check=(v,m)=>{if(!v)throw new Error(m);passed++};const equal=(a,b,m)=>check(a===b,`${m}: ${a} !== ${b}`);
-equal(SAVE_VERSION,17,'save v17');
+equal(SAVE_VERSION,18,'save v17');
 const tigerState=createState('突破測試');tigerState.worldBoss.captured=true;tigerState.party[4]=createCrimsonTiger();tigerState.equipment['crimson-tiger'].weapon='crimsonTigerClaw';tigerState.inventory.crimsonTigerClaw=1;tigerState.worldBossMastery.exp=345;
 const level=tigerState.party[4].level,exp=tigerState.party[4].exp,gear=tigerState.equipment['crimson-tiger'].weapon,mastery=tigerState.worldBossMastery.exp;
 check(!canBreakthrough(tigerState),'insufficient materials blocked');

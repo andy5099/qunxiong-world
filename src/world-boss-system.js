@@ -1,6 +1,6 @@
-import { createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v027-divine-awakening-1';
-import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v027-divine-awakening-1';
-import { compareWorldBossQuality, normalizeWorldBossIndividual } from './world-boss-collection.js?v=v027-divine-awakening-1';
+import { createBasaltTurtle, createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v030-yellow-heaven-1';
+import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v030-yellow-heaven-1';
+import { compareWorldBossQuality, normalizeWorldBossIndividual } from './world-boss-collection.js?v=v030-yellow-heaven-1';
 
 export const WORLD_BOSSES = {
   crimsonTiger: {
@@ -12,13 +12,14 @@ export const WORLD_BOSSES = {
     id: 'netherThunder', memberId: 'nether-thunder-beast', name: '九幽雷獸', title: '世界王・九幽雷獸', recommendedPower: 52000, captureRate: 0.05,
     stats: { level: 42, maxHp: 22800, maxMp: 260, might: 455, defense: 220, speed: 142, exp: 10800, gold: [7600, 9800] },
     drops: ['netherThunderClaw','netherThunderArmor','thunderEmperorSeal'], createMember: createNetherThunderBeast
-  }
+  },
+  basaltTurtle:{id:'basaltTurtle',memberId:'basalt-turtle',name:'玄武巨龜',title:'世界王・玄武巨龜',recommendedPower:78000,captureRate:.04,stats:{level:52,maxHp:36000,maxMp:320,might:590,defense:360,speed:72,exp:16800,gold:[11600,14800]},drops:['basaltShell','mountainStone','mysticTurtleCharm'],createMember:createBasaltTurtle}
 };
 export const WORLD_BOSS = WORLD_BOSSES.crimsonTiger;
 
 export function createWorldBossEnemy(id = 'crimsonTiger') {
   const profile = WORLD_BOSSES[id] || WORLD_BOSS;
-  return { id: `${profile.id}Boss`, worldBossId: profile.id, instanceId: `world-boss-${profile.id}`, name: profile.name, displayName: profile.title, ...profile.stats, hp: profile.stats.maxHp, mp: profile.stats.maxMp, side:'enemy', boss:true, worldBoss:true, battleMode:'puzzle', phase:1, rarityRank:5, rarityStars:'★★★★★', assaultMultiplier:id==='netherThunder'?2.45:2.2 };
+  return { id: `${profile.id}Boss`, worldBossId: profile.id, instanceId: `world-boss-${profile.id}`, name: profile.name, displayName: profile.title, ...profile.stats, hp: profile.stats.maxHp, mp: profile.stats.maxMp, side:'enemy', boss:true, worldBoss:true, battleMode:'puzzle', phase:1, rarityRank:5, rarityStars:'★★★★★', assaultMultiplier:id==='basaltTurtle'?2.7:id==='netherThunder'?2.45:2.2 };
 }
 
 export function normalizeWorldBoss(raw = {}, unlocked = false) {
@@ -58,6 +59,11 @@ export function getWorldBossResonance(state, memberOrId) {
     if(slots.armor==='netherThunderArmor'){result.hpPct+=.14;result.defensePct+=.12;result.set=result.set||'雷甲護體';}
     if(slots.accessory==='thunderEmperorSeal'){result.skillPct+=.14;result.set=result.set||'雷帝威壓';}
     if(slots.weapon==='netherThunderClaw'&&slots.armor==='netherThunderArmor'&&slots.accessory==='thunderEmperorSeal'){result.set='九幽雷帝';result.mightPct+=.12;result.speedPct+=.10;result.skillPct+=.14;}
+  } else if(member.id==='basalt-turtle'){
+    if(slots.weapon==='mountainStone'){result.mightPct+=.13;result.defensePct+=.06;result.set='鎮岳之力';}
+    if(slots.armor==='basaltShell'){result.hpPct+=.18;result.defensePct+=.16;result.set=result.set||'玄武神甲';}
+    if(slots.accessory==='mysticTurtleCharm'){result.skillPct+=.16;result.hpPct+=.08;result.set=result.set||'玄靈護體';}
+    if(slots.weapon==='mountainStone'&&slots.armor==='basaltShell'&&slots.accessory==='mysticTurtleCharm'){result.set='玄武鎮天';result.mightPct+=.12;result.defensePct+=.14;result.skillPct+=.16;}
   }
   return result;
 }
