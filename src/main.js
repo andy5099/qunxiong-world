@@ -1,14 +1,14 @@
-import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, prepareWorldBossChallenge, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, resolveWorldBossIndividual, retreatFromBoss, retreatFlipperBattle, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v026-bonds-combo-2';
-import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v026-bonds-combo-2';
-import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v026-bonds-combo-2';
-import { clearSave, createState, load, save } from './store.js?v=v026-bonds-combo-2';
-import { render, renderCreation, renderMarblePanel } from './ui.js?v=v026-bonds-combo-2';
-import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v026-bonds-combo-2';
-import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v026-bonds-combo-2';
-import { claimCollectionMilestone } from './boss-codex-system.js?v=v026-bonds-combo-2';
-import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v026-bonds-combo-2';
-import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v026-bonds-combo-2';
-import { discoverActiveBonds } from './bond-system.js?v=v026-bonds-combo-2';
+import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, prepareWorldBossChallenge, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, resolveWorldBossIndividual, retreatFromBoss, retreatFlipperBattle, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v026-bonds-combo-3';
+import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v026-bonds-combo-3';
+import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v026-bonds-combo-3';
+import { clearSave, createState, load, save } from './store.js?v=v026-bonds-combo-3';
+import { render, renderCreation, renderMarblePanel } from './ui.js?v=v026-bonds-combo-3';
+import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v026-bonds-combo-3';
+import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v026-bonds-combo-3';
+import { claimCollectionMilestone } from './boss-codex-system.js?v=v026-bonds-combo-3';
+import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v026-bonds-combo-3';
+import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v026-bonds-combo-3';
+import { discoverActiveBonds } from './bond-system.js?v=v026-bonds-combo-3';
 
 const app = document.querySelector('#app');
 const boot = window.__QX_BOOT__ || { mark() {}, fail() {}, ready() {} };
@@ -208,7 +208,7 @@ window.addEventListener('pagehide', () => { stopLoop(); cleanupMarbleBattle(stat
 
 if ('serviceWorker' in navigator) {
   boot.mark('SW REGISTER');
-  const buildVersion = 'v026-bonds-combo-2';
+  const buildVersion = 'v026-bonds-combo-3';
   const reloadKey = `sw-reloaded-${buildVersion}`;
   let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
