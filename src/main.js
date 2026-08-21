@@ -1,14 +1,15 @@
-import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, prepareWorldBossChallenge, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, resolveWorldBossIndividual, retreatFromBoss, retreatFlipperBattle, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v026-bonds-combo-3';
-import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v026-bonds-combo-3';
-import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v026-bonds-combo-3';
-import { clearSave, createState, load, save } from './store.js?v=v026-bonds-combo-3';
-import { render, renderCreation, renderMarblePanel } from './ui.js?v=v026-bonds-combo-3';
-import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v026-bonds-combo-3';
-import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v026-bonds-combo-3';
-import { claimCollectionMilestone } from './boss-codex-system.js?v=v026-bonds-combo-3';
-import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v026-bonds-combo-3';
-import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v026-bonds-combo-3';
-import { discoverActiveBonds } from './bond-system.js?v=v026-bonds-combo-3';
+import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, prepareWorldBossChallenge, recruitBlackwindLeader, recruitChapter2Boss, refreshUnlocks, resolveFormationAttack, resolveRound, resolveWorldBossIndividual, retreatFromBoss, retreatFlipperBattle, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v027-divine-awakening-1';
+import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v027-divine-awakening-1';
+import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v027-divine-awakening-1';
+import { clearSave, createState, load, save } from './store.js?v=v027-divine-awakening-1';
+import { render, renderCreation, renderMarblePanel } from './ui.js?v=v027-divine-awakening-1';
+import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v027-divine-awakening-1';
+import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v027-divine-awakening-1';
+import { claimCollectionMilestone } from './boss-codex-system.js?v=v027-divine-awakening-1';
+import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v027-divine-awakening-1';
+import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v027-divine-awakening-1';
+import { discoverActiveBonds } from './bond-system.js?v=v027-divine-awakening-1';
+import { awakenEquipment, toggleEquipmentLock } from './equipment-awakening.js?v=v027-divine-awakening-1';
 
 const app = document.querySelector('#app');
 const boot = window.__QX_BOOT__ || { mark() {}, fail() {}, ready() {} };
@@ -159,6 +160,12 @@ app.addEventListener('click', event => {
   else if (action === 'combine-all-divine') combineAllDivineTalismans(state);
   else if (action.startsWith('combine-divine:')) combineDivineTalismans(state, action.slice(16));
   else if (action.startsWith('evolve-boss-gear:')) evolveBossGear(state, action.slice(17));
+  else if(action.startsWith('awakening:view:')){state.ui.awakeningItem=action.slice(15);state.ui.awakeningConfirm=false;}
+  else if(action==='awakening:close'){state.ui.awakeningItem=null;state.ui.awakeningConfirm=false;}
+  else if(action.startsWith('awakening:filter:'))state.equipmentAwakening.filter=action.slice(18);
+  else if(action.startsWith('awakening:lock:')){const id=action.slice(15),locked=toggleEquipmentLock(state,id);state.notice=locked?'裝備已鎖定。':'裝備已解除鎖定。';state.ui.awakeningConfirm=false;}
+  else if(action.startsWith('awakening:confirm:'))state.ui.awakeningConfirm=true;
+  else if(action.startsWith('awakening:execute:')){const result=awakenEquipment(state,action.slice(18));state.notice=result.ok?`神裝覺醒成功！【${result.name}】達到覺醒 ${result.level}。`:result.reason;state.ui.awakeningConfirm=false;}
   else if (action.startsWith('roster-deploy:')) { const [,id,slot]=action.split(':'); deployRosterMember(state,id,slot); }
   else if(action.startsWith('party-swap-open:'))state.ui.partySwapSlot=Number(action.slice(16));
   else if(action==='party-swap-close')state.ui.partySwapSlot=null;
@@ -208,7 +215,7 @@ window.addEventListener('pagehide', () => { stopLoop(); cleanupMarbleBattle(stat
 
 if ('serviceWorker' in navigator) {
   boot.mark('SW REGISTER');
-  const buildVersion = 'v026-bonds-combo-3';
+  const buildVersion = 'v027-divine-awakening-1';
   const reloadKey = `sw-reloaded-${buildVersion}`;
   let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {

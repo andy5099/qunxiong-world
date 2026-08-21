@@ -1,5 +1,5 @@
-import { ITEMS, createYellowBossMember } from './data.js?v=v026-bonds-combo-3';
-import { applyLeaderRarity, getBossRarity, getCaptureRate } from './boss-progression.js?v=v026-bonds-combo-3';
+import { ITEMS, createYellowBossMember } from './data.js?v=v027-divine-awakening-1';
+import { applyLeaderRarity, getBossRarity, getCaptureRate } from './boss-progression.js?v=v027-divine-awakening-1';
 
 export const CHAPTER2_BOSSES={
   'yellow-captain':{name:'黃巾校尉',enemyId:'yellowCaptainBoss',role:'坦克',drops:['captainBlade','yellowHeavyArmor','captainToken'],resonance:'鐵壁統領'},

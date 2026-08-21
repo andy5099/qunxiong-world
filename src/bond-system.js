@@ -9,6 +9,8 @@ export const BOND_DATA = Object.freeze([
   {id:'saint-thunder',name:'武聖雷引',comboName:'武聖・引雷斬',requiredCharacterIds:['guan-yu','zhang-bao'],minimumActiveCount:1,triggerType:['weak'],effectType:'weakLightning',cooldown:9,priority:5,visualTheme:'jadeThunder',description:'武聖命中弱點後引落追擊雷。',hint:'青龍刀光引動天雷'}
 ]);
 
+import { getBondAwakeningBonus } from './equipment-awakening.js?v=v027-divine-awakening-1';
+
 export function normalizeBondState(raw={}){
   return {discovered:[...new Set(Array.isArray(raw.discovered)?raw.discovered.filter(id=>BOND_DATA.some(b=>b.id===id)):[])],codex:{...(raw.codex||{})}};
 }
@@ -63,6 +65,7 @@ export function executeBondCombo(state,bond){
   if(bond.effectType==='wallStorm'){hits=7;multiplier=2.15;marble.combo=Math.max(marble.combo,30)+hits;marble.comboTime=3;}
   if(bond.effectType==='worldCataclysm'){hits=8+(talents.has('thunderChain')?1:0)+(talents.has('netherLightning')?2:0);multiplier=2.45+legendary.length*.22+(talents.has('wildfire')?.12:0);boss.marbleBurn=Math.max(boss.marbleBurn||0,talents.has('heavenBlood')?4:3);marble.combo+=hits;marble.comboTime=4;marble.climaxTime=Math.max(marble.climaxTime,1.5+(talents.has('heavenBlood')?.4:0));}
   if(bond.effectType==='weakLightning'){hits=3;multiplier=1.8;}
+  const awakening=getBondAwakeningBonus(state,bond.id);hits+=awakening.extraHits;multiplier*=awakening.multiplier;if(awakening.extraHits)marble.effects.push({type:'awakening-bond',x:marble.boss.x,y:marble.boss.y+28,text:'神裝羈絆進化！',life:1});
   const damage=cappedDamage(battle,boss,might*multiplier,hits);marble.shot.damage=(marble.shot.damage||0)+damage;marble.camera.shake=Math.max(marble.camera.shake||0,.3);marble.hitStop=Math.max(marble.hitStop||0,.08);marble.effects.push({type:`bond-${bond.visualTheme}`,bondId:bond.id,participants:units.map(unit=>unit.id),x:marble.boss.x,y:marble.boss.y+48,text:`${bond.name}・${bond.comboName}`,life:1.3});marble.effects.push({type:'bond-damage',x:marble.boss.x,y:marble.boss.y+75,text:`-${damage}`,life:1});marble.lastProgressAt=Date.now();return damage;
 }
 

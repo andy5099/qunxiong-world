@@ -1,4 +1,4 @@
-import { FORMATION_ORBS, swapBoardCells } from './formation-puzzle.js?v=v026-bonds-combo-3';
+import { FORMATION_ORBS, swapBoardCells } from './formation-puzzle.js?v=v027-divine-awakening-1';
 
 const TURN_MS = 6000;
 let activePuzzle = null;

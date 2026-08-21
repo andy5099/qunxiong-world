@@ -1,6 +1,6 @@
-import { createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v026-bonds-combo-3';
-import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v026-bonds-combo-3';
-import { compareWorldBossQuality, normalizeWorldBossIndividual } from './world-boss-collection.js?v=v026-bonds-combo-3';
+import { createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v027-divine-awakening-1';
+import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v027-divine-awakening-1';
+import { compareWorldBossQuality, normalizeWorldBossIndividual } from './world-boss-collection.js?v=v027-divine-awakening-1';
 
 export const WORLD_BOSSES = {
   crimsonTiger: {
