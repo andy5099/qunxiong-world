@@ -1,4 +1,4 @@
-import { FORMATION_ORBS, swapBoardCells } from './formation-puzzle.js?v=v024-world-boss-capture-1';
+import { FORMATION_ORBS, swapBoardCells } from './formation-puzzle.js?v=v025-world-boss-collection-1';
 
 const TURN_MS = 6000;
 let activePuzzle = null;

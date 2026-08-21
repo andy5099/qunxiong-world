@@ -1,5 +1,6 @@
-import { createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v024-world-boss-capture-1';
-import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v024-world-boss-capture-1';
+import { createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v025-world-boss-collection-1';
+import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v025-world-boss-collection-1';
+import { compareWorldBossQuality, normalizeWorldBossIndividual } from './world-boss-collection.js?v=v025-world-boss-collection-1';
 
 export const WORLD_BOSSES = {
   crimsonTiger: {
@@ -21,7 +22,8 @@ export function createWorldBossEnemy(id = 'crimsonTiger') {
 }
 
 export function normalizeWorldBoss(raw = {}, unlocked = false) {
-  return { unlocked:Boolean(raw.unlocked || unlocked), attempts:Math.max(0,Number(raw.attempts)||0), bestPhase:Math.max(0,Math.min(3,Number(raw.bestPhase)||0)), lowestHpPct:Math.max(0,Math.min(100,Number.isFinite(Number(raw.lowestHpPct))?Number(raw.lowestHpPct):100)), defeated:Boolean(raw.defeated), defeats:Math.max(0,Number(raw.defeats)||0), captured:Boolean(raw.captured), firstRewardClaimed:Boolean(raw.firstRewardClaimed), breakthroughLevel:normalizeBreakthrough(raw.breakthroughLevel) };
+  const captured=Boolean(raw.captured),individual=captured?normalizeWorldBossIndividual(raw.currentIndividual):null;
+  return { unlocked:Boolean(raw.unlocked || unlocked), attempts:Math.max(0,Number(raw.attempts)||0), bestPhase:Math.max(0,Math.min(3,Number(raw.bestPhase)||0)), lowestHpPct:Math.max(0,Math.min(100,Number.isFinite(Number(raw.lowestHpPct))?Number(raw.lowestHpPct):100)), defeated:Boolean(raw.defeated), defeats:Math.max(0,Number(raw.defeats)||0), captured, firstRewardClaimed:Boolean(raw.firstRewardClaimed), breakthroughLevel:normalizeBreakthrough(raw.breakthroughLevel), legendaryPity:Math.max(0,Math.min(20,Number(raw.legendaryPity)||0)), highestEncounterQuality:normalizeWorldBossIndividual({quality:raw.highestEncounterQuality}).quality, highestCapturedQuality:captured?normalizeWorldBossIndividual({quality:raw.highestCapturedQuality||individual?.quality}).quality:'normal', currentIndividual:individual, discoveredTalents:Array.isArray(raw.discoveredTalents)?Array.from(new Set(raw.discoveredTalents.filter(id=>typeof id==='string'))):[] };
 }
 
 export function getWorldBossState(state, id = 'crimsonTiger') { return id === 'crimsonTiger' ? state.worldBoss : state.worldBosses?.[id]; }
@@ -65,6 +67,15 @@ export function addWorldBossToRoster(state,id='crimsonTiger'){
   if([...(state.party||[]),...(state.roster||[])].some(member=>member?.id===profile.memberId)){syncWorldBossCapture(state,id);return false;}
   state.roster.push(profile.createMember()); state.equipment[profile.memberId]||={weapon:null,armor:null,accessory:null};
   getWorldBossState(state,id).captured=true; return true;
+}
+
+export function applyCapturedWorldBossIndividual(state,id,individual){
+  const profile=WORLD_BOSSES[id],record=getWorldBossState(state,id);if(!profile||!record)return false;
+  const member=[...(state.party||[]),...(state.roster||[])].find(candidate=>candidate?.id===profile.memberId);if(!member)return false;
+  const normalized=normalizeWorldBossIndividual(individual);member.individualQuality=normalized.quality;member.individualTalent=normalized.talentId;record.currentIndividual=normalized;record.captured=true;
+  if(compareWorldBossQuality(normalized.quality,record.highestCapturedQuality)>=0)record.highestCapturedQuality=normalized.quality;
+  if(normalized.talentId)record.discoveredTalents=Array.from(new Set([...(record.discoveredTalents||[]),normalized.talentId]));
+  return true;
 }
 export const addTigerToRoster=state=>addWorldBossToRoster(state,'crimsonTiger');
 
