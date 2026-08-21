@@ -1,5 +1,5 @@
-import { ITEMS } from './data.js?v=v025-world-boss-collection-1';
-import { CHAPTER2_BOSSES, getChapter2CodexCompletion, recordChapter2Drop } from './chapter2-system.js?v=v025-world-boss-collection-1';
+import { ITEMS } from './data.js?v=v026-bonds-combo-1';
+import { CHAPTER2_BOSSES, getChapter2CodexCompletion, recordChapter2Drop } from './chapter2-system.js?v=v026-bonds-combo-1';
 
 export const BLACKWIND_DROPS = ['blackwindBlade', 'blackwindArmor', 'blackwindCharm', 'overlordBlade', 'blackwindWarArmor', 'leaderToken'];
 export const WORLD_BOSS_DROPS = ['crimsonTigerClaw', 'crimsonWarArmor', 'crimsonTigerSeal'];

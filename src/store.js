@@ -1,8 +1,9 @@
-import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v025-world-boss-collection-1';
-import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v025-world-boss-collection-1';
-import { WORLD_BOSSES, normalizeWorldBoss } from './world-boss-system.js?v=v025-world-boss-collection-1';
-import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v025-world-boss-collection-1';
-import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v025-world-boss-collection-1';
+import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v026-bonds-combo-1';
+import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v026-bonds-combo-1';
+import { WORLD_BOSSES, normalizeWorldBoss } from './world-boss-system.js?v=v026-bonds-combo-1';
+import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v026-bonds-combo-1';
+import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v026-bonds-combo-1';
+import { discoverActiveBonds, normalizeBondState } from './bond-system.js?v=v026-bonds-combo-1';
 
 export const STORAGE_KEY = 'qunxiong-world-v01';
 const LEGACY_KEY = 'qunxiong-world-v2';
@@ -40,6 +41,7 @@ export function createState(playerName) {
     worldBossRecordsById: { netherThunder: { fastestRound:null,highestDamage:0 } },
     chapter2: normalizeChapter2(),
     chapter2Codex: normalizeChapter2Codex(),
+    bonds: normalizeBondState(),
     roster: [],
     ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false, chapter2Complete:false, bossWarning: false, bossRarityRank: null, bossKind:null, worldBossConfirm: false, worldBossCandidate:null, selectedWorldBoss:'crimsonTiger', codexDetail: null, captureResult: null, worldBossComparison:null, quickEquipItem: null, partyEquipMember: null, partyEquipSlot: null, partySwapSlot:null, candidateSort:'power', optimizeChanges: [] },
     settings: { autoBattle: false },
@@ -164,6 +166,7 @@ export function normalize(raw) {
     worldBossRecords: { fastestRound: Number(raw.worldBossRecords?.fastestRound) > 0 ? Number(raw.worldBossRecords.fastestRound) : null, highestDamage: Math.max(0, Number(raw.worldBossRecords?.highestDamage) || 0) },
     worldBossRecordsById:{netherThunder:{fastestRound:Number(raw.worldBossRecordsById?.netherThunder?.fastestRound)>0?Number(raw.worldBossRecordsById.netherThunder.fastestRound):null,highestDamage:Math.max(0,Number(raw.worldBossRecordsById?.netherThunder?.highestDamage)||0)}},
     chapter2,chapter2Codex:normalizeChapter2Codex(raw.chapter2Codex),
+    bonds:normalizeBondState(raw.bonds),
     dungeon,
     bossProgress: normalizeBossProgress(raw.bossProgress),
     ui: { ...base.ui, ...(raw.ui || {}), bossWarning: false, bossRarityRank: null, worldBossConfirm: false, worldBossCandidate:null, captureResult: null, worldBossComparison:null, optimizeChanges: [] },
@@ -171,8 +174,9 @@ export function normalize(raw) {
     exploration: { ...base.exploration, ...(raw.exploration || {}), auto: false, active: false },
     battle: null,
     log: Array.isArray(raw.log) ? raw.log.slice(-60) : [],
-    screen: dungeonSource && (rawDungeon.active || rawDungeon.warning) ? dungeonSource : ['village', 'plain', 'forest', 'stronghold','yellowRoad','yellowCamp','yellowFortress', 'worldBoss', 'bossCodex', 'party', 'inventory', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
+    screen: dungeonSource && (rawDungeon.active || rawDungeon.warning) ? dungeonSource : ['village', 'plain', 'forest', 'stronghold','yellowRoad','yellowCamp','yellowFortress', 'worldBoss', 'bossCodex', 'bonds', 'party', 'inventory', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
   };
+  discoverActiveBonds(normalized);
   return syncCodexFromState(normalized);
 }
 

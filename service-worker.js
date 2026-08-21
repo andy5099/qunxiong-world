@@ -1,4 +1,4 @@
-const BUILD_VERSION = 'v025-world-boss-collection-1';
+const BUILD_VERSION = 'v026-bonds-combo-1';
 const CACHE = `qunxiong-world-${BUILD_VERSION}`;
 // Upgrade source: v021-illustrated-marble-boss. Kept as a readable migration marker.
 const APP_SHELL = [
@@ -15,6 +15,7 @@ const APP_SHELL = [
   `./src/boss-gear-system.js?v=${BUILD_VERSION}`,
   `./src/world-boss-system.js?v=${BUILD_VERSION}`,
   `./src/world-boss-collection.js?v=${BUILD_VERSION}`,
+  `./src/bond-system.js?v=${BUILD_VERSION}`,
   `./src/boss-codex-system.js?v=${BUILD_VERSION}`,
   `./src/chapter2-system.js?v=${BUILD_VERSION}`,
   `./src/gear-tier-system.js?v=${BUILD_VERSION}`,
