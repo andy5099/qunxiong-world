@@ -1,16 +1,16 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v030-yellow-heaven-1';
-import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v030-yellow-heaven-1';
-import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo, rollDivineTalismanDrops } from './boss-gear-system.js?v=v030-yellow-heaven-1';
-import { WORLD_BOSS, WORLD_BOSSES, addWorldBossToRoster, applyCapturedWorldBossIndividual, createWorldBossEnemy, getWorldBossMasteryState, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v030-yellow-heaven-1';
-import { applyWorldBossVariant, compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, recordWorldBossVariant, rollWorldBossVariant } from './world-boss-collection.js?v=v030-yellow-heaven-1';
-import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v030-yellow-heaven-1';
-import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v030-yellow-heaven-1';
-import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v030-yellow-heaven-1';
-import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v030-yellow-heaven-1';
-import { ensureMarbleBattle, getCurrentMarble, getFormationRole, getFormationTier, getMarbleSkill, getMarbleUltimate, getUltimateEnergy, hitMultiplier } from './marble-battle.js?v=v030-yellow-heaven-1';
-import { initializeBondRuntime, noteBondEvent, updateBondScheduler } from './bond-system.js?v=v030-yellow-heaven-1';
-import { getMemberAwakening, isEquipmentLocked } from './equipment-awakening.js?v=v030-yellow-heaven-1';
-import { CHAPTER3_BOSSES, ensureWorldAnomaly, isChapter3Area, isChapter3BossKind, recordChapter3Boss, recruitChapter3Boss, rollWorldBossIntrusion, spareChapter3Boss } from './chapter3-system.js?v=v030-yellow-heaven-1';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v031-quick-battle-1';
+import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v031-quick-battle-1';
+import { DIVINE_TALISMANS, awardBossDivineTalismans, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v031-quick-battle-1';
+import { WORLD_BOSS, WORLD_BOSSES, addWorldBossToRoster, applyCapturedWorldBossIndividual, createWorldBossEnemy, getWorldBossMasteryState, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v031-quick-battle-1';
+import { applyWorldBossVariant, compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, recordWorldBossVariant, rollWorldBossVariant } from './world-boss-collection.js?v=v031-quick-battle-1';
+import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v031-quick-battle-1';
+import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v031-quick-battle-1';
+import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v031-quick-battle-1';
+import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v031-quick-battle-1';
+import { ensureMarbleBattle, getCurrentMarble, getFormationRole, getFormationTier, getMarbleSkill, getMarbleUltimate, getUltimateEnergy, hitMultiplier } from './marble-battle.js?v=v031-quick-battle-1';
+import { initializeBondRuntime, noteBondEvent, updateBondScheduler } from './bond-system.js?v=v031-quick-battle-1';
+import { getMemberAwakening, isEquipmentLocked } from './equipment-awakening.js?v=v031-quick-battle-1';
+import { CHAPTER3_BOSSES, ensureWorldAnomaly, isChapter3Area, isChapter3BossKind, recordChapter3Boss, recruitChapter3Boss, rollWorldBossIntrusion, spareChapter3Boss } from './chapter3-system.js?v=v031-quick-battle-1';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -569,6 +569,7 @@ function finishVictory(state, rng) {
     state.bossProgress.talismans.advanced=(state.bossProgress.talismans.advanced||0)+2;
     if(rng()<.35) state.bossProgress.talismans.legendary=(state.bossProgress.talismans.legendary||0)+1;
     state.bossProgress.divineTalismans.advanced=(state.bossProgress.divineTalismans.advanced||0)+2;
+    state.battle.baseDivineTalismanDrops={advanced:2};
     state.battle.worldBossLoot={advanced:2,divineAdvanced:2,itemId:dropId}; targetState.firstRewardClaimed=true;
     codex.discovered=true; codex.challenged=true; codex.defeated=true;
     recordItemDrop(state, dropId); recordMaterials(state, { advanced: 2, ...(state.bossProgress.talismans.legendary ? { legendary: 1 } : {}) }, { advanced: 2 });
@@ -605,14 +606,14 @@ function finishVictory(state, rng) {
       appendLog(state, `獲得【${TALISMANS[talismanId].name}】×${amount}！`, 'epic');
       if (state.battle.dungeon) state.dungeon.loot.talismans[talismanId] = (state.dungeon.loot.talismans[talismanId] || 0) + amount;
     });
-    const divineDrops = rollDivineTalismanDrops(rank, Boolean(state.battle.dungeon), rng);
-    state.battle.divineTalismanDrops = divineDrops;
+    const divineDrops = awardBossDivineTalismans(state, { rank, dungeon: Boolean(state.battle.dungeon), worldBoss: worldBossBattle }, rng);
+    state.battle.divineTalismanDrops = worldBossBattle ? { ...divineDrops, advanced: (divineDrops.advanced || 0) + 2 } : divineDrops;
     Object.entries(divineDrops).forEach(([id, amount]) => {
       state.bossProgress.divineTalismans[id] = (state.bossProgress.divineTalismans[id] || 0) + amount;
       appendLog(state, `獲得【${DIVINE_TALISMANS[id].name}】×${amount}！`, id === 'advanced' ? 'epic' : 'rare');
       if (id === 'advanced' && rank === 5) appendLog(state, '高階神兵素材！', 'epic');
     });
-    recordMaterials(state, talismanDrops, divineDrops);
+    recordMaterials(state, talismanDrops, state.battle.divineTalismanDrops);
     if (!worldBossBattle){if(isChapter3BossKind(state.battle.bossKind))recordChapter3Boss(state,state.battle.bossKind,rank,'defeat');else if(state.battle.bossKind)recordChapter2Boss(state,state.battle.bossKind,rank,'defeat');else recordBlackwindDefeat(state, rank);}
     if (state.battle.dungeon) {
       const completionGold = 300 + rank * 120;

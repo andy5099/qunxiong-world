@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import { SAVE_VERSION } from '../src/data.js';
+import { awardBossDivineTalismans, combineDivineTalismans } from '../src/boss-gear-system.js';
+import { createBossEncounter, createWorldBossEncounter, retreatFlipperBattle } from '../src/engine.js';
+import { createState, normalize } from '../src/store.js';
+import { finishQuickBattle, getQuickBattleGroups, markQuickBattle, prepareQuickBoss, selectQuickBoss } from '../src/quick-battle-system.js';
+import { render } from '../src/ui.js';
+
+let passed=0;const test=(name,fn)=>{fn();passed++;console.log(`✓ ${name}`)};
+const zero=()=>0,high=()=>.99;
+
+test('save version 19',()=>assert.equal(SAVE_VERSION,19));
+test('normal Boss has 25 percent path',()=>{const s=createState('掉落');assert.equal(awardBossDivineTalismans(s,{rank:1},zero).novice,1)});
+test('normal Boss can miss',()=>{const s=createState('未掉落');assert.equal(awardBossDivineTalismans(s,{rank:1},high).novice,undefined);assert.equal(s.bossProgress.divineTalismanPity,1)});
+test('sixth Boss pity guarantees novice',()=>{const s=createState('保底');for(let i=0;i<5;i++)awardBossDivineTalismans(s,{rank:1},high);assert.equal(s.bossProgress.divineTalismanPity,5);assert.equal(awardBossDivineTalismans(s,{rank:1},high).novice,1);assert.equal(s.bossProgress.divineTalismanPity,0)});
+test('dungeon final Boss uses 60 percent path',()=>{const s=createState('秘境');assert.equal(awardBossDivineTalismans(s,{rank:3,dungeon:true},()=>.5).novice,1)});
+test('world Boss guarantees novice',()=>{const s=createState('世界王');assert.ok(awardBossDivineTalismans(s,{rank:5,worldBoss:true},high).novice>=1)});
+test('three novice combine to intermediate',()=>{const s=createState('合成');s.bossProgress.divineTalismans.novice=3;assert.ok(combineDivineTalismans(s,'intermediate').ok);assert.equal(s.bossProgress.divineTalismans.novice,0);assert.equal(s.bossProgress.divineTalismans.intermediate,1)});
+test('three intermediate combine to advanced',()=>{const s=createState('合成');s.bossProgress.divineTalismans.intermediate=3;assert.ok(combineDivineTalismans(s,'advanced').ok);assert.equal(s.bossProgress.divineTalismans.advanced,1)});
+test('old save migrates pity and quick state',()=>{const s=normalize({...createState('舊檔'),version:18,quickBattle:undefined});assert.equal(s.bossProgress.divineTalismanPity,0);assert.equal(s.quickBattle.selectedId,null)});
+test('quick screen lists only unlocked bosses',()=>{const s=createState('入口');assert.equal(getQuickBattleGroups(s).normal.length,0);s.progress.bossUnlocked=true;assert.equal(getQuickBattleGroups(s).normal[0].id,'blackwindLord')});
+test('hidden phoenix stays hidden before discovery',()=>{const s=createState('隱藏');s.unlocks.chapter3=true;assert.equal(getQuickBattleGroups(s).hidden.length,0);s.chapter3.phoenixUnlocked=true;assert.equal(getQuickBattleGroups(s).hidden[0].id,'netherPhoenixBoss')});
+test('quick normal Boss uses existing encounter engine',()=>{const s=createState('速戰');s.progress.bossUnlocked=true;selectQuickBoss(s,'normal','blackwindLord');prepareQuickBoss(s);const battle=markQuickBattle(s,createBossEncounter(s,1));assert.equal(battle.mode,'marble');assert.equal(battle.sourceContext,'quickBattle')});
+test('quick world Boss uses existing encounter engine',()=>{const s=createState('世界速戰');s.progress.chapterOneComplete=true;s.worldBoss.unlocked=true;selectQuickBoss(s,'world','crimsonTiger');const battle=markQuickBattle(s,createWorldBossEncounter(s,'crimsonTiger',zero));assert.equal(battle.worldBoss,true);assert.equal(battle.sourceContext,'quickBattle')});
+test('quick retreat returns to quick screen',()=>{const s=createState('撤退');s.progress.bossUnlocked=true;selectQuickBoss(s,'normal','blackwindLord');prepareQuickBoss(s);const battle=markQuickBattle(s,createBossEncounter(s,1)),source=battle.sourceContext;assert.ok(retreatFlipperBattle(s));assert.ok(finishQuickBattle(s,source));assert.equal(s.screen,'quickBattle')});
+test('quick UI shows party, bonds and actions',()=>{const s=createState('UI');s.progress.bossUnlocked=true;s.screen='quickBattle';selectQuickBoss(s,'normal','blackwindLord');const html=render(s);for(const label of ['快速 Boss 戰','主戰','支援','快速最佳編隊','立即挑戰'])assert.ok(html.includes(label),label)});
+test('awakening source and 3 to 1 recipe visible',()=>{const s=createState('背包');s.screen='inventory';s.inventory.greenEdgeSword=2;s.ui.awakeningItem='greenEdgeSword';const html=render(s);assert.ok(html.includes('一般 Boss、秘境最終 Boss、世界王'));assert.ok(html.includes('3 初階 → 1'))});
+test('ten normal Boss quick chains remain clean',()=>{const s=createState('連戰');s.progress.bossUnlocked=true;selectQuickBoss(s,'normal','blackwindLord');for(let i=0;i<10;i++){prepareQuickBoss(s);markQuickBattle(s,createBossEncounter(s,1));assert.equal(s.battle.sourceContext,'quickBattle');retreatFlipperBattle(s);finishQuickBattle(s,'quickBattle');assert.equal(s.battle,null)}});
+test('ten world Boss quick chains remain clean',()=>{const s=createState('世界連戰');s.progress.chapterOneComplete=true;s.worldBoss.unlocked=true;selectQuickBoss(s,'world','crimsonTiger');for(let i=0;i<10;i++){markQuickBattle(s,createWorldBossEncounter(s,'crimsonTiger',zero));assert.equal(s.battle.sourceContext,'quickBattle');retreatFlipperBattle(s);finishQuickBattle(s,'quickBattle');assert.equal(s.battle,null)}});
+console.log(`V0.3.1 smoke: ${passed} passed`);

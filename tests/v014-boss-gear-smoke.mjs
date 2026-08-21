@@ -10,7 +10,7 @@ const equal = (actual, expected, label) => check(actual === expected, `${label}:
 const rng = value => () => value;
 const leaderState = () => { const state = createState('神兵測試'); state.party[4] = createBlackwindLeader(); state.progress.bossRecruited = true; return state; };
 
-equal(SAVE_VERSION,18, 'save version');
+equal(SAVE_VERSION,19, 'save version');
 check((rollDivineTalismanDrops(1, false, rng(0)).novice || 0) >= 1, 'novice divine talisman drops');
 check((rollDivineTalismanDrops(3, false, rng(0)).intermediate || 0) >= 1, 'intermediate divine talisman drops');
 check((rollDivineTalismanDrops(4, false, rng(0)).advanced || 0) >= 1, 'advanced divine talisman drops');
@@ -18,10 +18,10 @@ let normalTotal = 0, dungeonTotal = 0;
 for (let i = 0; i < 100; i += 1) { const value = (i + .5) / 100; normalTotal += Object.values(rollDivineTalismanDrops(2, false, rng(value))).reduce((a,b)=>a+b,0); dungeonTotal += Object.values(rollDivineTalismanDrops(2, true, rng(value))).reduce((a,b)=>a+b,0); }
 check(dungeonTotal > normalTotal, 'dungeon boss divine yield is higher');
 
-const craft = leaderState(); craft.bossProgress.divineTalismans = { novice: 5, intermediate: 5, advanced: 0 };
-check(combineDivineTalismans(craft, 'intermediate').ok, 'novice combines'); equal(craft.bossProgress.divineTalismans.novice, 0, 'novice consumed'); equal(craft.bossProgress.divineTalismans.intermediate, 6, 'intermediate added');
+const craft = leaderState(); craft.bossProgress.divineTalismans = { novice: 3, intermediate: 3, advanced: 0 };
+check(combineDivineTalismans(craft, 'intermediate').ok, 'novice combines'); equal(craft.bossProgress.divineTalismans.novice, 0, 'novice consumed'); equal(craft.bossProgress.divineTalismans.intermediate, 4, 'intermediate added');
 check(combineDivineTalismans(craft, 'advanced').ok, 'intermediate combines'); equal(craft.bossProgress.divineTalismans.advanced, 1, 'advanced added');
-const cascade = leaderState(); cascade.bossProgress.divineTalismans = { novice: 25, intermediate: 0, advanced: 0 }; combineAllDivineTalismans(cascade); equal(cascade.bossProgress.divineTalismans.advanced, 1, 'combine all cascades'); check(Object.values(cascade.bossProgress.divineTalismans).every(v => v >= 0), 'materials never negative');
+const cascade = leaderState(); cascade.bossProgress.divineTalismans = { novice: 9, intermediate: 0, advanced: 0 }; combineAllDivineTalismans(cascade); equal(cascade.bossProgress.divineTalismans.advanced, 1, 'combine all cascades'); check(Object.values(cascade.bossProgress.divineTalismans).every(v => v >= 0), 'materials never negative');
 
 const evolve = leaderState(); evolve.inventory.blackwindBlade = 1; evolve.inventory.blackwindArmor = 1; evolve.inventory.blackwindCharm = 1; evolve.bossProgress.divineTalismans = { novice: 0, intermediate: 6, advanced: 9 };
 equipItem(evolve, 'blackwind-lord', 'blackwindBlade'); check(evolveBossGear(evolve, 'blackwindBlade').ok, 'blackwind blade evolves'); equal(evolve.equipment['blackwind-lord'].weapon, 'overlordBlade', 'equipped weapon stays equipped'); equal(evolve.inventory.blackwindBlade, 0, 'old weapon consumed once'); equal(evolve.inventory.overlordBlade, 1, 'new weapon created once');

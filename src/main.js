@@ -1,16 +1,17 @@
-import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, prepareWorldBossChallenge, recruitBlackwindLeader, recruitChapter2Boss,recruitChapter3Boss, refreshUnlocks, resolveFormationAttack, resolveRound, resolveWorldBossIndividual, retreatFromBoss, retreatFlipperBattle, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss,spareChapter3Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v030-yellow-heaven-1';
-import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v030-yellow-heaven-1';
-import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v030-yellow-heaven-1';
-import { clearSave, createState, load, save } from './store.js?v=v030-yellow-heaven-1';
-import { render, renderCreation, renderMarblePanel } from './ui.js?v=v030-yellow-heaven-1';
-import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v030-yellow-heaven-1';
-import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v030-yellow-heaven-1';
-import { claimCollectionMilestone } from './boss-codex-system.js?v=v030-yellow-heaven-1';
-import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v030-yellow-heaven-1';
-import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v030-yellow-heaven-1';
-import { discoverActiveBonds } from './bond-system.js?v=v030-yellow-heaven-1';
-import { awakenEquipment, toggleEquipmentLock } from './equipment-awakening.js?v=v030-yellow-heaven-1';
-import { isChapter3BossKind } from './chapter3-system.js?v=v030-yellow-heaven-1';
+import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, prepareWorldBossChallenge, recruitBlackwindLeader, recruitChapter2Boss,recruitChapter3Boss, refreshUnlocks, resolveFormationAttack, resolveRound, resolveWorldBossIndividual, retreatFromBoss, retreatFlipperBattle, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss,spareChapter3Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v031-quick-battle-1';
+import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v031-quick-battle-1';
+import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v031-quick-battle-1';
+import { clearSave, createState, load, save } from './store.js?v=v031-quick-battle-1';
+import { render, renderCreation, renderMarblePanel } from './ui.js?v=v031-quick-battle-1';
+import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v031-quick-battle-1';
+import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v031-quick-battle-1';
+import { claimCollectionMilestone } from './boss-codex-system.js?v=v031-quick-battle-1';
+import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v031-quick-battle-1';
+import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v031-quick-battle-1';
+import { discoverActiveBonds } from './bond-system.js?v=v031-quick-battle-1';
+import { awakenEquipment, toggleEquipmentLock } from './equipment-awakening.js?v=v031-quick-battle-1';
+import { isChapter3BossKind } from './chapter3-system.js?v=v031-quick-battle-1';
+import { finishQuickBattle, markQuickBattle, prepareQuickBoss, selectQuickBoss } from './quick-battle-system.js?v=v031-quick-battle-1';
 
 const app = document.querySelector('#app');
 const boot = window.__QX_BOOT__ || { mark() {}, fail() {}, ready() {} };
@@ -118,7 +119,7 @@ app.addEventListener('click', event => {
   else if (action === 'challenge-boss') { state.exploration.auto = false; stopLoop(); createBossEncounter(state); }
   else if (action === 'boss:engage') { state.exploration.auto = false; stopLoop(); createBossEncounter(state); }
   else if (action === 'boss:retreat') { stopLoop(); retreatFromBoss(state); }
-  else if (action === 'battle:retreat-flipper') { stopLoop(); cleanupMarbleBattle(state.battle); retreatFlipperBattle(state); }
+  else if (action === 'battle:retreat-flipper') { stopLoop(); const source=state.battle?.sourceContext; cleanupMarbleBattle(state.battle); retreatFlipperBattle(state); finishQuickBattle(state,source); }
   else if (action.startsWith('world-boss:view:')) state.ui.selectedWorldBoss=action.slice(16);
   else if (action.startsWith('world-boss:challenge')) { const id=action.split(':')[2]||state.ui.selectedWorldBoss||'crimsonTiger';state.ui.selectedWorldBoss=id;state.screen='worldBoss'; state.location='世界王祭壇';prepareWorldBossChallenge(state,id);state.ui.worldBossConfirm=true; }
   else if (action === 'world-boss:engage') { state.ui.worldBossConfirm=false; stopLoop(); createWorldBossEncounter(state,state.ui.selectedWorldBoss||'crimsonTiger'); }
@@ -134,8 +135,8 @@ app.addEventListener('click', event => {
   else if (action === 'battle:stop-auto') { state.exploration.auto = false; stopLoop(); state.notice = '已停止自動探索，本場戰鬥改為手動。'; }
   else if (action === 'battle:formation') { stopLoop(); startFormation(state); }
   else if (action === 'battle:formation-continue') { if (state.battle?.formation) state.battle.formation.result = null; }
-  else if (action === 'battle:recruit') { stopLoop(); state.battle?.worldBoss ? captureWorldBoss(state) : isChapter3BossKind(state.battle?.bossKind)?recruitChapter3Boss(state):state.battle?.bossKind?recruitChapter2Boss(state):recruitBlackwindLeader(state); }
-  else if (action === 'battle:spare') { stopLoop(); state.battle?.worldBoss ? spareWorldBoss(state) : isChapter3BossKind(state.battle?.bossKind)?spareChapter3Boss(state):state.battle?.bossKind?spareChapter2Boss(state):spareBlackwindLeader(state); }
+  else if (action === 'battle:recruit') { stopLoop(); const source=state.battle?.sourceContext; state.battle?.worldBoss ? captureWorldBoss(state) : isChapter3BossKind(state.battle?.bossKind)?recruitChapter3Boss(state):state.battle?.bossKind?recruitChapter2Boss(state):recruitBlackwindLeader(state); finishQuickBattle(state,source); }
+  else if (action === 'battle:spare') { stopLoop(); const source=state.battle?.sourceContext; state.battle?.worldBoss ? spareWorldBoss(state) : isChapter3BossKind(state.battle?.bossKind)?spareChapter3Boss(state):state.battle?.bossKind?spareChapter2Boss(state):spareBlackwindLeader(state); finishQuickBattle(state,source); }
   else if (action === 'battle:quick-equip') {
     const dropId = state.battle?.dropId;
     if (dropId && !state.battle.awaitingRecruit) { leaveBattle(state); prepareQuickEquip(state, dropId); }
@@ -174,6 +175,15 @@ app.addEventListener('click', event => {
   else if(action==='party-swap-close')state.ui.partySwapSlot=null;
   else if(action.startsWith('party-swap:')){const[,slot,id]=action.split(':');deployRosterMember(state,id,Number(slot));state.ui.partySwapSlot=null;}
   else if(action==='party-quick-best'){quickBestParty(state,getMemberPower);state.ui.partySwapSlot=null;}
+  else if(action.startsWith('quick-battle:select:')){const[, ,type,id]=action.split(':');selectQuickBoss(state,type,id);state.notice='已選擇 Boss，可調整隊伍後立即挑戰。';}
+  else if(action==='quick-battle:start'||action==='quick-battle:retry'){
+    stopLoop();cleanupMarbleBattle(state.battle,true);state.battle=null;state.quickBattle.resultReady=false;const targetInfo=prepareQuickBoss(state);
+    if(!targetInfo)state.notice='此 Boss 尚未解鎖。';
+    else if(targetInfo.type==='world'){state.ui.selectedWorldBoss=targetInfo.id;prepareWorldBossChallenge(state,targetInfo.id);markQuickBattle(state,createWorldBossEncounter(state,targetInfo.id));}
+    else markQuickBattle(state,createBossEncounter(state,1));
+  }
+  else if(action==='quick-battle:switch'){stopLoop();cleanupMarbleBattle(state.battle,true);state.battle=null;state.screen='quickBattle';state.location='快速 Boss 戰';state.quickBattle.resultReady=false;}
+  else if(action==='quick-battle:home'){stopLoop();cleanupMarbleBattle(state.battle,true);state.battle=null;state.screen='village';state.location='桃源村';state.quickBattle.resultReady=false;}
   else if(action.startsWith('party-sort:'))state.ui.candidateSort=action.slice(11);
   else if (action.startsWith('roster-withdraw:')) withdrawPartyMember(state,action.slice(16));
   else if (action.startsWith('codex:view:')) state.ui.codexDetail=action.slice(11);
@@ -219,7 +229,7 @@ window.addEventListener('pagehide', () => { stopLoop(); cleanupMarbleBattle(stat
 
 if ('serviceWorker' in navigator) {
   boot.mark('SW REGISTER');
-  const buildVersion = 'v030-yellow-heaven-1';
+  const buildVersion = 'v031-quick-battle-1';
   const reloadKey = `sw-reloaded-${buildVersion}`;
   let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {

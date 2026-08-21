@@ -11,7 +11,7 @@ const check=(value,label)=>{if(!value)throw new Error(label);passed+=1;};
 const equal=(actual,expected,label)=>check(actual===expected,`${label}: ${actual} !== ${expected}`);
 const state=()=>{const s=createState('測試主公');s.progress.chapterOneComplete=true;s.party.forEach(m=>{if(m)m.level=20;});return s;};
 
-equal(SAVE_VERSION,18,'save version');
+equal(SAVE_VERSION,19,'save version');
 for(const id of ['yellowRoad','yellowCamp','yellowFortress'])check(AREAS[id],`${id} area exists`);
 for(const id of ['yellowBladeSoldier','yellowShieldSoldier','yellowBowSoldier','yellowWarlock','yellowBrute'])check(ENEMIES[id],`${id} enemy exists`);
 for(const id of ['yellowCaptainBoss','yellowCommanderBoss','zhangBaoBoss'])check(ENEMIES[id]?.bossKind,`${id} boss exists`);
@@ -40,7 +40,7 @@ const blocked=state();blocked.roster.push(createYellowBossMember('yellow-captain
 
 const tomb=state();enterArea(tomb,'yellowCamp');tomb.dungeon.warning=true;tomb.dungeon.dungeonId='yellowTomb';tomb.dungeon.name=YELLOW_DUNGEON.name;tomb.dungeon.sourceScreen='yellowCamp';tomb.dungeon.sourceLocation='黃巾營地';check(enterDungeon(tomb,()=>0),'yellow tomb enters');equal(tomb.dungeon.name,YELLOW_DUNGEON.name,'tomb name');equal(tomb.dungeon.sourceScreen,'yellowCamp','tomb source saved');tomb.dungeon.floor=4;tomb.battle=null;check(createDungeonFloor(tomb,5,()=>0),'tomb boss floor starts');check(tomb.battle.boss,'tomb final floor boss');check(CHAPTER2_BOSSES[tomb.battle.bossKind],'tomb boss belongs to chapter two');
 
-const migrated=normalize({...createState('舊玩家'),version:13,progress:{chapterOneComplete:true},inventory:{ironSword:4},roster:[createYellowBossMember('yellow-captain')]});equal(migrated.version,18,'v13 migrates');equal(migrated.inventory.ironSword,4,'inventory preserved');check(migrated.chapter2,'chapter state added');check(migrated.chapter2Codex['yellow-captain'],'chapter codex added');check(migrated.worldBosses.netherThunder,'nether state added');equal(migrated.party.length,5,'five party slots preserved');
+const migrated=normalize({...createState('舊玩家'),version:13,progress:{chapterOneComplete:true},inventory:{ironSword:4},roster:[createYellowBossMember('yellow-captain')]});equal(migrated.version,19,'v13 migrates');equal(migrated.inventory.ironSword,4,'inventory preserved');check(migrated.chapter2,'chapter state added');check(migrated.chapter2Codex['yellow-captain'],'chapter codex added');check(migrated.worldBosses.netherThunder,'nether state added');equal(migrated.party.length,5,'five party slots preserved');
 
 const ui=state();ui.screen='party';ui.roster.push(createYellowBossMember('yellow-captain'),createNetherThunderBeast());let html=render(ui);check(html.includes('快速編隊'), 'quick formation UI');check(html.includes('支援 2'),'fifth slot support UI');check(html.includes('候補武將名冊'),'roster UI');ui.ui.partySwapSlot=4;html=render(ui);check(html.includes('立即換入'),'one-click swap UI');ui.screen='yellowRoad';html=render(ui);check(html.includes('黃巾荒道'),'chapter area UI');ui.screen='worldBoss';ui.worldBosses.netherThunder.unlocked=true;html=render(ui);check(html.includes('九幽雷獸'),'second world boss UI');
 

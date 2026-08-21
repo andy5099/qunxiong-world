@@ -1,11 +1,12 @@
-import { ITEMS, SAVE_VERSION, createBasaltTurtle, createBlackwindLeader, createChapter3BossMember, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v030-yellow-heaven-1';
-import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v030-yellow-heaven-1';
-import { WORLD_BOSSES, normalizeWorldBoss } from './world-boss-system.js?v=v030-yellow-heaven-1';
-import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v030-yellow-heaven-1';
-import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v030-yellow-heaven-1';
-import { discoverActiveBonds, normalizeBondState } from './bond-system.js?v=v030-yellow-heaven-1';
-import { normalizeEquipmentAwakening } from './equipment-awakening.js?v=v030-yellow-heaven-1';
-import { ensureWorldAnomaly, normalizeChapter3, normalizeChapter3Codex, normalizeWorldAnomaly } from './chapter3-system.js?v=v030-yellow-heaven-1';
+import { ITEMS, SAVE_VERSION, createBasaltTurtle, createBlackwindLeader, createChapter3BossMember, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v031-quick-battle-1';
+import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v031-quick-battle-1';
+import { WORLD_BOSSES, normalizeWorldBoss } from './world-boss-system.js?v=v031-quick-battle-1';
+import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v031-quick-battle-1';
+import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v031-quick-battle-1';
+import { discoverActiveBonds, normalizeBondState } from './bond-system.js?v=v031-quick-battle-1';
+import { normalizeEquipmentAwakening } from './equipment-awakening.js?v=v031-quick-battle-1';
+import { ensureWorldAnomaly, normalizeChapter3, normalizeChapter3Codex, normalizeWorldAnomaly } from './chapter3-system.js?v=v031-quick-battle-1';
+import { normalizeQuickBattle } from './quick-battle-system.js?v=v031-quick-battle-1';
 
 export const STORAGE_KEY = 'qunxiong-world-v01';
 const LEGACY_KEY = 'qunxiong-world-v2';
@@ -51,6 +52,7 @@ export function createState(playerName) {
     exploration: { auto: false, active: false },
     dungeon: { warning: false, active: false, name: '血色洞窟', dungeonId:'bloodCavern', floor: 0, sourceScreen: null, sourceLocation: null, pity: 0, awaitingAdvance: false, completed: false, loot: { gold: 0, potion: 0, items: [], talismans: {} } },
     battle: null,
+    quickBattle: normalizeQuickBattle(),
     notice: '桃源村的晨霧尚未散去，新的旅程正等待著你。',
     log: []
   };
@@ -174,13 +176,14 @@ export function normalize(raw) {
     bonds:normalizeBondState(raw.bonds),
     equipmentAwakening:normalizeEquipmentAwakening(raw.equipmentAwakening,raw.inventory),
     dungeon,
+    quickBattle: normalizeQuickBattle(raw.quickBattle),
     bossProgress: normalizeBossProgress(raw.bossProgress),
     ui: { ...base.ui, ...(raw.ui || {}), bossWarning: false, bossRarityRank: null, worldBossConfirm: false, worldBossCandidate:null,worldBossIntrusion:null, captureResult: null, worldBossComparison:null, optimizeChanges: [], awakeningItem:null, awakeningConfirm:false },
     settings: { ...base.settings, ...(raw.settings || {}) },
     exploration: { ...base.exploration, ...(raw.exploration || {}), auto: false, active: false },
     battle: null,
     log: Array.isArray(raw.log) ? raw.log.slice(-60) : [],
-    screen: dungeonSource && (rawDungeon.active || rawDungeon.warning) ? dungeonSource : ['village', 'plain', 'forest', 'stronghold','yellowRoad','yellowCamp','yellowFortress','desolateVillage','loessSlope','thunderValley','yellowHeavenAltar', 'worldBoss', 'bossCodex', 'bonds', 'party', 'inventory', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
+    screen: dungeonSource && (rawDungeon.active || rawDungeon.warning) ? dungeonSource : ['village', 'plain', 'forest', 'stronghold','yellowRoad','yellowCamp','yellowFortress','desolateVillage','loessSlope','thunderValley','yellowHeavenAltar', 'worldBoss', 'quickBattle', 'bossCodex', 'bonds', 'party', 'inventory', 'shop', 'settings'].includes(raw.screen) ? raw.screen : 'village'
   };
   ensureWorldAnomaly(normalized);discoverActiveBonds(normalized);
   return syncCodexFromState(normalized);
