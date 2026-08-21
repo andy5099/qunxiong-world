@@ -1,4 +1,4 @@
-import { ITEMS } from './data.js?v=v023-flipper-chain-1';
+import { ITEMS } from './data.js?v=v024-high-speed-flipper-1';
 
 export const DIVINE_TALISMANS = {
   novice: { id: 'novice', name: '初階神兵符' },

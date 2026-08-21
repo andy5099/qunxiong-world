@@ -1,5 +1,5 @@
-import { createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v023-flipper-chain-1';
-import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v023-flipper-chain-1';
+import { createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v024-high-speed-flipper-1';
+import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v024-high-speed-flipper-1';
 
 export const WORLD_BOSSES = {
   crimsonTiger: {
