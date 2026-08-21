@@ -1,5 +1,5 @@
-import { createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v024-high-speed-flipper-1';
-import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v024-high-speed-flipper-1';
+import { createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v024-world-boss-capture-1';
+import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v024-world-boss-capture-1';
 
 export const WORLD_BOSSES = {
   crimsonTiger: {
@@ -28,6 +28,19 @@ export function getWorldBossState(state, id = 'crimsonTiger') { return id === 'c
 export function getWorldBossMasteryState(state, id='crimsonTiger') { return id === 'crimsonTiger' ? state.worldBossMastery : state.worldBossMasteries?.[id]; }
 export function getWorldBossRecordState(state,id='crimsonTiger'){return id==='crimsonTiger'?state.worldBossRecords:state.worldBossRecordsById?.[id];}
 
+// Normalize the persisted record and the real roster through one accessor so
+// old saves cannot display a captured world boss as missing.
+export function hasCapturedWorldBoss(state,id='crimsonTiger'){
+  const profile=WORLD_BOSSES[id];if(!profile)return false;
+  return Boolean(getWorldBossState(state,id)?.captured||[...(state.party||[]),...(state.roster||[])].some(member=>member?.id===profile.memberId));
+}
+
+export function syncWorldBossCapture(state,id='crimsonTiger'){
+  const captured=hasCapturedWorldBoss(state,id),record=getWorldBossState(state,id);
+  if(captured&&record)record.captured=true;
+  return captured;
+}
+
 export function getWorldBossResonance(state, memberOrId) {
   const member=typeof memberOrId==='string'?[...state.party,...(state.roster||[])].find(candidate=>candidate?.id===memberOrId):memberOrId;
   const result={mightPct:0,defensePct:0,hpPct:0,speedPct:0,skillPct:0,set:null};
@@ -49,7 +62,7 @@ export function getWorldBossResonance(state, memberOrId) {
 
 export function addWorldBossToRoster(state,id='crimsonTiger'){
   const profile=WORLD_BOSSES[id]; if(!profile)return false;
-  if([...state.party,...state.roster].some(member=>member?.id===profile.memberId))return false;
+  if([...(state.party||[]),...(state.roster||[])].some(member=>member?.id===profile.memberId)){syncWorldBossCapture(state,id);return false;}
   state.roster.push(profile.createMember()); state.equipment[profile.memberId]||={weapon:null,armor:null,accessory:null};
   getWorldBossState(state,id).captured=true; return true;
 }

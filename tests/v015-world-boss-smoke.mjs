@@ -143,7 +143,7 @@ equal(spare.battle, null, 'spare closes battle safely');
 
 const altar = unlockedState(); altar.screen = 'worldBoss';
 const altarHtml = render(altar);
-check(altarHtml.includes('世界王・赤焰魔虎'), 'altar renders world boss');
+check(altarHtml.includes('赤焰魔虎'), 'altar renders world boss');
 check(altarHtml.includes('30,000'), 'altar renders recommendation');
 check(altarHtml.includes('挑戰世界王'), 'altar renders challenge action');
 altar.ui.worldBossConfirm = true;

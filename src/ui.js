@@ -1,14 +1,14 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v024-high-speed-flipper-1';
-import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v024-high-speed-flipper-1';
-import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v024-high-speed-flipper-1';
-import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v024-high-speed-flipper-1';
-import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState } from './world-boss-system.js?v=v024-high-speed-flipper-1';
-import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v024-high-speed-flipper-1';
-import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v024-high-speed-flipper-1';
-import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v024-high-speed-flipper-1';
-import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v024-high-speed-flipper-1';
-import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v024-high-speed-flipper-1';
-import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v024-high-speed-flipper-1';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v024-world-boss-capture-1';
+import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v024-world-boss-capture-1';
+import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v024-world-boss-capture-1';
+import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v024-world-boss-capture-1';
+import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v024-world-boss-capture-1';
+import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v024-world-boss-capture-1';
+import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v024-world-boss-capture-1';
+import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v024-world-boss-capture-1';
+import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v024-world-boss-capture-1';
+import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v024-world-boss-capture-1';
+import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v024-world-boss-capture-1';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
@@ -74,7 +74,7 @@ function memberCard(state, member, index) {
   const stats = getFinalStats(state, member);
   const equipped = getEquippedSummary(state, member.id);
   const isRecruitBoss = member.id === 'blackwind-lord' || member.bossRecruit;
-  const rarity = isRecruitBoss ? getBossRarity(member.rarityRank) : member.worldBoss?{rank:5,stars:'★★★★★',name:'世界王'}:null;
+  const rarity = isRecruitBoss ? getBossRarity(member.rarityRank) : member.worldBoss?{rank:5,stars:'★★★★★',name:'【世界王】'}:null;
   const resonance = isRecruitBoss||member.worldBoss ? resonancePanel(state, member) : '';
   const worldId=member.id==='nether-thunder-beast'?'netherThunder':'crimsonTiger';
   const progression = member.id === 'blackwind-lord' ? promotionPanel(state, member) : member.worldBoss ? breakthroughPanel(state,worldId) : '';
@@ -162,8 +162,8 @@ function bossCodex(state) {
 }
 
 function worldBoss(state){
-  const cards=Object.values(WORLD_BOSSES).map(profile=>{const w=getWorldBossState(state,profile.id),r=getWorldBossRecordState(state,profile.id),locked=!w.unlocked,status=locked?'未解鎖':w.captured?'已收服':w.defeated?'已擊敗':w.attempts?'已發現':'已解鎖';return `<article class="world-boss-card boss-rank-5 ${locked?'locked':''}"><div class="danger-stars">★★★★★</div><h2>${profile.title}</h2><strong>${status}</strong>${locked?'<p>完成第二章後解鎖</p>':`<div class="danger-line"><span>建議戰力 ${profile.recommendedPower.toLocaleString()}</span><span>目前戰力 ${getTeamPower(state).toLocaleString()}</span></div><dl><div><dt>挑戰／擊敗</dt><dd>${w.attempts} / ${w.defeats}</dd></div><div><dt>最佳階段</dt><dd>${w.bestPhase?`第 ${w.bestPhase} 階段`:'尚無'}</dd></div><div><dt>最快</dt><dd>${r.fastestRound?`${r.fastestRound} 回合`:'尚無'}</dd></div><div><dt>最高傷害</dt><dd>${r.highestDamage}</dd></div></dl>${button(`world-boss:challenge:${profile.id}`,'查看／挑戰','boss-button')}`}</article>`;}).join('');
-  return `<section class="scene world-boss-scene"><div class="scene-copy"><p class="eyebrow">高難終局挑戰</p><h1>世界王祭壇</h1><p>選擇已解鎖的世界王並挑戰世界王。能力採固定數值，不會依玩家動態縮放。</p></div></section><section class="panel"><div class="world-boss-list">${cards}</div></section>`;
+  const cards=Object.values(WORLD_BOSSES).map(profile=>{const w=getWorldBossState(state,profile.id),r=getWorldBossRecordState(state,profile.id),locked=!w.unlocked,captured=hasCapturedWorldBoss(state,profile.id),status=captured?'✓ 已收服':'未收服';return `<article class="world-boss-card boss-rank-5 ${locked?'locked':''}"><div class="danger-stars">★★★★★ 世界王</div><h2>${profile.name}</h2><span class="world-capture-status ${captured?'captured':'uncaptured'}">【${status}】</span>${locked?'<p>尚未解鎖・完成第二章後開放</p>':`<div class="danger-line"><span>建議戰力 ${profile.recommendedPower.toLocaleString()}</span><span>目前戰力 ${getTeamPower(state).toLocaleString()}</span></div><dl><div><dt>挑戰／擊敗</dt><dd>${w.attempts} / ${w.defeats}</dd></div><div><dt>最佳階段</dt><dd>${w.bestPhase?`第 ${w.bestPhase} 階段`:'尚無'}</dd></div><div><dt>最快</dt><dd>${r.fastestRound?`${r.fastestRound} 回合`:'尚無'}</dd></div><div><dt>最高傷害</dt><dd>${r.highestDamage}</dd></div></dl>${button(`world-boss:challenge:${profile.id}`,captured?'再次挑戰':'挑戰世界王','boss-button')}`}</article>`;}).join('');
+  return `<section class="scene world-boss-scene"><div class="scene-copy"><p class="eyebrow">高難終局挑戰</p><h1>世界王祭壇</h1><p>選擇已解鎖的世界王並挑戰世界王。能力採固定數值，不會依玩家動態縮放。</p></div></section><section class="panel"><div class="world-boss-list">${cards}</div><p class="notice">${esc(state.notice)}</p></section>`;
 }
 
 function shop(state) {
@@ -277,12 +277,13 @@ function battle(state) {
   const quickDrop = battle.dropId && ['稀有', '史詩'].includes(ITEMS[battle.dropId]?.quality) && !battle.awaitingRecruit && !battle.dungeon ? button('battle:quick-equip', '立即裝備', 'primary') : '';
   const recruitId=battle.worldBoss?(battle.worldBossId==='netherThunder'?'nether-thunder-beast':'crimson-tiger'):(battle.bossKind||'blackwind-lord');
   const currentLeader = [...state.party,...state.roster].find(member => member?.id === recruitId);
+  const worldCaptured=battle.worldBoss&&hasCapturedWorldBoss(state,battle.worldBossId||'crimsonTiger');
   const captureLabel = bossRarity ? (!currentLeader ? '招降 Boss' : bossRarity.rank > (currentLeader.rarityRank || 1) ? '招降並升格' : '招降／升格') : '';
   const noDowngrade = bossRarity && currentLeader && bossRarity.rank <= (currentLeader.rarityRank || 1) ? '<small>敵方稀有度不高於現有武將；成功時不會降階，將轉化額外金錢。</small>' : '';
   const talismanLoot = Object.entries(battle.talismanDrops || {}).map(([id, amount]) => `${TALISMANS[id].name} ×${amount}`).join('、');
   const divineLoot = Object.entries(battle.divineTalismanDrops || {}).map(([id, amount]) => `${DIVINE_TALISMANS[id].name} ×${amount}`).join('、');
   const recruitName=battle.worldBoss?WORLD_BOSSES[battle.worldBossId||'crimsonTiger'].title:battle.bossKind?CHAPTER2_BOSSES[battle.bossKind].name:'黑風寨主';
-  const recruitPanel = battle.awaitingRecruit && bossRarity ? `<section class="boss-recruit-first"><p class="eyebrow">Boss Victory</p><h2>${battle.worldBoss?'★★★★★ ':`${bossRarity.stars} ${bossRarity.name}・`}${recruitName}</h2><strong>${battle.worldBoss?'收服成功率 5%':`招降成功率 ${Math.round(bossRarity.captureRate * 100)}%`}</strong>${battle.worldBoss?'':noDowngrade}<div class="battle-actions">${button('battle:recruit',battle.worldBoss?'🔥 收服世界王':captureLabel,'primary recruit-primary')}${button('battle:spare','放棄')}</div><div class="victory-loot"><b>戰利品</b><span>EXP ${battle.rewardExp||0}</span><span>金錢 ${battle.rewardGold||0}</span>${battle.dropId?`<span>裝備 ${ITEMS[battle.dropId].name}</span>`:''}${talismanLoot?`<span>${talismanLoot}</span>`:''}${divineLoot?`<span class="divine-loot">${divineLoot}</span>`:''}</div></section>`:'';
+  const recruitPanel = battle.awaitingRecruit && bossRarity ? `<section class="boss-recruit-first"><p class="eyebrow">Boss Victory</p><h2>${battle.worldBoss?'★★★★★ ':`${bossRarity.stars} ${bossRarity.name}・`}${recruitName}</h2>${battle.worldBoss?`<span class="world-capture-status ${worldCaptured?'captured':'uncaptured'}">【${worldCaptured?'此世界王已收服':'尚未收服'}】</span>`:''}<strong>${battle.worldBoss?(worldCaptured?'戰利品可正常取得':`收服成功率 ${Math.round((WORLD_BOSSES[battle.worldBossId||'crimsonTiger']?.captureRate||.05)*100)}%`):`招降成功率 ${Math.round(bossRarity.captureRate * 100)}%`}</strong>${battle.worldBoss?'':noDowngrade}<div class="battle-actions">${worldCaptured?button('battle:recruit','✓ 已收服','primary recruit-primary',true):button('battle:recruit',battle.worldBoss?'收服世界王':captureLabel,'primary recruit-primary')}${button('battle:spare',worldCaptured?'領取戰利品並離開':'放棄招降')}</div><div class="victory-loot"><b>戰利品</b><span>EXP ${battle.rewardExp||0}</span><span>金錢 ${battle.rewardGold||0}</span>${battle.dropId?`<span>裝備 ${ITEMS[battle.dropId].name}</span>`:''}${talismanLoot?`<span>${talismanLoot}</span>`:''}${divineLoot?`<span class="divine-loot">${divineLoot}</span>`:''}</div></section>`:'';
   const finishedActions = battle.awaitingRecruit ? '' : `${quickDrop}${button('battle:close', battle.result === 'victory' ? (battle.dungeon ? '結束本層' : state.exploration.auto ? '自動繼續中' : '繼續探索') : '返回桃源村', 'primary')}`;
   const bossLabel=battle.worldBoss?`★★★★★ ${WORLD_BOSSES[battle.worldBossId||'crimsonTiger'].title}`:`${bossRarity?.stars||''} ${bossRarity?.name||''}・${battle.bossKind?CHAPTER2_BOSSES[battle.bossKind].name:'黑風寨主'}`;
   const dungeonName=state.dungeon.name||DUNGEON.name;
@@ -311,7 +312,7 @@ function bossWarning(state) {
   const bossName=state.ui.bossKind?ENEMIES[state.ui.bossKind]?.name:'黑風寨主';return `<div class="danger-overlay"><section class="danger-card boss-rank-${rarity.rank}"><p class="eyebrow">偵測到強大的氣息……</p><div class="danger-stars">${rarity.stars}</div><h2>${rarity.name} Boss</h2><h3>【${esc(bossName)}】</h3><dl><div><dt>你的隊伍戰力</dt><dd>${teamPower.toLocaleString()}</dd></div><div><dt>建議戰力</dt><dd>${rarity.recommendedPower.toLocaleString()}</dd></div></dl><p class="challenge-rating ${safe ? 'safe' : 'warning'}">${rating}</p><div class="action-grid">${button('boss:engage', rarity.rank === 5 ? '硬闖' : '迎戰', 'boss-button')}${button('boss:retreat', '撤退')}</div></section></div>`;
 }
 
-function worldBossConfirm(state){if(!state.ui.worldBossConfirm)return '';const profile=WORLD_BOSSES[state.ui.selectedWorldBoss]||WORLD_BOSS,risky=getTeamPower(state)<profile.recommendedPower;return `<div class="danger-overlay"><section class="danger-card boss-rank-5"><div class="danger-stars">★★★★★</div><h2>${profile.title}</h2><p class="challenge-rating warning">☠️ 極度危險</p><p>${risky?'目前戰力遠低於建議戰力，仍可硬闖。':'即將挑戰世界王。'}</p><div class="action-grid">${button('world-boss:engage','硬闖','boss-button')}${button('world-boss:cancel','取消')}</div></section></div>`;}
+function worldBossConfirm(state){if(!state.ui.worldBossConfirm)return '';const id=state.ui.selectedWorldBoss||'crimsonTiger',profile=WORLD_BOSSES[id]||WORLD_BOSS,captured=hasCapturedWorldBoss(state,id),risky=getTeamPower(state)<profile.recommendedPower;return `<div class="danger-overlay"><section class="danger-card boss-rank-5"><div class="danger-stars">★★★★★</div><h2>${profile.title}</h2><span class="world-capture-status ${captured?'captured':'uncaptured'}">【${captured?'✓ 已收服':'未收服'}】</span><p class="challenge-rating warning">☠️ 極度危險</p><p>${risky?'目前戰力遠低於建議戰力，仍可硬闖。':'即將挑戰世界王。'}</p><div class="action-grid">${button('world-boss:engage',captured?'再次挑戰':'挑戰世界王','boss-button')}${button('world-boss:cancel','取消')}</div></section></div>`;}
 
 function chapterComplete(state) {
   if (!state.ui.chapterComplete) return '';
