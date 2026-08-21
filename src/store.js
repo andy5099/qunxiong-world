@@ -1,9 +1,9 @@
-import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v026-bonds-combo-2';
-import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v026-bonds-combo-2';
-import { WORLD_BOSSES, normalizeWorldBoss } from './world-boss-system.js?v=v026-bonds-combo-2';
-import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v026-bonds-combo-2';
-import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v026-bonds-combo-2';
-import { discoverActiveBonds, normalizeBondState } from './bond-system.js?v=v026-bonds-combo-2';
+import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v026-bonds-combo-3';
+import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v026-bonds-combo-3';
+import { WORLD_BOSSES, normalizeWorldBoss } from './world-boss-system.js?v=v026-bonds-combo-3';
+import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v026-bonds-combo-3';
+import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v026-bonds-combo-3';
+import { discoverActiveBonds, normalizeBondState } from './bond-system.js?v=v026-bonds-combo-3';
 
 export const STORAGE_KEY = 'qunxiong-world-v01';
 const LEGACY_KEY = 'qunxiong-world-v2';

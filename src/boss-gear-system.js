@@ -1,4 +1,4 @@
-import { ITEMS } from './data.js?v=v026-bonds-combo-2';
+import { ITEMS } from './data.js?v=v026-bonds-combo-3';
 
 export const DIVINE_TALISMANS = {
   novice: { id: 'novice', name: '初階神兵符' },

@@ -1,16 +1,16 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v026-bonds-combo-2';
-import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v026-bonds-combo-2';
-import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v026-bonds-combo-2';
-import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v026-bonds-combo-2';
-import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v026-bonds-combo-2';
-import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v026-bonds-combo-2';
-import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v026-bonds-combo-2';
-import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v026-bonds-combo-2';
-import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v026-bonds-combo-2';
-import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v026-bonds-combo-2';
-import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v026-bonds-combo-2';
-import { compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, WORLD_BOSS_VARIANT_CONFIG } from './world-boss-collection.js?v=v026-bonds-combo-2';
-import { BOND_DATA, getActiveBonds, getFormableBonds } from './bond-system.js?v=v026-bonds-combo-2';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v026-bonds-combo-3';
+import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v026-bonds-combo-3';
+import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v026-bonds-combo-3';
+import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v026-bonds-combo-3';
+import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v026-bonds-combo-3';
+import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v026-bonds-combo-3';
+import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v026-bonds-combo-3';
+import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v026-bonds-combo-3';
+import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v026-bonds-combo-3';
+import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v026-bonds-combo-3';
+import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v026-bonds-combo-3';
+import { compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, WORLD_BOSS_VARIANT_CONFIG } from './world-boss-collection.js?v=v026-bonds-combo-3';
+import { BOND_DATA, getActiveBonds, getFormableBonds } from './bond-system.js?v=v026-bonds-combo-3';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
@@ -221,8 +221,10 @@ function comparison(state) {
   if (!itemId) return '<p class="empty">點選裝備的「比較」，即可查看各武將目前裝備與能力差異。</p>';
   const item = ITEMS[itemId];
   if (!item || !(state.inventory[itemId] > 0)) return '<p class="empty">此裝備已不在背包。</p>';
-  const memberId = state.ui.selectedMember || 'hero';
+  const requestedMemberId = state.ui.selectedMember || 'hero';
+  const memberId = state.party.some(member=>member?.id===requestedMemberId) ? requestedMemberId : (state.party.find(Boolean)?.id || 'hero');
   const comparisonData = compareItem(state, memberId, itemId);
+  if (!comparisonData) return '<p class="empty">目前沒有可比較裝備的出戰武將。</p>';
   const memberOptions = state.party.filter(Boolean).map(member => `<option value="${member.id}" ${member.id === memberId ? 'selected' : ''}>${esc(member.name)}</option>`).join('');
   return `<section class="comparison"><h2>裝備比較</h2><label>裝備給誰<select data-member-select>${memberOptions}</select></label><div class="compare-grid"><article><small>目前裝備</small><h3>${comparisonData.current?.name || '無'}</h3><p>${comparisonData.current?.description || '沒有能力加成'}</p></article><article class="${qualityClass(item.quality)}"><small>新裝備・${item.quality}</small><h3>${item.name}</h3><p>${item.description}</p></article></div><div class="difference-list">${comparisonData.differences.map(diff => `<span class="${diff.value > 0 ? 'positive' : diff.value < 0 ? 'negative' : ''}">${diff.name} ${diff.value > 0 ? '+' : ''}${diff.value}</span>`).join('')}</div>${button(`equip:${item.id}`, `裝備給${comparisonData.member.name}`, 'primary', (state.inventory[item.id] || 0) <= equippedCount(state, item.id) - (state.equipment[memberId]?.[item.slot] === item.id ? 1 : 0))}</section>`;
 }

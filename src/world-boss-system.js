@@ -1,6 +1,6 @@
-import { createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v026-bonds-combo-2';
-import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v026-bonds-combo-2';
-import { compareWorldBossQuality, normalizeWorldBossIndividual } from './world-boss-collection.js?v=v026-bonds-combo-2';
+import { createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v026-bonds-combo-3';
+import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v026-bonds-combo-3';
+import { compareWorldBossQuality, normalizeWorldBossIndividual } from './world-boss-collection.js?v=v026-bonds-combo-3';
 
 export const WORLD_BOSSES = {
   crimsonTiger: {
