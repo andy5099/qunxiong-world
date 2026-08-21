@@ -1,16 +1,17 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v026-bonds-combo-3';
-import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v026-bonds-combo-3';
-import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v026-bonds-combo-3';
-import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v026-bonds-combo-3';
-import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v026-bonds-combo-3';
-import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v026-bonds-combo-3';
-import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v026-bonds-combo-3';
-import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v026-bonds-combo-3';
-import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v026-bonds-combo-3';
-import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v026-bonds-combo-3';
-import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v026-bonds-combo-3';
-import { compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, WORLD_BOSS_VARIANT_CONFIG } from './world-boss-collection.js?v=v026-bonds-combo-3';
-import { BOND_DATA, getActiveBonds, getFormableBonds } from './bond-system.js?v=v026-bonds-combo-3';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v027-divine-awakening-1';
+import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v027-divine-awakening-1';
+import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v027-divine-awakening-1';
+import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v027-divine-awakening-1';
+import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v027-divine-awakening-1';
+import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v027-divine-awakening-1';
+import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v027-divine-awakening-1';
+import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v027-divine-awakening-1';
+import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v027-divine-awakening-1';
+import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v027-divine-awakening-1';
+import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v027-divine-awakening-1';
+import { compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, WORLD_BOSS_VARIANT_CONFIG } from './world-boss-collection.js?v=v027-divine-awakening-1';
+import { BOND_DATA, getActiveBonds, getFormableBonds } from './bond-system.js?v=v027-divine-awakening-1';
+import { EQUIPMENT_AWAKENING_DATA, canAwakenEquipment, getAwakenedDisplayName, getAwakeningLevel, getAwakeningRequirement, isAwakeningEligible, isEquipmentLocked } from './equipment-awakening.js?v=v027-divine-awakening-1';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
@@ -186,8 +187,11 @@ function inventoryCard(state, item) {
   const available = owned - equipped;
   const gear = getBossGearInfo(item.id);
   const evolution = gear?.nextId ? bossGearEvolution(state, item, gear) : item.generalGear ? generalGearEvolution(state,item) : '';
-  return `<article class="inventory-item ${qualityClass(item.quality)} ${state.ui.selectedItem === item.id ? 'selected' : ''}"><div><span class="quality-label">${item.quality}</span><h3>${item.name}</h3><p>${item.description}</p><small>${SLOT_NAMES[item.slot]}・持有 ${owned}・可用 ${available}${equipped ? `・已裝備 ${equipped}` : ''}</small>${evolution}</div><div class="item-actions">${button(`quick:${item.id}`, '快速裝備', 'primary', available <= 0)}${button(`inspect:${item.id}`, '比較')}${button(`sell:${item.id}`, `出售 ${item.sell} 金`, '', available <= 0)}</div></article>`;
+  const awakening=getAwakeningLevel(state,item.id),locked=isEquipmentLocked(state,item.id);
+  return `<article class="inventory-item ${qualityClass(item.quality)} ${awakening?'awakened-gear':''} ${state.ui.selectedItem === item.id ? 'selected' : ''}"><div><span class="quality-label">${item.quality}${locked?'・🔒':''}</span><h3>${getAwakenedDisplayName(state,item.id)}</h3><p>${item.description}</p><small>${SLOT_NAMES[item.slot]}・持有 ${owned}・可用 ${available}${equipped ? `・已裝備 ${equipped}` : ''}${awakening?`・覺醒 ${awakening}/3`:''}</small>${evolution}</div><div class="item-actions">${isAwakeningEligible(item.id)?button(`awakening:view:${item.id}`,awakening>=3?'神裝完成':'神裝覺醒','awakening-button'):''}${button(`awakening:lock:${item.id}`,locked?'解除鎖定':'鎖定')}${button(`quick:${item.id}`, '快速裝備', 'primary', available <= 0)}${button(`inspect:${item.id}`, '比較')}${button(`sell:${item.id}`, `出售 ${item.sell} 金`, '', available <= 0||locked)}</div></article>`;
 }
+
+function awakeningPanel(state){const itemId=state.ui.awakeningItem,item=ITEMS[itemId];if(!item)return'';const data=EQUIPMENT_AWAKENING_DATA[itemId],level=getAwakeningLevel(state,itemId),requirement=getAwakeningRequirement(state,itemId),check=canAwakenEquipment(state,itemId),effects=data?.effects||[],labels={mightPct:'武力',defensePct:'防禦',hpPct:'兵力',weakDamage:'弱點傷害',breakBonus:'BREAK',counterBonus:'反擊',wallBonus:'撞牆追擊',executeBonus:'斬殺',burnBonus:'燃燒',lightningBonus:'雷擊',healBonus:'治療',gaugeBonus:'能量',extraHits:'追加 HIT',ultimateBonus:'奧義'};const describe=obj=>Object.entries(obj||{}).map(([key,value])=>`${labels[key]||key} +${value<1?Math.round(value*100)+'%':value}`).join('・')||'尚未覺醒';return `<div class="danger-overlay"><section class="danger-card awakening-card"><p class="eyebrow">神裝覺醒</p><h2>${getAwakenedDisplayName(state,itemId)}</h2><strong>覺醒 ${level} / 3</strong><div class="awakening-levels">${effects.map((effect,index)=>`<article class="${level>=index+1?'active':''}"><b>覺醒 ${index+1}</b><span>${describe(effect)}</span></article>`).join('')}</div>${requirement?`<div class="awakening-cost"><b>下一階需求</b><span>同名裝備 ${requirement.ownedCopies} / ${requirement.copies}</span><span>${DIVINE_TALISMANS[requirement.talisman].name} ${requirement.ownedTalisman} / ${requirement.amount}</span></div>`:'<p>已達目前覺醒上限。</p>'}<p>${check.ok?'覺醒成功率 100%，完成後會自動重新鎖定。':check.reason}</p><div class="action-grid">${requirement?button(state.ui.awakeningConfirm?`awakening:execute:${itemId}`:`awakening:confirm:${itemId}`,state.ui.awakeningConfirm?'確認消耗並覺醒':'覺醒','primary',!check.ok):''}${button('awakening:close','返回')}</div></section></div>`;}
 
 function generalGearEvolution(state,item){
   const next=getNextGearTier(item.id);if(!next)return '<div class="gear-evolution"><strong>一般裝備最高階</strong><span>史詩不可再升階</span></div>';
@@ -230,9 +234,9 @@ function comparison(state) {
 }
 
 function inventory(state) {
-  const equipment = Object.values(ITEMS).filter(item => item.type === 'equipment' && (state.inventory[item.id] || 0) > 0).sort((a, b) => QUALITY_ORDER[b.quality] - QUALITY_ORDER[a.quality] || a.name.localeCompare(b.name, 'zh-Hant'));
+  const filter=state.equipmentAwakening?.filter||'all',all=Object.values(ITEMS).filter(item => item.type === 'equipment' && (state.inventory[item.id] || 0) > 0),equipment=all.filter(item=>filter==='all'||filter==='awakening'&&isAwakeningEligible(item.id)||filter==='exclusive'&&(item.bossOnly||item.worldBossOnly)||filter==='locked'&&isEquipmentLocked(state,item.id)).sort((a, b) => QUALITY_ORDER[b.quality] - QUALITY_ORDER[a.quality] || a.name.localeCompare(b.name, 'zh-Hant'));
   const changes = state.ui.optimizeChanges || [];
-  return `<section class="panel inventory-panel"><p class="eyebrow">共用背包・同名同階堆疊</p><div class="inventory-heading"><h1>背包裝備</h1>${button('promote-all-gear','一鍵升階可合成裝備','primary',!equipment.some(item=>item.generalGear&&getAvailableGearCount(state,item.id)>=3))}${button('optimize-equipment', '一鍵最佳裝備', 'primary', !equipment.length)}</div>${divineTalismanPanel(state)}${quickEquipPanel(state)}${comparison(state)}${changes.length ? `<div class="optimize-result"><strong>最佳化結果</strong>${changes.slice(0, 12).map(change => `<span>${esc(change)}</span>`).join('')}</div>` : ''}<div class="inventory-list">${equipment.length ? equipment.map(item => inventoryCard(state, item)).join('') : '<p class="empty">尚未取得裝備。黑風森林的敵人有機會掉落裝備。</p>'}</div><p class="notice">${esc(state.notice)}</p></section>`;
+  return `<section class="panel inventory-panel"><p class="eyebrow">共用背包・同名同階堆疊</p><div class="inventory-heading"><h1>背包裝備</h1>${button('promote-all-gear','一鍵升階可合成裝備','primary',!all.some(item=>item.generalGear&&getAvailableGearCount(state,item.id)>=3))}${button('optimize-equipment', '一鍵最佳裝備', 'primary', !all.length)}</div><div class="inventory-filters">${[['all','全部'],['awakening','可覺醒'],['exclusive','專屬裝'],['locked','已鎖定']].map(([id,label])=>button(`awakening:filter:${id}`,label,filter===id?'primary mini':'mini')).join('')}</div>${divineTalismanPanel(state)}${quickEquipPanel(state)}${comparison(state)}${changes.length ? `<div class="optimize-result"><strong>最佳化結果</strong>${changes.slice(0, 12).map(change => `<span>${esc(change)}</span>`).join('')}</div>` : ''}<div class="inventory-list">${equipment.length ? equipment.map(item => inventoryCard(state, item)).join('') : '<p class="empty">此篩選沒有裝備。</p>'}</div><p class="notice">${esc(state.notice)}</p>${awakeningPanel(state)}</section>`;
 }
 
 function settings(state) {

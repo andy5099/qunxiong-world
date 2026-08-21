@@ -1,9 +1,10 @@
-import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v026-bonds-combo-3';
-import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v026-bonds-combo-3';
-import { WORLD_BOSSES, normalizeWorldBoss } from './world-boss-system.js?v=v026-bonds-combo-3';
-import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v026-bonds-combo-3';
-import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v026-bonds-combo-3';
-import { discoverActiveBonds, normalizeBondState } from './bond-system.js?v=v026-bonds-combo-3';
+import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v027-divine-awakening-1';
+import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v027-divine-awakening-1';
+import { WORLD_BOSSES, normalizeWorldBoss } from './world-boss-system.js?v=v027-divine-awakening-1';
+import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v027-divine-awakening-1';
+import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v027-divine-awakening-1';
+import { discoverActiveBonds, normalizeBondState } from './bond-system.js?v=v027-divine-awakening-1';
+import { normalizeEquipmentAwakening } from './equipment-awakening.js?v=v027-divine-awakening-1';
 
 export const STORAGE_KEY = 'qunxiong-world-v01';
 const LEGACY_KEY = 'qunxiong-world-v2';
@@ -42,8 +43,9 @@ export function createState(playerName) {
     chapter2: normalizeChapter2(),
     chapter2Codex: normalizeChapter2Codex(),
     bonds: normalizeBondState(),
+    equipmentAwakening: normalizeEquipmentAwakening(),
     roster: [],
-    ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false, chapter2Complete:false, bossWarning: false, bossRarityRank: null, bossKind:null, worldBossConfirm: false, worldBossCandidate:null, selectedWorldBoss:'crimsonTiger', codexDetail: null, captureResult: null, worldBossComparison:null, quickEquipItem: null, partyEquipMember: null, partyEquipSlot: null, partySwapSlot:null, candidateSort:'power', optimizeChanges: [] },
+    ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false, chapter2Complete:false, bossWarning: false, bossRarityRank: null, bossKind:null, worldBossConfirm: false, worldBossCandidate:null, selectedWorldBoss:'crimsonTiger', codexDetail: null, captureResult: null, worldBossComparison:null, quickEquipItem: null, partyEquipMember: null, partyEquipSlot: null, partySwapSlot:null, candidateSort:'power', optimizeChanges: [], awakeningItem:null, awakeningConfirm:false },
     settings: { autoBattle: false },
     exploration: { auto: false, active: false },
     dungeon: { warning: false, active: false, name: '血色洞窟', dungeonId:'bloodCavern', floor: 0, sourceScreen: null, sourceLocation: null, pity: 0, awaitingAdvance: false, completed: false, loot: { gold: 0, potion: 0, items: [], talismans: {} } },
@@ -167,9 +169,10 @@ export function normalize(raw) {
     worldBossRecordsById:{netherThunder:{fastestRound:Number(raw.worldBossRecordsById?.netherThunder?.fastestRound)>0?Number(raw.worldBossRecordsById.netherThunder.fastestRound):null,highestDamage:Math.max(0,Number(raw.worldBossRecordsById?.netherThunder?.highestDamage)||0)}},
     chapter2,chapter2Codex:normalizeChapter2Codex(raw.chapter2Codex),
     bonds:normalizeBondState(raw.bonds),
+    equipmentAwakening:normalizeEquipmentAwakening(raw.equipmentAwakening,raw.inventory),
     dungeon,
     bossProgress: normalizeBossProgress(raw.bossProgress),
-    ui: { ...base.ui, ...(raw.ui || {}), bossWarning: false, bossRarityRank: null, worldBossConfirm: false, worldBossCandidate:null, captureResult: null, worldBossComparison:null, optimizeChanges: [] },
+    ui: { ...base.ui, ...(raw.ui || {}), bossWarning: false, bossRarityRank: null, worldBossConfirm: false, worldBossCandidate:null, captureResult: null, worldBossComparison:null, optimizeChanges: [], awakeningItem:null, awakeningConfirm:false },
     settings: { ...base.settings, ...(raw.settings || {}) },
     exploration: { ...base.exploration, ...(raw.exploration || {}), auto: false, active: false },
     battle: null,

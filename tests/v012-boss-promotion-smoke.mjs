@@ -11,7 +11,7 @@ const check = (value, message) => { assert.ok(value, message); checks += 1; };
 const equal = (actual, expected, message) => { assert.equal(actual, expected, message); checks += 1; };
 const rng = value => () => value;
 
-equal(SAVE_VERSION, 16, 'save version 16');
+equal(SAVE_VERSION,17, 'save version 17');
 equal(rollBossRarity(rng(0)).rank, 1, 'normal rarity');
 equal(rollBossRarity(rng(.56)).rank, 2, 'elite rarity');
 equal(rollBossRarity(rng(.81)).rank, 3, 'rare rarity');
@@ -138,7 +138,7 @@ promotion.party[4].rarityName = '傳說';
 equal(attemptPromotion(promotion).reason, 'max', 'five star cannot promote');
 
 const migrated = normalize({ ...state, version: 7, bossProgress: undefined });
-equal(migrated.version, 16, 'version 7 migrates to current');
+equal(migrated.version, 17, 'version 7 migrates to current');
 equal(migrated.party[4].rarityRank, 4, 'leader rarity preserved');
 equal(migrated.equipment['blackwind-lord'].weapon, 'blackwindBlade', 'migration preserves equipment');
 check(Object.keys(migrated.bossProgress.talismans).length === 4, 'migration adds talismans');

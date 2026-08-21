@@ -1,14 +1,15 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v026-bonds-combo-3';
-import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v026-bonds-combo-3';
-import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo, rollDivineTalismanDrops } from './boss-gear-system.js?v=v026-bonds-combo-3';
-import { WORLD_BOSS, WORLD_BOSSES, addWorldBossToRoster, applyCapturedWorldBossIndividual, createWorldBossEnemy, getWorldBossMasteryState, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v026-bonds-combo-3';
-import { applyWorldBossVariant, compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, recordWorldBossVariant, rollWorldBossVariant } from './world-boss-collection.js?v=v026-bonds-combo-3';
-import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v026-bonds-combo-3';
-import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v026-bonds-combo-3';
-import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v026-bonds-combo-3';
-import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v026-bonds-combo-3';
-import { ensureMarbleBattle, getCurrentMarble, getFormationRole, getFormationTier, getMarbleSkill, getMarbleUltimate, getUltimateEnergy, hitMultiplier } from './marble-battle.js?v=v026-bonds-combo-3';
-import { initializeBondRuntime, noteBondEvent, updateBondScheduler } from './bond-system.js?v=v026-bonds-combo-3';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v027-divine-awakening-1';
+import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v027-divine-awakening-1';
+import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo, rollDivineTalismanDrops } from './boss-gear-system.js?v=v027-divine-awakening-1';
+import { WORLD_BOSS, WORLD_BOSSES, addWorldBossToRoster, applyCapturedWorldBossIndividual, createWorldBossEnemy, getWorldBossMasteryState, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v027-divine-awakening-1';
+import { applyWorldBossVariant, compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, recordWorldBossVariant, rollWorldBossVariant } from './world-boss-collection.js?v=v027-divine-awakening-1';
+import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v027-divine-awakening-1';
+import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v027-divine-awakening-1';
+import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v027-divine-awakening-1';
+import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v027-divine-awakening-1';
+import { ensureMarbleBattle, getCurrentMarble, getFormationRole, getFormationTier, getMarbleSkill, getMarbleUltimate, getUltimateEnergy, hitMultiplier } from './marble-battle.js?v=v027-divine-awakening-1';
+import { initializeBondRuntime, noteBondEvent, updateBondScheduler } from './bond-system.js?v=v027-divine-awakening-1';
+import { getMemberAwakening, isEquipmentLocked } from './equipment-awakening.js?v=v027-divine-awakening-1';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -33,9 +34,10 @@ export function getFinalStats(state, memberOrId) {
   const worldId=member.id==='nether-thunder-beast'?'netherThunder':member.id==='crimson-tiger'?'crimsonTiger':null;
   const mastery = worldId ? getMasteryProfile(state,worldId) : { mightPct: 0, hpPct: 0 };
   const breakthrough = worldId ? getBreakthroughProfile(getWorldBossState(state,worldId).breakthroughLevel) : {mightPct:0,hpPct:0,defensePct:0,speedPct:0};
-  result.might = Math.round(result.might * (1 + resonance.mightPct + worldResonance.mightPct + chapterResonance.mightPct + mastery.mightPct + breakthrough.mightPct));
-  result.defense = Math.round(result.defense * (1 + resonance.defensePct + worldResonance.defensePct + chapterResonance.defensePct + breakthrough.defensePct));
-  result.maxHp = Math.round(result.maxHp * (1 + resonance.hpPct + worldResonance.hpPct + chapterResonance.hpPct + mastery.hpPct + breakthrough.hpPct));
+  const awakening=getMemberAwakening(state,member).effects;
+  result.might = Math.round(result.might * (1 + resonance.mightPct + worldResonance.mightPct + chapterResonance.mightPct + mastery.mightPct + breakthrough.mightPct+(awakening.mightPct||0)));
+  result.defense = Math.round(result.defense * (1 + resonance.defensePct + worldResonance.defensePct + chapterResonance.defensePct + breakthrough.defensePct+(awakening.defensePct||0)));
+  result.maxHp = Math.round(result.maxHp * (1 + resonance.hpPct + worldResonance.hpPct + chapterResonance.hpPct + mastery.hpPct + breakthrough.hpPct+(awakening.hpPct||0)));
   result.speed = Math.round(result.speed * (1 + resonance.speedPct + worldResonance.speedPct + chapterResonance.speedPct + breakthrough.speedPct));
   return result;
 }
@@ -707,13 +709,13 @@ export function resolveMarbleEvent(state,event,rng=Math.random){
   if(event.type!=='boss')return event;
   if(event.weak)noteBondEvent(marble,'weak');
   const target=battle.enemies.find(enemy=>enemy.boss&&alive(enemy))||battle.enemies.find(alive);if(!target)return null;
-  marble.shot.hits++;const hit=marble.phase==='pinball'?(marble.combo=(marble.combo||0)+1):marble.shot.hits,skill=getMarbleSkill(member),ultimate=getMarbleUltimate(member),stats=getFinalStats(state,member);let multiplier=hitMultiplier(hit);if(marble.phase==='pinball'){const now=Date.now();if(marble.stats.lastHitAt)marble.stats.hitGaps.push((now-marble.stats.lastHitAt)/1000);marble.stats.lastHitAt=now;marble.assistIn=0;marble.maxCombo=Math.max(marble.maxCombo||0,hit);if(hit>=100&&!marble.climaxTime){marble.climaxTime=2.6;marble.effects.push({type:'climax',x:180,y:215,text:'天下無雙！',life:1});}}
+  marble.shot.hits++;const hit=marble.phase==='pinball'?(marble.combo=(marble.combo||0)+1):marble.shot.hits,skill=getMarbleSkill(member),ultimate=getMarbleUltimate(member),stats=getFinalStats(state,member),awakening=getMemberAwakening(state,member),aw=awakening.effects||{};let multiplier=hitMultiplier(hit);if(marble.phase==='pinball'){const now=Date.now();if(marble.stats.lastHitAt)marble.stats.hitGaps.push((now-marble.stats.lastHitAt)/1000);marble.stats.lastHitAt=now;marble.assistIn=0;marble.maxCombo=Math.max(marble.maxCombo||0,hit);if(hit>=100&&!marble.climaxTime){marble.climaxTime=2.6;marble.effects.push({type:'climax',x:180,y:215,text:'天下無雙！',life:1});}}
   if(marble.phase==='pinball'){
     marble.comboTime=3;
     const formationTier=getFormationTier(hit);if(formationTier>marble.formationReady)marble.formationReady=formationTier;
     const formation=marble.formationActive,formationRole=formation?.role,formationPower=formation?.tier||0;if(formation){formation.hits++;if(formationRole==='vanguard'){multiplier*=1+formationPower*.1;if(event.weak)multiplier*=1+formationPower*.06;}if(formationRole==='world')multiplier*=1+formationPower*.08;if(formationRole==='breaker'&&formationPower>=3&&formation.hits===1)target.marbleDefenseDown=1;if(formationRole==='support'&&formation.hits===1){for(const ally of state.party.filter(alive)){const allyStats=getFinalStats(state,ally);ally.hp=Math.min(allyStats.maxHp,ally.hp+Math.round(allyStats.maxHp*.03*formationPower));}}}
     const talent=member.individualTalent;if(talent==='blaze'&&hit>=20)multiplier*=1.05;if(talent==='wildfire'&&hit>=50)multiplier*=1.1;if(talent==='flameKing'&&formationPower)multiplier*=1.08;if(talent==='heavenBlood'&&formationPower===4){multiplier*=1.18;const entity=marble.entities[memberIndex];if(entity){entity.vx*=1.03;entity.vy*=1.03;}marble.effects.push({type:'talent-fire',x:marble.boss.x,y:marble.boss.y,text:'焚天血脈！',life:.7});}if(talent==='thunderRush'&&event.speed>500)multiplier*=1.06;if(talent==='thunderChain')multiplier*=1.1;if(talent==='thunderField'&&formationPower)multiplier*=1.09;if(talent==='netherLightning'&&formationPower===4){multiplier*=1.2;marble.effects.push({type:'talent-thunder',x:marble.boss.x,y:marble.boss.y,text:'九幽神雷！',life:.7});}
-    let breakGain=event.weak?34:0;if(formationRole==='breaker')breakGain+=8*formationPower+(event.weak?10*formationPower:0);if(event.weak&&marble.breakImmunity<=0){marble.breakGauge=Math.min(100,(marble.breakGauge||0)+breakGain);if(marble.breakGauge>=100&&marble.breakTime<=0){marble.breakTime=3.5;marble.stats.breaks++;marble.camera.shake=.32;marble.lastProgressAt=Date.now();}}
+    let breakGain=(event.weak?34:0)+(aw.breakBonus||0);if(formationRole==='breaker')breakGain+=8*formationPower+(event.weak?10*formationPower:0);if(event.weak&&marble.breakImmunity<=0){marble.breakGauge=Math.min(100,(marble.breakGauge||0)+breakGain);if(marble.breakGauge>=100&&marble.breakTime<=0){marble.breakTime=3.5;marble.stats.breaks++;marble.camera.shake=.32;marble.lastProgressAt=Date.now();}}
     if(marble.breakTime>0)multiplier*=1.6;
     const slot=marble.skills?.[memberIndex];
     if(slot?.armed){multiplier*=member.id==='yellow-commander'&&target.hp/target.maxHp<.35?2.65:2;slot.armed=false;slot.energy=0;marble.stats.skills++;marble.camera.zoom=1.018;marble.camera.shake=.16;const entity=marble.entities[memberIndex],motion=skill.motion||'dash';if(entity){const dx=marble.boss.x-entity.x,dy=marble.boss.y-entity.y,d=Math.max(1,Math.hypot(dx,dy));if(['slash','pierce','burn','dash','hunt'].includes(motion)){entity.vx=dx/d*(motion==='pierce'?820:740);entity.vy=dy/d*(motion==='pierce'?820:740);}else if(motion==='ricochet'){entity.vx=(entity.x<180?1:-1)*760;entity.vy=-360;}else if(motion==='smash')marble.breakGauge=Math.min(100,marble.breakGauge+28);}if(motion==='support'){for(const ally of state.party.filter(alive)){const allyStats=getFinalStats(state,ally);ally.hp=Math.min(allyStats.maxHp,ally.hp+Math.round(allyStats.maxHp*.08));}}if(motion==='guard')marble.supportGuard=1;if(skill.burn)target.marbleBurn=Math.max(target.marbleBurn||0,2);marble.effects.push({type:`skill-${motion}`,x:marble.boss.x,y:marble.boss.y+35,text:`${member.name}・${skill.name}！`,life:1});}
@@ -729,12 +731,14 @@ export function resolveMarbleEvent(state,event,rng=Math.random){
   if(member.id==='yellow-commander'&&hit>=3)multiplier*=1.12;
   if(member.id==='yellow-commander'&&skill.execute)multiplier*=Math.min(1.5,1+(1-target.hp/target.maxHp)*.5);
   if(member.id==='zhang-bao'&&marble.shot.obstacleBounces)multiplier*=Math.min(1.4,1+marble.shot.obstacleBounces*.1);
+  if(aw.weakDamage&&event.weak)multiplier*=1+aw.weakDamage;if(aw.counterBonus&&marble.stats?.perfectCounters)multiplier*=1+aw.counterBonus;if(aw.wallBonus&&marble.shot.wallBounces)multiplier*=1+Math.min(aw.wallBonus,marble.shot.wallBounces*.05);if(aw.executeBonus)multiplier*=1+aw.executeBonus*(1-target.hp/target.maxHp);if(aw.burnBonus&&target.marbleBurn)multiplier*=1+aw.burnBonus;if(aw.lightningBonus&&marble.shot.obstacleBounces)multiplier*=1+aw.lightningBonus;if((marble.shot.ultimate||marble.ultimateArmedAuto)&&aw.ultimateBonus)multiplier*=1+aw.ultimateBonus;
   if(member.rarityRank)multiplier*=1+(member.rarityRank-1)*.04;
   if(event.weak)multiplier*=1.5;
   const variance=.94+rng()*.12,defenseFactor=marble.shot.ultimate&&ultimate.pierce?.08:.24;let damage=Math.max(1,Math.round((stats.might*multiplier-Math.max(0,target.defense)*(target.marbleDefenseDown?.16:defenseFactor))*variance));
   if(marble.shot.ultimate&&ultimate.lightning&&hit===1)damage=Math.round(damage*1.16);
   if(battle.worldBoss){const eventCapRate=marble.shot.ultimate?.24:(marble.ultimateGauge===0?.12:.055);damage=Math.min(damage,Math.max(1,Math.floor(target.maxHp*eventCapRate)));}
   if(!Number.isFinite(damage)||damage<1)damage=1;
+  if(aw.extraHits){damage=Math.round(damage*(1+Math.min(2,aw.extraHits)*.16));marble.combo=(marble.combo||0)+aw.extraHits;marble.effects.push({type:'awakening',x:marble.boss.x,y:marble.boss.y+24,text:`神裝追擊 ${aw.extraHits} HIT`,life:.75});}
   damage=Math.min(target.hp,damage);target.hp=Math.max(0,target.hp-damage);marble.shot.damage+=damage;if(marble.phase==='pinball'){marble.hitStop=Math.max(marble.hitStop,event.weak?.04:.02);marble.camera.shake=Math.max(marble.camera.shake,event.weak?.14:.04);marble.camera.nudgeX=(event.x||marble.boss.x)<marble.boss.x?4:-4;marble.boss.flash=.1;marble.boss.recoilX=((event.x||marble.boss.x)<marble.boss.x?1:-1)*(event.weak?12:5);}
   if(target.worldBoss){const records=getWorldBossRecordState(state,target.worldBossId||battle.worldBossId||'crimsonTiger');records.highestDamage=Math.max(records.highestDamage,damage);}
   if(marble.skillArmed&&skill.debuff&&hit===1)target.marbleDefenseDown=1;
@@ -948,6 +952,7 @@ export function unequipItem(state, memberId, slot) {
 
 export function sellItem(state, itemId) {
   const item = ITEMS[itemId], owned = state.inventory[itemId] || 0;
+  if (isEquipmentLocked(state,itemId)) return { ok:false, message:'此裝備已鎖定，無法出售。' };
   if (!item?.sell || owned <= equippedCount(state, itemId)) return { ok: false, message: owned ? '已裝備物品必須先卸下。' : '背包中沒有此物品。' };
   state.inventory[itemId] -= 1;
   state.gold += item.sell;
