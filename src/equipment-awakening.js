@@ -1,4 +1,4 @@
-import { ITEMS } from './data.js?v=v031-quick-battle-1';
+import { ITEMS } from './data.js?v=v031-rematch-1';
 
 export const AWAKENING_COSTS = Object.freeze({
   1: { copies: 1, talisman: 'novice', amount: 1 },

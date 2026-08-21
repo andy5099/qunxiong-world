@@ -1,4 +1,4 @@
-import { GEAR_QUALITIES, ITEMS } from './data.js?v=v031-quick-battle-1';
+import { GEAR_QUALITIES, ITEMS } from './data.js?v=v031-rematch-1';
 
 const equippedCount = (state, itemId) => Object.values(state.equipment || {}).reduce((sum, slots) => sum + Object.values(slots || {}).filter(id => id === itemId).length, 0);
 export const getAvailableGearCount = (state, itemId) => Math.max(0, (state.inventory[itemId] || 0) - equippedCount(state,itemId));

@@ -1,6 +1,6 @@
-import { createBasaltTurtle, createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v031-quick-battle-1';
-import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v031-quick-battle-1';
-import { compareWorldBossQuality, normalizeWorldBossIndividual } from './world-boss-collection.js?v=v031-quick-battle-1';
+import { createBasaltTurtle, createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v031-rematch-1';
+import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v031-rematch-1';
+import { compareWorldBossQuality, normalizeWorldBossIndividual } from './world-boss-collection.js?v=v031-rematch-1';
 
 export const WORLD_BOSSES = {
   crimsonTiger: {

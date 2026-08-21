@@ -1,5 +1,5 @@
-import { AREAS } from './data.js?v=v031-quick-battle-1';
-import { WORLD_BOSSES, getWorldBossState } from './world-boss-system.js?v=v031-quick-battle-1';
+import { AREAS } from './data.js?v=v031-rematch-1';
+import { WORLD_BOSSES, getWorldBossState } from './world-boss-system.js?v=v031-rematch-1';
 
 export const QUICK_BOSS_CATALOG = [
   { id: 'blackwindLord', group: 'normal', name: '黑風寨主', areaId: 'stronghold', unlock: state => state.progress.bossUnlocked },
@@ -13,7 +13,8 @@ export const QUICK_BOSS_CATALOG = [
 ];
 
 export function normalizeQuickBattle(raw = {}) {
-  return { selectedType: raw.selectedType === 'world' ? 'world' : 'normal', selectedId: typeof raw.selectedId === 'string' ? raw.selectedId : null, resultReady: Boolean(raw.resultReady), lastSource: null };
+  const recent=raw.recent&&['normal','world'].includes(raw.recent.type)&&typeof raw.recent.id==='string'?{type:raw.recent.type,id:raw.recent.id,partyIds:Array.isArray(raw.recent.partyIds)?raw.recent.partyIds.slice(0,5).map(id=>typeof id==='string'?id:null):[]}:null;
+  return { selectedType: raw.selectedType === 'world' ? 'world' : 'normal', selectedId: typeof raw.selectedId === 'string' ? raw.selectedId : null, resultReady: Boolean(raw.resultReady), recent };
 }
 
 export function getQuickBattleGroups(state) {
@@ -31,6 +32,34 @@ export function selectQuickBoss(state, type, id) {
   state.quickBattle.selectedId = id;
   state.quickBattle.resultReady = false;
   return entry;
+}
+
+export function rememberQuickBattle(state) {
+  const entry=selectQuickBoss(state,state.quickBattle.selectedType,state.quickBattle.selectedId);
+  if(!entry)return false;
+  state.quickBattle.recent={type:state.quickBattle.selectedType,id:state.quickBattle.selectedId,partyIds:state.party.map(member=>member?.id||null)};
+  return true;
+}
+
+export function getRecentQuickBoss(state) {
+  const recent=state.quickBattle.recent;if(!recent)return null;
+  const groups=getQuickBattleGroups(state),list=recent.type==='world'?groups.world:[...groups.normal,...groups.hidden];
+  const entry=list.find(item=>item.id===recent.id);
+  return entry?{...entry,type:recent.type}:null;
+}
+
+export function restoreRecentQuickParty(state) {
+  const ids=state.quickBattle.recent?.partyIds;if(!Array.isArray(ids))return false;
+  const pool=[...state.party,...state.roster].filter(Boolean),byId=new Map(pool.map(member=>[member.id,member])),used=new Set(),next=[];
+  for(let slot=0;slot<5;slot+=1){
+    let member=byId.get(ids[slot]);
+    if(slot===0&&(!member?.isPlayer))member=state.party.find(candidate=>candidate?.isPlayer)||pool.find(candidate=>candidate?.isPlayer);
+    if(!member||used.has(member.id))member=pool.find(candidate=>!used.has(candidate.id)&&(slot!==0||candidate.isPlayer))||null;
+    next.push(member);if(member)used.add(member.id);
+  }
+  if(!next[0])return false;
+  state.party=next;state.roster=pool.filter(member=>!used.has(member.id));
+  return true;
 }
 
 export function prepareQuickBoss(state) {

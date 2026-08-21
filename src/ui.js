@@ -1,19 +1,19 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v031-quick-battle-1';
-import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v031-quick-battle-1';
-import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v031-quick-battle-1';
-import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v031-quick-battle-1';
-import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v031-quick-battle-1';
-import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v031-quick-battle-1';
-import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v031-quick-battle-1';
-import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v031-quick-battle-1';
-import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v031-quick-battle-1';
-import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v031-quick-battle-1';
-import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v031-quick-battle-1';
-import { compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, WORLD_BOSS_VARIANT_CONFIG } from './world-boss-collection.js?v=v031-quick-battle-1';
-import { BOND_DATA, getActiveBonds, getFormableBonds } from './bond-system.js?v=v031-quick-battle-1';
-import { EQUIPMENT_AWAKENING_DATA, canAwakenEquipment, getAwakenedDisplayName, getAwakeningLevel, getAwakeningRequirement, isAwakeningEligible, isEquipmentLocked } from './equipment-awakening.js?v=v031-quick-battle-1';
-import { CHAPTER3_BOSSES, ensureWorldAnomaly } from './chapter3-system.js?v=v031-quick-battle-1';
-import { getQuickBattleGroups } from './quick-battle-system.js?v=v031-quick-battle-1';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v031-rematch-1';
+import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v031-rematch-1';
+import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v031-rematch-1';
+import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v031-rematch-1';
+import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v031-rematch-1';
+import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v031-rematch-1';
+import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v031-rematch-1';
+import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v031-rematch-1';
+import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v031-rematch-1';
+import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v031-rematch-1';
+import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v031-rematch-1';
+import { compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, WORLD_BOSS_VARIANT_CONFIG } from './world-boss-collection.js?v=v031-rematch-1';
+import { BOND_DATA, getActiveBonds, getFormableBonds } from './bond-system.js?v=v031-rematch-1';
+import { EQUIPMENT_AWAKENING_DATA, canAwakenEquipment, getAwakenedDisplayName, getAwakeningLevel, getAwakeningRequirement, isAwakeningEligible, isEquipmentLocked } from './equipment-awakening.js?v=v031-rematch-1';
+import { CHAPTER3_BOSSES, ensureWorldAnomaly } from './chapter3-system.js?v=v031-rematch-1';
+import { getQuickBattleGroups, getRecentQuickBoss } from './quick-battle-system.js?v=v031-rematch-1';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
@@ -46,9 +46,10 @@ function nav(state) {
 }
 
 function village(state) {
+  const recent=getRecentQuickBoss(state);
   return `<section class="scene village-scene"><div class="scene-art" aria-hidden="true"><span class="roof"></span><span class="tree"></span></div><div class="scene-copy"><p class="eyebrow">第一章・桃園初行</p><h1>桃源村</h1><p>炊煙從茅舍升起，村外偶有野獸與山賊出沒。</p></div></section>
   <section class="panel"><h2>村內設施</h2><div class="action-grid">
-    ${button('screen:quickBattle', '⚔ 快速 Boss 戰', 'boss-button quick-battle-entry')}${button('screen:plain', '出村', 'primary')}${state.unlocks.chapter2?button('screen:yellowRoad','前往黃巾戰區','primary'):''}${button('inn', `客棧・${INN_COST} 金`)}${button('screen:shop', '商店')}${button('screen:party', '隊伍')}${button('screen:inventory', '背包')}${button('screen:bossCodex','Boss 圖鑑')}${state.worldBoss.unlocked?button('screen:worldBoss','世界王祭壇','boss-button'):''}${button('save', '存檔')}
+    ${recent?button('quick-battle:rematch', `再次挑戰：${esc(recent.name)}`, 'boss-button quick-battle-entry'):''}${button('screen:quickBattle', '⚔ 快速 Boss 戰', 'boss-button quick-battle-entry')}${button('screen:plain', '出村', 'primary')}${state.unlocks.chapter2?button('screen:yellowRoad','前往黃巾戰區','primary'):''}${button('inn', `客棧・${INN_COST} 金`)}${button('screen:shop', '商店')}${button('screen:party', '隊伍')}${button('screen:inventory', '背包')}${button('screen:bossCodex','Boss 圖鑑')}${state.worldBoss.unlocked?button('screen:worldBoss','世界王祭壇','boss-button'):''}${button('save', '存檔')}
   </div><p class="notice">${esc(state.notice)}</p></section>`;
 }
 

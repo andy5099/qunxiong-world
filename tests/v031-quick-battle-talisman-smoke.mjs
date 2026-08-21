@@ -3,7 +3,7 @@ import { SAVE_VERSION } from '../src/data.js';
 import { awardBossDivineTalismans, combineDivineTalismans } from '../src/boss-gear-system.js';
 import { createBossEncounter, createWorldBossEncounter, retreatFlipperBattle } from '../src/engine.js';
 import { createState, normalize } from '../src/store.js';
-import { finishQuickBattle, getQuickBattleGroups, markQuickBattle, prepareQuickBoss, selectQuickBoss } from '../src/quick-battle-system.js';
+import { finishQuickBattle, getQuickBattleGroups, getRecentQuickBoss, markQuickBattle, prepareQuickBoss, rememberQuickBattle, restoreRecentQuickParty, selectQuickBoss } from '../src/quick-battle-system.js';
 import { render } from '../src/ui.js';
 
 let passed=0;const test=(name,fn)=>{fn();passed++;console.log(`✓ ${name}`)};
@@ -27,4 +27,10 @@ test('quick UI shows party, bonds and actions',()=>{const s=createState('UI');s.
 test('awakening source and 3 to 1 recipe visible',()=>{const s=createState('背包');s.screen='inventory';s.inventory.greenEdgeSword=2;s.ui.awakeningItem='greenEdgeSword';const html=render(s);assert.ok(html.includes('一般 Boss、秘境最終 Boss、世界王'));assert.ok(html.includes('3 初階 → 1'))});
 test('ten normal Boss quick chains remain clean',()=>{const s=createState('連戰');s.progress.bossUnlocked=true;selectQuickBoss(s,'normal','blackwindLord');for(let i=0;i<10;i++){prepareQuickBoss(s);markQuickBattle(s,createBossEncounter(s,1));assert.equal(s.battle.sourceContext,'quickBattle');retreatFlipperBattle(s);finishQuickBattle(s,'quickBattle');assert.equal(s.battle,null)}});
 test('ten world Boss quick chains remain clean',()=>{const s=createState('世界連戰');s.progress.chapterOneComplete=true;s.worldBoss.unlocked=true;selectQuickBoss(s,'world','crimsonTiger');for(let i=0;i<10;i++){markQuickBattle(s,createWorldBossEncounter(s,'crimsonTiger',zero));assert.equal(s.battle.sourceContext,'quickBattle');retreatFlipperBattle(s);finishQuickBattle(s,'quickBattle');assert.equal(s.battle,null)}});
+test('recent normal Boss and five slots survive reload',()=>{const s=createState('再戰');s.progress.bossUnlocked=true;selectQuickBoss(s,'normal','blackwindLord');assert.ok(rememberQuickBattle(s));const loaded=normalize(JSON.parse(JSON.stringify(s)));assert.equal(loaded.quickBattle.recent.id,'blackwindLord');assert.equal(loaded.quickBattle.recent.partyIds.length,5);assert.equal(getRecentQuickBoss(loaded).name,'黑風寨主')});
+test('old save hides rematch shortcut',()=>{const s=normalize({...createState('舊檔'),quickBattle:undefined});s.screen='village';assert.equal(s.quickBattle.recent,null);assert.ok(!render(s).includes('再次挑戰：'))});
+test('invalid saved members safely fall back to current party',()=>{const s=createState('失效隊伍');s.progress.bossUnlocked=true;s.quickBattle.recent={type:'normal',id:'blackwindLord',partyIds:['hero','missing-a','missing-b','missing-c','missing-d']};assert.ok(restoreRecentQuickParty(s));assert.equal(s.party[0].id,'hero');assert.equal(new Set(s.party.filter(Boolean).map(m=>m.id)).size,s.party.filter(Boolean).length)});
+test('locked recent Boss is rejected',()=>{const s=createState('鎖定');s.quickBattle.recent={type:'world',id:'netherThunder',partyIds:[]};assert.equal(getRecentQuickBoss(s),null)});
+test('world rematch stores identity but never quality',()=>{const s=createState('世界品質');s.progress.chapterOneComplete=true;s.worldBoss.unlocked=true;selectQuickBoss(s,'world','crimsonTiger');rememberQuickBattle(s);assert.deepEqual(Object.keys(s.quickBattle.recent).sort(),['id','partyIds','type']);assert.equal('quality' in s.quickBattle.recent,false)});
+test('victory settlement can return to rematch result',()=>{const s=createState('勝利');s.progress.bossUnlocked=true;selectQuickBoss(s,'normal','blackwindLord');rememberQuickBattle(s);assert.ok(finishQuickBattle(s,'quickBattle'));assert.equal(s.quickBattle.resultReady,true);assert.ok(render(s).includes('再次挑戰'))});
 console.log(`V0.3.1 smoke: ${passed} passed`);

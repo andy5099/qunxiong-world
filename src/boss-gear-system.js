@@ -1,4 +1,4 @@
-import { ITEMS } from './data.js?v=v031-quick-battle-1';
+import { ITEMS } from './data.js?v=v031-rematch-1';
 
 export const DIVINE_TALISMANS = {
   novice: { id: 'novice', name: '初階神兵符' },
