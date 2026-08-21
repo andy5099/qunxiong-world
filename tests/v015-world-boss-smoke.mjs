@@ -11,7 +11,7 @@ const equal = (actual, expected, label) => check(actual === expected, `${label}:
 const rng = value => () => value;
 const unlockedState = () => { const state = createState('世界王測試'); state.progress.chapterOneComplete = true; state.worldBoss.unlocked = true; return state; };
 
-equal(SAVE_VERSION,18, 'save version 17');
+equal(SAVE_VERSION,19, 'save version 17');
 equal(WORLD_BOSS.name, '赤焰魔虎', 'world boss name');
 equal(WORLD_BOSS.recommendedPower, 30000, 'recommended power');
 equal(WORLD_BOSS.captureRate, 0.05, 'capture rate');

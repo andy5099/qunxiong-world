@@ -6,7 +6,7 @@ import { render } from '../src/ui.js';
 import { AWAKENING_COSTS, EQUIPMENT_AWAKENING_DATA, awakenEquipment, canAwakenEquipment, getAwakenedDisplayName, getAwakeningLevel, getAwakeningRequirement, getAvailableAwakeningCopies, getBondAwakeningBonus, getMemberAwakening, isAwakeningEligible, isEquipmentLocked, toggleEquipmentLock } from '../src/equipment-awakening.js';
 
 let passed=0;const check=(value,label)=>{assert.ok(value,label);passed++;};const equal=(a,b,label)=>{assert.equal(a,b,label);passed++;};
-equal(SAVE_VERSION,18,'save version 17');
+equal(SAVE_VERSION,19,'save version 17');
 equal(AWAKENING_COSTS[1].copies,1,'level one duplicate cost centralized');
 equal(AWAKENING_COSTS[2].talisman,'intermediate','level two material centralized');
 equal(AWAKENING_COSTS[3].talisman,'advanced','level three material centralized');
@@ -30,7 +30,7 @@ check(!sellItem(state,'greenEdgeSword').ok,'locked awakened gear cannot sell');t
 
 const protectedState=createState('保護');protectedState.party[4]=createBlackwindLeader();protectedState.inventory.blackwindBlade=3;equipItem(protectedState,'blackwind-lord','blackwindBlade');equal(getAvailableAwakeningCopies(protectedState,'blackwindBlade'),2,'equipped copy excluded');check(!canAwakenEquipment(protectedState,'blackwindBlade').ok,'default lock blocks material');toggleEquipmentLock(protectedState,'blackwindBlade');protectedState.bossProgress.divineTalismans.novice=1;check(canAwakenEquipment(protectedState,'blackwindBlade').ok,'unlock permits explicit awakening');check(awakenEquipment(protectedState,'blackwindBlade').ok,'boss exclusive awakens');equal(protectedState.equipment['blackwind-lord'].weapon,'blackwindBlade','equipped main copy preserved');
 
-const migrated=normalize({...createState('舊玩家'),version:16,inventory:{greenEdgeSword:4,blackwindBlade:2},equipmentAwakening:undefined});equal(migrated.version,18,'v16 migrates to v17');equal(migrated.inventory.greenEdgeSword,4,'old inventory preserved');equal(migrated.inventory.blackwindBlade,2,'old exclusive inventory preserved');equal(getAwakeningLevel(migrated,'greenEdgeSword'),0,'old gear gets zero awakening');check(isEquipmentLocked(migrated,'blackwindBlade'),'old boss gear auto locked');
+const migrated=normalize({...createState('舊玩家'),version:16,inventory:{greenEdgeSword:4,blackwindBlade:2},equipmentAwakening:undefined});equal(migrated.version,19,'v16 migrates to v17');equal(migrated.inventory.greenEdgeSword,4,'old inventory preserved');equal(migrated.inventory.blackwindBlade,2,'old exclusive inventory preserved');equal(getAwakeningLevel(migrated,'greenEdgeSword'),0,'old gear gets zero awakening');check(isEquipmentLocked(migrated,'blackwindBlade'),'old boss gear auto locked');
 const reloaded=normalize(state);equal(getAwakeningLevel(reloaded,'greenEdgeSword'),3,'awakening reload preserved');equal(getFinalStats(reloaded,'guan-yu').might,awakenedStats.might,'reload does not double stack');
 
 reloaded.screen='inventory';reloaded.ui.awakeningItem='greenEdgeSword';const html=render(reloaded);check(html.includes('神裝覺醒'),'awakening UI rendered');check(html.includes('覺醒 3 / 3'),'level UI rendered');check(html.includes('可覺醒'),'filter UI rendered');check(html.includes('專屬裝'),'exclusive filter rendered');check(html.includes('已鎖定'),'lock filter rendered');check(html.includes('已達目前覺醒上限'),'cap UI rendered');

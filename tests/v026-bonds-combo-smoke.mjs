@@ -10,7 +10,7 @@ let passed=0;const ok=(value,message)=>{assert.ok(value,message);passed++;},equa
 const member=(state,id)=>state.party.find(unit=>unit?.id===id);
 const bossState=party=>{const state=createState('羈絆測試');state.unlocks.stronghold=true;state.screen='stronghold';state.party=party;state.ui.bossWarning=true;state.ui.bossRarityRank=3;createBossEncounter(state,3);state.battle.enemies[0].maxHp=state.battle.enemies[0].hp=1e8;state.battle.marble.phase='pinball';initializeBondRuntime(state,state.battle.marble);return state;};
 
-equal(SAVE_VERSION,18,'save version 17');
+equal(SAVE_VERSION,19,'save version 17');
 equal(BOND_DATA.length,11,'central bond table includes the three chapter-three bonds');
 for(const bond of BOND_DATA)for(const key of ['id','name','requiredCharacterIds','minimumActiveCount','triggerType','effectType','cooldown','priority','visualTheme','description'])ok(bond[key]!=null,`${bond.id} has ${key}`);
 
@@ -30,7 +30,7 @@ ok(getActiveBonds([guan,bao,null,null,null]).some(b=>b.id==='saint-thunder'),'sa
 
 const forming=getFormableBonds([liu,guan,null,null,null],zhang,2);ok(forming.some(b=>b.id==='peach-oath'),'candidate UI can preview newly formed bond');
 const discovery=createState('發現');discovery.party=[liu,guan,zhang,null,null];equal(discoverActiveBonds(discovery).length,2,'multiple valid bonds discovered once');equal(discoverActiveBonds(discovery).length,0,'discovery does not repeat');
-const migrated=normalize({...createState('舊存檔'),version:15,bonds:undefined});equal(migrated.version,18,'old save migrates');ok(Array.isArray(migrated.bonds.discovered),'old save gains bond codex');equal(normalizeBondState({discovered:['bad']}).discovered.length,0,'unknown bond ids removed safely');
+const migrated=normalize({...createState('舊存檔'),version:15,bonds:undefined});equal(migrated.version,19,'old save migrates');ok(Array.isArray(migrated.bonds.discovered),'old save gains bond codex');equal(normalizeBondState({discovered:['bad']}).discovered.length,0,'unknown bond ids removed safely');
 
 const peach=bossState([liu,guan,zhang,null,null]),pm=peach.battle.marble,boss=peach.battle.enemies[0],before=boss.hp;pm.stats.breaks++;const triggered=updateBondScheduler(peach,.02);equal(triggered.id,'peach-oath','break scheduler prioritizes peach oath');ok(boss.hp<before,'peach combo deals real damage');ok(pm.breakGauge>=32,'peach combo adds break');ok(pm.skills.every(slot=>!slot||slot.energy>=10),'peach combo restores skill gauge');ok(pm.bonds.cooldowns['peach-oath']>0,'bond cooldown starts');equal(updateBondScheduler(peach,.02),null,'cooldown prevents immediate replay');
 
@@ -43,5 +43,5 @@ for(const id of ['crimson-tiger','nether-thunder-beast']){const unit=id==='crims
 const uiState=createState('UI');uiState.party=[liu,guan,zhang,null,null];uiState.bonds.discovered=['peach-oath'];uiState.screen='party';let html=render(uiState);ok(html.includes('目前羈絆')&&html.includes('桃園結義'),'party UI shows active bonds');uiState.screen='bonds';html=render(uiState);ok(html.includes('武將羈絆')&&html.includes('？？？'),'codex protects undiscovered recipes');
 const hud=bossState([liu,guan,zhang,null,null]);html=renderMarblePanel(hud,hud.battle);ok(html.includes('pinball-bonds')&&html.includes('桃園結義'),'battle HUD shows bond without new button');
 const oldInventory=normalize({...createState('舊背包'),screen:'inventory',ui:{selectedItem:'woodenSword',selectedMember:'retired-unit'},inventory:{woodenSword:1}});ok(render(oldInventory).includes('裝備比較'),'old save with retired selected member falls back safely');
-const css=fs.readFileSync(new URL('../style.css',import.meta.url),'utf8'),sw=fs.readFileSync(new URL('../service-worker.js',import.meta.url),'utf8'),index=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');ok(css.includes('@media(max-width:430px)')&&css.includes('.bond-codex-grid'),'390px bond layout exists');ok(sw.includes('v030-yellow-heaven-1')&&sw.includes('bond-system.js'),'service worker caches V0.2.6 module');ok(index.includes('v030-yellow-heaven-1'),'HTML uses matching build version');ok(!sw.includes('localStorage'),'service worker preserves saves');
+const css=fs.readFileSync(new URL('../style.css',import.meta.url),'utf8'),sw=fs.readFileSync(new URL('../service-worker.js',import.meta.url),'utf8'),index=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');ok(css.includes('@media(max-width:430px)')&&css.includes('.bond-codex-grid'),'390px bond layout exists');ok(sw.includes('v031-quick-battle-1')&&sw.includes('bond-system.js'),'service worker caches V0.2.6 module');ok(index.includes('v031-quick-battle-1'),'HTML uses matching build version');ok(!sw.includes('localStorage'),'service worker preserves saves');
 console.log(`V0.2.6 bonds combo smoke: ${passed} assertions passed.`);

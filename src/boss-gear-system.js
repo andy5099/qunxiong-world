@@ -1,4 +1,4 @@
-import { ITEMS } from './data.js?v=v030-yellow-heaven-1';
+import { ITEMS } from './data.js?v=v031-quick-battle-1';
 
 export const DIVINE_TALISMANS = {
   novice: { id: 'novice', name: '初階神兵符' },
@@ -42,12 +42,24 @@ export function combineDivineTalismans(state, targetId, all = false) {
   const source = targetId === 'intermediate' ? 'novice' : targetId === 'advanced' ? 'intermediate' : null;
   if (!source) return { ok: false, amount: 0 };
   const available = Math.max(0, Math.floor(state.bossProgress.divineTalismans[source] || 0));
-  const amount = all ? Math.floor(available / 5) : available >= 5 ? 1 : 0;
+  const amount = all ? Math.floor(available / 3) : available >= 3 ? 1 : 0;
   if (!amount) return { ok: false, amount: 0 };
-  state.bossProgress.divineTalismans[source] -= amount * 5;
+  state.bossProgress.divineTalismans[source] -= amount * 3;
   state.bossProgress.divineTalismans[targetId] += amount;
   state.notice = `神兵符合成成功：${DIVINE_TALISMANS[targetId].name} ×${amount}`;
   return { ok: true, amount };
+}
+
+export function awardBossDivineTalismans(state, { rank = 1, dungeon = false, worldBoss = false } = {}, rng = Math.random) {
+  state.bossProgress.divineTalismanPity = Math.max(0, Math.floor(Number(state.bossProgress.divineTalismanPity) || 0));
+  const guaranteed = worldBoss || state.bossProgress.divineTalismanPity >= 5;
+  const chance = worldBoss ? 1 : dungeon ? 0.60 : rank >= 4 ? 0.35 : 0.25;
+  const drops = rollDivineTalismanDrops(rank, dungeon, rng);
+  delete drops.novice;
+  if (guaranteed || rng() < chance) drops.novice = (drops.novice || 0) + (worldBoss && rank >= 5 ? 2 : 1);
+  if (drops.novice) state.bossProgress.divineTalismanPity = 0;
+  else state.bossProgress.divineTalismanPity += 1;
+  return drops;
 }
 
 export function combineAllDivineTalismans(state) {
