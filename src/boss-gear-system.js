@@ -1,4 +1,4 @@
-import { ITEMS } from './data.js?v=v027-divine-awakening-1';
+import { ITEMS } from './data.js?v=v030-yellow-heaven-1';
 
 export const DIVINE_TALISMANS = {
   novice: { id: 'novice', name: '初階神兵符' },

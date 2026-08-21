@@ -9,6 +9,11 @@ export const MARBLE_SKILLS={
   'yellow-captain':{name:'鐵壁軍陣',cost:8,firstHit:1.35,guard:true,motion:'guard',passive:'重甲'},
   'yellow-commander':{name:'破軍追殺',cost:9,execute:true,motion:'hunt',passive:'乘勝追擊'},
   'zhang-bao':{name:'黃天雷陣',cost:10,firstHit:1.5,lightning:true,motion:'storm',passive:'雷引'},
+  'basalt-turtle':{name:'玄武鎮岳',cost:12,firstHit:1.5,debuff:true,motion:'smash',passive:'玄武守護'},
+  'storm-warden':{name:'雷谷反擊',cost:9,firstHit:1.45,lightning:true,motion:'storm',passive:'反擊'},
+  'earth-brute':{name:'鎮地震破',cost:9,firstHit:1.5,debuff:true,motion:'smash',passive:'破陣'},
+  'yellow-demon-general':{name:'黃天妖雷',cost:11,firstHit:1.55,lightning:true,motion:'storm',passive:'弱點轉移'},
+  'nether-phoenix':{name:'冥火穿翔',cost:11,firstHit:1.5,burn:true,motion:'burn',passive:'涅槃'},
   hero:{name:'龍膽突擊',cost:6,firstHit:1.45,motion:'dash',passive:'勇進'}
 };
 
@@ -24,7 +29,12 @@ export const MARBLE_ULTIMATES={
   'nether-thunder-beast':{name:'九幽天罰',effect:'pierce',damage:2.6,pierce:true},
   'yellow-captain':{name:'黃巾鐵陣',effect:'guard',damage:2.2,guard:true},
   'yellow-commander':{name:'黃天絕殺',effect:'combo',damage:2.35,combo:2},
-  'zhang-bao':{name:'蒼天已死・黃天神雷',effect:'lightning',damage:2.6,lightning:true}
+  'zhang-bao':{name:'蒼天已死・黃天神雷',effect:'lightning',damage:2.6,lightning:true},
+  'basalt-turtle':{name:'玄武・天地鎮壓',effect:'stun',damage:2.75,stun:true},
+  'storm-warden':{name:'雷谷・天雷反擊',effect:'lightning',damage:2.55,lightning:true},
+  'earth-brute':{name:'黃天・大地崩裂',effect:'stun',damage:2.65,stun:true},
+  'yellow-demon-general':{name:'黃天崛起',effect:'combo',damage:2.75,combo:3},
+  'nether-phoenix':{name:'幽冥・涅槃天火',effect:'burn',damage:2.8,burn:true}
 };
 
 export function getMarbleUltimate(member){return MARBLE_ULTIMATES[member?.id]||MARBLE_ULTIMATES.hero;}
@@ -32,9 +42,9 @@ export function getUltimateEnergy(member){return Math.max(0,Math.min(100,Number(
 
 export function getMarbleSkill(member){return MARBLE_SKILLS[member?.id]||{name:'猛擊',cost:6,firstHit:1.35,passive:'奮戰'};}
 export function hitMultiplier(hit){return hit<=1?1:hit===2?1.1:hit===3?1.2:hit===4?1.3:hit===5?1.45:Math.min(1.8,1.45+(hit-5)*.07);}
-export function getBossVisualKey(battle){if(battle.worldBoss)return battle.worldBossId==='netherThunder'?'thunder-beast':'crimson-tiger';if(battle.bossKind)return battle.bossKind;return'blackwind-lord';}
+export function getBossVisualKey(battle){if(battle.worldBoss)return battle.worldBossId==='basaltTurtle'?'basalt-turtle':battle.worldBossId==='netherThunder'?'thunder-beast':'crimson-tiger';if(battle.bossKind)return battle.bossKind;return'blackwind-lord';}
 export function getFormationTier(combo){return combo>=50?4:combo>=35?3:combo>=20?2:combo>=10?1:0;}
-export function getFormationRole(member){const id=member?.id;if(['guan-yu','yellow-commander'].includes(id))return'vanguard';if(id==='zhang-fei')return'breaker';if(['liu-bei','yellow-captain'].includes(id))return'support';if(id==='zhang-bao')return'mage';if(['crimson-tiger','nether-thunder-beast'].includes(id))return'world';return'vanguard';}
+export function getFormationRole(member){const id=member?.id;if(['guan-yu','yellow-commander','storm-warden','yellow-demon-general','nether-phoenix'].includes(id))return'vanguard';if(['zhang-fei','earth-brute'].includes(id))return'breaker';if(['liu-bei','yellow-captain'].includes(id))return'support';if(id==='zhang-bao')return'mage';if(['crimson-tiger','nether-thunder-beast','basalt-turtle'].includes(id))return'world';return'vanguard';}
 
 const LAYOUTS={
   forest:[[{type:'rock',shape:'circle',x:180,y:205,r:27}],[{type:'stump',shape:'rect',x:72,y:208,w:38,h:82}]],
@@ -45,7 +55,7 @@ const LAYOUTS={
 };
 
 export function createMarbleBattleState(battle,party,rng=Math.random){
-  const visual=getBossVisualKey(battle),theme=visual==='crimson-tiger'?'crimson':visual==='thunder-beast'?'thunder':battle.areaId?.startsWith('yellow')||battle.bossKind?'yellow':battle.areaId==='forest'?'forest':'stronghold';
+  const visual=getBossVisualKey(battle),theme=visual==='basalt-turtle'?'forest':visual==='crimson-tiger'?'crimson':visual==='thunder-beast'?'thunder':battle.areaId?.startsWith('yellow')||battle.bossKind?'yellow':battle.areaId==='forest'?'forest':'stronghold';
   const layouts=LAYOUTS[theme]||LAYOUTS.stronghold,layout=layouts[Math.floor(rng()*layouts.length)%layouts.length];
   const entities=party.slice(0,3).map((member,i)=>member?{characterId:member.id,x:85+i*95,y:185+i*26,vx:(i-1)*45,vy:0,radius:20,rarityRank:member.rarityRank||1,worldBoss:Boolean(member.worldBoss)}:null);
   const size=battle.worldBoss?58:Math.min(52,40+(battle.bossRarityRank||1)*2),boss={x:180,y:78,radius:size,visualKey:visual,weakAngle:Math.PI*.5};

@@ -1,9 +1,11 @@
-import { ITEMS } from './data.js?v=v027-divine-awakening-1';
-import { CHAPTER2_BOSSES, getChapter2CodexCompletion, recordChapter2Drop } from './chapter2-system.js?v=v027-divine-awakening-1';
+import { ITEMS } from './data.js?v=v030-yellow-heaven-1';
+import { CHAPTER2_BOSSES, getChapter2CodexCompletion, recordChapter2Drop } from './chapter2-system.js?v=v030-yellow-heaven-1';
+import { recordChapter3Drop } from './chapter3-system.js?v=v030-yellow-heaven-1';
 
 export const BLACKWIND_DROPS = ['blackwindBlade', 'blackwindArmor', 'blackwindCharm', 'overlordBlade', 'blackwindWarArmor', 'leaderToken'];
 export const WORLD_BOSS_DROPS = ['crimsonTigerClaw', 'crimsonWarArmor', 'crimsonTigerSeal'];
 export const NETHER_WORLD_BOSS_DROPS=['netherThunderClaw','netherThunderArmor','thunderEmperorSeal'];
+export const BASALT_WORLD_BOSS_DROPS=['basaltShell','mountainStone','mysticTurtleCharm'];
 export const CODEX_MATERIALS = ['novice', 'intermediate', 'advanced', 'legendary'];
 export const DIVINE_CODEX_MATERIALS = ['novice', 'intermediate', 'advanced'];
 export const MASTERY_THRESHOLDS = [0, 100, 300, 700, 1500];
@@ -67,7 +69,7 @@ export function awardWorldBossMastery(state, battle) {
   if (battle.dungeon && battle.boss) amount = Math.ceil(amount * 1.25);
   let activeCount=0;
   for(const member of state.party.filter(member=>member?.worldBoss)){
-    const id=member.id==='nether-thunder-beast'?'netherThunder':'crimsonTiger',mastery=id==='crimsonTiger'?state.worldBossMastery:state.worldBossMasteries[id];
+    const id=member.id==='basalt-turtle'?'basaltTurtle':member.id==='nether-thunder-beast'?'netherThunder':'crimsonTiger',mastery=id==='crimsonTiger'?state.worldBossMastery:state.worldBossMasteries[id];
     mastery.exp+=amount;mastery.level=getMasteryLevel(mastery.exp);activeCount+=1;
   }
   return activeCount ? amount : 0;
@@ -97,7 +99,7 @@ export function recordItemDrop(state, itemId) {
   if (BLACKWIND_DROPS.includes(itemId)) state.bossCodex.blackwind.drops[itemId] = true;
   if (WORLD_BOSS_DROPS.includes(itemId)) state.worldBossCodex.drops[itemId] = true;
   if(NETHER_WORLD_BOSS_DROPS.includes(itemId))state.worldBossCodices.netherThunder.drops[itemId]=true;
-  recordChapter2Drop(state,itemId);
+  if(BASALT_WORLD_BOSS_DROPS.includes(itemId))state.worldBossCodices.basaltTurtle.drops[itemId]=true;recordChapter2Drop(state,itemId);recordChapter3Drop(state,itemId);
 }
 
 export function recordMaterials(state, talismans = {}, divineTalismans = {}) {
@@ -110,6 +112,7 @@ export function syncCodexFromState(state) {
   for (const id of BLACKWIND_DROPS) if ((state.inventory[id] || 0) > 0 || Object.values(state.equipment || {}).some(slots => Object.values(slots).includes(id))) entry.drops[id] = true;
   for (const id of WORLD_BOSS_DROPS) if ((state.inventory[id] || 0) > 0 || Object.values(state.equipment || {}).some(slots => Object.values(slots).includes(id))) state.worldBossCodex.drops[id] = true;
   for(const id of NETHER_WORLD_BOSS_DROPS)if((state.inventory[id]||0)>0||Object.values(state.equipment||{}).some(slots=>Object.values(slots).includes(id)))state.worldBossCodices.netherThunder.drops[id]=true;
+  for(const id of BASALT_WORLD_BOSS_DROPS)if((state.inventory[id]||0)>0||Object.values(state.equipment||{}).some(slots=>Object.values(slots).includes(id)))state.worldBossCodices.basaltTurtle.drops[id]=true;
   for(const profile of Object.values(CHAPTER2_BOSSES))for(const id of profile.drops)if((state.inventory[id]||0)>0||Object.values(state.equipment||{}).some(slots=>Object.values(slots).includes(id)))recordChapter2Drop(state,id);
   for (const id of CODEX_MATERIALS) if ((state.bossProgress.talismans[id] || 0) > 0) entry.talismans[id] = true;
   for (const id of DIVINE_CODEX_MATERIALS) if ((state.bossProgress.divineTalismans[id] || 0) > 0) entry.divineTalismans[id] = true;
@@ -130,6 +133,7 @@ export function syncCodexFromState(state) {
   state.worldBossCodex.defeated ||= Boolean(state.worldBoss.defeated);
   state.worldBossCodex.captured ||= Boolean(state.worldBoss.captured);
   const nw=state.worldBosses.netherThunder,nc=state.worldBossCodices.netherThunder;nc.discovered||=Boolean(nw.unlocked);nc.challenged||=nw.attempts>0;nc.defeated||=nw.defeated;nc.captured||=nw.captured;
+  const bw=state.worldBosses.basaltTurtle,bc=state.worldBossCodices.basaltTurtle;bc.discovered||=Boolean(bw.unlocked);bc.challenged||=bw.attempts>0;bc.defeated||=bw.defeated;bc.captured||=bw.captured;
   return state;
 }
 

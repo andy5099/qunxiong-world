@@ -1,17 +1,18 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v027-divine-awakening-1';
-import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v027-divine-awakening-1';
-import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v027-divine-awakening-1';
-import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v027-divine-awakening-1';
-import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v027-divine-awakening-1';
-import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v027-divine-awakening-1';
-import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v027-divine-awakening-1';
-import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v027-divine-awakening-1';
-import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v027-divine-awakening-1';
-import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v027-divine-awakening-1';
-import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v027-divine-awakening-1';
-import { compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, WORLD_BOSS_VARIANT_CONFIG } from './world-boss-collection.js?v=v027-divine-awakening-1';
-import { BOND_DATA, getActiveBonds, getFormableBonds } from './bond-system.js?v=v027-divine-awakening-1';
-import { EQUIPMENT_AWAKENING_DATA, canAwakenEquipment, getAwakenedDisplayName, getAwakeningLevel, getAwakeningRequirement, isAwakeningEligible, isEquipmentLocked } from './equipment-awakening.js?v=v027-divine-awakening-1';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v030-yellow-heaven-1';
+import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v030-yellow-heaven-1';
+import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v030-yellow-heaven-1';
+import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v030-yellow-heaven-1';
+import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v030-yellow-heaven-1';
+import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v030-yellow-heaven-1';
+import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v030-yellow-heaven-1';
+import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v030-yellow-heaven-1';
+import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v030-yellow-heaven-1';
+import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v030-yellow-heaven-1';
+import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v030-yellow-heaven-1';
+import { compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, WORLD_BOSS_VARIANT_CONFIG } from './world-boss-collection.js?v=v030-yellow-heaven-1';
+import { BOND_DATA, getActiveBonds, getFormableBonds } from './bond-system.js?v=v030-yellow-heaven-1';
+import { EQUIPMENT_AWAKENING_DATA, canAwakenEquipment, getAwakenedDisplayName, getAwakeningLevel, getAwakeningRequirement, isAwakeningEligible, isEquipmentLocked } from './equipment-awakening.js?v=v030-yellow-heaven-1';
+import { CHAPTER3_BOSSES, ensureWorldAnomaly } from './chapter3-system.js?v=v030-yellow-heaven-1';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
@@ -31,6 +32,7 @@ function nav(state) {
     ${button('screen:forest', state.unlocks.forest ? '黑風森林' : '森林 Lv.3', state.screen === 'forest' ? 'active' : '')}
     ${button('screen:stronghold', state.unlocks.stronghold ? '黑風寨' : '寨 Lv.5', state.screen === 'stronghold' ? 'active' : '')}
     ${state.unlocks.chapter2?button('screen:yellowRoad','黃巾戰區',state.screen.startsWith('yellow')?'active':''):''}
+    ${state.unlocks.chapter3?button('screen:desolateVillage','天地異變區',['desolateVillage','loessSlope','thunderValley','yellowHeavenAltar'].includes(state.screen)?'active':''):''}
     ${state.worldBoss.unlocked ? button('screen:worldBoss', '世界王', state.screen === 'worldBoss' ? 'active' : '') : ''}
     ${button('screen:bossCodex', 'Boss 圖鑑', state.screen === 'bossCodex' ? 'active' : '')}
     ${button('screen:bonds', '羈絆', state.screen === 'bonds' ? 'active' : '')}
@@ -74,6 +76,12 @@ function yellowArea(state,areaId){
 }
 const yellowRoad=state=>yellowArea(state,'yellowRoad'),yellowCamp=state=>yellowArea(state,'yellowCamp'),yellowFortress=state=>yellowArea(state,'yellowFortress');
 
+function chapter3Area(state,areaId){
+  const area=AREAS[areaId],event=ensureWorldAnomaly(state),count=Math.min(BOSS_PITY_LIMIT,state.chapter3.bossPity[areaId]||0),order=['desolateVillage','loessSlope','thunderValley','yellowHeavenAltar'],index=order.indexOf(areaId),routes=`${index>0?button(`screen:${order[index-1]}`,'返回上一區'):button('screen:yellowFortress','返回黃巾主寨')}${index<order.length-1?button(`screen:${order[index+1]}`,'前往下一區','primary'):''}`;
+  return `<section class="scene yellow-scene chapter3-scene"><div class="scene-copy"><p class="eyebrow">第三章・黃天崛起</p><h1>${area.name}</h1><div class="danger-line"><span>危險度：${dangerStars(area.danger)}</span><span>建議戰力 ${area.recommendedPower.toLocaleString()}</span></div><aside class="anomaly-banner"><b>今日天地異變：${event.name}</b><span>${event.description}</span></aside><p>天地能量紊亂；精英、敵將與世界王入侵都可能突然發生。</p></div></section><section class="panel"><div class="progress-heading"><h2>異變探索</h2><b>${count} / ${BOSS_PITY_LIMIT}</b></div>${hpBar(count,BOSS_PITY_LIMIT,'stronghold-progress')}<div class="action-grid three">${button('explore-once','探索一次','primary',Boolean(state.battle))}${button('auto-explore',state.exploration.auto?'自動探索中':'自動探索','',state.exploration.auto||Boolean(state.battle))}${button('stop-explore','停止探索','danger',!state.exploration.auto)}</div><div class="route-action">${routes}</div><p class="notice">${esc(state.notice)}</p></section>`;
+}
+const desolateVillage=state=>chapter3Area(state,'desolateVillage'),loessSlope=state=>chapter3Area(state,'loessSlope'),thunderValley=state=>chapter3Area(state,'thunderValley'),yellowHeavenAltar=state=>chapter3Area(state,'yellowHeavenAltar');
+
 function memberCard(state, member, index) {
   if (!member) return `<article class="member empty-slot"><span>空位</span><strong>＋加入武將</strong></article>`;
   const stats = getFinalStats(state, member);
@@ -81,7 +89,7 @@ function memberCard(state, member, index) {
   const isRecruitBoss = member.id === 'blackwind-lord' || member.bossRecruit;
   const rarity = isRecruitBoss ? getBossRarity(member.rarityRank) : member.worldBoss?{rank:5,stars:'★★★★★',name:'【世界王】'}:null;
   const resonance = isRecruitBoss||member.worldBoss ? resonancePanel(state, member) : '';
-  const worldId=member.id==='nether-thunder-beast'?'netherThunder':'crimsonTiger';
+  const worldId=member.id==='basalt-turtle'?'basaltTurtle':member.id==='nether-thunder-beast'?'netherThunder':'crimsonTiger';
   const progression = member.id === 'blackwind-lord' ? promotionPanel(state, member) : member.worldBoss ? breakthroughPanel(state,worldId) : '';
   const mastery = member.worldBoss ? getMasteryProfile(state,worldId) : null;
   const masteryPanel = mastery ? `<section class="mastery-box world-individual"><strong>世界王個體</strong>${variantText(worldId,{quality:member.individualQuality||'normal',talentId:member.individualTalent||null})}<hr><strong>世界王熟練 Lv.${mastery.level}</strong><span>熟練：${mastery.exp}${mastery.next ? ` / ${mastery.next}` : '（MAX）'}</span><small>${mastery.level < 2 ? '下階：最大兵力 +3%' : mastery.level < 3 ? '下階：武力 +3%' : mastery.level < 4 ? '下階：烈焰撕裂 +5%' : mastery.level < 5 ? '下階：烈焰橫掃 +10%、最大兵力再 +5%' : '熟練度已達最高'}</small></section>` : '';
@@ -291,7 +299,7 @@ function battle(state) {
   const auto = state.settings.autoBattle || state.exploration.auto;
   const bossRarity = battle.boss ? getBossRarity(battle.bossRarityRank || 1) : null;
   const quickDrop = battle.dropId && ['稀有', '史詩'].includes(ITEMS[battle.dropId]?.quality) && !battle.awaitingRecruit && !battle.dungeon ? button('battle:quick-equip', '立即裝備', 'primary') : '';
-  const recruitId=battle.worldBoss?(battle.worldBossId==='netherThunder'?'nether-thunder-beast':'crimson-tiger'):(battle.bossKind||'blackwind-lord');
+  const recruitId=battle.worldBoss?(WORLD_BOSSES[battle.worldBossId||'crimsonTiger']?.memberId||'crimson-tiger'):(battle.bossKind||'blackwind-lord');
   const currentLeader = [...state.party,...state.roster].find(member => member?.id === recruitId);
   const worldCaptured=battle.worldBoss&&hasCapturedWorldBoss(state,battle.worldBossId||'crimsonTiger');
   const worldRecord=battle.worldBoss?getWorldBossState(state,battle.worldBossId||'crimsonTiger'):null,worldVariant=battle.worldBossVariant||{quality:'normal',talentId:null},worldQuality=getWorldBossQuality(worldVariant.quality),worldTalent=battle.worldBoss?getWorldBossTalent(battle.worldBossId||'crimsonTiger',worldVariant.talentId):null,worldUpgrade=Boolean(worldCaptured&&compareWorldBossQuality(worldVariant.quality,worldRecord?.currentIndividual?.quality)>0);
@@ -299,10 +307,10 @@ function battle(state) {
   const noDowngrade = bossRarity && currentLeader && bossRarity.rank <= (currentLeader.rarityRank || 1) ? '<small>敵方稀有度不高於現有武將；成功時不會降階，將轉化額外金錢。</small>' : '';
   const talismanLoot = Object.entries(battle.talismanDrops || {}).map(([id, amount]) => `${TALISMANS[id].name} ×${amount}`).join('、');
   const divineLoot = Object.entries(battle.divineTalismanDrops || {}).map(([id, amount]) => `${DIVINE_TALISMANS[id].name} ×${amount}`).join('、');
-  const recruitName=battle.worldBoss?WORLD_BOSSES[battle.worldBossId||'crimsonTiger'].title:battle.bossKind?CHAPTER2_BOSSES[battle.bossKind].name:'黑風寨主';
+  const recruitName=battle.worldBoss?WORLD_BOSSES[battle.worldBossId||'crimsonTiger'].title:battle.bossKind?(CHAPTER3_BOSSES[battle.bossKind]?.name||CHAPTER2_BOSSES[battle.bossKind]?.name||'敵將'):'黑風寨主';
   const recruitPanel = battle.awaitingRecruit && bossRarity ? `<section class="boss-recruit-first"><p class="eyebrow">Boss Victory</p><h2>${battle.worldBoss?`★★★★★ ${worldQuality.name}・`:`${bossRarity.stars} ${bossRarity.name}・`}${recruitName}</h2>${battle.worldBoss?`<span class="world-capture-status ${worldCaptured?'captured':'uncaptured'}">【${worldCaptured?(worldUpgrade?'已收服・发现更佳个體':'此世界王已收服'):'尚未收服'}】</span><div class="world-individual"><strong>特殊天賦：${worldTalent?.name||'無'}</strong><small>${worldTalent?.description||'此個體沒有核心特殊天賦。'}</small></div>`:''}<strong>${battle.worldBoss?`收服成功率 ${Math.round((WORLD_BOSSES[battle.worldBossId||'crimsonTiger']?.captureRate||.05)*worldQuality.captureMultiplier*100)}%`:`招降成功率 ${Math.round(bossRarity.captureRate * 100)}%`}</strong>${battle.worldBoss?'':noDowngrade}<div class="battle-actions">${button('battle:recruit',battle.worldBoss?(worldUpgrade?'收服並比較個體':worldCaptured?'嘗試收服此個體':'收服世界王'):captureLabel,'primary recruit-primary')}${button('battle:spare',worldCaptured?'保留現況並離開':'放棄招降')}</div><div class="victory-loot"><b>戰利品</b><span>EXP ${battle.rewardExp||0}</span><span>金錢 ${battle.rewardGold||0}</span>${battle.dropId?`<span>裝備 ${ITEMS[battle.dropId].name}</span>`:''}${talismanLoot?`<span>${talismanLoot}</span>`:''}${divineLoot?`<span class="divine-loot">${divineLoot}</span>`:''}</div></section>`:'';
   const finishedActions = battle.awaitingRecruit ? '' : `${quickDrop}${button('battle:close', battle.result === 'victory' ? (battle.dungeon ? '結束本層' : state.exploration.auto ? '自動繼續中' : '繼續探索') : '返回桃源村', 'primary')}`;
-  const bossLabel=battle.worldBoss?`★★★★★ ${WORLD_BOSSES[battle.worldBossId||'crimsonTiger'].title}`:`${bossRarity?.stars||''} ${bossRarity?.name||''}・${battle.bossKind?CHAPTER2_BOSSES[battle.bossKind].name:'黑風寨主'}`;
+  const bossLabel=battle.worldBoss?`★★★★★ ${WORLD_BOSSES[battle.worldBossId||'crimsonTiger'].title}`:`${bossRarity?.stars||''} ${bossRarity?.name||''}・${battle.bossKind?(CHAPTER3_BOSSES[battle.bossKind]?.name||CHAPTER2_BOSSES[battle.bossKind]?.name||'敵將'):'黑風寨主'}`;
   const dungeonName=state.dungeon.name||DUNGEON.name;
   return `<div class="battle-overlay"><section class="battle-panel ${battle.dungeon ? 'dungeon-battle' : ''} ${battle.boss ? `boss-battle boss-rank-${bossRarity.rank}` : battle.elite ? 'elite-battle' : ''}"><div class="battle-heading"><div><p class="eyebrow">${battle.dungeon ? `${dungeonName}・第 ${battle.dungeonFloor} / 4 層・` : ''}${battle.boss ? `${bossLabel}・` : battle.elite ? '精英遭遇・' : `${AREAS[battle.areaId]?.name||''}・`}回合 ${battle.round}</p><h2>${battle.finished ? (battle.boss && battle.result === 'victory' ? `${battle.worldBoss?'世界王倒下了！':`${recruitName}已敗！`}` : battle.elite && battle.result === 'victory' ? '精英敵人擊破！' : battle.result === 'victory' ? '戰鬥勝利' : '戰鬥失敗') : battle.boss ? `${bossLabel}戰` : battle.elite ? '精英遭遇戰' : '遭遇戰'}</h2></div><span>${auto ? 'AUTO ON' : '手動'}</span></div>${recruitPanel}<div class="enemy-row">${enemies}</div><div class="versus">交 戰</div><div class="party-battle-row">${members}</div><div class="battle-log">${battleLog(state.log)}</div><div class="battle-actions">${active ? `${button('battle:attack', '普通攻擊', 'primary')}${button('battle:slam', '猛擊・技力 6', '', state.party[0].mp < 6)}${button('battle:defend', '全隊防禦')}${button('battle:potion', `回復藥 ×${state.inventory.potion || 0}`, '', !state.inventory.potion)}${state.exploration.auto ? button('battle:stop-auto', '停止自動探索', 'danger') : ''}` : finishedActions}</div></section></div>`;
 }
@@ -333,6 +341,8 @@ function worldBossConfirm(state){if(!state.ui.worldBossConfirm)return '';const i
 
 function worldBossComparison(state){const comparison=state.ui.worldBossComparison;if(!comparison)return'';const profile=WORLD_BOSSES[comparison.bossId];return `<div class="danger-overlay"><section class="danger-card individual-compare"><p class="eyebrow">發現更優秀的世界王個體！</p><h2>${profile.name}</h2><div class="individual-compare-grid"><article><strong>目前個體</strong>${variantText(profile.id,comparison.current)}</article><article><strong>新個體</strong>${variantText(profile.id,comparison.candidate)}</article></div><p>替換只更新品質與天賦；等級、EXP、突破、熟練、裝備和編隊位置完整保留。</p><div class="action-grid">${button('world-boss-individual:replace','替換個體','primary')}${button('world-boss-individual:keep','保留原個體')}</div></section></div>`;}
 
+function worldBossIntrusion(state){const warning=state.ui.worldBossIntrusion;if(!warning)return'';const profile=WORLD_BOSSES[warning.bossId],power=getTeamPower(state);return `<div class="danger-overlay"><section class="danger-card boss-rank-5"><p class="eyebrow">天地異變・世界王入侵</p><h2>★★★★★ ${profile.name}</h2><p>世界裂隙突然張開。此戰可獲得原有專裝、兵符與收服機會。</p><dl><div><dt>目前戰力</dt><dd>${power.toLocaleString()}</dd></div><div><dt>建議戰力</dt><dd>${profile.recommendedPower.toLocaleString()}</dd></div></dl><div class="action-grid">${button('intrusion:engage','接受挑戰','boss-button')}${button('intrusion:decline','避開異變')}</div></section></div>`;}
+
 function chapterComplete(state) {
   if (!state.ui.chapterComplete) return '';
   const equipmentCount = Object.entries(state.inventory).reduce((sum, [id, count]) => sum + (ITEMS[id]?.type === 'equipment' ? Number(count) || 0 : 0), 0);
@@ -340,10 +350,11 @@ function chapterComplete(state) {
 }
 
 function chapter2Complete(state){if(!state.ui.chapter2Complete)return'';return `<div class="chapter-overlay"><section class="chapter-card"><p class="eyebrow">V0.2.0 第二章</p><h2>第二章・黃巾之亂 完成！</h2><p>地公將軍張寶已敗，世界王・九幽雷獸在祭壇甦醒。</p><dl><div><dt>通關條件</dt><dd>首次擊敗張寶</dd></div><div><dt>新世界王</dt><dd>九幽雷獸</dd></div><div><dt>黃巾主寨</dt><dd>可繼續刷寶</dd></div></dl>${button('chapter2:continue','繼續冒險','primary')}</section></div>`;}
+function chapter3Complete(state){if(!state.ui.chapter3Complete)return'';return `<div class="chapter-overlay"><section class="chapter-card"><p class="eyebrow">V0.3.0 第三章</p><h2>黃天崛起・天地異變 完成！</h2><p>程遠志已敗；玄武巨龜在世界王祭壇甦醒，幽冥鳳凰的冥火也開始重燃。</p><dl><div><dt>新世界王</dt><dd>玄武巨龜</dd></div><div><dt>隱藏 Boss</dt><dd>幽冥鳳凰</dd></div><div><dt>異變區域</dt><dd>可繼續刷寶</dd></div></dl>${button('chapter3:continue','繼續冒險','primary')}</section></div>`;}
 
 export function render(state) {
-  const views = { village, plain, forest, stronghold,yellowRoad,yellowCamp,yellowFortress, worldBoss, bossCodex, bonds, party, inventory, shop, settings },dungeonConfig=state.dungeon.dungeonId==='yellowTomb'?YELLOW_DUNGEON:DUNGEON;
-  return `<div class="app-shell">${header(state)}<main>${state.dungeon.active ? `<section class="dungeon-status"><strong>${dungeonConfig.name}</strong><span>第 ${state.dungeon.floor} / ${dungeonConfig.floors} 層</span><span>危險度 ${dangerStars(dungeonConfig.danger)}</span><span>戰力 ${getTeamPower(state).toLocaleString()}</span></section>` : ''}${(views[state.screen] || village)(state)}</main>${nav(state)}${battle(state)}${bossWarning(state)}${worldBossConfirm(state)}${worldBossComparison(state)}${dungeonWarning(state)}${dungeonProgress(state)}${chapterComplete(state)}${chapter2Complete(state)}</div>`;
+  const views = { village, plain, forest, stronghold,yellowRoad,yellowCamp,yellowFortress,desolateVillage,loessSlope,thunderValley,yellowHeavenAltar, worldBoss, bossCodex, bonds, party, inventory, shop, settings },dungeonConfig=state.dungeon.dungeonId==='yellowTomb'?YELLOW_DUNGEON:DUNGEON;
+  return `<div class="app-shell">${header(state)}<main>${state.dungeon.active ? `<section class="dungeon-status"><strong>${dungeonConfig.name}</strong><span>第 ${state.dungeon.floor} / ${dungeonConfig.floors} 層</span><span>危險度 ${dangerStars(dungeonConfig.danger)}</span><span>戰力 ${getTeamPower(state).toLocaleString()}</span></section>` : ''}${(views[state.screen] || village)(state)}</main>${nav(state)}${battle(state)}${bossWarning(state)}${worldBossConfirm(state)}${worldBossIntrusion(state)}${worldBossComparison(state)}${dungeonWarning(state)}${dungeonProgress(state)}${chapterComplete(state)}${chapter2Complete(state)}${chapter3Complete(state)}</div>`;
 }
 
 export function renderCreation() {

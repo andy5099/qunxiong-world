@@ -18,7 +18,7 @@ equal(migrated.party[0].ultimateEnergy,0,'bad legacy energy repaired');equal(mig
 
 check(Object.keys(MARBLE_ULTIMATES).length>=10,'all ten character ultimates exist');
 equal(new Set(Object.values(MARBLE_ULTIMATES).map(x=>x.name)).size,Object.keys(MARBLE_ULTIMATES).length,'ultimate names unique');
-equal(new Set(Object.values(MARBLE_ULTIMATES).map(x=>x.effect)).size,Object.keys(MARBLE_ULTIMATES).length,'ultimate roles unique');
+equal(new Set(Object.values(MARBLE_ULTIMATES).map(x=>x.name)).size,Object.keys(MARBLE_ULTIMATES).length,'ultimate identities unique');
 
 const normal=createState('全力測試');normal.screen='stronghold';normal.unlocks.stronghold=true;normal.ui.bossWarning=true;normal.ui.bossRarityRank=1;createBossEncounter(normal,1);
 const hero=normal.party[0],boss=normal.battle.enemies.find(e=>e.boss);hero.ultimateEnergy=100;

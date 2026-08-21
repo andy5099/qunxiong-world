@@ -6,10 +6,13 @@ export const BOND_DATA = Object.freeze([
   {id:'yellow-vanguard',name:'黃巾雙鋒',comboName:'黃巾・守殺連陣',requiredCharacterIds:['yellow-captain','yellow-commander'],minimumActiveCount:1,triggerType:['bossLow','telegraph'],effectType:'guardHunt',cooldown:9,priority:1,visualTheme:'yellow',description:'擋下危險強襲後立刻追殺。',hint:'黃巾的盾與鋒'},
   {id:'blackwind-thunder',name:'黑風雷陣',comboName:'黑風・雷壁亂舞',requiredCharacterIds:['blackwind-lord','zhang-bao'],minimumActiveCount:1,triggerType:['wallCombo'],effectType:'wallStorm',cooldown:11,priority:4,visualTheme:'darkThunder',description:'高連擊撞牆蓄雷，最後風雷合擊。',hint:'黑風與雷法'},
   {id:'fire-thunder',name:'雷火天災',comboName:'雷火・天災滅陣',requiredCharacterIds:['crimson-tiger','nether-thunder-beast'],minimumActiveCount:1,triggerType:['powerMax','break'],effectType:'worldCataclysm',cooldown:17,priority:3,visualTheme:'fireThunder',description:'兩大世界王交錯穿擊，維持 Combo 並引爆雷火。',hint:'兩頭天災世界王'},
-  {id:'saint-thunder',name:'武聖雷引',comboName:'武聖・引雷斬',requiredCharacterIds:['guan-yu','zhang-bao'],minimumActiveCount:1,triggerType:['weak'],effectType:'weakLightning',cooldown:9,priority:5,visualTheme:'jadeThunder',description:'武聖命中弱點後引落追擊雷。',hint:'青龍刀光引動天雷'}
+  {id:'saint-thunder',name:'武聖雷引',comboName:'武聖・引雷斬',requiredCharacterIds:['guan-yu','zhang-bao'],minimumActiveCount:1,triggerType:['weak'],effectType:'weakLightning',cooldown:9,priority:5,visualTheme:'jadeThunder',description:'武聖命中弱點後引落追擊雷。',hint:'青龍刀光引動天雷'},
+  {id:'earth-thunder',name:'地雷雙鎮',comboName:'玄雷・鎮岳擊',requiredCharacterIds:['storm-warden','earth-brute'],minimumActiveCount:1,triggerType:['break','perfectCounter'],effectType:'pincerBreak',cooldown:11,priority:2,visualTheme:'thunderGold',description:'雷霆反擊與鎮地重擊合流。',hint:'第三章兩名守將'},
+  {id:'yellow-demon',name:'黃天妖軍',comboName:'黃天・妖雷祭',requiredCharacterIds:['yellow-demon-general','zhang-bao'],minimumActiveCount:1,triggerType:['weak','break'],effectType:'counterStorm',cooldown:13,priority:3,visualTheme:'thunderGold',description:'黃天妖力與地公妖雷連鎖。',hint:'兩代黃天術將'},
+  {id:'phoenix-fire',name:'不滅烈火',comboName:'涅槃・焚天輪迴',requiredCharacterIds:['nether-phoenix','crimson-tiger'],minimumActiveCount:1,triggerType:['powerMax','break'],effectType:'worldCataclysm',cooldown:17,priority:3,visualTheme:'fireThunder',description:'冥火與赤焰交織成不滅追擊。',hint:'兩頭火焰天災'}
 ]);
 
-import { getBondAwakeningBonus } from './equipment-awakening.js?v=v027-divine-awakening-1';
+import { getBondAwakeningBonus } from './equipment-awakening.js?v=v030-yellow-heaven-1';
 
 export function normalizeBondState(raw={}){
   return {discovered:[...new Set(Array.isArray(raw.discovered)?raw.discovered.filter(id=>BOND_DATA.some(b=>b.id===id)):[])],codex:{...(raw.codex||{})}};
