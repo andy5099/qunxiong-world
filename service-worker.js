@@ -1,4 +1,4 @@
-const BUILD_VERSION = 'v031-quick-battle-1';
+const BUILD_VERSION = 'v031-rematch-1';
 const CACHE = `qunxiong-world-${BUILD_VERSION}`;
 // Upgrade source: v021-illustrated-marble-boss. Kept as a readable migration marker.
 const APP_SHELL = [
