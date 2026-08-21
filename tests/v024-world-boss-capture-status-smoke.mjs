@@ -26,8 +26,8 @@ check(render(reloaded).includes('再次挑戰'),'captured altar offers repeat ch
 victory(reloaded,'crimsonTiger');
 const beforeCount=[...reloaded.party,...reloaded.roster].filter(member=>member?.id==='crimson-tiger').length;
 const ownedVictory=render(reloaded);
-check(ownedVictory.includes('【此世界王已收服】'),'repeat victory shows already captured');
-check(ownedVictory.includes('✓ 已收服')&&ownedVictory.includes('disabled'),'repeat victory disables capture');
+check(ownedVictory.includes('此世界王已收服')||ownedVictory.includes('发现更佳个體'),'repeat victory shows captured collection state');
+check(ownedVictory.includes('嘗試收服此個體')||ownedVictory.includes('收服並比較個體'),'repeat victory supports collection without duplicate roster entries');
 captureWorldBoss(reloaded,()=>0);
 check([...reloaded.party,...reloaded.roster].filter(member=>member?.id==='crimson-tiger').length===beforeCount,'repeat victory never duplicates member');
 check(reloaded.roster.find(member=>member.id==='crimson-tiger')?.level===37,'repeat victory preserves training');

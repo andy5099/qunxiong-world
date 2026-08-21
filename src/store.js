@@ -1,8 +1,8 @@
-import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v024-world-boss-capture-1';
-import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v024-world-boss-capture-1';
-import { normalizeWorldBoss } from './world-boss-system.js?v=v024-world-boss-capture-1';
-import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v024-world-boss-capture-1';
-import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v024-world-boss-capture-1';
+import { ITEMS, SAVE_VERSION, createBlackwindLeader, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v025-world-boss-collection-1';
+import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v025-world-boss-collection-1';
+import { WORLD_BOSSES, normalizeWorldBoss } from './world-boss-system.js?v=v025-world-boss-collection-1';
+import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v025-world-boss-collection-1';
+import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v025-world-boss-collection-1';
 
 export const STORAGE_KEY = 'qunxiong-world-v01';
 const LEGACY_KEY = 'qunxiong-world-v2';
@@ -41,7 +41,7 @@ export function createState(playerName) {
     chapter2: normalizeChapter2(),
     chapter2Codex: normalizeChapter2Codex(),
     roster: [],
-    ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false, chapter2Complete:false, bossWarning: false, bossRarityRank: null, bossKind:null, worldBossConfirm: false, selectedWorldBoss:'crimsonTiger', codexDetail: null, captureResult: null, quickEquipItem: null, partyEquipMember: null, partyEquipSlot: null, partySwapSlot:null, candidateSort:'power', optimizeChanges: [] },
+    ui: { selectedItem: null, selectedMember: 'hero', chapterComplete: false, chapter2Complete:false, bossWarning: false, bossRarityRank: null, bossKind:null, worldBossConfirm: false, worldBossCandidate:null, selectedWorldBoss:'crimsonTiger', codexDetail: null, captureResult: null, worldBossComparison:null, quickEquipItem: null, partyEquipMember: null, partyEquipSlot: null, partySwapSlot:null, candidateSort:'power', optimizeChanges: [] },
     settings: { autoBattle: false },
     exploration: { auto: false, active: false },
     dungeon: { warning: false, active: false, name: '血色洞窟', dungeonId:'bloodCavern', floor: 0, sourceScreen: null, sourceLocation: null, pity: 0, awaitingAdvance: false, completed: false, loot: { gold: 0, potion: 0, items: [], talismans: {} } },
@@ -108,6 +108,10 @@ export function normalize(raw) {
   progress.chapter2Unlocked=Boolean(progress.chapter2Unlocked||chapter2.unlocked);progress.chapter2Cleared=Boolean(progress.chapter2Cleared||chapter2.cleared);
   const netherThunder=normalizeWorldBoss(raw.worldBosses?.netherThunder,progress.chapter2Cleared);
   if(party.some(member=>member?.id==='nether-thunder-beast')||roster.some(member=>member?.id==='nether-thunder-beast'))netherThunder.captured=true;
+  for(const [id,record] of Object.entries({crimsonTiger:worldBoss,netherThunder})){
+    const profile=WORLD_BOSSES[id],member=[...party,...roster].find(candidate=>candidate?.id===profile.memberId);
+    if(member){record.captured=true;record.currentIndividual||={quality:member.individualQuality||'normal',talentId:member.individualTalent||null};record.highestCapturedQuality=record.highestCapturedQuality||record.currentIndividual.quality;member.individualQuality=record.currentIndividual.quality;member.individualTalent=record.currentIndividual.talentId;}
+  }
   const dungeonSource = ['forest', 'stronghold','yellowCamp','yellowFortress'].includes(rawDungeon.sourceScreen) ? rawDungeon.sourceScreen : null;
   const dungeon = {
     ...base.dungeon,
@@ -162,7 +166,7 @@ export function normalize(raw) {
     chapter2,chapter2Codex:normalizeChapter2Codex(raw.chapter2Codex),
     dungeon,
     bossProgress: normalizeBossProgress(raw.bossProgress),
-    ui: { ...base.ui, ...(raw.ui || {}), bossWarning: false, bossRarityRank: null, worldBossConfirm: false, captureResult: null, optimizeChanges: [] },
+    ui: { ...base.ui, ...(raw.ui || {}), bossWarning: false, bossRarityRank: null, worldBossConfirm: false, worldBossCandidate:null, captureResult: null, worldBossComparison:null, optimizeChanges: [] },
     settings: { ...base.settings, ...(raw.settings || {}) },
     exploration: { ...base.exploration, ...(raw.exploration || {}), auto: false, active: false },
     battle: null,

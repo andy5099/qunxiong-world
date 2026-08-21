@@ -1,12 +1,13 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v024-world-boss-capture-1';
-import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v024-world-boss-capture-1';
-import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo, rollDivineTalismanDrops } from './boss-gear-system.js?v=v024-world-boss-capture-1';
-import { WORLD_BOSS, WORLD_BOSSES, addWorldBossToRoster, createWorldBossEnemy, getWorldBossMasteryState, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v024-world-boss-capture-1';
-import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v024-world-boss-capture-1';
-import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v024-world-boss-capture-1';
-import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v024-world-boss-capture-1';
-import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v024-world-boss-capture-1';
-import { ensureMarbleBattle, getCurrentMarble, getFormationRole, getFormationTier, getMarbleSkill, getMarbleUltimate, getUltimateEnergy, hitMultiplier } from './marble-battle.js?v=v024-world-boss-capture-1';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v025-world-boss-collection-1';
+import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v025-world-boss-collection-1';
+import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo, rollDivineTalismanDrops } from './boss-gear-system.js?v=v025-world-boss-collection-1';
+import { WORLD_BOSS, WORLD_BOSSES, addWorldBossToRoster, applyCapturedWorldBossIndividual, createWorldBossEnemy, getWorldBossMasteryState, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v025-world-boss-collection-1';
+import { applyWorldBossVariant, compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, recordWorldBossVariant, rollWorldBossVariant } from './world-boss-collection.js?v=v025-world-boss-collection-1';
+import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v025-world-boss-collection-1';
+import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v025-world-boss-collection-1';
+import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v025-world-boss-collection-1';
+import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v025-world-boss-collection-1';
+import { ensureMarbleBattle, getCurrentMarble, getFormationRole, getFormationTier, getMarbleSkill, getMarbleUltimate, getUltimateEnergy, hitMultiplier } from './marble-battle.js?v=v025-world-boss-collection-1';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -363,14 +364,19 @@ export function createBossEncounter(state, forcedRank) {
   return state.battle;
 }
 
-export function createWorldBossEncounter(state,id='crimsonTiger') {
+export function prepareWorldBossChallenge(state,id='crimsonTiger',rng=Math.random){
+  const record=getWorldBossState(state,id);if(!record?.unlocked)return null;const variant=rollWorldBossVariant(id,record,rng);recordWorldBossVariant(record,variant);state.ui.worldBossCandidate={bossId:id,...variant};return variant;
+}
+
+export function createWorldBossEncounter(state,id='crimsonTiger',rng=Math.random) {
   const profile=WORLD_BOSSES[id]||WORLD_BOSS,target=getWorldBossState(state,id);
   if (!target?.unlocked || state.battle || state.dungeon.active || state.dungeon.warning || state.ui.bossWarning) return null;
   state.exploration.auto=false; state.exploration.active=false; state.ui.bossWarning=false;
-  const boss=createWorldBossEnemy(id),codex=id==='crimsonTiger'?state.worldBossCodex:state.worldBossCodices[id];
-  boss.displayName=`${boss.displayName} ${hasCapturedWorldBoss(state,id)?'【✓ 已收服】':'【未收服】'}`;
+  const prepared=state.ui.worldBossCandidate?.bossId===id?state.ui.worldBossCandidate:null,variant=prepared?{quality:prepared.quality,talentId:prepared.talentId}:prepareWorldBossChallenge(state,id,rng),boss=applyWorldBossVariant(createWorldBossEnemy(id),variant),codex=id==='crimsonTiger'?state.worldBossCodex:state.worldBossCodices[id],quality=getWorldBossQuality(variant.quality),talent=getWorldBossTalent(id,variant.talentId);
+  state.ui.worldBossCandidate=null;boss.displayName=`${quality.name}・${boss.displayName} ${hasCapturedWorldBoss(state,id)?'【✓ 已收服】':'【未收服】'}`;
   target.attempts+=1;codex.discovered=true;codex.challenged=true;
-  state.battle={enemies:[boss],round:1,awaitingCommand:false,finished:false,mode:'marble',areaId:'worldBoss',source:'worldBoss',boss:true,worldBoss:true,worldBossId:id,bossRarityRank:5,awaitingRecruit:false,recommendedPower:profile.recommendedPower};
+  state.battle={enemies:[boss],round:1,awaitingCommand:false,finished:false,mode:'marble',areaId:'worldBoss',source:'worldBoss',boss:true,worldBoss:true,worldBossId:id,worldBossVariant:variant,bossRarityRank:5,awaitingRecruit:false,recommendedPower:Math.round(profile.recommendedPower*quality.statMultiplier)};
+  state.notice=quality.id==='legendary'?`傳說個體出現！${profile.name}・${talent?.name||'傳說天賦'}`:`發現${quality.name}個體・${profile.name}${talent?`，天賦：${talent.name}`:''}`;
   ensureMarbleBattle(state.battle,state.party);
   state.party.filter(Boolean).forEach(member=>{member.guarding=false;}); state.log=[];
   appendLog(state,`★★★★★ ${profile.title}降臨！`,'epic'); state.notice='世界王挑戰開始！'; return state.battle;
@@ -704,6 +710,7 @@ export function resolveMarbleEvent(state,event,rng=Math.random){
     marble.comboTime=3;
     const formationTier=getFormationTier(hit);if(formationTier>marble.formationReady)marble.formationReady=formationTier;
     const formation=marble.formationActive,formationRole=formation?.role,formationPower=formation?.tier||0;if(formation){formation.hits++;if(formationRole==='vanguard'){multiplier*=1+formationPower*.1;if(event.weak)multiplier*=1+formationPower*.06;}if(formationRole==='world')multiplier*=1+formationPower*.08;if(formationRole==='breaker'&&formationPower>=3&&formation.hits===1)target.marbleDefenseDown=1;if(formationRole==='support'&&formation.hits===1){for(const ally of state.party.filter(alive)){const allyStats=getFinalStats(state,ally);ally.hp=Math.min(allyStats.maxHp,ally.hp+Math.round(allyStats.maxHp*.03*formationPower));}}}
+    const talent=member.individualTalent;if(talent==='blaze'&&hit>=20)multiplier*=1.05;if(talent==='wildfire'&&hit>=50)multiplier*=1.1;if(talent==='flameKing'&&formationPower)multiplier*=1.08;if(talent==='heavenBlood'&&formationPower===4){multiplier*=1.18;const entity=marble.entities[memberIndex];if(entity){entity.vx*=1.03;entity.vy*=1.03;}marble.effects.push({type:'talent-fire',x:marble.boss.x,y:marble.boss.y,text:'焚天血脈！',life:.7});}if(talent==='thunderRush'&&event.speed>500)multiplier*=1.06;if(talent==='thunderChain')multiplier*=1.1;if(talent==='thunderField'&&formationPower)multiplier*=1.09;if(talent==='netherLightning'&&formationPower===4){multiplier*=1.2;marble.effects.push({type:'talent-thunder',x:marble.boss.x,y:marble.boss.y,text:'九幽神雷！',life:.7});}
     let breakGain=event.weak?34:0;if(formationRole==='breaker')breakGain+=8*formationPower+(event.weak?10*formationPower:0);if(event.weak&&marble.breakImmunity<=0){marble.breakGauge=Math.min(100,(marble.breakGauge||0)+breakGain);if(marble.breakGauge>=100&&marble.breakTime<=0){marble.breakTime=3.5;marble.stats.breaks++;marble.camera.shake=.32;marble.lastProgressAt=Date.now();}}
     if(marble.breakTime>0)multiplier*=1.6;
     const slot=marble.skills?.[memberIndex];
@@ -879,12 +886,21 @@ export function resolveRound(state, command = 'attack', rng = Math.random) {
 
 export function captureWorldBoss(state,rng=Math.random){
   if(!state.battle?.worldBoss||!state.battle.awaitingRecruit)return false;
-  const id=state.battle.worldBossId||'crimsonTiger',profile=WORLD_BOSSES[id],codex=id==='crimsonTiger'?state.worldBossCodex:state.worldBossCodices[id];
-  if(hasCapturedWorldBoss(state,id)){state.battle=null;state.screen='worldBoss';state.location='世界王祭壇';state.notice=`${profile.title}早已收服，本次戰利品已保留。`;return false;}
-  const success=rng()<profile.captureRate;
-  codex.captureAttempts+=1;if(success)addWorldBossToRoster(state,id);if(success){codex.captured=true;codex.captureSuccesses+=1;}
+  const battle=state.battle,id=battle.worldBossId||'crimsonTiger',profile=WORLD_BOSSES[id],record=getWorldBossState(state,id),codex=id==='crimsonTiger'?state.worldBossCodex:state.worldBossCodices[id],variant=battle.worldBossVariant||{quality:'normal',talentId:null},quality=getWorldBossQuality(variant.quality),rate=Math.max(.01,profile.captureRate*quality.captureMultiplier),success=rng()<rate,already=hasCapturedWorldBoss(state,id);
+  codex.captureAttempts+=1;
+  if(success){codex.captured=true;codex.captureSuccesses+=1;if(compareWorldBossQuality(variant.quality,record.highestCapturedQuality)>=0)record.highestCapturedQuality=variant.quality;}
   state.battle=null;state.screen='worldBoss';state.location='世界王祭壇';state.exploration.auto=false;state.exploration.active=false;state.ui.bossWarning=false;
-  state.notice=success?`✓ 收服成功！${profile.title}已加入武將名冊。`:`收服失敗：${profile.name}掙脫束縛並離去，戰利品全部保留。`;return success;
+  if(!success){state.notice=`收服失敗：${quality.name}・${profile.name}離去，戰利品全部保留。`;return false;}
+  if(!already){addWorldBossToRoster(state,id);applyCapturedWorldBossIndividual(state,id,variant);state.notice=`✓ 收服成功！${quality.id==='legendary'?'傳說世界王收服成功！':''}${quality.name}・${profile.name}已加入武將名冊。`;return true;}
+  const current=record.currentIndividual||{quality:'normal',talentId:null};
+  if(compareWorldBossQuality(variant.quality,current.quality)>0){state.ui.worldBossComparison={bossId:id,current:{...current},candidate:{...variant}};state.notice=`發現更優秀的${profile.name}！請選擇是否替換個體。`;return true;}
+  state.notice=`收服成功，但目前${getWorldBossQuality(current.quality).name}個體更優秀；已保留原個體與全部戰利品。`;return true;
+}
+
+export function resolveWorldBossIndividual(state,replace=false){
+  const comparison=state.ui.worldBossComparison;if(!comparison)return false;const profile=WORLD_BOSSES[comparison.bossId];
+  if(replace)applyCapturedWorldBossIndividual(state,comparison.bossId,comparison.candidate);
+  state.ui.worldBossComparison=null;state.notice=replace?`已替換為${getWorldBossQuality(comparison.candidate.quality).name}・${profile.name}，原有養成與装备完整保留。`:`已保留原本的${getWorldBossQuality(comparison.current.quality).name}・${profile.name}。`;return true;
 }
 
 export function spareWorldBoss(state){if(!state.battle?.worldBoss||!state.battle.awaitingRecruit)return false;state.battle=null;state.screen='worldBoss';state.location='世界王祭壇';state.notice='你放棄收服，世界王戰利品全部保留。';return true;}

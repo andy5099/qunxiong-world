@@ -92,8 +92,8 @@ equal(lowPower.battle, null, 'failed capture clears battle state');
 
 const migrated7 = normalize({ ...createState('v7'), version: 7 });
 const migrated8 = normalize({ ...createState('v8'), version: 8 });
-equal(migrated7.version, 14, 'v7 migration');
-equal(migrated8.version, 14, 'v8 remains compatible');
+equal(migrated7.version, 15, 'v7 migration');
+equal(migrated8.version, 15, 'v8 remains compatible');
 
 const sw = readFileSync(new URL('../service-worker.js', import.meta.url), 'utf8');
 check(sw.includes('v021-'), 'service worker updated');

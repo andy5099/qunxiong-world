@@ -1,5 +1,5 @@
-import { MARBLE_ARENA, activateMarbleFlippers, aimVelocity, getCurrentMarble, getMarbleSkill, stepMarblePhysics } from './marble-battle.js?v=v024-world-boss-capture-1';
-import { armMarbleSkill, armMarbleUltimate, commitMarbleLaunch, finishMarbleShot, resolveMarbleEvent, updateFlipperSystems } from './engine.js?v=v024-world-boss-capture-1';
+import { MARBLE_ARENA, activateMarbleFlippers, aimVelocity, getCurrentMarble, getMarbleSkill, stepMarblePhysics } from './marble-battle.js?v=v025-world-boss-collection-1';
+import { armMarbleSkill, armMarbleUltimate, commitMarbleLaunch, finishMarbleShot, resolveMarbleEvent, updateFlipperSystems } from './engine.js?v=v025-world-boss-collection-1';
 
 let active=null;
 const palette={hero:['#d9efff','#1c67a4'],'liu-bei':['#f2d36a','#31734d'],'guan-yu':['#6fd29b','#174d39'],'zhang-fei':['#ef746f','#351923'],'blackwind-lord':['#c5a16a','#27232e'],'crimson-tiger':['#ffb13b','#6f1810'],'nether-thunder-beast':['#a88cff','#21155c'],'yellow-captain':['#e7c36c','#705820'],'yellow-commander':['#efb855','#6d2c16'],'zhang-bao':['#bc8cff','#3b1768']};
