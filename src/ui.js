@@ -1,19 +1,20 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v031-rematch-1';
-import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v031-rematch-1';
-import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v031-rematch-1';
-import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v031-rematch-1';
-import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v031-rematch-1';
-import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v031-rematch-1';
-import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v031-rematch-1';
-import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v031-rematch-1';
-import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v031-rematch-1';
-import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v031-rematch-1';
-import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v031-rematch-1';
-import { compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, WORLD_BOSS_VARIANT_CONFIG } from './world-boss-collection.js?v=v031-rematch-1';
-import { BOND_DATA, getActiveBonds, getFormableBonds } from './bond-system.js?v=v031-rematch-1';
-import { EQUIPMENT_AWAKENING_DATA, canAwakenEquipment, getAwakenedDisplayName, getAwakeningLevel, getAwakeningRequirement, isAwakeningEligible, isEquipmentLocked } from './equipment-awakening.js?v=v031-rematch-1';
-import { CHAPTER3_BOSSES, ensureWorldAnomaly } from './chapter3-system.js?v=v031-rematch-1';
-import { getQuickBattleGroups, getRecentQuickBoss } from './quick-battle-system.js?v=v031-rematch-1';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, CHARACTER_ROLES, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, QUALITY_ORDER, SLOT_NAMES } from './data.js?v=v032a-art-1';
+import { compareItem, equippedCount, getEquippedSummary, getFinalStats, getMemberPower, getTeamPower, recommendMemberForItem } from './engine.js?v=v032a-art-1';
+import { getBossRarity, getPromotionChance, RANK_TALISMAN, TALISMANS } from './boss-progression.js?v=v032a-art-1';
+import { DIVINE_TALISMANS, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v032a-art-1';
+import { WORLD_BOSS, WORLD_BOSSES, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v032a-art-1';
+import { BLACKWIND_DROPS, CODEX_MATERIALS, COLLECTION_MILESTONES, DIVINE_CODEX_MATERIALS, WORLD_BOSS_DROPS, NETHER_WORLD_BOSS_DROPS, getCodexCompletion, getHighestRank, getKnownItemName, getMasteryProfile } from './boss-codex-system.js?v=v032a-art-1';
+import { getAvailableGearCount, getNextGearTier } from './gear-tier-system.js?v=v032a-art-1';
+import { WORLD_BOSS_BREAKTHROUGH_COSTS, canBreakthrough } from './world-boss-breakthrough.js?v=v032a-art-1';
+import { CHAPTER2_BOSSES, getChapter2Resonance } from './chapter2-system.js?v=v032a-art-1';
+import { ensureFormation, FORMATION_ORBS } from './formation-puzzle.js?v=v032a-art-1';
+import { ensureMarbleBattle, getMarbleSkill, getMarbleUltimate, getUltimateEnergy } from './marble-battle.js?v=v032a-art-1';
+import { compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, WORLD_BOSS_VARIANT_CONFIG } from './world-boss-collection.js?v=v032a-art-1';
+import { BOND_DATA, getActiveBonds, getFormableBonds } from './bond-system.js?v=v032a-art-1';
+import { EQUIPMENT_AWAKENING_DATA, canAwakenEquipment, getAwakenedDisplayName, getAwakeningLevel, getAwakeningRequirement, isAwakeningEligible, isEquipmentLocked } from './equipment-awakening.js?v=v032a-art-1';
+import { CHAPTER3_BOSSES, ensureWorldAnomaly } from './chapter3-system.js?v=v032a-art-1';
+import { getQuickBattleGroups, getRecentQuickBoss } from './quick-battle-system.js?v=v032a-art-1';
+import { getArtDefinition } from './art-manifest.js?v=v032a-art-1';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const button = (action, label, className = '', disabled = false) => `<button type="button" data-action="${action}" class="${className}" ${disabled ? 'disabled' : ''}>${label}</button>`;
@@ -21,6 +22,7 @@ const variantText=(bossId,individual)=>{const quality=getWorldBossQuality(indivi
 const hpBar = (value, max, type = '') => `<div class="meter ${type}"><i style="width:${Math.max(0, value / max * 100)}%"></i></div>`;
 const qualityClass = quality => `quality-${({ '普通': 'common', '精良':'fine', '稀有': 'rare', '史詩': 'epic', '傳說': 'legendary' })[quality] || 'common'}`;
 const dangerStars = value => '★'.repeat(Math.max(1, Number(value) || 1));
+const artImg=(group,id,kind='portrait',className='art-portrait')=>{const entry=getArtDefinition(group,id),src=entry?.[kind]||(typeof entry==='string'?entry:null);return src?`<img class="${className}" src="${src}" alt="" loading="lazy" decoding="async">`:'';};
 
 function header(state) {
   return `<header class="status-bar"><div><strong>${esc(state.playerName)}</strong><small>${esc(state.location)}</small></div><div class="header-values"><span>戰力 <b>${getTeamPower(state).toLocaleString()}</b></span><span>金錢 <b>${state.gold}</b></span></div></header>`;
@@ -55,7 +57,7 @@ function village(state) {
 
 function quickBattle(state){
   const groups=getQuickBattleGroups(state),selected=state.quickBattle.selectedId,all=[...groups.normal,...groups.world,...groups.hidden],entry=all.find(item=>item.id===selected),party=state.party.filter(Boolean),bonds=getActiveBonds(state.party);
-  const card=(item,type)=>`<article class="quick-boss-card ${selected===item.id?'selected':''}"><div><strong>${esc(item.name)}</strong><small>${type==='world'?'★★★★★ 世界王':type==='hidden'?'隱藏 Boss':`建議戰力 ${(item.recommendedPower||AREAS[item.areaId]?.recommendedPower||3200).toLocaleString()}`}</small></div>${button(`quick-battle:select:${type==='world'?'world':'normal'}:${item.id}`,selected===item.id?'已選擇':'選擇',selected===item.id?'primary':'')}</article>`;
+  const card=(item,type)=>`<article class="quick-boss-card ${selected===item.id?'selected':''}">${item.id==='crimsonTiger'?artImg('bosses','crimson-tiger','battle','boss-card-art'):''}<div><strong>${esc(item.name)}</strong><small>${type==='world'?'★★★★★ 世界王':type==='hidden'?'隱藏 Boss':`建議戰力 ${(item.recommendedPower||AREAS[item.areaId]?.recommendedPower||3200).toLocaleString()}`}</small></div>${button(`quick-battle:select:${type==='world'?'world':'normal'}:${item.id}`,selected===item.id?'已選擇':'選擇',selected===item.id?'primary':'')}</article>`;
   const group=(title,items,type)=>items.length?`<section class="quick-boss-group"><h2>${title}</h2><div>${items.map(item=>card(item,type)).join('')}</div></section>`:'';
   const result=state.quickBattle.resultReady?`<section class="quick-result"><strong>本次 Boss 戰已結束</strong><div class="action-grid three">${button('quick-battle:retry','再次挑戰','primary')}${button('quick-battle:switch','更換 Boss')}${button('quick-battle:home','回桃源村')}</div></section>`:'';
   const prep=entry?`<section class="quick-prep"><p class="eyebrow">出戰準備</p><h2>${esc(entry.name)}</h2><div class="quick-party-row">${party.slice(0,3).map(member=>`<span><b>主戰</b>${esc(member.name)}</span>`).join('')}${party.slice(3,5).map(member=>`<span><b>支援</b>${esc(member.name)}</span>`).join('')}</div><p>啟用羈絆：${bonds.length?bonds.map(bond=>esc(bond.name)).join('、'):'無'}</p><div class="action-grid">${button('party-quick-best','快速最佳編隊')}${button('quick-battle:start','立即挑戰','boss-button')}</div></section>`:'<p class="empty">請先選擇一名已解鎖 Boss。</p>';
@@ -131,11 +133,10 @@ function promotionPanel(state, member) {
 }
 
 function breakthroughPanel(state,id='crimsonTiger'){
-  const level=getWorldBossState(state,id).breakthroughLevel||0;
-  if(level>=3)return `<section class="promotion-box breakthrough-box"><strong>世界王突破：Ⅲ / Ⅲ</strong><p>已達目前突破上限</p></section>`;
-  const next=level+1,cost=WORLD_BOSS_BREAKTHROUGH_COSTS[next],roman=['','Ⅰ','Ⅱ','Ⅲ'];
-  const legendary=state.bossProgress.talismans.legendary||0,divine=state.bossProgress.divineTalismans.advanced||0;
-  return `<section class="promotion-box breakthrough-box"><strong>世界王突破：${level?roman[level]:'未突破'} / Ⅲ</strong><p>下一階：突破${roman[next]}</p><span>傳說轉職兵符 ${legendary} / ${cost.legendary}</span><span>高階神兵符 ${divine} / ${cost.divineAdvanced}</span>${button(`world-boss:breakthrough:${id}`,'突破','primary',!canBreakthrough(state,id))}</section>`;
+  const record=getWorldBossState(state,id),level=record.breakthroughLevel||0,souls=record.souls||0;
+  if(level>=5)return `<section class="promotion-box breakthrough-box"><strong>世界王突破：★★★★★</strong><p>已達目前突破上限・傳說天賦「極」已解鎖</p><span>剩餘魂魄 ${souls}</span></section>`;
+  const next=level+1,cost=WORLD_BOSS_BREAKTHROUGH_COSTS[next],unlocks=['','能力成長','特色技能強化','Power Flip 共鳴','Ultimate 進化','傳說天賦「極」'];
+  return `<section class="promotion-box breakthrough-box"><strong>世界王突破：${'★'.repeat(level)}${'☆'.repeat(5-level)}</strong><p>下一階：★${next}・${unlocks[next]}</p><span>專屬魂魄 ${souls} / ${cost}</span>${button(`world-boss:breakthrough:${id}`,'世界王突破','primary',!canBreakthrough(state,id))}</section>`;
 }
 
 function partyEquipmentPicker(state) {

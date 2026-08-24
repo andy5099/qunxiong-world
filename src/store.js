@@ -1,12 +1,12 @@
-import { ITEMS, SAVE_VERSION, createBasaltTurtle, createBlackwindLeader, createChapter3BossMember, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v031-rematch-1';
-import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v031-rematch-1';
-import { WORLD_BOSSES, normalizeWorldBoss } from './world-boss-system.js?v=v031-rematch-1';
-import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v031-rematch-1';
-import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v031-rematch-1';
-import { discoverActiveBonds, normalizeBondState } from './bond-system.js?v=v031-rematch-1';
-import { normalizeEquipmentAwakening } from './equipment-awakening.js?v=v031-rematch-1';
-import { ensureWorldAnomaly, normalizeChapter3, normalizeChapter3Codex, normalizeWorldAnomaly } from './chapter3-system.js?v=v031-rematch-1';
-import { normalizeQuickBattle } from './quick-battle-system.js?v=v031-rematch-1';
+import { ITEMS, SAVE_VERSION, createBasaltTurtle, createBlackwindLeader, createChapter3BossMember, createCrimsonTiger, createNetherThunderBeast, createParty, createYellowBossMember } from './data.js?v=v032a-art-1';
+import { getBossRarity, normalizeBossProgress } from './boss-progression.js?v=v032a-art-1';
+import { WORLD_BOSSES, normalizeWorldBoss } from './world-boss-system.js?v=v032a-art-1';
+import { NETHER_WORLD_BOSS_DROPS, normalizeBossCodex, normalizeWorldBossCodex, normalizeWorldBossMastery, syncCodexFromState } from './boss-codex-system.js?v=v032a-art-1';
+import { normalizeChapter2, normalizeChapter2Codex } from './chapter2-system.js?v=v032a-art-1';
+import { discoverActiveBonds, normalizeBondState } from './bond-system.js?v=v032a-art-1';
+import { normalizeEquipmentAwakening } from './equipment-awakening.js?v=v032a-art-1';
+import { ensureWorldAnomaly, normalizeChapter3, normalizeChapter3Codex, normalizeWorldAnomaly } from './chapter3-system.js?v=v032a-art-1';
+import { normalizeQuickBattle } from './quick-battle-system.js?v=v032a-art-1';
 
 export const STORAGE_KEY = 'qunxiong-world-v01';
 const LEGACY_KEY = 'qunxiong-world-v2';

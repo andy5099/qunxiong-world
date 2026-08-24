@@ -10,7 +10,7 @@ const equal = (actual, expected, label) => check(actual === expected, `${label}:
 const rng = value => () => value;
 const leaderState = () => { const state = createState('神兵測試'); state.party[4] = createBlackwindLeader(); state.progress.bossRecruited = true; return state; };
 
-equal(SAVE_VERSION,19, 'save version');
+equal(SAVE_VERSION,20, 'save version');
 check((rollDivineTalismanDrops(1, false, rng(0)).novice || 0) >= 1, 'novice divine talisman drops');
 check((rollDivineTalismanDrops(3, false, rng(0)).intermediate || 0) >= 1, 'intermediate divine talisman drops');
 check((rollDivineTalismanDrops(4, false, rng(0)).advanced || 0) >= 1, 'advanced divine talisman drops');

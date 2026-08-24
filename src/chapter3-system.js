@@ -1,5 +1,5 @@
-import { createChapter3BossMember } from './data.js?v=v031-rematch-1';
-import { applyLeaderRarity, getBossRarity, getCaptureRate } from './boss-progression.js?v=v031-rematch-1';
+import { createChapter3BossMember } from './data.js?v=v032a-art-1';
+import { applyLeaderRarity, getBossRarity, getCaptureRate } from './boss-progression.js?v=v032a-art-1';
 
 export const CHAPTER3_AREAS=['desolateVillage','loessSlope','thunderValley','yellowHeavenAltar'];
 export const CHAPTER3_BOSSES={

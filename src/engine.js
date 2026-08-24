@@ -1,16 +1,16 @@
-import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v031-rematch-1';
-import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v031-rematch-1';
-import { DIVINE_TALISMANS, awardBossDivineTalismans, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v031-rematch-1';
-import { WORLD_BOSS, WORLD_BOSSES, addWorldBossToRoster, applyCapturedWorldBossIndividual, createWorldBossEnemy, getWorldBossMasteryState, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v031-rematch-1';
-import { applyWorldBossVariant, compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, recordWorldBossVariant, rollWorldBossVariant } from './world-boss-collection.js?v=v031-rematch-1';
-import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v031-rematch-1';
-import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v031-rematch-1';
-import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v031-rematch-1';
-import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v031-rematch-1';
-import { ensureMarbleBattle, getCurrentMarble, getFormationRole, getFormationTier, getMarbleSkill, getMarbleUltimate, getUltimateEnergy, hitMultiplier } from './marble-battle.js?v=v031-rematch-1';
-import { initializeBondRuntime, noteBondEvent, updateBondScheduler } from './bond-system.js?v=v031-rematch-1';
-import { getMemberAwakening, isEquipmentLocked } from './equipment-awakening.js?v=v031-rematch-1';
-import { CHAPTER3_BOSSES, ensureWorldAnomaly, isChapter3Area, isChapter3BossKind, recordChapter3Boss, recruitChapter3Boss, rollWorldBossIntrusion, spareChapter3Boss } from './chapter3-system.js?v=v031-rematch-1';
+import { AREAS, BOSS_PITY_LIMIT, BOSS_RECOMMENDED_POWER, DUNGEON, YELLOW_DUNGEON, ENEMIES, EXP_TO_LEVEL, INN_COST, ITEMS, SLOT_NAMES, STAT_NAMES, createBlackwindLeader } from './data.js?v=v032a-art-1';
+import { applyLeaderRarity, createRarityBoss, getBossRarity, getCaptureRate, rollBossRarity, rollTalismanDrops, TALISMANS } from './boss-progression.js?v=v032a-art-1';
+import { DIVINE_TALISMANS, awardBossDivineTalismans, getBlackwindResonance, getBossGearInfo } from './boss-gear-system.js?v=v032a-art-1';
+import { WORLD_BOSS, WORLD_BOSSES, addWorldBossToRoster, applyCapturedWorldBossIndividual, createWorldBossEnemy, getWorldBossMasteryState, getWorldBossRecordState, getWorldBossResonance, getWorldBossState, hasCapturedWorldBoss } from './world-boss-system.js?v=v032a-art-1';
+import { applyWorldBossVariant, compareWorldBossQuality, getWorldBossQuality, getWorldBossTalent, recordWorldBossVariant, rollWorldBossVariant } from './world-boss-collection.js?v=v032a-art-1';
+import { awardWorldBossMastery, getMasteryProfile, recordBlackwindCapture, recordBlackwindDefeat, recordBlackwindEncounter, recordItemDrop, recordMaterials } from './boss-codex-system.js?v=v032a-art-1';
+import { getBreakthroughProfile } from './world-boss-breakthrough.js?v=v032a-art-1';
+import { CHAPTER2_BOSSES, getChapter2Resonance, recordChapter2Boss, recruitChapter2Boss, spareChapter2Boss } from './chapter2-system.js?v=v032a-art-1';
+import { ensureFormation, preparePuzzleTurn, settleFormationPuzzle, startFormationPuzzle } from './formation-puzzle.js?v=v032a-art-1';
+import { ensureMarbleBattle, getCurrentMarble, getFormationRole, getFormationTier, getMarbleSkill, getMarbleUltimate, getUltimateEnergy, hitMultiplier } from './marble-battle.js?v=v032a-art-1';
+import { initializeBondRuntime, noteBondEvent, updateBondScheduler } from './bond-system.js?v=v032a-art-1';
+import { getMemberAwakening, isEquipmentLocked } from './equipment-awakening.js?v=v032a-art-1';
+import { CHAPTER3_BOSSES, ensureWorldAnomaly, isChapter3Area, isChapter3BossKind, recordChapter3Boss, recruitChapter3Boss, rollWorldBossIntrusion, spareChapter3Boss } from './chapter3-system.js?v=v032a-art-1';
 
 const alive = unit => unit && unit.hp > 0;
 const randomInt = (min, max, rng = Math.random) => Math.floor(rng() * (max - min + 1)) + min;
@@ -915,9 +915,13 @@ export function captureWorldBoss(state,rng=Math.random){
   state.battle=null;state.screen='worldBoss';state.location='世界王祭壇';state.exploration.auto=false;state.exploration.active=false;state.ui.bossWarning=false;
   if(!success){state.notice=`收服失敗：${quality.name}・${profile.name}離去，戰利品全部保留。`;return false;}
   if(!already){addWorldBossToRoster(state,id);applyCapturedWorldBossIndividual(state,id,variant);state.notice=`✓ 收服成功！${quality.id==='legendary'?'傳說世界王收服成功！':''}${quality.name}・${profile.name}已加入武將名冊。`;return true;}
+  const soulYield={normal:1,rare:2,epic:4,legendary:8}[quality.id]||1;
+  record.souls=Math.max(0,(record.souls||0)+soulYield);
   const current=record.currentIndividual||{quality:'normal',talentId:null};
-  if(compareWorldBossQuality(variant.quality,current.quality)>0){state.ui.worldBossComparison={bossId:id,current:{...current},candidate:{...variant}};state.notice=`發現更優秀的${profile.name}！請選擇是否替換個體。`;return true;}
-  state.notice=`收服成功，但目前${getWorldBossQuality(current.quality).name}個體更優秀；已保留原個體與全部戰利品。`;return true;
+  const better=compareWorldBossQuality(variant.quality,current.quality)>0;
+  const alternateLegendary=quality.id==='legendary'&&current.quality==='legendary'&&variant.talentId&&variant.talentId!==current.talentId;
+  if(better||alternateLegendary){state.ui.worldBossComparison={bossId:id,current:{...current},candidate:{...variant}};state.notice=`獲得 ${profile.name}魂魄 ×${soulYield}，並發現可替換的世界王個體。`;return true;}
+  state.notice=`重複收服成功：獲得 ${profile.name}魂魄 ×${soulYield}；原有個體與全部養成均已保留。`;return true;
 }
 
 export function resolveWorldBossIndividual(state,replace=false){

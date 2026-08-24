@@ -1,6 +1,6 @@
-import { createBasaltTurtle, createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v031-rematch-1';
-import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v031-rematch-1';
-import { compareWorldBossQuality, normalizeWorldBossIndividual } from './world-boss-collection.js?v=v031-rematch-1';
+import { createBasaltTurtle, createCrimsonTiger, createNetherThunderBeast } from './data.js?v=v032a-art-1';
+import { normalizeBreakthrough } from './world-boss-breakthrough.js?v=v032a-art-1';
+import { compareWorldBossQuality, normalizeWorldBossIndividual } from './world-boss-collection.js?v=v032a-art-1';
 
 export const WORLD_BOSSES = {
   crimsonTiger: {
@@ -24,7 +24,7 @@ export function createWorldBossEnemy(id = 'crimsonTiger') {
 
 export function normalizeWorldBoss(raw = {}, unlocked = false) {
   const captured=Boolean(raw.captured),individual=captured?normalizeWorldBossIndividual(raw.currentIndividual):null;
-  return { unlocked:Boolean(raw.unlocked || unlocked), attempts:Math.max(0,Number(raw.attempts)||0), bestPhase:Math.max(0,Math.min(3,Number(raw.bestPhase)||0)), lowestHpPct:Math.max(0,Math.min(100,Number.isFinite(Number(raw.lowestHpPct))?Number(raw.lowestHpPct):100)), defeated:Boolean(raw.defeated), defeats:Math.max(0,Number(raw.defeats)||0), captured, firstRewardClaimed:Boolean(raw.firstRewardClaimed), breakthroughLevel:normalizeBreakthrough(raw.breakthroughLevel), legendaryPity:Math.max(0,Math.min(20,Number(raw.legendaryPity)||0)), highestEncounterQuality:normalizeWorldBossIndividual({quality:raw.highestEncounterQuality}).quality, highestCapturedQuality:captured?normalizeWorldBossIndividual({quality:raw.highestCapturedQuality||individual?.quality}).quality:'normal', currentIndividual:individual, discoveredTalents:Array.isArray(raw.discoveredTalents)?Array.from(new Set(raw.discoveredTalents.filter(id=>typeof id==='string'))):[] };
+  return { unlocked:Boolean(raw.unlocked || unlocked), attempts:Math.max(0,Number(raw.attempts)||0), bestPhase:Math.max(0,Math.min(3,Number(raw.bestPhase)||0)), lowestHpPct:Math.max(0,Math.min(100,Number.isFinite(Number(raw.lowestHpPct))?Number(raw.lowestHpPct):100)), defeated:Boolean(raw.defeated), defeats:Math.max(0,Number(raw.defeats)||0), captured, firstRewardClaimed:Boolean(raw.firstRewardClaimed), breakthroughLevel:normalizeBreakthrough(raw.breakthroughLevel), souls:Math.max(0,Math.floor(Number(raw.souls)||0)), legendaryPity:Math.max(0,Math.min(20,Number(raw.legendaryPity)||0)), highestEncounterQuality:normalizeWorldBossIndividual({quality:raw.highestEncounterQuality}).quality, highestCapturedQuality:captured?normalizeWorldBossIndividual({quality:raw.highestCapturedQuality||individual?.quality}).quality:'normal', currentIndividual:individual, discoveredTalents:Array.isArray(raw.discoveredTalents)?Array.from(new Set(raw.discoveredTalents.filter(id=>typeof id==='string'))):[] };
 }
 
 export function getWorldBossState(state, id = 'crimsonTiger') { return id === 'crimsonTiger' ? state.worldBoss : state.worldBosses?.[id]; }

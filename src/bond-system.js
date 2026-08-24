@@ -12,7 +12,7 @@ export const BOND_DATA = Object.freeze([
   {id:'phoenix-fire',name:'不滅烈火',comboName:'涅槃・焚天輪迴',requiredCharacterIds:['nether-phoenix','crimson-tiger'],minimumActiveCount:1,triggerType:['powerMax','break'],effectType:'worldCataclysm',cooldown:17,priority:3,visualTheme:'fireThunder',description:'冥火與赤焰交織成不滅追擊。',hint:'兩頭火焰天災'}
 ]);
 
-import { getBondAwakeningBonus } from './equipment-awakening.js?v=v031-rematch-1';
+import { getBondAwakeningBonus } from './equipment-awakening.js?v=v032a-art-1';
 
 export function normalizeBondState(raw={}){
   return {discovered:[...new Set(Array.isArray(raw.discovered)?raw.discovered.filter(id=>BOND_DATA.some(b=>b.id===id)):[])],codex:{...(raw.codex||{})}};

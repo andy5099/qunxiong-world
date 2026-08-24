@@ -8,14 +8,14 @@ const {createBossEncounter,createEncounter,enterArea,refreshUnlocks,resolveMarbl
 const {render}=await import('../src/ui.js');
 let passed=0;const test=(name,fn)=>{fn();passed++;console.log(`PASS ${passed}: ${name}`)};
 
-test('SAVE_VERSION 18',()=>assert.equal(SAVE_VERSION,19));
+test('SAVE_VERSION 18',()=>assert.equal(SAVE_VERSION,20));
 test('四個第三章區域存在',()=>assert.equal(CHAPTER3_AREAS.filter(id=>AREAS[id]).length,4));
 test('第三章有三敵將與隱藏鳳凰',()=>assert.equal(Object.keys(CHAPTER3_BOSSES).length,4));
 test('章節裝備至少九件',()=>assert.ok(['yellowHeavenBlade','thunderBow','earthBreakerHammer','dustRobe','thunderArmor','skyRitualArmor','dustCharm','thunderBead','yellowHeavenSeal'].every(id=>ITEMS[id])));
 test('玄武三件專裝存在',()=>assert.ok(WORLD_BOSSES.basaltTurtle.drops.every(id=>ITEMS[id])));
 test('每日異變同日本機固定',()=>{const a=createState('測試');const x=ensureWorldAnomaly(a,'2026-08-21');const y=ensureWorldAnomaly(a,'2026-08-21');assert.equal(x,y)});
 test('每日異變四種類齊全',()=>assert.equal(Object.keys(WORLD_ANOMALIES).length,4));
-test('舊存檔自動解鎖第三章',()=>{const old=createState('舊存檔');old.version=17;old.progress.chapter2Cleared=true;const migrated=normalize(old);assert.equal(migrated.unlocks.chapter3,true);assert.equal(migrated.version,19)});
+test('舊存檔自動解鎖第三章',()=>{const old=createState('舊存檔');old.version=17;old.progress.chapter2Cleared=true;const migrated=normalize(old);assert.equal(migrated.unlocks.chapter3,true);assert.equal(migrated.version,20)});
 test('舊存檔保留隊伍與裝備',()=>{const old=createState('保留');old.inventory.ironSword=3;old.equipment.hero.weapon='ironSword';const migrated=normalize(old);assert.equal(migrated.inventory.ironSword,3);assert.equal(migrated.equipment.hero.weapon,'ironSword')});
 test('第二章通關後可進荒村',()=>{const s=createState('旅人');s.progress.chapter2Cleared=true;refreshUnlocks(s);assert.equal(enterArea(s,'desolateVillage'),true)});
 test('未通關不能進第三章',()=>assert.equal(enterArea(createState('新手'),'desolateVillage'),false));

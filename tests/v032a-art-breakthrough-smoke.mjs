@@ -1,0 +1,22 @@
+import fs from 'node:fs';
+import { createState } from '../src/store.js?v=v032a-art-1';
+import { ART_MANIFEST } from '../src/art-manifest.js?v=v032a-art-1';
+import { WORLD_BOSS_BREAKTHROUGH_COSTS, breakthroughWorldBoss, getBreakthroughProfile, normalizeBreakthrough } from '../src/world-boss-breakthrough.js?v=v032a-art-1';
+import { normalizeWorldBoss } from '../src/world-boss-system.js?v=v032a-art-1';
+import { getSkillParticleCount, renderSkillVfx } from '../src/skill-vfx-renderer.js?v=v032a-art-1';
+
+let passed=0;const ok=(condition,label)=>{if(!condition)throw new Error(label);passed++;};
+ok(normalizeBreakthrough(99)===5,'breakthrough capped at five');
+ok(JSON.stringify(WORLD_BOSS_BREAKTHROUGH_COSTS)==='{"1":3,"2":5,"3":8,"4":12,"5":18}','soul cost table');
+const migrated=normalizeWorldBoss({captured:true,breakthroughLevel:3,currentIndividual:{quality:'legendary'},souls:7},true);
+ok(migrated.breakthroughLevel===3&&migrated.souls===7,'old world boss state migrates without reset');
+const state=createState('V032A');state.worldBoss.captured=true;state.worldBoss.souls=46;
+for(let rank=1;rank<=5;rank++)ok(breakthroughWorldBoss(state,'crimsonTiger').level===rank,`breakthrough rank ${rank}`);
+ok(state.worldBoss.souls===0&&getBreakthroughProfile(5).extreme,'five breakthroughs consume exact souls and unlock extreme');
+for(const entry of Object.values(ART_MANIFEST.characters))for(const path of [entry.battle,entry.portrait])ok(fs.existsSync(new URL(`../${path.replace('./','')}`,import.meta.url)),`asset exists ${path}`);
+ok(fs.existsSync(new URL('../assets/qunxiong/bosses/crimson-tiger.webp',import.meta.url)),'crimson tiger art exists');
+ok(fs.existsSync(new URL('../assets/qunxiong/backgrounds/crimson-arena.webp',import.meta.url)),'crimson arena art exists');
+ok(typeof renderSkillVfx==='function'&&getSkillParticleCount()===0,'bounded VFX pool exports');
+const marble=fs.readFileSync(new URL('../src/marble-battle.js',import.meta.url),'utf8'),ui=fs.readFileSync(new URL('../src/marble-battle-ui.js',import.meta.url),'utf8');
+ok(marble.includes('Collider radius remains authoritative')&&ui.includes('devicePixelRatio'),'visual collider split and Retina canvas');
+console.log(`V0.3.2A art/breakthrough smoke: ${passed} assertions passed.`);
