@@ -9,7 +9,7 @@ import { render } from '../src/ui.js';
 let passed=0;const test=(name,fn)=>{fn();passed++;console.log(`✓ ${name}`)};
 const zero=()=>0,high=()=>.99;
 
-test('save version 19',()=>assert.equal(SAVE_VERSION,19));
+test('save version 19',()=>assert.equal(SAVE_VERSION,20));
 test('normal Boss has 25 percent path',()=>{const s=createState('掉落');assert.equal(awardBossDivineTalismans(s,{rank:1},zero).novice,1)});
 test('normal Boss can miss',()=>{const s=createState('未掉落');assert.equal(awardBossDivineTalismans(s,{rank:1},high).novice,undefined);assert.equal(s.bossProgress.divineTalismanPity,1)});
 test('sixth Boss pity guarantees novice',()=>{const s=createState('保底');for(let i=0;i<5;i++)awardBossDivineTalismans(s,{rank:1},high);assert.equal(s.bossProgress.divineTalismanPity,5);assert.equal(awardBossDivineTalismans(s,{rank:1},high).novice,1);assert.equal(s.bossProgress.divineTalismanPity,0)});

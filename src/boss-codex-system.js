@@ -1,6 +1,6 @@
-import { ITEMS } from './data.js?v=v031-rematch-1';
-import { CHAPTER2_BOSSES, getChapter2CodexCompletion, recordChapter2Drop } from './chapter2-system.js?v=v031-rematch-1';
-import { recordChapter3Drop } from './chapter3-system.js?v=v031-rematch-1';
+import { ITEMS } from './data.js?v=v032a-art-1';
+import { CHAPTER2_BOSSES, getChapter2CodexCompletion, recordChapter2Drop } from './chapter2-system.js?v=v032a-art-1';
+import { recordChapter3Drop } from './chapter3-system.js?v=v032a-art-1';
 
 export const BLACKWIND_DROPS = ['blackwindBlade', 'blackwindArmor', 'blackwindCharm', 'overlordBlade', 'blackwindWarArmor', 'leaderToken'];
 export const WORLD_BOSS_DROPS = ['crimsonTigerClaw', 'crimsonWarArmor', 'crimsonTigerSeal'];

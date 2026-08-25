@@ -1,17 +1,18 @@
-import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, prepareWorldBossChallenge, recruitBlackwindLeader, recruitChapter2Boss,recruitChapter3Boss, refreshUnlocks, resolveFormationAttack, resolveRound, resolveWorldBossIndividual, retreatFromBoss, retreatFlipperBattle, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss,spareChapter3Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v031-rematch-1';
-import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v031-rematch-1';
-import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v031-rematch-1';
-import { clearSave, createState, load, save } from './store.js?v=v031-rematch-1';
-import { render, renderCreation, renderMarblePanel } from './ui.js?v=v031-rematch-1';
-import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v031-rematch-1';
-import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v031-rematch-1';
-import { claimCollectionMilestone } from './boss-codex-system.js?v=v031-rematch-1';
-import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v031-rematch-1';
-import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v031-rematch-1';
-import { discoverActiveBonds } from './bond-system.js?v=v031-rematch-1';
-import { awakenEquipment, toggleEquipmentLock } from './equipment-awakening.js?v=v031-rematch-1';
-import { isChapter3BossKind } from './chapter3-system.js?v=v031-rematch-1';
-import { finishQuickBattle, getRecentQuickBoss, markQuickBattle, prepareQuickBoss, rememberQuickBattle, restoreRecentQuickParty, selectQuickBoss } from './quick-battle-system.js?v=v031-rematch-1';
+import { advanceDungeon, buyItem, captureWorldBoss, chooseAutoCommand, confirmQuickEquip, continueAfterChapter, createBossEncounter, createEncounter, createWorldBossEncounter, declineDungeon, enterArea, enterDungeon, equipItem, exitDungeon, leaveBattle, optimizeEquipment, prepareQuickEquip, prepareWorldBossChallenge, recruitBlackwindLeader, recruitChapter2Boss,recruitChapter3Boss, refreshUnlocks, resolveFormationAttack, resolveRound, resolveWorldBossIndividual, retreatFromBoss, retreatFlipperBattle, sellItem, settleDungeonBattle, spareBlackwindLeader, spareChapter2Boss,spareChapter3Boss, spareWorldBoss, startFormation, unequipItem, usePotion, visitInn, getMemberPower } from './engine.js?v=v032a-art-1';
+import { attemptPromotion, combineAllTalismans, combineTalismans } from './boss-progression.js?v=v032a-art-1';
+import { combineAllDivineTalismans, combineDivineTalismans, evolveBossGear } from './boss-gear-system.js?v=v032a-art-1';
+import { clearSave, createState, load, save } from './store.js?v=v032a-art-1';
+import { render, renderCreation, renderMarblePanel } from './ui.js?v=v032a-art-1';
+import { cleanupMarbleBattle, mountMarbleBattle } from './marble-battle-ui.js?v=v032a-art-1';
+import { deployRosterMember, quickBestParty, withdrawPartyMember } from './world-boss-system.js?v=v032a-art-1';
+import { claimCollectionMilestone } from './boss-codex-system.js?v=v032a-art-1';
+import { promoteAllGear, promoteGear } from './gear-tier-system.js?v=v032a-art-1';
+import { breakthroughWorldBoss } from './world-boss-breakthrough.js?v=v032a-art-1';
+import { discoverActiveBonds } from './bond-system.js?v=v032a-art-1';
+import { awakenEquipment, toggleEquipmentLock } from './equipment-awakening.js?v=v032a-art-1';
+import { isChapter3BossKind } from './chapter3-system.js?v=v032a-art-1';
+import { finishQuickBattle, getRecentQuickBoss, markQuickBattle, prepareQuickBoss, rememberQuickBattle, restoreRecentQuickParty, selectQuickBoss } from './quick-battle-system.js?v=v032a-art-1';
+import { preloadArtAssets } from './asset-loader.js?v=v032a-art-1';
 
 const app = document.querySelector('#app');
 const boot = window.__QX_BOOT__ || { mark() {}, fail() {}, ready() {} };
@@ -23,6 +24,7 @@ try {
   boot.fail(error);
 }
 let loopTimer = null;
+preloadArtAssets().then(() => { if (state?.battle?.mode === 'marble') draw(); }).catch(() => {});
 
 function stopLoop() {
   if (loopTimer !== null) clearTimeout(loopTimer);
@@ -231,7 +233,7 @@ window.addEventListener('pagehide', () => { stopLoop(); cleanupMarbleBattle(stat
 
 if ('serviceWorker' in navigator) {
   boot.mark('SW REGISTER');
-  const buildVersion = 'v031-rematch-1';
+  const buildVersion = 'v032a-art-1';
   const reloadKey = `sw-reloaded-${buildVersion}`;
   let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {

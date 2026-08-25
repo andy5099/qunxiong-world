@@ -7,17 +7,17 @@ import { WORLD_BOSS_BREAKTHROUGH_COSTS, breakthroughWorldBoss, canBreakthrough, 
 import { render } from '../src/ui.js';
 
 let passed=0;const check=(v,m)=>{if(!v)throw new Error(m);passed++};const equal=(a,b,m)=>check(a===b,`${m}: ${a} !== ${b}`);
-equal(SAVE_VERSION,19,'save v17');
+equal(SAVE_VERSION,20,'save v17');
 const tigerState=createState('突破測試');tigerState.worldBoss.captured=true;tigerState.party[4]=createCrimsonTiger();tigerState.equipment['crimson-tiger'].weapon='crimsonTigerClaw';tigerState.inventory.crimsonTigerClaw=1;tigerState.worldBossMastery.exp=345;
 const level=tigerState.party[4].level,exp=tigerState.party[4].exp,gear=tigerState.equipment['crimson-tiger'].weapon,mastery=tigerState.worldBossMastery.exp;
 check(!canBreakthrough(tigerState),'insufficient materials blocked');
-tigerState.bossProgress.talismans.legendary=6;tigerState.bossProgress.divineTalismans.advanced=12;
+tigerState.worldBoss.souls=46;
 const base=getFinalStats(tigerState,'crimson-tiger');
-for(let target=1;target<=3;target++){check(breakthroughWorldBoss(tigerState).ok,`breakthrough ${target}`);equal(tigerState.worldBoss.breakthroughLevel,target,`level ${target}`);}
+for(let target=1;target<=5;target++){check(breakthroughWorldBoss(tigerState).ok,`breakthrough ${target}`);equal(tigerState.worldBoss.breakthroughLevel,target,`level ${target}`);}
 check(!breakthroughWorldBoss(tigerState).ok,'breakthrough capped');
 equal(tigerState.party[4].level,level,'level preserved');equal(tigerState.party[4].exp,exp,'exp preserved');equal(tigerState.equipment['crimson-tiger'].weapon,gear,'gear preserved');equal(tigerState.worldBossMastery.exp,mastery,'mastery preserved');
 const boosted=getFinalStats(tigerState,'crimson-tiger');check(boosted.maxHp>base.maxHp,'hp bonus');check(boosted.might>base.might,'might bonus');check(boosted.defense>base.defense,'defense bonus');check(boosted.speed>base.speed,'speed bonus');equal(getBreakthroughProfile(3).sweepPct,.1,'skill bonus');
-const reloaded=normalize(tigerState);equal(reloaded.worldBoss.breakthroughLevel,3,'breakthrough reload');equal(getFinalStats(reloaded,'crimson-tiger').might,boosted.might,'reload no double stack');
+const reloaded=normalize(tigerState);equal(reloaded.worldBoss.breakthroughLevel,5,'breakthrough reload');equal(getFinalStats(reloaded,'crimson-tiger').might,boosted.might,'reload no double stack');
 
 const gearState=createState('裝備測試');gearState.inventory.ironSword=9;
 const fine=getNextGearTier('ironSword');check(fine&&fine.quality==='精良','normal next fine');
@@ -31,6 +31,6 @@ check(equipItem(cascade,'hero',epic.id).ok,'epic general equips');check(getFinal
 const gold=cascade.gold,epicSell=ITEMS[epic.id].sell;check(!sellItem(cascade,epic.id).ok,'equipped epic sale protected');cascade.inventory[epic.id]++;check(sellItem(cascade,epic.id).ok,'spare epic sells');equal(cascade.gold,gold+epicSell,'tier sell price');check(epicSell>ITEMS.ironSword.sell,'higher sale value');
 const old=normalize({...createState('舊檔'),version:12,inventory:{ironSword:7,blackwindBlade:2,crimsonTigerClaw:1},worldBoss:{captured:true}});equal(old.inventory.ironSword,7,'old inventory preserved');equal(old.inventory.blackwindBlade,2,'boss gear preserved');equal(old.inventory.crimsonTigerClaw,1,'world gear preserved');equal(old.worldBoss.breakthroughLevel,0,'old breakthrough defaults');
 old.screen='inventory';let html=render(old);check(html.includes('一鍵升階可合成裝備'),'one click UI');check(html.includes('可升階 2 次'),'stack craft count UI');old.roster=[createCrimsonTiger()];old.screen='party';html=render(old);check(html.includes('世界王突破'),'roster breakthrough UI');
-equal(WORLD_BOSS_BREAKTHROUGH_COSTS[3].divineAdvanced,6,'cost centralized');
+equal(WORLD_BOSS_BREAKTHROUGH_COSTS[5],18,'soul cost centralized');
 const sw=fs.readFileSync(new URL('../service-worker.js',import.meta.url),'utf8');check(sw.includes('v021-illustrated-marble-boss'),'cache bumped');check(sw.includes('gear-tier-system.js')&&sw.includes('world-boss-breakthrough.js'),'modules cached');
 console.log(`V0.1.7 growth smoke: ${passed} assertions passed.`);

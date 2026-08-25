@@ -36,7 +36,7 @@ function win(state, rng = zero) {
   check(guard < 40 && state.battle?.result === 'victory', 'battle ends in victory');
 }
 
-equal(SAVE_VERSION,19, 'save version is 17');
+equal(SAVE_VERSION,20, 'save version is 17');
 equal(DUNGEON.floors, 4, 'dungeon has four floors');
 check(getDungeonEncounterChance(1) >= 0.05 && getDungeonEncounterChance(1) <= 0.08, 'base encounter chance is 5-8%');
 check(getDungeonEncounterChance(30) > getDungeonEncounterChance(10), 'dungeon pity raises encounter chance');
@@ -138,7 +138,7 @@ equal(rollDungeonBossRarity(() => 0.70), 4, 'epic dungeon boss can roll');
 equal(rollDungeonBossRarity(() => 0.95), 5, 'legendary dungeon boss can roll');
 
 const migrated = normalize({ ...readyState('forest'), version: 8, dungeon: { warning: true, active: true, floor: 2, sourceScreen: 'forest', sourceLocation: '黑風森林', pity: 17, loot: { gold: 88, potion: 1, items: ['ironArmor'], talismans: { novice: 1 } } }, battle: { unsafe: true } });
-equal(migrated.version, 19, 'version 8 save migrates to current');
+equal(migrated.version, 20, 'version 8 save migrates to current');
 check(!migrated.dungeon.active && !migrated.dungeon.warning && !migrated.battle, 'active dungeon reload safely returns to source');
 equal(migrated.screen, 'forest', 'reload restores source area');
 equal(migrated.dungeon.pity, 17, 'reload preserves dungeon pity');

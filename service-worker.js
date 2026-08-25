@@ -1,4 +1,4 @@
-const BUILD_VERSION = 'v031-rematch-1';
+const BUILD_VERSION = 'v032a-art-1';
 const CACHE = `qunxiong-world-${BUILD_VERSION}`;
 // Upgrade source: v021-illustrated-marble-boss. Kept as a readable migration marker.
 const APP_SHELL = [
@@ -25,7 +25,18 @@ const APP_SHELL = [
   `./src/world-boss-breakthrough.js?v=${BUILD_VERSION}`,
   `./src/marble-battle.js?v=${BUILD_VERSION}`,
   `./src/marble-battle-ui.js?v=${BUILD_VERSION}`,
+  `./src/art-manifest.js?v=${BUILD_VERSION}`,
+  `./src/asset-loader.js?v=${BUILD_VERSION}`,
+  `./src/skill-vfx-renderer.js?v=${BUILD_VERSION}`,
   `./src/ui.js?v=${BUILD_VERSION}`,
+  './assets/qunxiong/characters/battle/liu-bei.webp',
+  './assets/qunxiong/characters/battle/guan-yu.webp',
+  './assets/qunxiong/characters/battle/zhang-fei.webp',
+  './assets/qunxiong/characters/portraits/liu-bei.webp',
+  './assets/qunxiong/characters/portraits/guan-yu.webp',
+  './assets/qunxiong/characters/portraits/zhang-fei.webp',
+  './assets/qunxiong/bosses/crimson-tiger.webp',
+  './assets/qunxiong/backgrounds/crimson-arena.webp',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png'

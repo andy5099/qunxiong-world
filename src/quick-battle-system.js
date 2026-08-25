@@ -1,5 +1,5 @@
-import { AREAS } from './data.js?v=v031-rematch-1';
-import { WORLD_BOSSES, getWorldBossState } from './world-boss-system.js?v=v031-rematch-1';
+import { AREAS } from './data.js?v=v032a-art-1';
+import { WORLD_BOSSES, getWorldBossState } from './world-boss-system.js?v=v032a-art-1';
 
 export const QUICK_BOSS_CATALOG = [
   { id: 'blackwindLord', group: 'normal', name: '黑風寨主', areaId: 'stronghold', unlock: state => state.progress.bossUnlocked },
