@@ -22,14 +22,38 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: 取得遊戲檔案
+      - name: 驗證手動 Preview 分支
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_NAME}" != "master" && "${GITHUB_REF_NAME}" != "agent/v033-lubu-legend-prototype" ]]; then
+            echo "Manual Pages deploy is only allowed from master or the Lu Bu preview branch."
+            exit 1
+          fi
+      - name: 取得 master 正式網站
         uses: actions/checkout@v6
+        with:
+          ref: master
+          path: _site
+      - name: 取得呂布 Prototype 子目錄
+        if: github.event_name == 'workflow_dispatch' && github.ref_name == 'agent/v033-lubu-legend-prototype'
+        uses: actions/checkout@v6
+        with:
+          ref: agent/v033-lubu-legend-prototype
+          path: _preview
+          sparse-checkout: prototype-lubu-v033
+      - name: 僅更新 Preview 子路徑
+        if: github.event_name == 'workflow_dispatch' && github.ref_name == 'agent/v033-lubu-legend-prototype'
+        shell: bash
+        run: |
+          rm -rf _site/prototype-lubu-v033
+          cp -a _preview/prototype-lubu-v033 _site/prototype-lubu-v033
       - name: 設定 GitHub Pages
         uses: actions/configure-pages@v5
       - name: 上傳靜態網站
         uses: actions/upload-pages-artifact@v4
         with:
-          path: .
+          path: _site
       - name: 發布網站
         id: deployment
         uses: actions/deploy-pages@v4
