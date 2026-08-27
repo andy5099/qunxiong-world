@@ -1,0 +1,11 @@
+import assert from'node:assert/strict';
+import{CONTACT_PRESETS,simulateContacts,simulateBurst}from'./contact-physics.mjs';
+const contacts=Object.fromEntries(Object.entries(CONTACT_PRESETS).map(([name,config])=>[name,simulateContacts(config)]));
+const bursts=Array.from({length:10},(_,index)=>simulateBurst(CONTACT_PRESETS.burst,index+1));
+assert.ok(contacts.burst.zoneRate>=.7);
+assert.ok(contacts.burst.directRate>=.6);
+assert.ok(contacts.burst.emptyRate<.2);
+assert.ok(bursts.every(run=>run.skills>0));
+assert.ok(bursts.some(run=>run.fullChains>0));
+assert.ok(bursts.some(run=>run.powerMax>0));
+console.log(JSON.stringify({contacts,bursts},null,2));
