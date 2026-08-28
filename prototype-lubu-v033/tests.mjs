@@ -4,4 +4,7 @@ assert.ok(fs.existsSync(new URL('./character-renderer.mjs',import.meta.url)));
 assert.ok(fs.existsSync(new URL('./skill-vfx-renderer.mjs',import.meta.url)));
 assert.doesNotMatch(js,/ctx\.arc\(e\.x,e\.y,16/);
 assert.match(js,/drawSpriteAfterimages/);
+assert.match(js,/角色強化・突破/);
+assert.match(js,/partyPower\(save\)/);
+assert.match(js,/recommendedPower\(save\.selected\)/);
 console.log('Pixel Battle Pack: 8 assertions passed');

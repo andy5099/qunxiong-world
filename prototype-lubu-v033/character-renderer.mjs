@@ -20,6 +20,7 @@ export function drawCharacter(ctx,entity,assets,{state,alpha=1,x=entity.x,y=enti
  const pose=POSE[poseFor(entity,state)]??0,sw=image.naturalWidth/FRAME_COUNT,sh=image.naturalHeight;
  const width=visual.width*scale,height=visual.height*scale;
  ctx.save();ctx.globalAlpha*=alpha;ctx.imageSmoothingEnabled=false;
+ if(entity.stars>=5){ctx.shadowBlur=18;ctx.shadowColor=entity.character==='guanyu'?'#5dffc2':entity.character==='zhangfei'?'#ff5649':entity.character==='liubei'?'#ffe073':'#ff3d32'}
  ctx.translate(x,y);ctx.scale(entity.vx<0?-1:1,1);
  ctx.drawImage(image,pose*sw,0,sw,sh,-width*visual.anchorX,-height*visual.anchorY,width,height);
  ctx.restore();return true;
