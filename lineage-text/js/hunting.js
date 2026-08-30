@@ -1,4 +1,4 @@
-import{ITEMS,CLASSES}from'./data.js?v=10';import{HUNTING_MAPS,BOSS_CATALOG,MINI_MATERIALS}from'./systems.js?v=10';import{DUNGEON_FLOORS}from'./dungeons.js?v=10';import{weaponFor,RARITY_RATE}from'./loot.js?v=10';
+import{ITEMS,CLASSES}from'./data.js?v=13';import{HUNTING_MAPS,BOSS_CATALOG,MINI_MATERIALS}from'./systems.js?v=13';import{DUNGEON_FLOORS}from'./dungeons.js?v=13';import{weaponFor,RARITY_RATE}from'./loot.js?v=13';
 export const ALL_MAPS=[...HUNTING_MAPS,...DUNGEON_FLOORS];export function mapFor(id){return ALL_MAPS.find(x=>x.id===id)||ALL_MAPS[0]}
 export function eligibleItems(p){return ITEMS.filter(i=>i.slot!=='武器'||(i.classes?i.classes.includes(p.cls):CLASSES[p.cls].weapon.includes(i.type)))}
 export function equipmentDrop(p,m,rng=Math.random){let target=weaponFor(m.weapon);if(target&&target.classes.includes(p.cls)&&rng()<RARITY_RATE[target.rarity])return target;let rate=m.tier<4?.075:m.tier<9?.045:.025;if(rng()<rate){let pool=eligibleItems(p).filter(x=>x.slot!=='武器'||CLASSES[p.cls].weapon.includes(x.type));return pool[Math.floor(rng()*pool.length)]}return null}
