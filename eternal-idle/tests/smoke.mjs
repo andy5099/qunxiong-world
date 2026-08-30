@@ -1,10 +1,12 @@
-import assert from 'node:assert/strict';
-import {MAPS,makeEnemy} from '../js/maps.js';
-import {newPlayer,recalc,addExp,expNeed} from '../js/player.js';
-import {rollItem,SLOTS,power,enhanceChance} from '../js/items.js';
-import {calculateOffline,claimOffline} from '../js/offline.js';
-assert.equal(MAPS.length,12);assert.ok(MAPS.every(m=>m.monsters.length===4));
-for(const cls of ['王族','騎士','妖精','法師','黑暗妖精','龍騎士','幻術士']){const p=newPlayer('測試',cls);assert.equal(p.level,1);assert.ok(recalc(p).power>0)}
-let p=newPlayer('測試','騎士');assert.ok(addExp(p,expNeed(1)*2)>=1);let item=rollItem(30,0,3);assert.ok(SLOTS.includes(item.slot));assert.ok(power(item)>0);assert.equal(enhanceChance(0),1);assert.ok(makeEnemy(MAPS[0],true).boss);
-let state={lastSaveTime:Date.now()-3600_000,player:p};p.map=0;let off=calculateOffline(state,Date.now());assert.ok(off&&off.kills>0);let before=p.totalKills;claimOffline(state,off);assert.ok(p.totalKills>before);assert.equal(state.pendingOffline,null);
-console.log('永恆掛機傳說 smoke tests passed');
+import assert from'node:assert/strict';import{MAPS}from'../js/maps.js';import{newPlayer,gearStats}from'../js/player.js';import{rollItem,power,QUALITY,registerItem}from'../js/items.js';import{SETS,BOSS_LOOT,CLASS_AFFIXES,SPECIAL_AFFIXES}from'../js/v2-data.js';import{migrate}from'../js/migration.js';import{salvage,forge,reroll}from'../js/crafting.js';import{towerEnemy,challengeTower}from'../js/tower.js';import{calculateOffline,claimOffline}from'../js/offline.js';import{recordBossKill}from'../js/combat.js';
+assert.equal(QUALITY.length,7);assert.equal(SETS.length,12);assert.equal(BOSS_LOOT.length,48);assert.equal(Object.values(CLASS_AFFIXES).flat().length,28);assert.equal(SPECIAL_AFFIXES.length,9);assert.equal(MAPS.length,12);
+let v1={version:1,lastSaveTime:Date.now(),player:{...newPlayer('舊玩家','騎士'),settings:{potion:50,autoSell:[false,false,false],skillOrder:[]},drops:[0,0,0,0,0,0]}};delete v1.player.materials;delete v1.player.forge;delete v1.player.collection;let s=migrate(v1);assert.equal(s.saveVersion,2);assert.equal(s.player.drops.length,7);assert.ok(s.player.materials);
+let p=s.player,item=rollItem(120,0,6,{class:'騎士'});assert.ok(item.itemLevel>0&&item.affixes.length>=5&&power(item)>0&&item.locked);registerItem(p,item);assert.ok(p.collection.items[item.name]);
+let wrong={...item,affixes:[{name:'法師詞綴',key:'skillDamage',value:20,class:'法師'}]};p.equipment.武器=wrong;assert.equal(gearStats(p).skillDamage,0);wrong.affixes[0].class='騎士';assert.equal(gearStats(p).skillDamage,20);
+for(let n of[2,4,6]){p.equipment={};for(let i=0;i<n;i++)p.equipment['s'+i]={setId:'set0',affixes:[]};assert.ok(gearStats(p).atkPct>=10)}
+let bossItem;for(let i=0;i<200&&!bossItem;i++){let x=rollItem(100,0,4,{boss:true,map:0,class:'騎士'});if(x.bossId)bossItem=x}assert.ok(bossItem);let first=recordBossKill(p,MAPS[0],{},10),second=recordBossKill(p,MAPS[0],{},8);assert.equal(first,true);assert.equal(second,false);assert.equal(p.bossCodex[0].kills,2);
+p.inventory=[];let trash=rollItem(20,0,1,{class:'騎士'});p.inventory.push(trash);let gain=salvage(p,trash);assert.ok(gain.iron>0&&!p.inventory.includes(trash));let locked=rollItem(20,0,5);p.inventory.push(locked);assert.equal(salvage(p,locked),null);
+p.gold=1e9;p.materials={iron:1e5,crystal:1e5,essence:1e5,greater:0,eternal:0};let forged=forge(p,'武器',()=>.5);assert.ok(forged&&p.forge.total===1);let before=JSON.stringify(forged.affixes.slice(1));if(forged.affixes.length){assert.ok(reroll(p,forged,0,()=>.2));assert.equal(JSON.stringify(forged.affixes.slice(1)),before)}
+p.level=999;p.base.str=9999;p.base.con=9999;p.tower={highest:9,current:10,attempts:0,bossKills:0,fastest:null,highestDamage:0};assert.equal(towerEnemy(10).boss,true);let tr=challengeTower(p,()=>1);assert.ok(tr.win&&p.tower.highest===10&&p.tower.bossKills===1);
+let state={lastSaveTime:Date.now()-3600e3,player:p};let high=p.tower.highest,o=calculateOffline(state);assert.ok(o.kills>0&&o.materials.iron>0);p.settings.autoDecompose=[true,true,true,true];let inv=p.inventory.length;claimOffline(state,o);assert.equal(state.pendingOffline,null);assert.equal(p.tower.highest,high);assert.ok(p.inventory.length<=inv+o.items.length);
+console.log('永恆掛機傳說 V2 smoke tests passed');
