@@ -1,7 +1,7 @@
-import{SKILL_DEFS,BOOK_SOURCES}from'./systems.js?v=2';
-export const skillsFor=p=>SKILL_DEFS[p.cls]||[];
-export function learnSkill(p,name){let s=skillsFor(p).find(x=>x[0]===name);if(!s||p.level<s[1]||!p.skillBooks[name]||p.learnedSkills.includes(name))return false;p.skillBooks[name]--;p.learnedSkills.push(name);if(s[2]==='active'&&p.activeSkillSettings.attack.length<2)p.activeSkillSettings.attack.push(name);if(s[2]==='recover'&&!p.activeSkillSettings.heal)p.activeSkillSettings.heal=name;return true}
-export function skillDrop(enemy,p,rng=Math.random){let names=skillsFor(p).filter(s=>BOOK_SOURCES[s[0]]===enemy.name&&!p.learnedSkills.includes(s[0]));if(names.length&&rng()<.09){let n=names[0][0];p.skillBooks[n]=(p.skillBooks[n]||0)+1;return n}return null}
-export function passive(p,name){return p.learnedSkills.includes(name)}
-export function activeSkill(p){return skillsFor(p).find(s=>p.activeSkillSettings.attack.includes(s[0])&&p.mp>=s[3])}
-export function healSkill(p){return skillsFor(p).find(s=>s[0]===p.activeSkillSettings.heal&&p.learnedSkills.includes(s[0])&&p.mp>=s[3])}
+import{SKILL_DEFS,BOOK_SOURCES}from'./systems.js?v=3';import{SKILL_TIER_RATE}from'./loot.js?v=4';
+export const skillsFor=p=>SKILL_DEFS[p.cls]||[];export const skillTier=s=>s[1]<15?'初階':s[1]<25?'中低階':s[1]<35?'中階':s[1]<45?'高階':s[1]<55?'稀有高階':'頂級';export const bookName=(p,n)=>`${p.cls==='法師'?'魔法書':p.cls==='騎士'?'技術書':'技能書'}：${n}`;
+export function learnSkill(p,name){let s=skillsFor(p).find(x=>x[0]===name),book=p.bag.find(x=>x.kind==='book'&&x.skill===name);if(!s||p.level<s[1]||!book||p.learnedSkills.includes(name))return false;book.count--;if(book.count<=0)p.bag=p.bag.filter(x=>x!==book);p.skillBooks[name]=Math.max(0,(p.skillBooks[name]||0)-1);p.learnedSkills.push(name);if(s[2]==='active'&&p.activeSkillSettings.attack.length<2)p.activeSkillSettings.attack.push(name);if(s[2]==='recover'&&!p.activeSkillSettings.heal)p.activeSkillSettings.heal=name;return true}
+export function addBook(p,s){let n=s[0],book=p.bag.find(x=>x.kind==='book'&&x.skill===n);if(book)book.count++;else p.bag.push({uid:`book-${n}`,kind:'book',name:bookName(p,n),skill:n,cls:p.cls,level:s[1],tier:skillTier(s),count:1,price:2500+s[1]*500,weight:1});p.skillBooks[n]=(p.skillBooks[n]||0)+1}
+export function skillDrop(enemy,p,rng=Math.random){let names=skillsFor(p).filter(s=>BOOK_SOURCES[s[0]]===enemy.name);if(names.length){let s=names[0];if(rng()<SKILL_TIER_RATE[skillTier(s)]){addBook(p,s);return s}}return null}
+export function passive(p,name){return p.learnedSkills?.includes(name)||false}export function activeSkill(p){return skillsFor(p).find(s=>p.activeSkillSettings.attack.includes(s[0])&&p.mp>=s[3])}export function healSkill(p){return skillsFor(p).find(s=>s[0]===p.activeSkillSettings.heal&&p.learnedSkills.includes(s[0])&&p.mp>=s[3])}
+
