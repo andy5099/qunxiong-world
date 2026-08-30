@@ -16,3 +16,4 @@ export const BOSS_CATALOG=[['狼人王','狼王之牙','狼王短劍','匕首'],
 export const MINI_MATERIALS={狼人王:'狼王之牙',巨蟻女皇:'女皇甲殼',獸人督軍:'督軍徽記',吸血鬼:'吸血鬼之牙',黑長者:'黑長者魔力核',炎魔:'炎魔之角',幻象眼魔:'幻象之眼',騎士范德:'范德徽章',艾莉絲:'艾莉絲項鍊',古代巨人:'巨人之骨',海賊船長:'船長徽章',混沌:'混沌之核'};
 export const PET_EVOLUTIONS={dog:[{level:15,name:'進化杜賓狗',material:'狼王之牙',count:3,mult:1.28,control:3},{level:35,name:'高階杜賓狗',material:'死亡騎士之魂',count:4,mult:1.6,control:5}],wolf:[{level:15,name:'進化牧羊犬',material:'督軍徽記',count:3,mult:1.25,control:3},{level:35,name:'高階牧羊犬',material:'克特徽章',count:4,mult:1.58,control:5}],bear:[{level:20,name:'狂暴巨熊',material:'巨人之骨',count:4,mult:1.3,control:5},{level:40,name:'古代巨熊',material:'地龍之心',count:5,mult:1.7,control:7}],tiger:[{level:20,name:'迅捷猛虎',material:'吸血鬼之牙',count:4,mult:1.35,control:6},{level:40,name:'暗影猛虎',material:'惡魔之血',count:5,mult:1.75,control:8}]};
 
+

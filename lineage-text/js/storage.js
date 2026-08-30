@@ -1,1 +1,2 @@
 export const KEY='lineageTextSaveV1';export function save(s){s.lastOnlineTimestamp=Date.now();localStorage.setItem(KEY,JSON.stringify(s))}export function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch{return null}}export function clear(){localStorage.removeItem(KEY)}export function encode(s){return btoa(unescape(encodeURIComponent(JSON.stringify(s))))}export function decode(t){try{let s=JSON.parse(decodeURIComponent(escape(atob(t.trim()))));if(s.saveVersion!==1||!s.player)throw 0;return s}catch{return null}}
+
