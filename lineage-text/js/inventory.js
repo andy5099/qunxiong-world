@@ -1,4 +1,4 @@
-import{CLASSES}from'./data.js?v=21';
+import{CLASSES}from'./data.js?v=24';
 export function canEquip(p,item){if(item.slot==='武器'&&item.classes&&!item.classes.includes(p.cls))return false;if(item.slot==='武器'&&!CLASSES[p.cls].weapon.includes(item.type))return false;if(item.slot==='盾牌'){let w=p.equipment.武器;if(w&&(w.two||w.type==='弓'||['雙刀','鋼爪'].includes(w.type)))return false}return true}
 export function equip(p,id){let i=p.bag.find(x=>x.uid===id);if(!i||!canEquip(p,i))return false;if(i.slot==='武器'&&(i.two||i.type==='弓'||['雙刀','鋼爪'].includes(i.type))&&p.equipment.盾牌)p.bag.push(p.equipment.盾牌),delete p.equipment.盾牌;let old=p.equipment[i.slot];p.bag=p.bag.filter(x=>x.uid!==id);if(old)p.bag.push(old);p.equipment[i.slot]=i;return true}
 export function addItem(p,item){p.bag.push({...item,uid:Date.now().toString(36)+Math.random().toString(36).slice(2),enhance:item.enhance||0,protected:!!item.protected||!!item.boss||!!item.world||!!item.special});return true}
