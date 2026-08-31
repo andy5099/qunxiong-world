@@ -1,4 +1,4 @@
-import{FULL_SKILLS}from'./balance.js?v=19';import{SKILL_DEFS,BOOK_SOURCES}from'./systems.js?v=19';import{SKILL_TIER_RATE}from'./loot.js?v=19';
+import{FULL_SKILLS}from'./balance.js?v=21';import{SKILL_DEFS,BOOK_SOURCES}from'./systems.js?v=21';import{SKILL_TIER_RATE}from'./loot.js?v=21';
 export const BOOK_SOURCE_ALTERNATES={精準目標:['妖魔戰士','妖魔弓手'],勇猛意志:['獸人戰士','黑騎士'],增幅防禦:['骷髏兵','骷髏弓手','黑騎士'],魂體轉換:['精靈弓手','風精靈','水精靈'],燃燒鬥志:['黑騎士','妖魔巡守'],影襲:['黑騎士','暗影獸'],血之渴望:['邪惡蜥蜴','巨蟻兵'],弱點曝光:['巨大螞蟻','巨蟻兵'],龍牙:['黑騎士','骷髏近衛兵'],專注:['骷髏法師','妖魔法師'],幻刃:['骷髏弓手','骷髏法師'],骷髏毀壞:['殭屍','不死的木乃伊']};
 export const skillSources=s=>[s[6]||BOOK_SOURCES[s[0]],...(BOOK_SOURCE_ALTERNATES[s[0]]||[])].filter((x,i,a)=>x&&a.indexOf(x)===i);
 export const skillsFor=p=>FULL_SKILLS[p.cls]||[];export const skillTier=s=>s[1]<15?'初階':s[1]<25?'中低階':s[1]<35?'中階':s[1]<45?'高階':s[1]<55?'稀有高階':'頂級';export const bookName=(p,n)=>`${p.cls==='法師'?'魔法書':p.cls==='騎士'?'技術書':'技能書'}：${n}`;
