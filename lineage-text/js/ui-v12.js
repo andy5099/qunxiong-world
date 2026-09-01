@@ -1,6 +1,6 @@
-import{UI}from'./ui.js?v=26';
-import{skillsFor}from'./skills.js?v=26';
-import{setPotionSetting}from'./core-v12.js?v=26';
+import{UI}from'./ui.js?v=27';
+import{skillsFor}from'./skills.js?v=27';
+import{setPotionSetting}from'./core-v12.js?v=27';
 
 const previousMore=UI.prototype.more;
 UI.prototype.more=function(p){let html=previousMore.call(this,p),active=skillsFor(p).filter(s=>s[2]==='active'&&p.learnedSkills.includes(s[0])),selected=p.activeSkillSettings.selectedActiveSkill||'未選擇',selector=`<h2>主動攻擊技能選擇</h2><p>目前使用：<b>${selected}</b></p><div class="cards">${active.map(s=>`<button class="card ${selected===s[0]?'active':''}" data-primary-skill="${s[0]}"><b>${s[0]}</b><br><small>MP ${s[3]}・CD ${s[5]||6}秒<br>設為主要攻擊技能</small></button>`).join('')||'<p>尚未學會主動攻擊技能。</p>'}</div><small>治癒技能仍依 HP 閾值獨立觸發；MP 不足時改用普通攻擊。</small>`;return html.replace('<h2>技能分類</h2>',selector+'<h2>技能分類</h2>').replace('綠水自動使用・自動補貨','綠水自動使用・自動購買').replace('勇水自動使用・自動補貨','勇水自動使用・自動購買')};

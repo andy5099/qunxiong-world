@@ -1,4 +1,4 @@
-import{CLASSES}from'./data.js?v=26';
+import{CLASSES}from'./data.js?v=27';
 let instanceSequence=0;export const itemInstanceId=()=>`item-${Date.now().toString(36)}-${(++instanceSequence).toString(36)}-${Math.random().toString(36).slice(2,9)}`;
 export function ensureItemInstances(p){let used=new Set;for(let item of[...(p.bag||[]),...Object.values(p.equipment||{}).filter(Boolean)]){let id=item.instanceId||item.uid;if(!id||used.has(id))id=itemInstanceId();item.instanceId=item.uid=id;used.add(id)}return used.size}
 export function canEquip(p,item){if(item.slot==='武器'&&item.classes&&!item.classes.includes(p.cls))return false;if(item.slot==='武器'&&!CLASSES[p.cls].weapon.includes(item.type))return false;if(item.slot==='盾牌'){let w=p.equipment.武器;if(w&&(w.two||w.type==='弓'||['雙刀','鋼爪'].includes(w.type)))return false}return true}

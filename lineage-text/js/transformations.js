@@ -1,4 +1,4 @@
-import{CONSUMABLES}from'./data.js?v=26';
+import{CONSUMABLES}from'./data.js?v=27';
 export const TRANSFORM_DURATION=1800,ATTACK_SPEED_CAP=2.6;
 CONSUMABLES.變身卷軸={price:1000,weight:1,transform:true,duration:TRANSFORM_DURATION};
 const T=(id,name,requiredLevel,weaponSpeeds,magicCompatible=true,moveSpeed=1,category='經典')=>({id,name,requiredLevel,allowedWeaponTypes:Object.keys(weaponSpeeds),weaponSpeeds,magicCompatible,moveSpeed,category});

@@ -1,5 +1,5 @@
 import assert from'node:assert/strict';
-import{createPlayer,derived}from'../js/player.js';import{CONSUMABLES,ITEMS}from'../js/data.js?v=26';import{buy,supply}from'../js/shop.js';import{migrate}from'../js/migration.js';import{TRANSFORMATIONS,TRANSFORM_DURATION,ATTACK_SPEED_CAP,transformById,compatible,recommend,activateTransform,autoTransform,simulateOfflineTransform}from'../js/transformations.js';import{calculateOffline,claimOffline}from'../js/offline.js';
+import{createPlayer,derived}from'../js/player.js';import{CONSUMABLES,ITEMS}from'../js/data.js?v=27';import{buy,supply}from'../js/shop.js';import{migrate}from'../js/migration.js';import{TRANSFORMATIONS,TRANSFORM_DURATION,ATTACK_SPEED_CAP,transformById,compatible,recommend,activateTransform,autoTransform,simulateOfflineTransform}from'../js/transformations.js';import{calculateOffline,claimOffline}from'../js/offline.js';
 let checks=0,ok=(v,m)=>{assert.ok(v,m);checks++},eq=(a,b,m)=>{assert.equal(a,b,m);checks++};
 let p=migrate({player:createPlayer('測試','妖精')}).player;p.gold=1e9;p.level=55;p.equipment.武器={...ITEMS.find(x=>x.type==='弓'),uid:'bow'};
 ok(CONSUMABLES.變身卷軸,'商店有變身卷軸');eq(CONSUMABLES.變身卷軸.price,1000);eq(CONSUMABLES.變身卷軸.weight,1);for(let n of[1,10,50,100]){let before=p.consumables.變身卷軸||0;ok(buy(p,'變身卷軸',n),`可買${n}`);eq(p.consumables.變身卷軸,before+n)}
