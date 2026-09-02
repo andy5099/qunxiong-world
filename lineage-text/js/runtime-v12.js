@@ -1,7 +1,7 @@
-import{Combat}from'./combat.js?v=27';
-import{normalizeCharacterState,maintainSpeedPotions,buySpeedPotionTargets}from'./core-v12.js?v=27';
-import{autoTransform}from'./transformations.js?v=27';
-import{derived}from'./player.js?v=27';
+import{Combat}from'./combat.js?v=38';
+import{normalizeCharacterState,maintainSpeedPotions,buySpeedPotionTargets}from'./core-v12.js?v=38';
+import{autoTransform}from'./transformations.js?v=38';
+import{derived}from'./player.js?v=38';
 
 const originalStart=Combat.prototype.start;
 Combat.prototype.start=function(){normalizeCharacterState(this.s);let p=this.s.player;if(p.settings.autoSupply){let r=buySpeedPotionTargets(p);if(r.cost)this.log(`自動補給綠水／勇水，花費 ${r.cost} 金幣。`,'good')}originalStart.call(this);let used=maintainSpeedPotions(p);used.used.forEach(n=>this.log(`自動使用${n}。`,'good'));p.__derivedSpeed=derived(p).speed;autoTransform(p);delete p.__derivedSpeed};

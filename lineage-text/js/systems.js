@@ -5,7 +5,20 @@ export const TRANSFORMATIONS=[['巡守兵',1,['單手劍','匕首'],1.02],['骷�
 const setNames=['死亡騎士','巴風特','克特','冰之女王','惡魔','巫妖'];export const BOSS_SETS=setNames.map((name,i)=>({id:`set${i}`,name,boss:name,material:['死亡騎士之魂','巴風特之角','克特徽章','冰之女王淚','惡魔之血','巫妖魔力核'][i],role:['近戰','魔法','防禦','遠攻','續航','魔法'][i],pieces:['頭盔','盔甲','手套','鞋子'].map((slot,j)=>({id:`set${i}-${j}`,name:`${name}${slot}`,slot,ac:-2-i-(slot==='盔甲'?3:0),safe:4,weight:18,price:90000,protected:true,bossSet:`set${i}`,...(i===0&&j===0?{str:1}:i===2&&j===1?{con:1}:i===3&&j===3?{dex:1}:i===5&&j===2?{int:1,wis:1}:{})})),effects:{2:i===3?{dex:1,hit:1}:{con:1,hp:20},3:i>=4?{int:1,mp:20}:{str:1,damage:1},4:{speed:.08,hit:2,magic:i===1||i===5?2:0}}}));
 export const SPECIAL_GEAR=[{id:'str-neck',name:'力量項鍊',slot:'項鍊',ac:0,safe:0,str:1,weight:4,price:80000,protected:true},{id:'dex-boots',name:'敏捷長靴',slot:'鞋子',ac:-2,safe:4,dex:1,weight:12,price:90000,protected:true},{id:'mage-ring',name:'賢者戒指',slot:'戒指1',ac:0,safe:0,int:1,mp:20,weight:2,price:140000,protected:true},{id:'summon-ring',name:'召喚控制戒指',slot:'戒指2',ac:0,safe:0,cha:2,weight:2,price:300000,protected:true}];
 export const PET_TYPES=[{id:'dog',name:'杜賓狗',control:2,hp:70,atk:5,hit:9,ac:7,speed:1.05},{id:'wolf',name:'牧羊犬',control:2,hp:82,atk:6,hit:8,ac:6,speed:1},{id:'bear',name:'熊',control:4,hp:145,atk:10,hit:7,ac:3,speed:.78,max:2},{id:'tiger',name:'猛虎',control:5,hp:120,atk:13,hit:11,ac:1,speed:1.08,max:1}];
-export const SUMMON_TYPES=[{id:'skeleton',name:'骷髏戰士',level:28,requiredCha:12,control:3,hp:160,atk:15,hit:18,ac:-2,speed:.9,skill:'召喚術'},{id:'direwolf',name:'魔狼',level:36,requiredCha:16,control:4,hp:220,atk:22,hit:24,ac:-8,speed:1.05,skill:'召喚術'},{id:'elder',name:'黑長者之影',level:52,requiredCha:18,control:5,hp:620,atk:55,hit:40,ac:-25,speed:1.15,skill:'高階召喚術',boss:true,ring:true,max:1}];
+export const SUMMON_TYPES=[
+{id:'skeleton',name:'骷髏戰士',rank:'普通',level:28,requiredCha:12,control:3,hp:160,atk:15,hit:18,ac:-2,speed:.9,skill:'召喚術'},
+{id:'hellhound',name:'地獄犬',rank:'普通',level:32,requiredCha:14,control:3,hp:190,atk:19,hit:21,ac:-5,speed:1.05,skill:'召喚術'},
+{id:'ogre',name:'食人妖精',rank:'普通',level:36,requiredCha:16,control:4,hp:260,atk:25,hit:24,ac:-8,speed:.88,skill:'召喚術'},
+{id:'ogre-king',name:'食人妖精王',rank:'中階',level:44,requiredCha:18,control:5,hp:410,atk:38,hit:31,ac:-15,speed:.95,skill:'高階召喚術'},
+{id:'elder',name:'黑長者',rank:'中階',level:48,requiredCha:19,control:5,hp:480,atk:44,hit:34,ac:-19,speed:1.06,skill:'高階召喚術'},
+{id:'fire-demon',name:'火焰魔族',rank:'中階',level:50,requiredCha:20,control:5,hp:520,atk:49,hit:36,ac:-21,speed:1.08,skill:'高階召喚術'},
+{id:'death-knight',name:'死亡騎士',rank:'高階',level:52,requiredCha:22,control:6,hp:720,atk:68,hit:43,ac:-30,speed:1.2,skill:'高階召喚術',boss:true,ring:true},
+{id:'demon',name:'惡魔',rank:'高階',level:56,requiredCha:24,control:6,hp:790,atk:74,hit:46,ac:-34,speed:1.16,skill:'高階召喚術',boss:true,ring:true},
+{id:'vampire',name:'吸血鬼',rank:'高階',level:60,requiredCha:25,control:7,hp:850,atk:80,hit:49,ac:-37,speed:1.18,skill:'高階召喚術',boss:true,ring:true},
+{id:'vander',name:'騎士范德',rank:'高階',level:64,requiredCha:26,control:7,hp:920,atk:88,hit:52,ac:-40,speed:1.2,skill:'高階召喚術',boss:true,ring:true},
+{id:'lich',name:'巫妖',rank:'高階',level:68,requiredCha:27,control:8,hp:860,atk:96,hit:55,ac:-43,speed:1.15,skill:'高階召喚術',boss:true,ring:true},
+{id:'reaper',name:'鐮刀死神',rank:'頂階',level:72,requiredCha:28,control:8,hp:1100,atk:112,hit:60,ac:-48,speed:1.24,skill:'高階召喚術',boss:true,ring:true}
+];
 export const MAP_FLAVORS=[['新手森林',['哥布林','妖魔戰士','妖魔法師','狼人'],'狼人王','巴風特'],['地下礦坑',['巨大螞蟻','巨蟻兵','穴居人','食人妖精'],'巨蟻女皇','巴列斯'],['荒廢墓地',['骷髏兵','骷髏弓手','骷髏法師','殭屍'],'殭屍王','木乃伊王'],['獸人荒原',['獸人戰士','獸人弓手','獸人法師','黑騎士'],'獸人督軍','克特'],['精靈森林',['精靈弓手','風精靈','冰原妖魔','獨角獸'],'黑長者','冰之女王'],['黑暗洞穴',['暗黑精靈','黑騎士','吸血蝙蝠','暗影獸'],'吸血鬼','惡魔'],['火焰山谷',['火焰戰士','熔岩高崙','烈焰蜥蜴','火焰蛋'],'炎魔','不死鳥'],['龍之谷',['哈維','亞力安','骷髏近衛兵','巨大骷髏'],'黑長者','死亡騎士'],['魔族神殿',['魔族衛兵','魔族法師','幻術士靈魂','龍人戰士'],'騎士范德','巫妖'],['遺忘之地',['遺忘巨人','木乃伊守衛','深淵騎士','死亡司祭'],'艾莉絲','鐮刀死神']].map((x,i)=>({map:i,normals:x[1],mini:x[2],boss:x[3]}));
 export function controlCapacity(cha){return Math.max(1,Math.floor((cha-8)/3)+2)}export function setState(equipment){let counts={};Object.values(equipment).filter(Boolean).forEach(i=>{if(i.bossSet)counts[i.bossSet]=(counts[i.bossSet]||0)+1});return counts}
 

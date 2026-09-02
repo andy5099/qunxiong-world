@@ -1,4 +1,4 @@
-import{CONSUMABLES}from'./data.js?v=27';import{PET_TYPES}from'./systems.js?v=27';
+import{CONSUMABLES}from'./data.js?v=38';import{PET_TYPES}from'./systems.js?v=38';
 export const ARROWS={木箭:{price:2,damage:1,undead:1},銀箭:{price:5,damage:2,undead:1.5},米索莉箭:{price:12,damage:4,undead:1.25}};
 for(let[name,x]of Object.entries(ARROWS))CONSUMABLES[name]={price:x.price,weight:0,arrow:true,damage:x.damage,undead:x.undead};
 export const STACK_USE={紅色藥水:'恢復 28 HP',橙色藥水:'恢復 75 HP',白色藥水:'恢復 180 HP',藍色藥水:'提升 MP 回復',魔力藥水:'立即恢復 MP',綠色藥水:'普通攻速 ×1.20，300秒',勇敢藥水:'普通攻速 ×1.25，300秒',回城卷軸:'返回村莊',瞬間移動卷軸:'移動用途',變身卷軸:'選擇經典變身',武器強化卷軸:'強化武器',防具強化卷軸:'強化防具',木箭:'基礎箭矢傷害 +1',銀箭:'基礎傷害 +2；對不死系 ×1.50',米索莉箭:'基礎傷害 +4；對不死系 ×1.25'};

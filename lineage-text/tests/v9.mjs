@@ -33,7 +33,7 @@ let gaps=[3,5,10].map(g=>miss(49,-5-g/2,30+g));ok(gaps[0]>=9&&gaps[0]<=18);ok(ga
 // Seeded Lv1→27 progression: 50 normal kills per level on the matching progression map.
 const rngFor=seed=>()=>{seed=(1664525*seed+1013904223)>>>0;return seed/4294967296};
 let totals=[],zeros=0;for(let seed=1;seed<=500;seed++){let p=migrate({player:createPlayer('進度','法師'),logs:[]}).player,rng=rngFor(seed),count=0;for(let level=1;level<=27;level++){p.level=level;let map=HUNTING_MAPS[Math.min(6,Math.floor((level-1)/4))];for(let k=0;k<50;k++){let e=map.normals[Math.floor(rng()*map.normals.length)];if(skillDrop(e,p,rng))count++}}totals.push(count);if(!count)zeros++}
-let sorted=[...totals].sort((a,b)=>a-b),avg=totals.reduce((a,b)=>a+b,0)/totals.length;ok(avg>=35&&avg<=70,`Lv27 平均 ${avg}`);ok(zeros/500<=.01,`零本率 ${zeros/500}`);ok(sorted[250]>=35&&sorted[250]<=70,`中位數 ${sorted[250]}`);
+let sorted=[...totals].sort((a,b)=>a-b),avg=totals.reduce((a,b)=>a+b,0)/totals.length;ok(avg>=70&&avg<=110,`Lv27 平均 ${avg}`);ok(zeros/500<=.01,`零本率 ${zeros/500}`);ok(sorted[250]>=70&&sorted[250]<=110,`中位數 ${sorted[250]}`);
 for(let s of skillsFor(migrate({player:createPlayer('來源','法師')}).player))ok(skillSources(s).length>0,`${s[0]}有來源`);
 
 console.log(JSON.stringify({suite:'V9',checks,transform:true,petLimits:PET_CLASS_LIMIT,hitSameLevel:hitRows,hitLevelGaps:gaps,skillBooks:{runs:500,average:+avg.toFixed(2),median:sorted[250],p10:sorted[49],p90:sorted[449],zeroRate:+(zeros/500*100).toFixed(2)}}));

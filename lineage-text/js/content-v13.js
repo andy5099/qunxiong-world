@@ -1,4 +1,4 @@
-import{HUNTING_MAPS,BOSS_CATALOG}from'./systems.js?v=27';
+import{HUNTING_MAPS,BOSS_CATALOG}from'./systems.js?v=38';
 
 const gear=(id,name,slot,ac,statBonuses,source,rarity='稀有',extra={})=>({id,name,slot,ac,safe:slot==='戒指1'||slot==='項鍊'?0:4,price:80000,rarity,statBonuses,source,protected:true,...extra});
 export const CLASSIC_STAT_GEAR=[
@@ -7,9 +7,15 @@ export const CLASSIC_STAT_GEAR=[
  gear('con-belt','身體腰帶','斗篷',-1,{con:1},{mapId:8,monster:'熔岩高崙',rarity:'稀有'}),
  gear('int-shirt','智力T恤','內衣',-1,{int:1},{mapId:7,monster:'冰原妖魔',rarity:'稀有'}),
  gear('wis-amulet','精神項鍊','項鍊',0,{wis:1},{mapId:9,monster:'黑長者',rarity:'稀有'}),
- gear('cha-amulet','魅力項鍊','項鍊',0,{cha:1},{mapId:4,boss:'克特',rarity:'極稀有'}),
- gear('summon-ring','召喚控制戒指','戒指1',0,{cha:2},{mapId:12,boss:'騎士范德',rarity:'極稀有'},{summonControl:true})
+ gear('cha-amulet','魅力項鍊','項鍊',0,{cha:2},{mapId:4,boss:'克特',rarity:'稀有'}),
+ gear('cha-helm','曼波帽','頭盔',-1,{cha:2},{mapId:4,monster:'妖魔法師',rarity:'進階'},{charmSet:true}),
+ gear('cha-robe','象牙塔長袍','盔甲',-3,{cha:2},{mapId:6,monster:'獨角獸',rarity:'稀有'},{charmSet:true}),
+ gear('cha-cloak','瑪那斗篷','斗篷',-2,{cha:2},{mapId:9,monster:'黑長者',rarity:'稀有'},{charmSet:true}),
+ gear('cha-boots','曼波兔長靴','鞋子',-2,{cha:2},{mapId:12,monster:'思克巴女皇',rarity:'極稀有'},{charmSet:true}),
+ gear('summon-ring','召喚控制戒指','戒指1',0,{cha:3},{mapId:12,boss:'騎士范德',rarity:'極稀有'},{summonControl:true})
 ];
+
+export const CHARM_SET={name:'曼波召喚套裝',pieceIds:['cha-helm','cha-robe','cha-cloak','cha-boots'],effects:{2:{cha:1},3:{cha:2},4:{cha:4,summonDamage:.18}}};
 
 export const itemSource=item=>{let s=item?.source;if(!s)return null;let m=HUNTING_MAPS.find(x=>x.id===s.mapId);return{map:m?.name||'未知地圖',floor:m?.floor||null,monster:s.monster||null,boss:s.boss||null,rarity:s.rarity||item.rarity||'稀有'}};
 export const statText=item=>Object.entries(item?.statBonuses||{}).filter(([,v])=>v).map(([k,v])=>`${k.toUpperCase()} ${v>0?'+':''}${v}`).join('・');
