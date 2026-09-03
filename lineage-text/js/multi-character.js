@@ -1,5 +1,5 @@
 import{createPlayer,derived}from'./player.js?v=38';
-import{migrate}from'./migration.js?v=38';
+import{migrate}from'./migration.js?v=44';
 export const MULTI_KEY='lineageTextMultiSaveV10',LEGACY_KEY='lineageTextSaveV1',MAX_CHARACTERS=7;
 const uid=()=>`char-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,9)}`;
 export const emptyRoster=()=>({saveVersion:10,multiCharacterMigration:true,activeCharacterId:null,characters:Array(MAX_CHARACTERS).fill(null),globalSettings:{}});
