@@ -8,11 +8,13 @@ export function normalizeCharacterState(state){
  const p=state?.player;if(!p)return state;
  p.settings??={};p.settings.target??={};p.activeSkillSettings??={attack:[],heal:null,healThreshold:45};p.activeSkillSettings.attack??=[];
  p.activeSkillSettings.selectedActiveSkill??=p.selectedActiveSkill??p.activeSkillSettings.attack[0]??null;
+ p.activeSkillSettings.resource??={};p.activeSkillSettings.soulMpBelow??=30;p.activeSkillSettings.soulHpAbove??=70;
+ p.buffs??={greenUntil:0,braveUntil:0,blueUntil:0};p.buffs.blueUntil??=0;
  p.settings.autoGreen??=p.settings.autoUseGreenPotion??true;p.settings.autoBrave??=p.settings.autoUseBraveryPotion??true;
  p.settings.autoSupplyGreen??=p.settings.autoBuyGreenPotion??true;p.settings.autoSupplyBrave??=p.settings.autoBuyBraveryPotion??true;
  p.settings.autoUseGreenPotion=p.settings.autoGreen;p.settings.autoUseBraveryPotion=p.settings.autoBrave;
  p.settings.autoBuyGreenPotion=p.settings.autoSupplyGreen;p.settings.autoBuyBraveryPotion=p.settings.autoSupplyBrave;
- p.settings.target.綠色藥水??=50;p.settings.target.勇敢藥水??=30;p.buffs??={greenUntil:0,braveUntil:0};
+ p.settings.target.綠色藥水??=50;p.settings.target.勇敢藥水??=30;
  p.petMaterials??={'寵物進化石':0,'高級寵物進化石':0};for(const item of[...p.bag,...Object.values(p.equipment||{}).filter(Boolean)]){item.statBonuses??={};for(const k of['str','dex','con','int','wis','cha'])if(item[k]&&!item.statBonuses[k])item.statBonuses[k]=item[k]}
  ensureItemInstances(p);return state;
 }
