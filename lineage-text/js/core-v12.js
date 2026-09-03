@@ -7,6 +7,7 @@ import{CONSUMABLES}from'./data.js?v=38';
 export function normalizeCharacterState(state){
  const p=state?.player;if(!p)return state;
  p.settings??={};p.settings.target??={};p.activeSkillSettings??={attack:[],heal:null,healThreshold:45};p.activeSkillSettings.attack??=[];
+ for(const key of['魔力藥水','manaPotion','magicPotion'])delete p.consumables?.[key];for(const key of['autoManaPotion','autoBuyMana','autoUseManaPotion'])delete p.settings[key];for(const key of['魔力藥水','manaPotion','magicPotion'])delete p.settings.target[key];
  p.activeSkillSettings.selectedActiveSkill??=p.selectedActiveSkill??p.activeSkillSettings.attack[0]??null;
  p.activeSkillSettings.resource??={};p.activeSkillSettings.soulMpBelow??=30;p.activeSkillSettings.soulHpAbove??=70;
  p.buffs??={greenUntil:0,braveUntil:0,blueUntil:0};p.buffs.blueUntil??=0;

@@ -1,0 +1,3 @@
+import{migrate as previousMigrate}from'./migration.js?v=44';
+export function removeMagicPotion(p){if(!p)return p;for(const key of['魔力藥水','manaPotion','magicPotion'])delete p.consumables?.[key];p.settings??={};p.settings.target??={};for(const key of['autoManaPotion','autoBuyMana','autoUseManaPotion','manaPotion','magicPotion'])delete p.settings[key];for(const key of['魔力藥水','manaPotion','magicPotion'])delete p.settings.target[key];delete p.autoManaPotion;for(const key of['weight','currentWeight','maxWeight','carryWeight','overweight','encumbrance'])delete p[key];return p}
+export function migrate(state){let result=previousMigrate(state);removeMagicPotion(result?.player);return result}
