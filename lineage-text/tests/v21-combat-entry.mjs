@@ -1,0 +1,12 @@
+import assert from'node:assert/strict';
+import{createPlayer}from'../js/player.js';
+import{migrate}from'../js/migration-v19.js';
+import{ITEMS}from'../js/data.js';
+import{Combat}from'../js/combat.js?v=51';
+import'../js/runtime-v12.js';import'../js/runtime-v13.js';import'../js/runtime-v19.js';
+const make=cls=>migrate({player:createPlayer('正式戰鬥',cls),logs:[]}).player;
+let melee=make('騎士');melee.inTown=false;for(const n of ['木箭','銀箭','米索莉箭'])melee.consumables[n]=0;let mc=new Combat({player:melee,logs:[]});mc.enemy.hp=999;let hp=mc.enemy.hp;mc.tick(2);assert.ok(mc.enemy.hp<hp);assert.equal(melee.inTown,false);
+let elf=make('妖精');elf.inTown=false;elf.equipment.武器={...ITEMS.find(x=>x.type==='弓'),uid:'bow'};elf.settings.arrowType='木箭';elf.consumables.木箭=0;elf.consumables.銀箭=2;elf.consumables.米索莉箭=0;let ec=new Combat({player:elf,logs:[]});ec.tick(2);assert.equal(elf.settings.arrowType,'銀箭');assert.equal(elf.inTown,false);ec.tick(2);assert.equal(elf.consumables.銀箭,1);
+elf.consumables.銀箭=0;let returns=elf.statsLog.returns,gold=elf.gold,cost=elf.statsLog.supplyCost;for(let i=0;i<100;i++)ec.tick(.1);assert.equal(elf.inTown,false);assert.equal(elf.statsLog.returns,returns);assert.equal(elf.gold,gold);assert.equal(elf.statsLog.supplyCost,cost);
+for(const n of ['紅色藥水','橙色藥水','白色藥水','藍色藥水','綠色藥水','勇敢藥水','變身卷軸'])melee.consumables[n]=0;melee.hp=1;mc.autoPotion();assert.equal(melee.inTown,false);
+console.log(JSON.stringify({suite:'V21 formal combat entry',cases:{meleeNoArrow:true,arrowFallback:true,allArrowsEmpty:true,allSuppliesEmpty:true},autoReturns:0,autoSupplyCost:0}));

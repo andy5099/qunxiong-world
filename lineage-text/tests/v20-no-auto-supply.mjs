@@ -2,7 +2,7 @@ import assert from'node:assert/strict';
 import{createPlayer}from'../js/player.js';
 import{migrate}from'../js/migration-v19.js';
 import{supply}from'../js/shop.js';
-import{Combat}from'../js/combat.js?v=38';
+import{Combat}from'../js/combat.js?v=51';
 import{calculateOffline}from'../js/offline-v19.js';
 import'../js/runtime-v12.js';
 import'../js/runtime-v19.js';

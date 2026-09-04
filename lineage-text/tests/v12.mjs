@@ -2,7 +2,7 @@ import assert from'node:assert/strict';
 import{createPlayer,derived}from'../js/player.js';
 import{migrate}from'../js/migration.js';
 import{normalizeCharacterState,applyOfflineRewards,maintainSpeedPotions,buySpeedPotionTargets}from'../js/core-v12.js';
-import{Combat}from'../js/combat.js';import'../js/runtime-v12.js';
+import{Combat}from'../js/combat.js?v=51';import'../js/runtime-v12.js';
 import{ITEMS}from'../js/data.js';
 import{addItem,equip,unequip,sell,ensureItemInstances}from'../js/inventory.js';
 import{autoTransform}from'../js/transformations.js';

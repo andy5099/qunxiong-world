@@ -6,7 +6,7 @@ import{supply}from'../js/shop.js';
 import{BALANCE_CONFIG,expReward,goldReward}from'../js/balance-config.js';
 import{calculateOffline}from'../js/offline-v19.js';
 import{addItem}from'../js/inventory.js';
-import{Combat}from'../js/combat.js?v=38';
+import{Combat}from'../js/combat.js?v=51';
 import'../js/runtime-v19.js';
 let checks=0,ok=(v,m)=>{assert.ok(v,m);checks++},eq=(a,b,m)=>{assert.deepEqual(a,b,m);checks++};
 const make=()=>migrate({player:createPlayer('掛機驗收','騎士'),logs:[]}).player;

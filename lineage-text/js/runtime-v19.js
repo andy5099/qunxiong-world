@@ -1,4 +1,4 @@
-import{Combat}from'./combat.js?v=38';
+import{Combat}from'./combat.js?v=51';
 import{CONSUMABLES}from'./data.js?v=38';
 import{derived}from'./player.js?v=38';
 import{expReward,goldReward}from'./balance-config.js';

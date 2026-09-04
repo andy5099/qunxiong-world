@@ -1,4 +1,4 @@
-import{Combat}from'./combat.js?v=38';
+import{Combat}from'./combat.js?v=51';
 import{normalizeCharacterState,maintainSpeedPotions}from'./core-v12.js?v=38';
 import{autoTransform}from'./transformations.js?v=38';
 import{derived}from'./player.js?v=38';
