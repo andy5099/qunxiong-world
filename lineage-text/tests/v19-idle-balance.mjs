@@ -11,11 +11,11 @@ import'../js/runtime-v19.js';
 let checks=0,ok=(v,m)=>{assert.ok(v,m);checks++},eq=(a,b,m)=>{assert.deepEqual(a,b,m);checks++};
 const make=()=>migrate({player:createPlayer('掛機驗收','騎士'),logs:[]}).player;
 
-// CASE A: partial purchases are independent and always continue.
-let partial=make();partial.gold=500;partial.settings.autoSell=false;partial.settings.autoBuyHeal=true;partial.settings.autoBuyBlue=true;partial.settings.autoSupplyGreen=true;partial.settings.autoSupplyBrave=true;partial.settings.autoSupplyTransform=false;partial.settings.target.紅色藥水=100;partial.settings.target.藍色藥水=20;partial.settings.target.綠色藥水=20;partial.settings.target.勇敢藥水=20;let a=supply(partial,{fee:0});ok(a.ok);ok(a.partial);ok(a.bought.紅色藥水>0);ok(a.missing.length>0);
+// CASE A: legacy auto-purchase flags are ignored.
+let partial=make();partial.gold=500;partial.settings.autoSell=false;partial.settings.autoBuyHeal=true;partial.settings.autoBuyBlue=true;partial.settings.autoSupplyGreen=true;partial.settings.autoSupplyBrave=true;partial.settings.autoSupplyTransform=false;partial.settings.target.紅色藥水=100;partial.settings.target.藍色藥水=20;partial.settings.target.綠色藥水=20;partial.settings.target.勇敢藥水=20;let goldBefore=partial.gold,itemsBefore={...partial.consumables},a=supply(partial,{fee:0});ok(a.ok);ok(a.disabled);eq(a.cost,0);eq(partial.gold,goldBefore);eq(partial.consumables,itemsBefore);
 
 // CASE B: zero gold never makes supply or auto hunt stop.
-let zero=make();zero.gold=0;zero.settings.autoSell=false;for(const n of Object.keys(zero.consumables))zero.consumables[n]=0;let b=supply(zero,{fee:999});ok(b.ok);ok(b.partial);zero.inTown=false;let cs={player:zero,logs:[]},combat=new Combat(cs);combat.returnTown(true);eq(zero.inTown,false);ok(combat.enemy);
+let zero=make();zero.gold=0;zero.settings.autoSell=false;for(const n of Object.keys(zero.consumables))zero.consumables[n]=0;let b=supply(zero,{fee:999});ok(b.ok);ok(b.disabled);zero.inTown=false;let cs={player:zero,logs:[]},combat=new Combat(cs);eq(combat.returnTown(true),false);eq(zero.inTown,false);ok(combat.enemy);
 
 // CASE C: no carry restriction with large mixed inventory.
 let heavy=make();for(let i=0;i<2000;i++)addItem(heavy,{...ITEMS[i%ITEMS.length],id:`bulk-${i}`});heavy.consumables.紅色藥水=1e7;heavy.bossMaterials.測試材料=1e7;heavy.bag.push({uid:'book',instanceId:'book',kind:'book',name:'技能書',count:999});eq(weight(heavy).current,0);eq(weight(heavy).max,Infinity);eq(heavy.bag.length,2001);

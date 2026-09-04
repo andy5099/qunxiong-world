@@ -1,7 +1,13 @@
 import{Combat}from'./combat.js?v=38';
-import{supply}from'./shop.js?v=48';
-import{mapFor}from'./hunting.js?v=38';
+import{CONSUMABLES}from'./data.js?v=38';
+import{derived}from'./player.js?v=38';
 import{expReward,goldReward}from'./balance-config.js';
 const previousWin=Combat.prototype.win;
+const previousStart=Combat.prototype.start,previousTick=Combat.prototype.tick,autoSupplyKeys=['autoSupply','autoBuyHeal','autoBuyBlue','autoBuyArrows','autoSupplyGreen','autoSupplyBrave','autoSupplyTransform'];
+const withoutAutoSupply=(p,run)=>{let saved=Object.fromEntries(autoSupplyKeys.map(k=>[k,p.settings[k]]));for(const k of autoSupplyKeys)p.settings[k]=false;try{return run()}finally{for(const k of autoSupplyKeys)p.settings[k]=saved[k]}};
+Combat.prototype.start=function(){return withoutAutoSupply(this.s.player,()=>previousStart.call(this))};
+Combat.prototype.tick=function(dt){return withoutAutoSupply(this.s.player,()=>previousTick.call(this,dt))};
 Combat.prototype.win=function(){let defeated=this.enemy;if(!defeated)return previousWin.call(this);let baseExp=defeated.exp,baseGold=defeated.gold,isBoss=!!(defeated.boss||defeated.mini);defeated.exp=expReward(baseExp,{boss:isBoss});defeated.gold=goldReward(baseGold,{boss:isBoss})/10;let result=previousWin.call(this);defeated.exp=baseExp;defeated.gold=baseGold;return result};
-Combat.prototype.returnTown=function(auto=false){let p=this.s.player;p.inTown=true;p.statsLog.returns++;if(auto){let result=supply(p,mapFor(p.map));p.inTown=false;this.spawn();this.log(result.missing.length?`部分補給完成（${result.missing.join('、')}未補滿），繼續掛機。`:'補給完成，繼續掛機。','good')}this.onChange?.()};
+Combat.prototype.autoPotion=function(){let p=this.s.player;if(!p.settings.autoPotion)return;let d=derived(p),pct=p.hp/d.maxHp*100,n=p.settings.healPotion||'紅色藥水';if(pct<(p.settings.thresholds[n]||70)&&(p.consumables[n]||0)>0&&CONSUMABLES[n]){p.consumables[n]--;p.hp=Math.min(d.maxHp,p.hp+CONSUMABLES[n].heal);return}if((p.consumables.藍色藥水||0)>0&&p.buffs.blueUntil<Date.now()){p.consumables.藍色藥水--;p.buffs.blueUntil=Date.now()+300000;this.log('自動使用藍色藥水，MP自然恢復提升。','good')}this.autoBuff(p)};
+Combat.prototype.arrowEmpty=function(){let p=this.s.player,alternate=Object.keys(p.consumables||{}).find(n=>/箭$/.test(n)&&(p.consumables[n]||0)>0);if(alternate)p.settings.arrowType=alternate;this.pcd=Math.max(this.pcd,1);return false};
+Combat.prototype.returnTown=function(auto=false){if(auto)return false;let p=this.s.player;p.inTown=true;p.statsLog.returns++;this.onChange?.();return true};

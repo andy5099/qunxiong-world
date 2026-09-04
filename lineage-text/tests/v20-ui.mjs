@@ -1,0 +1,21 @@
+import assert from'node:assert/strict';
+import{UI}from'../js/ui.js?v=38';
+import{createPlayer}from'../js/player.js';
+import{migrate}from'../js/migration-v19.js';
+import'../js/ui-v8.js?v=38';
+import'../js/ui-v11.js?v=38';
+import'../js/ui-v12.js?v=38';
+import'../js/ui-v13.js?v=38';
+import'../js/ui-multi.js?v=38';
+import'../js/ui-v14.js?v=44';
+import'../js/ui-v15.js?v=45';
+import'../js/ui-v16.js?v=49';
+import'../js/ui-v17.js?v=50';
+
+let p=migrate({player:createPlayer('介面驗收','騎士'),logs:[]}).player,html=UI.prototype.more.call({},p),forbidden=['自動購買','補給目標','自動補滿','回村補給','補給成本','自動採買','自動補給變身卷軸','箭矢目標','固定補給箭矢'];
+for(const text of forbidden)assert.equal(html.includes(text),false,`UI still contains ${text}`);
+assert.ok(html.includes('回血藥水'));
+assert.ok(html.includes('目前箭矢'));
+assert.ok(html.includes('auto-green'));
+assert.ok(html.includes('auto-brave'));
+console.log(JSON.stringify({suite:'V20 no auto-buy UI',checks:forbidden.length+4,forbiddenRemaining:[],autoUseRetained:['回血藥水','藍色藥水','綠色藥水','勇敢藥水','變身','箭矢']}));
