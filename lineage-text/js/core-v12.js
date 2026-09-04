@@ -2,7 +2,7 @@ import{addItem,ensureItemInstances}from'./inventory.js?v=38';
 import{gainExp}from'./player.js?v=38';
 import{petWin}from'./companions.js?v=38';
 import{buy}from'./shop.js?v=38';
-import{CONSUMABLES}from'./data.js?v=38';
+import{CONSUMABLES}from'./data.js?v=53';
 
 export function normalizeCharacterState(state){
  const p=state?.player;if(!p)return state;

@@ -1,2 +1,2 @@
-import{ITEMS}from'./data.js?v=38';
+import{ITEMS}from'./data.js?v=53';
 export function qaOfflineReward(p,count=5){let base=ITEMS.find(x=>x.slot==='頭盔')||ITEMS[0],gear=Array.from({length:count},(_,i)=>({...base,id:`qa-offline-${i}`,name:`QA離線裝備${i+1}`,protected:false,enhance:0,price:300+i}));return{sec:3600,combatSec:3384,kills:100,bosses:0,deaths:0,returns:0,exp:0,gross:0,cost:0,net:0,consumed:{},purchased:{},materials:{},gear,books:[],petExp:0,petShares:{},arrowName:null,arrowEffect:{},transformScrolls:0,lootConsumables:{},petEvolutionMaterials:{},dropTrace:{kills:100},stopped:false}}

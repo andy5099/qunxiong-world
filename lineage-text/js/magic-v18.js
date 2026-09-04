@@ -1,4 +1,4 @@
-import{DOLLS}from'./data.js?v=38';
+import{DOLLS}from'./data.js?v=53';
 export function manaRegenPerSecond(p,{blue=false}={}){
  const wis=p.stats?.wis||0,equipment=Object.values(p.equipment||{}).filter(Boolean).reduce((n,i)=>n+(i.mpRegen||i.mpr||0),0),doll=DOLLS[p.doll]?.effect==='mpRegen'?(DOLLS[p.doll].value||0):0;
  const base=.18+Math.max(0,wis-8)*.035,blueBonus=blue?.45:0;

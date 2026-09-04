@@ -30,8 +30,8 @@ let petOwner=make('王族');petOwner.pets=[{uid:'a',type:'dog',name:'A',level:5,
 // CASE E summon requires class/level/CHA/skill; participates and has no permanent EXP.
 let summoner=make('法師'),unit=SUMMON_TYPES[0];ok(!summonStatus(summoner,unit.id).ok);summoner.level=unit.level;summoner.stats.cha=unit.requiredCha;summoner.learnedSkills=['召喚術'];ok(summon(summoner,unit.id));ok(companionHits(summoner).some(x=>x.name===unit.name));ok(!('exp'in summoner.summons[0]));ok(SUMMON_TYPES.every(x=>!x.boss));
 
-// CASE F ancient boots retain every instance and equip normally.
-let bootsOwner=make('騎士'),boots=ITEMS.find(x=>x.name==='古代長靴');addItem(bootsOwner,boots);addItem(bootsOwner,ITEMS[0]);let idsBefore=bootsOwner.bag.map(x=>x.instanceId).sort(),bootId=bootsOwner.bag.find(x=>x.name==='古代長靴').instanceId;ok(equip(bootsOwner,bootId));eq(countInstanceId(bootsOwner,bootId),1);let allAfter=[...bootsOwner.bag,...Object.values(bootsOwner.equipment)].filter(Boolean).map(x=>x.instanceId).sort();eq(allAfter,idsBefore);
+// CASE F the legacy boot itemId keeps every instance after its canonical display-name correction.
+let bootsOwner=make('騎士'),boots=ITEMS.find(x=>x.id==='黑曜長靴');eq(boots.name,'黑長者涼鞋');addItem(bootsOwner,boots);addItem(bootsOwner,ITEMS[0]);let idsBefore=bootsOwner.bag.map(x=>x.instanceId).sort(),bootId=bootsOwner.bag.find(x=>x.id==='黑曜長靴').instanceId;ok(equip(bootsOwner,bootId));eq(countInstanceId(bootsOwner,bootId),1);let allAfter=[...bootsOwner.bag,...Object.values(bootsOwner.equipment)].filter(Boolean).map(x=>x.instanceId).sort();eq(allAfter,idsBefore);
 
 // CASE G JSON persistence keeps equipped IDs.
 let saved=JSON.parse(JSON.stringify(bootsOwner)),equipped=saved.equipment.鞋子.instanceId;eq(equipped,bootId);eq(countInstanceId(saved,bootId),1);

@@ -1,5 +1,5 @@
 import{UI}from'./ui.js?v=38';
-import{skillsFor}from'./skills.js?v=38';
+import{skillsFor}from'./skills.js?v=53';
 import{setPotionSetting}from'./core-v12.js?v=38';
 
 const previousMore=UI.prototype.more;
