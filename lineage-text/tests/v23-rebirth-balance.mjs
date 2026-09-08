@@ -5,11 +5,11 @@ import{ITEMS}from'../js/data.js?v=53';
 import{HUNTING_MAPS}from'../js/systems.js?v=38';
 import{skillsFor}from'../js/skills.js?v=53';
 import{addItem,equip,countInstanceId}from'../js/inventory.js?v=42';
-import{Combat,weaponDamage}from'../js/combat.js?v=53';
+import{Combat,weaponDamage}from'../js/combat.js?v=57';
 import{companionHits,petWin}from'../js/companions.js?v=54';
 import{BALANCE_CONFIG,expReward,goldReward}from'../js/balance-config.js?v=54';
 import{REBIRTH_CONFIG,REBIRTH_SKILL_ADVANCEMENTS,ELF_REBIRTH_ADVANCEMENTS,rebirthBonuses,unlockedAdvancements,advancedSkill,createRebirthPlayer}from'../js/rebirth.js?v=54';
-import'../js/runtime-v19.js?v=54';import'../js/runtime-v20.js?v=54';
+import'../js/runtime-v19.js?v=57';import'../js/runtime-v20.js?v=57';
 
 let checks=0,ok=(v,m)=>{assert.ok(v,m);checks++},eq=(a,b,m)=>{assert.deepEqual(a,b,m);checks++};
 const make=(cls='騎士')=>migrate({saveVersion:10,player:createPlayer('轉生驗收',cls),logs:[]}).player;

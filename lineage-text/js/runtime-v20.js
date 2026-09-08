@@ -1,4 +1,4 @@
-import{Combat,weaponDamage}from'./combat.js?v=53';
+import{Combat,weaponDamage}from'./combat.js?v=57';
 import{activeSkills,healSkills}from'./skills.js?v=53';
 import{consumeArrow,selectedArrow}from'./resources.js?v=53';
 import{derived}from'./player.js?v=54';

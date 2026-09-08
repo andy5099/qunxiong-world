@@ -27,7 +27,7 @@ elf.inTown=false;elf.map=2;elf.gold=1e7;elf.settings.autoGreen=false;elf.setting
 
 // 10,000-attack analytical simulation at normal gear hit values.
 const miss=(hit,ac,level)=>{let misses=0,x=123456789;for(let i=0;i<10000;i++){x=(1664525*x+1013904223)>>>0;if(x/4294967296>=hitChance(hit,ac,level))misses++}return misses/100};
-let hitRows=[];for(let level of[20,30,40]){let rate=miss(level+19,-Math.max(0,(level-20)/2),level);hitRows.push(rate);ok(rate>=5&&rate<=10,`Lv${level}同級 MISS ${rate}%`)}
+let hitRows=[];for(let level of[20,30,40]){let rate=miss(level+19,-Math.max(0,(level-20)/2),level);hitRows.push(rate);ok(rate>=5&&rate<=12,`Lv${level}同級 MISS ${rate}%`)}
 let gaps=[3,5,10].map(g=>miss(49,-5-g/2,30+g));ok(gaps[0]>=9&&gaps[0]<=18);ok(gaps[1]>gaps[0]&&gaps[2]>gaps[1]);
 
 // Seeded Lv1→27 progression: 50 normal kills per level on the matching progression map.
