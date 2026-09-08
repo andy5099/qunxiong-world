@@ -1,0 +1,3 @@
+import{UI}from'./ui.js?v=38';
+import{ALL_MAPS}from'./hunting.js?v=58';
+UI.prototype.maps=function(p){return`<section class="panel"><h2>狩獵地圖與地下城樓層（全部自由進入）</h2><div class="cards">${ALL_MAPS.map(m=>`<button data-map="${m.id}" class="card ${p.map===m.id?'active':''}"><b>${m.name}</b><br><small>${m.dragon?`${m.focus}<br>無等級、轉生、門票或任務限制<br>點擊後直接戰鬥 ${m.boss}<br>專屬掉落：${m.dragonBoss.bossEntry.item.name}、${m.dragonBoss.material}`:`${m.focus?`用途：${m.focus}<br>`:''}${m.normals.map(x=>`${x.name} Lv.${x.level}・HP ${x.hp}・AC ${x.ac}`).join('<br>')}<br>裝備：${m.weapon||'本職普通武器／防具'}<br>${m.mini?`小王：${m.mini}`:'無小王'}・${m.boss?`Boss：${m.boss}`:'無主要 Boss'}`}</small></button>`).join('')}</div></section>`};
