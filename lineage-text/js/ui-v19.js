@@ -1,5 +1,5 @@
 import{UI}from'./ui.js?v=38';
-import{REBIRTH_CONFIG,rebirthBonuses,unlockedAdvancements}from'./rebirth.js?v=54';
+import{REBIRTH_CONFIG,rebirthBonuses,unlockedAdvancements}from'./rebirth.js?v=55';
 const previousCharacter=UI.prototype.character,previousMore=UI.prototype.more;
 UI.prototype.character=function(p,d){let b=rebirthBonuses(p),rows=unlockedAdvancements(p),panel=`<section class="panel"><h2>【轉生】${b.count}轉</h2><p>永久效果：HP +${b.count*2}%・MP +${b.count*2}%・物理傷害 +${b.count}%・魔法傷害 +${b.count}%</p><p>下一次轉生：Lv.${REBIRTH_CONFIG.levelRequirement}</p>${rows.length?`<h3>已解鎖技能進階</h3>${rows.map(x=>`<div class="card"><b>${x.rebirth}轉・${x.name}</b><br><small>${x.effect}</small></div>`).join('')}`:'<p>3轉開始解鎖職業特色進階。</p>'}<button id="rebirth" class="primary" ${p.level<REBIRTH_CONFIG.levelRequirement?'disabled':''}>進行轉生</button></section>`;return previousCharacter.call(this,p,d)+panel};
 UI.prototype.more=function(p){let rows=unlockedAdvancements(p);return previousMore.call(this,p).replace('<h2>設定與存檔</h2>',`<h2>轉生技能進階</h2>${rows.map(x=>`<div class="card"><b>${x.rebirth}轉・${x.name}</b><br><small>${x.effect}</small></div>`).join('')||'<p>尚未解鎖轉生技能進階。</p>'}<h2>設定與存檔</h2>`)};

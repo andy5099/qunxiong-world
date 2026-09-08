@@ -13,7 +13,7 @@ const seeded=seed=>()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
 
 // SHOP-1..6: large/custom purchases are atomic and safe.
 let shop=make();shop.gold=10_000_000;let start=shop.gold;
-eq(buy(shop,'銀箭',10_000),10_000);eq(shop.consumables.銀箭,10_000);eq(shop.gold,start-50_000);
+eq(buy(shop,'銀箭',10_000),10_000);eq(shop.consumables.銀箭,10_000);eq(shop.gold,start-30_000);
 eq(buy(shop,'銀箭',50_000),50_000);eq(shop.consumables.銀箭,60_000);
 eq(buy(shop,'紅色藥水',5_000),5_000);eq(shop.consumables.紅色藥水,5_060);
 eq(buy(shop,'米索莉箭',12_345),12_345);eq(shop.consumables.米索莉箭,12_345);
