@@ -1,0 +1,25 @@
+import assert from'node:assert/strict';
+import{createPlayer,expNeed,gainExp}from'../js/player.js?v=59';
+import{migrate}from'../js/migration-v19.js';
+import{calculateOffline}from'../js/offline-v19.js?v=58';
+import{ITEMS}from'../js/data.js?v=53';
+import{WEAPON_ROUTES}from'../js/loot.js';
+import{skillsFor}from'../js/skills.js?v=53';
+import{REBIRTH_CONFIG,createRebirthPlayer}from'../js/rebirth.js?v=55';
+import{emptyRoster,addCharacter}from'../js/multi-character.js?v=48';
+import{Combat}from'../js/combat.js?v=58';
+
+const oldExpNeed=l=>l<10?45+l*28+l*l*4:l<20?700+(l-10)*180+(l-10)**2*24:l<30?4900+(l-20)*950+(l-20)**2*115:l<40?25900+(l-30)*4200+(l-30)**2*520:l<50?119900+(l-40)*18000+(l-40)**2*2500:Math.floor(549900*Math.pow(1.19,l-50));
+const targetExpNeed=l=>l<10?45+l*28+l*l*4:l<20?700+(l-10)*180+(l-10)**2*24:l<30?4900+(l-20)*950+(l-20)**2*115:l<40?25900+(l-30)*2500+(l-30)**2*250:l<50?70000+(l-40)*7000+(l-40)**2*600:Math.floor(195000*Math.pow(1.045,l-50));
+const mapAt=level=>level<8?0:level<15?1:level<22?2:level<30?4:level<38?5:level<45?7:level<52?9:level<57?11:13;
+const weaponNames={王族:['銀劍','大馬士革刀','瑟魯基之劍'],騎士:['銀劍','大馬士革刀','瑟魯基之劍'],妖精:['銀劍','大馬士革刀','瑟魯基之劍'],法師:['橡木魔法杖','瑪那魔杖','力量魔法杖'],黑暗妖精:['黑暗鋼爪','幽暗鋼爪','破壞鋼爪'],龍騎士:['消滅者鎖鏈劍','酷寒鎖鏈劍','極寒鎖鏈劍'],幻術士:['橡木魔法杖','水晶魔杖','共鳴奇古獸']};
+const find=name=>[...ITEMS,...WEAPON_ROUTES].find(x=>x.name===name),armorBands=[['皮頭盔','皮盔甲','腕甲','短統靴'],['鋼鐵頭盔','鋼鐵盔甲','保護者斗篷','長靴'],['抗魔法頭盔','抗魔法鏈甲','瑪那斗篷','黑暗長靴']];
+const equipProgression=p=>{let band=p.level<25?0:p.level<45?1:2,w=weaponNames[p.cls][band];p.equipment={武器:{...find(w),enhance:band*2}};for(const name of armorBands[band]){let item=find(name);if(item)p.equipment[item.slot]={...item,enhance:band*2}}};
+const levelWith=(p,amount,curve)=>{p.exp+=amount;while(p.level<60&&p.exp>=curve(p.level)){p.exp-=curve(p.level);p.level++;p.stats.str+=p.level%4===0?1:0;p.stats.con+=p.level%6===0?1:0;p.stats.dex+=p.level%5===0?1:0}};
+const simulate=(cls,curve,{skills=true}={})=>{let p=migrate({player:createPlayer(`首轉${cls}`,cls),logs:[]}).player;p.inTown=false;p.rebirthCount=0;for(const k of Object.keys(p.consumables))p.consumables[k]=1e8;p.settings.autoGreen=p.settings.autoBrave=false;let hours=0,totalExp=0,deaths=0,milestones={};while(p.level<60&&hours<240){equipProgression(p);if(skills)p.learnedSkills=skillsFor(p).filter(x=>x[1]<=p.level&&x[1]<=45).map(x=>x[0]);p.map=mapAt(p.level);let end=9e12+hours*3600e3,report=calculateOffline({player:p,lastOnlineTimestamp:end-3600e3},end,()=>.5);assert.ok(report&&report.exp>0,`${cls} Lv${p.level} 無離線EXP`);totalExp+=report.exp;deaths+=report.deaths;levelWith(p,report.exp,curve);hours++;for(const lv of[10,20,30,40,50,60])if(p.level>=lv&&milestones[lv]===undefined)milestones[lv]=hours}return{hours,totalExp,averageExpPerHour:Math.round(totalExp/hours),deaths,milestones}};
+let classes=['王族','騎士','妖精','法師','黑暗妖精','龍騎士','幻術士'],before=Object.fromEntries(classes.map(c=>[c,simulate(c,oldExpNeed)])),after=Object.fromEntries(classes.map(c=>[c,simulate(c,targetExpNeed)]));
+for(let l=1;l<59;l++)assert.ok(targetExpNeed(l+1)>targetExpNeed(l),`Lv${l}→${l+1} 非單調`);for(let l=1;l<30;l++)assert.equal(targetExpNeed(l),oldExpNeed(l));for(const l of[1,10,20,30,35,40,45,50,55,59])assert.equal(expNeed(l),targetExpNeed(l));
+let median=[...Object.values(after).map(x=>x.hours)].sort((a,b)=>a-b)[3];assert.ok(after.騎士.hours>=60&&after.騎士.hours<=80);assert.ok(median>=60&&median<=80);assert.ok(Math.max(...Object.values(after).map(x=>x.hours))<150);
+assert.equal(REBIRTH_CONFIG.levelRequirement,60);let rebirthBase=migrate({player:createPlayer('轉生驗收','騎士'),logs:[]}).player;rebirthBase.level=60;rebirthBase.exp=123;rebirthBase.gold=987654;rebirthBase.learnedSkills=['增幅防禦'];rebirthBase.bag.push({uid:'keep',instanceId:'keep',name:'銀劍',slot:'武器'});let reborn=createRebirthPlayer(rebirthBase);assert.equal(reborn.level,1);assert.equal(reborn.exp,0);assert.equal(reborn.rebirthCount,1);assert.equal(reborn.gold,987654);assert.deepEqual(reborn.learnedSkills,['增幅防禦']);assert.equal(reborn.bag[0].instanceId,'keep');
+let online=migrate({player:createPlayer('Online','騎士'),logs:[]}).player;gainExp(online,expNeed(1));assert.equal(online.level,2);let deathState={player:migrate({player:createPlayer('死亡','騎士'),logs:[]}).player,logs:[]};deathState.player.exp=1000;new Combat(deathState).die();assert.equal(deathState.player.exp,980);assert.equal(deathState.player.lostExp,20);let roster=emptyRoster(),charA=addCharacter(roster,'角色A','騎士',0),charB=addCharacter(roster,'角色B','法師',1);gainExp(charA.state.player,expNeed(1)+10);let serialized=JSON.parse(JSON.stringify(roster));assert.equal(serialized.characters[0].state.player.level,2);assert.equal(serialized.characters[0].state.player.exp,10);assert.equal(serialized.characters[1].state.player.level,1);assert.equal(serialized.characters[1].id,charB.id);
+console.log(JSON.stringify({suite:'V27 EXP curve',requirements:Object.fromEntries([1,10,20,30,35,40,45,50,55,59].map(l=>[l,targetExpNeed(l)])),before,after},null,2));
