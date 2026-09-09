@@ -6,6 +6,6 @@ const TIER_BY_NAME={
  '騎士范德之劍':5,'沙哈之弓':5,'熾炎天使弓':5,'巴風特魔杖':5,'冰之女王魔杖':5,'暗黑雙刀':5,'破壞鋼爪':5,'極寒鎖鏈劍':5,'共鳴奇古獸':5,'古代之劍':5,'古代巨劍':5,'古代頭盔':5,'古代鱗甲':5,'巨蟻女皇的銀翅膀':5,'黑長者涼鞋':5,'曼波兔長靴':5,'召喚控制戒指':5
 };
 export const maxEquipmentTier=mapTier=>mapTier<=2?1:mapTier<=4?2:mapTier<=7?3:mapTier<=10?4:5;
-export const equipmentTier=item=>item?.dragon||item?.tier===7?7:item?.boss||item?.bossSet?6:TIER_BY_NAME[item?.name]||null;
+export const equipmentTier=item=>item?.dragon||item?.tier===7?7:item?.boss||item?.bossSet?6:item?.tier||TIER_BY_NAME[item?.name]||null;
 export const eligibleForMap=(item,map)=>{let tier=equipmentTier(item);return tier!==null&&tier<=maxEquipmentTier(map.tier)&&!item?.boss&&!item?.source?.boss};
 export const EQUIPMENT_AUDIT={confirmed:Object.keys(TIER_BY_NAME),rename:[],remove:[],needsVerification:['身體腰帶','智力T恤','賢者戒指']};

@@ -17,6 +17,7 @@ export function normalizeCharacterState(state){
  p.settings.autoBuyGreenPotion=p.settings.autoSupplyGreen;p.settings.autoBuyBraveryPotion=p.settings.autoSupplyBrave;
  p.settings.target.綠色藥水??=50;p.settings.target.勇敢藥水??=30;
  p.petMaterials??={'寵物進化石':0,'高級寵物進化石':0};for(const item of[...p.bag,...Object.values(p.equipment||{}).filter(Boolean)]){item.statBonuses??={};for(const k of['str','dex','con','int','wis','cha'])if(item[k]&&!item.statBonuses[k])item.statBonuses[k]=item[k]}
+ p.consumables['防爆武器強化卷軸']??=0;p.consumables['防爆防具強化卷軸']??=0;
  ensureItemInstances(p);return state;
 }
 

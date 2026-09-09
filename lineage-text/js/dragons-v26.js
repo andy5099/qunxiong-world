@@ -12,3 +12,5 @@ export const DRAGON_MAPS=[
 export const isDragonMap=id=>DRAGON_MAPS.some(x=>x.id===id);
 export const dragonEnemy=map=>({...map.dragonBoss,hp:map.dragonBoss.maxHp});
 export const DRAGON_T7_EQUIPMENT=DRAGON_MAPS.map(x=>x.dragonBoss.bossEntry.item);
+export const DRAGON_UTILITY_ITEMS={weapon:{name:'防爆武器強化卷軸',classification:'GAMEPLAY_UTILITY_ITEM',rate:.0025},armor:{name:'防爆防具強化卷軸',classification:'GAMEPLAY_UTILITY_ITEM',rate:.0025}};
+export function dragonUtilityDrops(p,rng=Math.random){let drops=[];for(const item of Object.values(DRAGON_UTILITY_ITEMS))if(rng()<item.rate){p.consumables[item.name]=(p.consumables[item.name]||0)+1;drops.push(item.name)}return drops}
