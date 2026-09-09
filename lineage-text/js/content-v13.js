@@ -1,4 +1,5 @@
-import{HUNTING_MAPS,BOSS_CATALOG}from'./systems.js?v=38';
+import{HUNTING_MAPS,BOSS_CATALOG,PET_STONES}from'./systems.js?v=60';
+export{PET_STONES};
 
 const gear=(id,name,slot,ac,statBonuses,source,rarity='稀有',extra={})=>({id,name,slot,ac,safe:slot==='戒指1'||slot==='項鍊'?0:4,price:80000,rarity,statBonuses,source,protected:true,...extra});
 export const CLASSIC_STAT_GEAR=[
@@ -20,7 +21,6 @@ export const CHARM_SET={name:'曼波召喚套裝',pieceIds:['cha-helm','cha-robe
 export const itemSource=item=>{let s=item?.source;if(!s)return null;let m=HUNTING_MAPS.find(x=>x.id===s.mapId);return{map:m?.name||'未知地圖',floor:m?.floor||null,monster:s.monster||null,boss:s.boss||null,rarity:s.rarity||item.rarity||'稀有'}};
 export const statText=item=>Object.entries(item?.statBonuses||{}).filter(([,v])=>v).map(([k,v])=>`${k.toUpperCase()} ${v>0?'+':''}${v}`).join('・');
 
-export const PET_STONES={normal:'寵物進化石',advanced:'高級寵物進化石'};
 export const PET_STONE_RATE=tier=>({normal:tier<3?.0025:tier<8?.0045:.003,advanced:tier<4?0:tier<9?.0012:.0025});
 
 export const BOSS_PET_FORMS=[
