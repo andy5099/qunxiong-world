@@ -1,4 +1,4 @@
-import{Combat}from'./combat.js?v=61';
+import{Combat}from'./combat.js?v=62';
 import{dragonUtilityDrops}from'./dragons-v26.js?v=61';
 import{weaponMagicProc}from'./equipment-v29.js?v=61';
 
