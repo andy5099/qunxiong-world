@@ -1,4 +1,4 @@
-import{UI}from'./ui.js?v=38';
+import{UI}from'./ui.js?v=63';
 import{CONSUMABLES}from'./data.js?v=53';
 delete CONSUMABLES.魔力藥水;
 const previousMore=UI.prototype.more;

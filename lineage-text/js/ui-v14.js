@@ -1,4 +1,4 @@
-import{UI}from'./ui.js?v=38';
+import{UI}from'./ui.js?v=63';
 import{groupEquipment,quickSellPreview,sellInstances}from'./inventory.js?v=44';
 import{BOSS_SETS}from'./systems.js?v=38';
 import{statText,itemSource,PET_STONES}from'./content-v13.js?v=38';

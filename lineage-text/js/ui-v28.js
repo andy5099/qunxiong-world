@@ -1,4 +1,4 @@
-import{UI}from'./ui.js?v=38';
+import{UI}from'./ui.js?v=63';
 
 const previousMore=UI.prototype.more;
 UI.prototype.more=function(player){return previousMore.call(this,player).replace(/<button data-evolve="[^"]+">進化：Lv\.[^<]+<\/button>/g,'')};

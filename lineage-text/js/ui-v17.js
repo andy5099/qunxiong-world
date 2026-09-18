@@ -1,4 +1,4 @@
-import{UI}from'./ui.js?v=38';
+import{UI}from'./ui.js?v=63';
 const previousMore=UI.prototype.more,previousBattle=UI.prototype.battle,previousOffline=UI.prototype.offline;
 UI.prototype.more=function(p){return previousMore.call(this,p)
  .replace(/<label><input[^>]+id="auto-green"[\s\S]*?<\/label>/g,`<label><input style="width:auto" type="checkbox" id="auto-green" ${p.settings.autoGreen?'checked':''}> 綠水自動使用</label>`)

@@ -1,4 +1,4 @@
-import{UI}from'./ui.js?v=38';
+import{UI}from'./ui.js?v=63';
 import{groupEquipment}from'./inventory.js?v=44';
 import{protectedEnhance}from'./enhance.js?v=61';
 import{WEAPON_MAGIC}from'./equipment-v29.js?v=61';

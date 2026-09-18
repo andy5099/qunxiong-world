@@ -1,4 +1,4 @@
-import{UI}from'./ui.js?v=38';
+import{UI}from'./ui.js?v=63';
 import{skillsFor}from'./skills.js?v=53';
 import{SUMMON_TYPES}from'./systems.js?v=45';
 import{summonStatus}from'./companions.js?v=45';

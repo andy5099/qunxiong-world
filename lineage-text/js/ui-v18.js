@@ -1,4 +1,4 @@
-import{UI}from'./ui.js?v=38';
+import{UI}from'./ui.js?v=63';
 import{CONSUMABLES}from'./data.js?v=53';
 import{recipes}from'./crafting.js?v=38';
 import{MAX_MANUAL_BUY}from'./shop.js?v=53';
