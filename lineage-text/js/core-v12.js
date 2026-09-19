@@ -1,11 +1,34 @@
 import{addItem,ensureItemInstances}from'./inventory.js?v=38';
-import{gainExp}from'./player.js?v=38';
+import{createPlayer,gainExp}from'./player.js?v=38';
 import{petWin}from'./companions.js?v=38';
 import{buy}from'./shop.js?v=38';
-import{CONSUMABLES}from'./data.js?v=53';
+import{CLASSES,CONSUMABLES}from'./data.js?v=53';
+import{PET_TYPES}from'./systems.js?v=60';
+import{ALL_MAPS}from'./hunting.js?v=62';
 
-export function normalizeCharacterState(state){
- const p=state?.player;if(!p)return state;p.rebirthCount=Math.max(0,Math.floor(Number(p.rebirthCount)||0));
+const object=value=>value&&typeof value==='object'&&!Array.isArray(value)?value:{};
+const array=value=>Array.isArray(value)?value:[];
+const number=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
+const mergeMissing=(defaults,saved)=>{let out={...defaults,...object(saved)};for(const[k,v]of Object.entries(defaults))if(v&&typeof v==='object'&&!Array.isArray(v))out[k]={...v,...object(saved?.[k])};return out};
+const validClass=cls=>Object.prototype.hasOwnProperty.call(CLASSES,cls)?cls:'騎士';
+
+export function prepareLegacyState(input,warnings=[]){
+ let state=object(input),rawPlayer=object(state.player),cls=validClass(rawPlayer.cls),base=createPlayer(String(rawPlayer.name||'無名角色').slice(0,12),cls),p=mergeMissing(base,{...rawPlayer,cls});
+ p.stats=mergeMissing(base.stats,p.stats);p.equipment=object(p.equipment);p.bag=array(p.bag).filter(x=>x&&typeof x==='object');p.warehouse=array(p.warehouse).filter(x=>x&&typeof x==='object');
+ p.consumables=mergeMissing(base.consumables,p.consumables);p.settings=mergeMissing(base.settings,p.settings);p.settings.target=mergeMissing(base.settings.target,p.settings.target);p.settings.thresholds=mergeMissing(base.settings.thresholds,p.settings.thresholds);
+ p.bossMaterials=object(p.bossMaterials);p.worldMaterials=object(p.worldMaterials);p.petMaterials=object(p.petMaterials);p.skills=object(p.skills);p.skillBooks=object(p.skillBooks);p.skillCooldowns=object(p.skillCooldowns);p.skillPity=object(p.skillPity);
+ p.learnedSkills=array(p.learnedSkills).filter(x=>typeof x==='string');p.activePets=array(p.activePets).filter(x=>typeof x==='string');p.summons=array(p.summons).filter(x=>x&&typeof x==='object');p.transforms=array(p.transforms);p.dolls=array(p.dolls);
+ p.pets=array(p.pets).filter(x=>x&&typeof x==='object').map((pet,i)=>{let type=PET_TYPES.some(x=>x.id===pet.type)?pet.type:'dog',basePet=PET_TYPES.find(x=>x.id===type);return{...pet,uid:String(pet.uid||pet.id||`legacy-pet-${i}`),type,name:pet.name||basePet.name,level:Math.max(1,Math.floor(number(pet.level,1))),exp:Math.max(0,number(pet.exp)),hp:Math.max(0,number(pet.hp,basePet.hp)),alive:pet.alive!==false,evolution:Math.max(0,Math.min(2,Math.floor(number(pet.evolution)))),evolutionMultiplier:Math.max(1,number(pet.evolutionMultiplier,1)),attack:number(pet.attack,basePet.atk),ac:number(pet.ac,basePet.ac),hit:number(pet.hit,basePet.hit),speed:number(pet.speed,basePet.speed)}});
+ let petIds=new Set(p.pets.map(x=>x.uid));p.activePets=p.activePets.filter(id=>petIds.has(id));p.statsLog=mergeMissing(base.statsLog,p.statsLog);p.statsLog.potions=object(p.statsLog.potions);
+ p.buffs=mergeMissing({greenUntil:0,braveUntil:0,blueUntil:0},p.buffs);p.activeSkillSettings=mergeMissing({attack:[],heal:null,healThreshold:45,resource:{}},p.activeSkillSettings);p.activeSkillSettings.attack=array(p.activeSkillSettings.attack);p.activeSkillSettings.resource=object(p.activeSkillSettings.resource);
+ p.transformationSettings=mergeMissing({selected:p.transform||0,autoBest:true},p.transformationSettings);p.transformState=mergeMissing({id:null,until:0},p.transformState);p.rebirthCount=Math.max(0,Math.floor(number(p.rebirthCount)));
+ if(!ALL_MAPS.some(x=>x.id===Number(p.map))){warnings.push(`invalid map ${String(p.map)} -> 0`);p.map=0}else p.map=Number(p.map);
+ for(const[slot,item]of Object.entries(p.equipment))if(!item||typeof item!=='object'){delete p.equipment[slot];warnings.push(`invalid equipment slot ${slot} removed`)}
+ return{...state,saveVersion:10,logs:array(state.logs).filter(x=>x&&typeof x==='object'),player:p,pendingOffline:state.pendingOffline&&typeof state.pendingOffline==='object'?state.pendingOffline:null,lastOnlineTimestamp:number(state.lastOnlineTimestamp,Date.now())};
+}
+
+export function normalizeCharacterState(state,warnings=[]){
+ state=prepareLegacyState(state,warnings);const p=state.player;p.rebirthCount=Math.max(0,Math.floor(Number(p.rebirthCount)||0));
  p.settings??={};p.settings.target??={};p.activeSkillSettings??={attack:[],heal:null,healThreshold:45};p.activeSkillSettings.attack??=[];
  for(const key of['魔力藥水','manaPotion','magicPotion'])delete p.consumables?.[key];for(const key of['autoManaPotion','autoBuyMana','autoUseManaPotion'])delete p.settings[key];for(const key of['魔力藥水','manaPotion','magicPotion'])delete p.settings.target[key];
  p.activeSkillSettings.selectedActiveSkill??=p.selectedActiveSkill??p.activeSkillSettings.attack[0]??null;

@@ -1,8 +1,8 @@
 import assert from'node:assert/strict';
 import{createPlayer}from'../js/player.js?v=61';
 import{migrate}from'../js/migration-v19.js?v=51';
-import{TREASURE_MAPS,TREASURE_EXCLUDED_NAMES,treasureBosses,treasureMaterialDrop}from'../js/treasure-v30.js?v=62';
-import{ALL_MAPS,equipmentDrop,rollEnemy}from'../js/hunting.js?v=62';
+import{TREASURE_MAPS,TREASURE_EXCLUDED_NAMES,treasureBosses,treasureMaterialDrop}from'../js/treasure-v30.js?v=64';
+import{ALL_MAPS,equipmentDrop,rollEnemy}from'../js/hunting.js?v=64';
 import{skillDrop}from'../js/skills.js?v=53';
 import{calculateOffline}from'../js/offline-v19.js?v=62';
 
