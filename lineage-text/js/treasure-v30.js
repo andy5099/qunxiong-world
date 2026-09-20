@@ -11,14 +11,14 @@ const STAGE_SET_IDS={1:['set0'],2:['set0','set4'],3:['set0','set4'],4:['set0','s
 const RATES={1:{gear:.042,weapon:.0025,set:.002},2:{gear:.048,weapon:.0035,set:.003},3:{gear:.054,weapon:.0048,set:.0042},4:{gear:.06,weapon:.006,set:.0055}};
 const dreamWeapon=(id,name,type,small,large,classes,feature,extra={})=>({id,name,slot:'武器',type,small,large,hit:6,safe:6,price:1200000,rarity:'夢幻',tier:6,sourceType:'TREASURE_EXCLUSIVE',treasureStage:4,classes,feature,protected:true,...extra});
 export const TREASURE_DREAM_WEAPONS=[
- dreamWeapon('treasure-doom-blade','末日刀','單手劍',29,33,['王族','騎士'],'高速連擊',{attackSpeed:.12,doubleStrike:.12}),
+ dreamWeapon('treasure-doom-blade','末日刀','單手劍',29,33,['王族','騎士'],'高速連擊',{attackSpeed:.12,doubleStrike:.12,dragonDamage:.12}),
  dreamWeapon('treasure-dragon-slayer','屠龍劍','雙手劍',42,48,['騎士','龍騎士'],'Boss／龍族特化',{two:true,bossDamage:.25,dragonDamage:.2}),
- dreamWeapon('treasure-starfall-bow','星隕神弓','弓',31,36,['妖精'],'高速遠距離',{attackSpeed:.1,rangedDamage:6}),
- dreamWeapon('treasure-eternal-staff','永夜魔杖','法杖',41,46,['法師'],'MP／法術特化',{statBonuses:{int:6,wis:4},magic:10,mpRegen:6,spellDamage:.22}),
- dreamWeapon('treasure-shadow-blades','影皇雙刀','雙刀',33,38,['黑暗妖精'],'爆發雙擊',{two:true,attackSpeed:.06,doubleStrike:.12}),
- dreamWeapon('treasure-abyss-claw','深淵鋼爪','鋼爪',40,46,['黑暗妖精'],'高單擊',{two:true,critical:.2}),
- dreamWeapon('treasure-azure-chain','蒼龍鎖鏈劍','鎖鏈劍',39,45,['龍騎士'],'Boss破甲',{two:true,doubleStrike:.1,bossDamage:.18,statBonuses:{str:4}}),
- dreamWeapon('treasure-phantasm-kiringku','幻界奇古獸','法杖',42,47,['幻術士'],'精神魔攻',{statBonuses:{int:5,wis:5},magic:9,spellDamage:.18})
+ dreamWeapon('treasure-starfall-bow','星隕神弓','弓',31,36,['妖精'],'高速遠距離',{attackSpeed:.1,rangedDamage:6,dragonDamage:.14}),
+ dreamWeapon('treasure-eternal-staff','永夜魔杖','法杖',41,46,['法師'],'MP／法術特化',{statBonuses:{int:6,wis:4},magic:10,mpRegen:6,spellDamage:.22,dragonDamage:.18}),
+ dreamWeapon('treasure-shadow-blades','影皇雙刀','雙刀',33,38,['黑暗妖精'],'爆發雙擊',{two:true,attackSpeed:.06,doubleStrike:.12,dragonDamage:.13}),
+ dreamWeapon('treasure-abyss-claw','深淵鋼爪','鋼爪',40,46,['黑暗妖精'],'高單擊',{two:true,critical:.2,dragonDamage:.16}),
+ dreamWeapon('treasure-azure-chain','蒼龍鎖鏈劍','鎖鏈劍',39,45,['龍騎士'],'Boss破甲',{two:true,doubleStrike:.1,bossDamage:.18,dragonDamage:.22,statBonuses:{str:4}}),
+ dreamWeapon('treasure-phantasm-kiringku','幻界奇古獸','法杖',42,47,['幻術士'],'精神魔攻',{statBonuses:{int:5,wis:5},magic:9,spellDamage:.18,dragonDamage:.17})
 ];
 const dreamArmor=(id,name,slot,ac,classes,statBonuses,feature,treasureSet)=>({id,name,slot,ac,safe:4,price:750000,rarity:'夢幻',tier:6,sourceType:'TREASURE_EXCLUSIVE',treasureStage:4,classes,statBonuses,feature,treasureSet,protected:true});
 export const TREASURE_DREAM_ARMOR=[

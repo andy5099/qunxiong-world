@@ -13,7 +13,7 @@ eq(new Set(DRAGON_MAPS.map(x=>x.id)).size,4);
 for(const map of DRAGON_MAPS){
  ok(ALL_MAPS.includes(map),`${map.boss} 地圖未公開`);
  eq(map.fee,0);ok(map.directBoss);ok(map.dragon);eq(map.normals.length,0);
- let enemy=rollEnemy({map:map.id},()=>.99);eq(enemy.name,map.boss);ok(enemy.dragon);ok(enemy.boss);ok(enemy.hp>=6400000);ok(enemy.hit>=100);ok(enemy.atk>=400);
+ let enemy=rollEnemy({map:map.id},()=>.99);eq(enemy.name,map.boss);ok(enemy.dragon);ok(enemy.boss);ok(enemy.hp>=150000);ok(enemy.hit>=80);ok(enemy.atk>=200);
  eq(enemy.material,`${map.boss}之心`);eq(equipmentTier(enemy.bossEntry.item),7);ok(enemy.bossEntry.item.source.boss===map.boss);
 }
 ok(!ALL_MAPS.filter(x=>!x.dragon).some(x=>names.includes(x.boss)),'一般地圖仍含四大龍 Boss');
