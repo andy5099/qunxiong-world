@@ -5,6 +5,7 @@ import{buy}from'./shop.js?v=38';
 import{CLASSES,CONSUMABLES}from'./data.js?v=53';
 import{PET_TYPES}from'./systems.js?v=60';
 import{ALL_MAPS}from'./hunting.js?v=62';
+import{TREASURE_EXCLUSIVE_GEAR}from'./treasure-v30.js?v=65';
 
 const object=value=>value&&typeof value==='object'&&!Array.isArray(value)?value:{};
 const array=value=>Array.isArray(value)?value:[];
@@ -39,7 +40,7 @@ export function normalizeCharacterState(state,warnings=[]){
  p.settings.autoUseGreenPotion=p.settings.autoGreen;p.settings.autoUseBraveryPotion=p.settings.autoBrave;
  p.settings.autoBuyGreenPotion=p.settings.autoSupplyGreen;p.settings.autoBuyBraveryPotion=p.settings.autoSupplyBrave;
  p.settings.target.綠色藥水??=50;p.settings.target.勇敢藥水??=30;
- p.petMaterials??={'寵物進化石':0,'高級寵物進化石':0};for(const item of[...p.bag,...Object.values(p.equipment||{}).filter(Boolean)]){item.statBonuses??={};for(const k of['str','dex','con','int','wis','cha'])if(item[k]&&!item.statBonuses[k])item.statBonuses[k]=item[k]}
+ p.petMaterials??={'寵物進化石':0,'高級寵物進化石':0};for(const item of[...p.bag,...Object.values(p.equipment||{}).filter(Boolean)]){let current=TREASURE_EXCLUSIVE_GEAR.find(x=>x.id===item.id);if(current)Object.assign(item,current,{uid:item.uid,instanceId:item.instanceId,enhance:item.enhance||0});item.statBonuses??={};for(const k of['str','dex','con','int','wis','cha'])if(item[k]&&!item.statBonuses[k])item.statBonuses[k]=item[k]}
  p.consumables['防爆武器強化卷軸']??=0;p.consumables['防爆防具強化卷軸']??=0;
  ensureItemInstances(p);return state;
 }

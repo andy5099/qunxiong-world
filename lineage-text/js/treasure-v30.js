@@ -11,20 +11,23 @@ const STAGE_SET_IDS={1:['set0'],2:['set0','set4'],3:['set0','set4'],4:['set0','s
 const RATES={1:{gear:.042,weapon:.0025,set:.002},2:{gear:.048,weapon:.0035,set:.003},3:{gear:.054,weapon:.0048,set:.0042},4:{gear:.06,weapon:.006,set:.0055}};
 const dreamWeapon=(id,name,type,small,large,classes,feature,extra={})=>({id,name,slot:'武器',type,small,large,hit:6,safe:6,price:1200000,rarity:'夢幻',tier:6,sourceType:'TREASURE_EXCLUSIVE',treasureStage:4,classes,feature,protected:true,...extra});
 export const TREASURE_DREAM_WEAPONS=[
- dreamWeapon('treasure-doom-blade','末日刀','單手劍',26,30,['王族','騎士'],'高速連擊',{attackSpeed:.12,doubleStrike:.1}),
- dreamWeapon('treasure-dragon-slayer','屠龍劍','雙手劍',34,39,['騎士','龍騎士'],'Boss／龍族特化',{two:true,bossDamage:.18,dragonDamage:.12}),
- dreamWeapon('treasure-starfall-bow','星隕神弓','弓',27,31,['妖精'],'高速遠距離',{attackSpeed:.08,rangedDamage:5}),
- dreamWeapon('treasure-eternal-staff','永夜魔杖','法杖',23,25,['法師'],'MP／法術特化',{statBonuses:{int:4,wis:3},magic:7,mpRegen:4}),
- dreamWeapon('treasure-shadow-blades','影皇雙刀','雙刀',29,33,['黑暗妖精'],'爆發雙擊',{two:true,doubleStrike:.14}),
- dreamWeapon('treasure-abyss-claw','深淵鋼爪','鋼爪',31,35,['黑暗妖精'],'高單擊',{two:true,critical:.12}),
- dreamWeapon('treasure-azure-chain','蒼龍鎖鏈劍','鎖鏈劍',32,37,['龍騎士'],'Boss破甲',{two:true,bossDamage:.12,statBonuses:{str:3}}),
- dreamWeapon('treasure-phantasm-kiringku','幻界奇古獸','法杖',24,28,['幻術士'],'精神魔攻',{statBonuses:{int:3,wis:3},magic:6})
+ dreamWeapon('treasure-doom-blade','末日刀','單手劍',29,33,['王族','騎士'],'高速連擊',{attackSpeed:.12,doubleStrike:.12}),
+ dreamWeapon('treasure-dragon-slayer','屠龍劍','雙手劍',42,48,['騎士','龍騎士'],'Boss／龍族特化',{two:true,bossDamage:.25,dragonDamage:.2}),
+ dreamWeapon('treasure-starfall-bow','星隕神弓','弓',31,36,['妖精'],'高速遠距離',{attackSpeed:.1,rangedDamage:6}),
+ dreamWeapon('treasure-eternal-staff','永夜魔杖','法杖',41,46,['法師'],'MP／法術特化',{statBonuses:{int:6,wis:4},magic:10,mpRegen:6,spellDamage:.22}),
+ dreamWeapon('treasure-shadow-blades','影皇雙刀','雙刀',33,38,['黑暗妖精'],'爆發雙擊',{two:true,attackSpeed:.06,doubleStrike:.12}),
+ dreamWeapon('treasure-abyss-claw','深淵鋼爪','鋼爪',40,46,['黑暗妖精'],'高單擊',{two:true,critical:.2}),
+ dreamWeapon('treasure-azure-chain','蒼龍鎖鏈劍','鎖鏈劍',39,45,['龍騎士'],'Boss破甲',{two:true,doubleStrike:.1,bossDamage:.18,statBonuses:{str:4}}),
+ dreamWeapon('treasure-phantasm-kiringku','幻界奇古獸','法杖',42,47,['幻術士'],'精神魔攻',{statBonuses:{int:5,wis:5},magic:9,spellDamage:.18})
 ];
-const dreamArmor=(id,name,slot,ac,classes,statBonuses,feature)=>({id,name,slot,ac,safe:4,price:750000,rarity:'夢幻',tier:6,sourceType:'TREASURE_EXCLUSIVE',treasureStage:4,classes,statBonuses,feature,treasureSet:'寶版夢幻套裝',protected:true});
+const dreamArmor=(id,name,slot,ac,classes,statBonuses,feature,treasureSet)=>({id,name,slot,ac,safe:4,price:750000,rarity:'夢幻',tier:6,sourceType:'TREASURE_EXCLUSIVE',treasureStage:4,classes,statBonuses,feature,treasureSet,protected:true});
 export const TREASURE_DREAM_ARMOR=[
- dreamArmor('treasure-war-helm','末日戰盔','頭盔',-7,['王族','騎士','黑暗妖精','龍騎士'],{str:2,con:1},'近戰'),dreamArmor('treasure-moon-helm','星月冠冕','頭盔',-6,['妖精','法師','幻術士'],{dex:2,int:2},'遠距／魔法'),
- dreamArmor('treasure-war-armor','屠龍戰甲','盔甲',-13,['王族','騎士','黑暗妖精','龍騎士'],{str:2,con:2},'防禦'),dreamArmor('treasure-arcane-robe','永夜法袍','盔甲',-10,['妖精','法師','幻術士'],{int:3,wis:2},'魔法'),
- dreamArmor('treasure-shirt','夢境T恤','內衣',-4,null,{str:1,dex:1,int:1},'共用'),dreamArmor('treasure-cloak','星界斗篷','斗篷',-7,null,{wis:2,con:1},'回復'),dreamArmor('treasure-gloves','破軍手套','手套',-5,['王族','騎士','黑暗妖精','龍騎士'],{str:2},'近戰'),dreamArmor('treasure-boots','流星長靴','鞋子',-6,null,{dex:2},'機動'),
+ dreamArmor('treasure-war-helm','戰神盔','頭盔',-8,['王族','騎士','黑暗妖精','龍騎士'],{str:3,con:1},'近戰','戰神'),dreamArmor('treasure-moon-helm','神射冠','頭盔',-7,['妖精'],{dex:4},'遠距','神射'),
+ dreamArmor('treasure-war-armor','戰神甲','盔甲',-14,['王族','騎士','黑暗妖精','龍騎士'],{str:3,con:3},'防禦','戰神'),dreamArmor('treasure-arcane-robe','賢者袍','盔甲',-11,['法師','幻術士'],{int:4,wis:3},'魔法','賢者'),
+ dreamArmor('treasure-shirt','夢境T恤','內衣',-5,null,{str:2,dex:2,int:2},'共用','戰神'),dreamArmor('treasure-cloak','星界斗篷','斗篷',-8,null,{wis:3,con:2},'回復','賢者'),dreamArmor('treasure-gloves','破軍手套','手套',-6,['王族','騎士','黑暗妖精','龍騎士'],{str:3},'近戰','戰神'),dreamArmor('treasure-boots','流星長靴','鞋子',-7,null,{dex:3},'機動','神射'),
+ dreamArmor('treasure-war-cloak','戰神披風','斗篷',-8,['王族','騎士','黑暗妖精','龍騎士'],{str:2,con:2},'近戰','戰神'),dreamArmor('treasure-war-boots','戰神靴','鞋子',-7,['王族','騎士','黑暗妖精','龍騎士'],{str:2},'近戰','戰神'),
+ dreamArmor('treasure-shot-armor','神射甲','盔甲',-11,['妖精'],{dex:4,con:2},'遠距','神射'),dreamArmor('treasure-shot-cloak','神射披風','斗篷',-7,['妖精'],{dex:3},'遠距','神射'),dreamArmor('treasure-shot-shirt','神射T恤','內衣',-5,['妖精'],{dex:3},'遠距','神射'),dreamArmor('treasure-shot-gloves','神射手套','手套',-5,['妖精'],{dex:4},'遠距','神射'),
+ dreamArmor('treasure-sage-helm','賢者冠','頭盔',-7,['法師','幻術士'],{int:3,wis:2},'魔法','賢者'),dreamArmor('treasure-sage-shirt','賢者T恤','內衣',-4,['法師','幻術士'],{int:3},'魔法','賢者'),dreamArmor('treasure-sage-gloves','賢者手套','手套',-5,['法師','幻術士'],{int:3,wis:2},'魔法','賢者'),dreamArmor('treasure-sage-boots','賢者靴','鞋子',-6,['法師','幻術士'],{wis:3},'魔法','賢者'),
  dreamArmor('treasure-shield','永恆神盾','盾牌',-8,['王族','騎士','幻術士'],{con:2},'防禦'),dreamArmor('treasure-necklace','七曜項鍊','項鍊',-2,null,{str:1,dex:1,int:1},'全能'),dreamArmor('treasure-ring-a','夢幻之戒','戒指1',-2,null,{con:1,wis:1},'生存'),dreamArmor('treasure-ring-b','夢幻之戒','戒指2',-2,null,{con:1,wis:1},'生存')
 ];
 export const TREASURE_EXCLUSIVE_GEAR=[...TREASURE_DREAM_WEAPONS,...TREASURE_DREAM_ARMOR];
