@@ -10,11 +10,13 @@ export function intimacyAllowed(state,world,id,kind) {
 export function storePermanent(table,entries,limit,label) {
   for(const entry of entries){if(!Object.hasOwn(table,entry.id)&&Object.keys(table).length>=limit)throw new Error(`${label}已達容量；請匯出並建立新世界。既有記憶未刪除。`);table[entry.id]=structuredClone(entry);}
 }
+export function isImportantMemory(f){return f.importance==='routine'?false:!!f.importance || ['promise','enemy','romance','item','ability','secret','thread'].includes(f.kind);}
 export function rememberAIScene(state,response,action) {
   const ai=state.ai;
   // Immutable facts cannot be overwritten under an existing ID.
-  for(const f of response.memoryUpdates){if(ai.facts[f.id]&&JSON.stringify(ai.facts[f.id])!==JSON.stringify(f))throw new Error('重要記憶 ID 已存在；新事件請使用新 ID');}
-  storePermanent(ai.facts,response.memoryUpdates,1000,'重要記憶');
+  const important=response.memoryUpdates.filter(isImportantMemory);
+  for(const f of important){if(ai.facts[f.id]&&JSON.stringify(ai.facts[f.id])!==JSON.stringify(f))throw new Error('重要記憶 ID 已存在；新事件請使用新 ID');}
+  storePermanent(ai.facts,important,1000,'重要記憶');
   ai.recent.push({turn:state.turn,type:response.sceneType,location:response.location,participants:response.participants,choice:action.slice(0,300),text:response.sceneText});
   if(ai.recent.length>12){
     const old=ai.recent.shift();ai.compactedScenes++;
@@ -30,11 +32,11 @@ export function directorContext(state,world,action) {
   const last=recent.slice(-4),stagnationScore=last.filter(s=>s.type==='dialogue').length+(last.length>=3&&new Set(last.map(s=>s.location)).size===1?2:0);
   return structuredClone({
     WORLD:{id:world.id,name:world.name,setting:world.description,background:state.definition?.background,style:world.theme,rules:world.rules,timeMinutes:ai.minutes,location:state.location,locations:[...world.locations,...Object.values(ai.locations)],majorEvents:select(Object.values(ai.facts).filter(f=>f.kind==='event')),entities:select(Object.values(ai.entities)),catalog:Object.values(ai.entities).map(e=>({id:e.id,name:e.name,kind:e.kind}))},
-    PLAYER:{...state.player,stats:state.stats,statRules:world.stats,abilities:world.playerRole.abilities,inventory:state.inventory,worldState:state.worldState,gimmick:state.gimmick,quests:Object.values(ai.quests).filter(q=>q.status==='active'),questArchive:Object.values(ai.quests).map(q=>({id:q.id,title:q.title,status:q.status}))},
+    PLAYER:{...state.player,turn:state.turn,stats:state.stats,statRules:world.stats,abilities:world.playerRole.abilities,inventory:state.inventory,worldState:state.worldState,gimmick:state.gimmick,quests:Object.values(ai.quests).filter(q=>q.status==='active'),questArchive:Object.values(ai.quests).map(q=>({id:q.id,title:q.title,status:q.status}))},
     CHARACTERS:scored.map(id=>({id,core:getCharacter(state,id),state:state.characters[id],consent:{flirt:intimacyAllowed(state,world,id,'flirt'),date:intimacyAllowed(state,world,id,'date'),resonance:intimacyAllowed(state,world,id,'resonance')}})),
     CHARACTER_CATALOG:Object.keys(state.characters).map(id=>({id,name:getCharacter(state,id)?.name,relationship:state.characters[id].relationship,met:!!state.flags['met:'+id]})),
     MEMORY:{recent:recent.length?recent:state.memory.recent.slice(-12),longTerm:select(Object.values(ai.facts)),legacyImportant:state.memory.long,olderSceneSummary:ai.summaries,compactedScenes:ai.compactedScenes,relationshipSummary:state.memory.relationshipSummary,worldSummary:state.memory.worldSummary,unresolvedThreads:Object.values(ai.threads).filter(t=>t.status==='active')},
-    PACING:{recentSceneTypes:last.map(s=>s.type),recentLocations:last.map(s=>s.location),recentCharacters:last.flatMap(s=>s.participants),stagnationScore,guidance:'依玩家意圖延續對話；不強制新事件'},
+    PACING:{recentSceneTypes:last.map(s=>s.type),recentLocations:last.map(s=>s.location),recentCharacters:last.flatMap(s=>s.participants),stagnationScore,mustAdvance:last.length>=3&&last.every(s=>s.type==='dialogue'&&s.location===last[0].location),guidance:'每幕需有新結果；連續三幕同地聊天後，帶出具體線索、決定、關係轉折或事件進展，不靠重複世界介紹湊字'},
     TONE:{style:world.theme,comedy:2,romance:3,adultFlirt:2,darkness:2,adventure:4,scale:'0–5；成熟曖昧但不露骨，成年人、自願、尊重界線'},
     ACTION:{intent:action,settledOutcome:state.lastOutcome,rule:'已套用的本地能力效果不可重複發放；敘述結果並建立後續劇情。'}
   });

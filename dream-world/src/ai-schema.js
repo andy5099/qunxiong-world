@@ -20,15 +20,16 @@ export function character(v) {
 }
 export function location(v) {object(v,['id','name','description']);return {id:id(v.id),name:text(v.name,80),description:text(v.description,600)};}
 export function quest(v) {object(v,['id','title','description','status']);if(!['active','resolved','failed'].includes(v.status))throw new Error('任務狀態錯誤');return {id:id(v.id),title:text(v.title,100),description:text(v.description,600),status:v.status};}
-export function fact(v) {object(v,['id','text','character','kind']);if(!['event','promise','enemy','romance','item','ability','secret','thread'].includes(v.kind))throw new Error('記憶種類錯誤');return {id:id(v.id),text:text(v.text,1500),character:v.character===null?null:id(v.character),kind:v.kind};}
+export function fact(v) {object(v,['id','text','character','kind','importance']);if(v.importance!==undefined&&!['routine','relationship','major-choice','world-change','ability'].includes(v.importance))throw new Error('重要記憶分類錯誤');if(!['event','promise','enemy','romance','item','ability','secret','thread'].includes(v.kind))throw new Error('記憶種類錯誤');return {id:id(v.id),text:text(v.text,1500),character:v.character===null?null:id(v.character),kind:v.kind,...(v.importance===undefined?{}:{importance:v.importance})};}
 export function entity(v) {object(v,['id','name','description','kind']);if(!['item','faction','secret','event','change','ability'].includes(v.kind))throw new Error('世界內容種類錯誤');return {id:id(v.id),name:text(v.name,80),description:text(v.description,600),kind:v.kind};}
-export function validateAIResponse(raw) {
+export function validateAIResponse(raw,{allowLegacyChoices=false}={}) {
   const keys=['sceneText','sceneType','location','timeAdvance','choices','stateChanges','relationshipChanges','memoryUpdates','newCharacters','newLocations','questUpdates','gimmickEvents','media','participants','intimacyChecks'];
   object(raw,keys,'AI 回應');if(keys.some(k=>!Object.hasOwn(raw,k)))throw new Error('AI 回應缺少必要欄位');
   if(!['adventure','dialogue','discovery','crisis','quest','twist','gimmick','world','intimacy'].includes(raw.sceneType))throw new Error('場景類型錯誤');
   if(raw.media!==null)throw new Error('AI 媒體暫只接受 null');
   const s={sceneText:text(raw.sceneText,6000),sceneType:raw.sceneType,location:id(raw.location),timeAdvance:number(raw.timeAdvance,0,1440),media:null};
   s.choices=list(raw.choices,3,c=>{object(c,['label','intent','risk','abilityAction']);const out={label:text(c.label,120),intent:text(c.intent,300),risk:text(c.risk,120)};if(c.abilityAction){object(c.abilityAction,['ability','target']);out.abilityAction={ability:id(c.abilityAction.ability),target:c.abilityAction.target===null?null:id(c.abilityAction.target)};}return out;});
+  if(!allowLegacyChoices && s.choices.length!==3)throw new Error('AI 每幕必須產生三個動態選項，請重新生成');
   if(new Set(s.choices.map(c=>c.label)).size!==s.choices.length||new Set(s.choices.map(c=>c.intent)).size!==s.choices.length)throw new Error('快捷行動的標籤與意圖不可重複');
   const changes=object(raw.stateChanges,['stats','inventory','worldState','entities','threads']);
   s.stateChanges={stats:record(changes.stats??{},v=>number(v,-20,20)),inventory:record(changes.inventory??{},v=>number(v,-20,20)),worldState:record(changes.worldState??{},v=>number(v,-20,20)),entities:list(changes.entities??[],8,entity),threads:list(changes.threads??[],8,quest)};

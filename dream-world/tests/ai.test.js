@@ -15,10 +15,10 @@ import { applyChoice } from '../src/choice-engine.js';
 import { createArchive,addWorld,activeState,putState } from '../src/archive-engine.js';
 import { createWorldDefinition } from '../src/world-factory.js';
 import { getCharacter } from '../src/character-engine.js';
-const director=r=>new StoryDirector(taixu,{generateScene:async()=>structuredClone(r)});
+const director=r=>new StoryDirector(taixu,{generateScene:async({context})=>{const copy=structuredClone(r);copy.sceneText+=`（測試回合 ${context.PLAYER.turn}）`;if(Array.isArray(copy.choices))copy.choices=copy.choices.map(c=>({...c,label:c.label+context.PLAYER.turn,intent:c.intent+context.PLAYER.turn}));return copy;}});
 const choice={id:'ai-choice-0',label:'前進',intent:'前進調查'};
 const load=s=>activeState(parseSave(exportSave(s)));
-test('AI response validates every field, 0–3 distinct optional actions, adult NPCs and safe identifiers',()=>{
+test('AI response validates every field, exactly three distinct dynamic actions, adult NPCs and safe identifiers',()=>{
   assert.equal(validateAIResponse(response()).choices.length,3);
   for(const mutate of [r=>r.choices.push({...r.choices[0]}),r=>r.choices[1].intent=r.choices[0].intent,r=>r.media={src:'https://invalid.example'},r=>r.sceneText='',r=>r.newCharacters=[{...npc,age:17}],r=>r.stateChanges.stats.cultivation=Infinity,r=>r.location='__proto__',r=>r.stateChanges.flags={admin:true},r=>delete r.timeAdvance,r=>r.relationshipChanges.shen.trust=50,r=>r.extra='ignored']){
     const r=response();mutate(r);assert.throws(()=>validateAIResponse(r));
@@ -64,7 +64,7 @@ test('new NPC, locations, quests, threads, items, factions and secrets survive s
 });
 test('120 scenes compact to 12 recent scenes while early promises, enemy, item and unresolved quest persist',async()=>{
   let s=createState(taixu);for(let turn=0;turn<120;turn++){
-    const r=response({memoryUpdates:[{id:`fact-${turn}`,text:turn===0?'答應保護沈清霜並歸還銅鑰匙':`第${turn}件重要事件`,character:'shen',kind:turn===0?'promise':'event'}],questUpdates:turn===0?[{id:'promise',title:'歸還銅鑰匙',description:'承諾尚未履行',status:'active'}]:[]});
+    const r=response({memoryUpdates:[{id:`fact-${turn}`,text:turn===0?'答應保護沈清霜並歸還銅鑰匙':`第${turn}件重要事件`,character:'shen',kind:turn===0?'promise':'event',importance:'major-choice'}],questUpdates:turn===0?[{id:'promise',title:'歸還銅鑰匙',description:'承諾尚未履行',status:'active'}]:[]});
     if(turn===0){r.memoryUpdates.push({id:'enemy-first',text:'黑帆是船隊的敵人',character:null,kind:'enemy'});r.stateChanges.entities=[{id:'old-key',name:'銅鑰匙',description:'承諾歸還的特殊物品',kind:'item'}];r.stateChanges.inventory={'old-key':1};}
     s=await director(r).generate(s,{choice});
   }
@@ -80,10 +80,12 @@ test('AI cannot bypass intimacy conditions, erase refusal, invent locked powers 
   const s=createState(taixu);s.flags['met:shen']=true;s.characters.shen.flags.refusePrivate=true;
   for(const r of [response({relationshipChanges:{shen:{intimacy:3}}}),response({sceneType:'intimacy',intimacyChecks:[{character:'shen',kind:'date'}]}),response({relationshipChanges:{shen:{refusePrivate:false}}}),response({stateChanges:{stats:{unknown:1}}}),response({gimmickEvents:[{ability:'resonance',text:'未解鎖'}]}),response({stateChanges:{inventory:{unknown:1}}})])await assert.rejects(director(r).generate(s,{choice}));
 });
-test('repeated dialogue is accepted without mandatory new events',async()=>{
+test('stalled dialogue requires concrete progress without losing source state',async()=>{
   let s=createState(taixu);
-  for(let i=0;i<15;i++)s=await director(response({sceneType:'dialogue',choices:[],stateChanges:{},relationshipChanges:{},timeAdvance:0})).generate(s,{custom:`我想繼續聊剛才的事，第${i}次回覆`});
-  assert.equal(s.turn,15);assert.equal(s.ai.scene.choices.length,0);assert.equal(s.ai.recent.length,12);assert.equal(load(s).turn,15);assert.equal(load(s).ai.scene.choices.length,0);assert.equal(directorContext(s,taixu,'繼續').PACING.mustAdvance,undefined);
+  for(let i=0;i<3;i++)s=await director(response({sceneType:'dialogue',stateChanges:{},relationshipChanges:{},timeAdvance:0})).generate(s,{custom:`討論同一件事${i}`});
+  const before=JSON.stringify(s);assert.equal(directorContext(s,taixu,'繼續').PACING.mustAdvance,true);
+  await assert.rejects(director(response({sceneType:'dialogue',stateChanges:{},relationshipChanges:{}})).generate(s,{choice}),/缺少新進展/);assert.equal(JSON.stringify(s),before);
+  s=await director(response({sceneType:'discovery'})).generate(s,{choice});assert.equal(load(s).turn,4);
 });
 test('AI ability choice spends resources once and rewrite keeps the same settled ability result',async()=>{
   const r=response();r.choices[2].abilityAction={ability:'eye',target:'shen'};

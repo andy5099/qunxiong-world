@@ -9,18 +9,19 @@ import {SessionCredentials,PROVIDER_PRESETS,DEFAULT_AI_CONFIG,validateConfig} fr
 import {story} from '../src/ui.js';
 import {aiWelcome,aiSettings} from '../src/ai-ui.js';
 import {exportSave,parseSave} from '../src/save.js';
-test('AI opening and zero-choice responses expose the same visible composer',()=>{
+test('AI custom action is collapsed; legacy zero-choice scenes can request new AI options',()=>{
  const s=createState(taixu);
  for(const html of [aiWelcome(s),story(s,taixu,aiDisplayScene(response({choices:[]})))]){
-  assert.match(html,/<form id="custom-form"/);assert.match(html,/<textarea id="custom-input"/);assert.ok(!html.includes('<details class="custom-action">'));assert.match(html,/送出對話／行動/);
+  assert.match(html,/<form id="custom-form"/);assert.match(html,/<textarea id="custom-input"/);assert.ok(html.includes('<details class="custom-action">'));assert.ok(!html.includes('<details class="custom-action" open'));assert.match(html,/送出對話／行動/);
  }
- for(let n=0;n<=3;n++)assert.equal(validateAIResponse(response({choices:response().choices.slice(0,n)})).choices.length,n);
+ for(let n=0;n<3;n++){const r=response({choices:response().choices.slice(0,n)});assert.throws(()=>validateAIResponse(r),/三個動態選項/);assert.equal(validateAIResponse(r,{allowLegacyChoices:true}).choices.length,n);const old=createState(taixu);old.ai.scene=r;assert.equal(parseSave(exportSave(old)).worlds[0].ai.scene.choices.length,n);}
+ assert.match(story(s,taixu,aiDisplayScene(response({choices:[]}))),/接續劇情並生成三選項/);
 });
 test('free input reaches context verbatim, saves and reloads without losing conversation or NPC memory',async()=>{
  let context;const text='清霜，剛才我說的話讓你不開心嗎？';
- const d=new StoryDirector(taixu,{generateScene:async c=>{context=c.context;return response({sceneType:'dialogue',choices:[],memoryUpdates:[{id:'talk-1',text:'你詢問清霜的感受',character:'shen',kind:'event'}]});}});
- let s=await d.generate(createState(taixu),{custom:text});assert.equal(context.ACTION.intent,text);assert.match(DIRECTOR_PROMPT,/優先直接回應/);
- s=parseSave(exportSave(s)).worlds[0];assert.equal(s.ai.recent[0].choice,text);assert.equal(s.ai.scene.choices.length,0);assert.equal(s.ai.facts['talk-1'].character,'shen');assert.ok(s.characters.shen.memories.some(m=>m.text==='你詢問清霜的感受'));
+ const d=new StoryDirector(taixu,{generateScene:async c=>{context=c.context;return response({sceneType:'dialogue',memoryUpdates:[{id:'talk-1',text:'你詢問清霜的感受',character:'shen',kind:'event',importance:'routine'}]});}});
+ let s=await d.generate(createState(taixu),{custom:text});assert.equal(context.ACTION.intent,text);assert.match(DIRECTOR_PROMPT,/玩家已選定的實際行動/);
+ s=parseSave(exportSave(s)).worlds[0];assert.equal(s.ai.recent[0].choice,text);assert.equal(s.ai.scene.choices.length,3);assert.equal(s.ai.facts['talk-1'],undefined);assert.ok(s.characters.shen.memories.some(m=>m.text==='你詢問清霜的感受'));
  await assert.rejects(d.generate(s,{custom:'   '}),/輸入/);
 });
 test('OpenRouter preset and model switching send exact model, protect credentials and do not change saves',async()=>{
