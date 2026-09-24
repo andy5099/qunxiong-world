@@ -1,0 +1,393 @@
+{
+  "version": 1,
+  "worldId": "taixu",
+  "slotId": "main",
+  "player": {
+    "name": "白見微",
+    "age": 24
+  },
+  "started": true,
+  "turn": 10,
+  "sceneId": "hub",
+  "location": "bamboo",
+  "stats": {
+    "realm": 2,
+    "cultivation": 8,
+    "insight": 1
+  },
+  "characters": {
+    "shen": {
+      "affection": 56,
+      "trust": 58,
+      "intimacy": 12,
+      "relationship": "曖昧",
+      "memories": [
+        {
+          "text": "初見時，你認真介紹自己，她替你拿了行囊。",
+          "turn": 1,
+          "character": "shen"
+        },
+        {
+          "text": "你第一次與她分享桂花糕。",
+          "turn": 2,
+          "character": "shen"
+        },
+        {
+          "text": "試劍坪失控時，你協助她保護了弟子。",
+          "turn": 3,
+          "character": "shen"
+        },
+        {
+          "text": "你說明夢境風險，她自願與你同行。",
+          "turn": 4,
+          "character": "shen"
+        },
+        {
+          "text": "第一次共修，你先詢問，她點頭後與你掌心相抵。",
+          "turn": 5,
+          "character": "shen"
+        },
+        {
+          "text": "突破煉氣二層後，你第一個向她道謝。",
+          "turn": 6,
+          "character": "shen"
+        },
+        {
+          "text": "在聽雨閣，你先徵求清霜同意，才談起共同經歷。",
+          "turn": 7,
+          "character": "shen"
+        },
+        {
+          "text": "宗主召見之前，你邀清霜一起面對。",
+          "turn": 8,
+          "character": "shen"
+        },
+        {
+          "text": "練習之後，你為她準備了桂花糕。",
+          "turn": 10,
+          "character": "shen"
+        }
+      ],
+      "worldMemories": [
+        {
+          "text": "初見時，你認真介紹自己，她替你拿了行囊。",
+          "turn": 1,
+          "character": "shen"
+        },
+        {
+          "text": "你第一次與她分享桂花糕。",
+          "turn": 2,
+          "character": "shen"
+        },
+        {
+          "text": "試劍坪失控時，你協助她保護了弟子。",
+          "turn": 3,
+          "character": "shen"
+        },
+        {
+          "text": "你說明夢境風險，她自願與你同行。",
+          "turn": 4,
+          "character": "shen"
+        },
+        {
+          "text": "第一次共修，你先詢問，她點頭後與你掌心相抵。",
+          "turn": 5,
+          "character": "shen"
+        },
+        {
+          "text": "突破煉氣二層後，你第一個向她道謝。",
+          "turn": 6,
+          "character": "shen"
+        },
+        {
+          "text": "在聽雨閣，你先徵求清霜同意，才談起共同經歷。",
+          "turn": 7,
+          "character": "shen"
+        },
+        {
+          "text": "宗主召見之前，你邀清霜一起面對。",
+          "turn": 8,
+          "character": "shen"
+        },
+        {
+          "text": "練習之後，你為她準備了桂花糕。",
+          "turn": 10,
+          "character": "shen"
+        }
+      ],
+      "flags": {},
+      "mood": "安心",
+      "status": "帶你入門",
+      "history": [
+        {
+          "text": "初見時，你認真介紹自己，她替你拿了行囊。",
+          "turn": 1,
+          "character": "shen"
+        },
+        {
+          "text": "你第一次與她分享桂花糕。",
+          "turn": 2,
+          "character": "shen"
+        },
+        {
+          "text": "試劍坪失控時，你協助她保護了弟子。",
+          "turn": 3,
+          "character": "shen"
+        },
+        {
+          "text": "你說明夢境風險，她自願與你同行。",
+          "turn": 4,
+          "character": "shen"
+        },
+        {
+          "text": "第一次共修，你先詢問，她點頭後與你掌心相抵。",
+          "turn": 5,
+          "character": "shen"
+        },
+        {
+          "text": "突破煉氣二層後，你第一個向她道謝。",
+          "turn": 6,
+          "character": "shen"
+        },
+        {
+          "text": "在聽雨閣，你先徵求清霜同意，才談起共同經歷。",
+          "turn": 7,
+          "character": "shen"
+        },
+        {
+          "text": "宗主召見之前，你邀清霜一起面對。",
+          "turn": 8,
+          "character": "shen"
+        },
+        {
+          "text": "練習之後，你為她準備了桂花糕。",
+          "turn": 10,
+          "character": "shen"
+        }
+      ],
+      "intimacyHistory": [
+        {
+          "text": "第一次共修，你先詢問，她點頭後與你掌心相抵。",
+          "turn": 5,
+          "character": "shen"
+        },
+        {
+          "text": "練習之後，你為她準備了桂花糕。",
+          "turn": 10,
+          "character": "shen"
+        }
+      ],
+      "unlocked": []
+    },
+    "su": {
+      "affection": 3,
+      "trust": 10,
+      "intimacy": 0,
+      "relationship": "相識",
+      "memories": [],
+      "worldMemories": [],
+      "flags": {},
+      "mood": "認真",
+      "status": "願意交換情報",
+      "history": [],
+      "intimacyHistory": [],
+      "unlocked": []
+    },
+    "gu": {
+      "affection": 0,
+      "trust": 0,
+      "intimacy": 0,
+      "relationship": "陌生人",
+      "memories": [],
+      "worldMemories": [],
+      "flags": {},
+      "mood": "觀望",
+      "status": "尚未相遇",
+      "history": [],
+      "intimacyHistory": [],
+      "unlocked": []
+    }
+  },
+  "customCharacters": [],
+  "flags": {
+    "event:moon": false,
+    "met:shen": true,
+    "polite": true,
+    "cake": true,
+    "rescued": true,
+    "dreamOpened": true,
+    "consent": true,
+    "sharedTraining": true,
+    "breakthrough": true,
+    "met:su": true,
+    "discreet": true,
+    "met:gu": true,
+    "chapterComplete": true,
+    "withShen": true
+  },
+  "memory": {
+    "short": [
+      {
+        "text": "你第一次與她分享桂花糕。",
+        "turn": 2,
+        "character": "shen"
+      },
+      {
+        "text": "試劍坪失控時，你協助她保護了弟子。",
+        "turn": 3,
+        "character": "shen"
+      },
+      {
+        "text": "你說明夢境風險，她自願與你同行。",
+        "turn": 4,
+        "character": "shen"
+      },
+      {
+        "text": "第一次共修，你先詢問，她點頭後與你掌心相抵。",
+        "turn": 5,
+        "character": "shen"
+      },
+      {
+        "text": "突破煉氣二層後，你第一個向她道謝。",
+        "turn": 6,
+        "character": "shen"
+      },
+      {
+        "text": "在聽雨閣，你先徵求清霜同意，才談起共同經歷。",
+        "turn": 7,
+        "character": "shen"
+      },
+      {
+        "text": "宗主召見之前，你邀清霜一起面對。",
+        "turn": 8,
+        "character": "shen"
+      },
+      {
+        "text": "練習之後，你為她準備了桂花糕。",
+        "turn": 10,
+        "character": "shen"
+      }
+    ],
+    "long": [
+      {
+        "text": "初見時，你認真介紹自己，她替你拿了行囊。",
+        "turn": 1,
+        "character": "shen"
+      },
+      {
+        "text": "你第一次與她分享桂花糕。",
+        "turn": 2,
+        "character": "shen"
+      },
+      {
+        "text": "試劍坪失控時，你協助她保護了弟子。",
+        "turn": 3,
+        "character": "shen"
+      },
+      {
+        "text": "你說明夢境風險，她自願與你同行。",
+        "turn": 4,
+        "character": "shen"
+      },
+      {
+        "text": "第一次共修，你先詢問，她點頭後與你掌心相抵。",
+        "turn": 5,
+        "character": "shen"
+      },
+      {
+        "text": "突破煉氣二層後，你第一個向她道謝。",
+        "turn": 6,
+        "character": "shen"
+      },
+      {
+        "text": "在聽雨閣，你先徵求清霜同意，才談起共同經歷。",
+        "turn": 7,
+        "character": "shen"
+      },
+      {
+        "text": "宗主召見之前，你邀清霜一起面對。",
+        "turn": 8,
+        "character": "shen"
+      },
+      {
+        "text": "練習之後，你為她準備了桂花糕。",
+        "turn": 10,
+        "character": "shen"
+      }
+    ],
+    "recent": [
+      {
+        "turn": 1,
+        "choice": "禮貌介紹自己",
+        "text": "「白見微……記住了。」她接過行囊，腳步刻意慢了半拍。"
+      },
+      {
+        "turn": 2,
+        "choice": "把桂花糕分她一半",
+        "text": "她說不餓，最後還是接了。「下次別徒手掰，笨。」"
+      },
+      {
+        "turn": 3,
+        "choice": "協助她疏散弟子",
+        "text": "你接過她護住的人群，讓她騰出手封住裂隙。「做得好。」這次她沒有避開你的目光。"
+      },
+      {
+        "turn": 4,
+        "choice": "說明風險，再邀她同行",
+        "text": "「只試一刻鐘。不舒服就停。」她主動踏近一步，把護心符交給你。"
+      },
+      {
+        "turn": 5,
+        "choice": "先詢問，再掌心相抵",
+        "text": "她點頭，把掌心輕輕貼上來。靈力沿兩人的經脈流轉，那道瓶頸終於鬆動。"
+      },
+      {
+        "turn": 6,
+        "choice": "突破後，先向她道謝",
+        "text": "「是你自己走過來的。」她停頓一下，「但下次也可以找我。」"
+      },
+      {
+        "turn": 7,
+        "choice": "先問清霜是否願意談昨夜",
+        "text": "清霜輕輕點頭。蘇媚璃收起笑意：「懂分寸的人，消息可以算便宜些。」"
+      },
+      {
+        "turn": 8,
+        "choice": "邀清霜明日一同前往",
+        "text": "「我本來就會去。」她看向你，聲音比平日輕一些。"
+      },
+      {
+        "turn": 9,
+        "choice": "邀她再次共修",
+        "text": "「可以。還是老規矩，隨時能停。」"
+      },
+      {
+        "turn": 10,
+        "choice": "練習後，請她吃桂花糕",
+        "text": "「又是桂花糕。」她接過紙包，唇角卻沒有壓住。"
+      }
+    ],
+    "relationshipSummary": "沈清霜：曖昧，好感56／信任58／親密12；蘇媚璃：相識，好感3／信任10／親密0；顧傾城：陌生人，好感0／信任0／親密0",
+    "worldSummary": "太虛仙緣，已做出 10 次選擇，目前位於青玄竹林。「又是桂花糕。」她接過紙包，唇角卻沒有壓住。"
+  },
+  "lastOutcome": {
+    "text": "「又是桂花糕。」她接過紙包，唇角卻沒有壓住。",
+    "changes": {
+      "characters": {
+        "shen": {
+          "affection": 6,
+          "trust": 3,
+          "intimacy": 4
+        }
+      },
+      "stats": {
+        "cultivation": 1
+      },
+      "flags": {
+        "cake": true
+      }
+    },
+    "label": "練習後，請她吃桂花糕"
+  },
+  "savedAt": "2026-09-24T00:50:22.274Z"
+}

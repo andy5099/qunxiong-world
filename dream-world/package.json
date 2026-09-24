@@ -1,0 +1,1 @@
+{"name":"dream-world","private":true,"type":"module","scripts":{"test":"node --test tests/*.test.js","start":"node tools/serve.js"}}
