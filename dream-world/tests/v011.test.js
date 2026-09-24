@@ -89,9 +89,9 @@ test('user world/character strings escaped and private text stays in data layer'
 test('service worker only owns dream-world scope and caches all local module dependencies',async()=>{
  const handlers={},cached=[];let responded=false;
  const self={location:{href:'https://example.test/qunxiong-world/dream-world/service-worker.js'},addEventListener:(name,fn)=>handlers[name]=fn,skipWaiting:()=>Promise.resolve(),clients:{claim:()=>Promise.resolve()}};
- runInNewContext(readFileSync(new URL('../service-worker.js',import.meta.url),'utf8'),{self,URL,caches:{open:async()=>({addAll:async urls=>cached.push(...urls)}),match:async()=>null},fetch:async()=>({ok:true})});
+ runInNewContext(readFileSync(new URL('../service-worker.js',import.meta.url),'utf8'),{self,URL,Request,caches:{open:async()=>({addAll:async urls=>cached.push(...urls)}),match:async()=>null},fetch:async()=>({ok:true})});
  let installed;handlers.install({waitUntil:p=>installed=p});await installed;
- for(const url of cached){const path=new URL(url).pathname.split('/dream-world/')[1] || 'index.html';assert.ok(existsSync(new URL('../'+path,import.meta.url)),path);}
+ for(const request of cached){assert.equal(request.cache,'reload');const path=new URL(request.url).pathname.split('/dream-world/')[1] || 'index.html';assert.ok(existsSync(new URL('../'+path,import.meta.url)),path);}
  handlers.fetch({request:{method:'GET',url:'https://example.test/qunxiong-world/lineage-text/'},respondWith:()=>responded=true});assert.equal(responded,false);
  handlers.fetch({request:{method:'GET',url:'https://example.test/qunxiong-world/dream-world/src/main.js'},respondWith:()=>responded=true});assert.equal(responded,true);
 });
