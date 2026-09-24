@@ -10,14 +10,48 @@ export function validateConfig(raw) {
   const temperature=Number(raw.temperature);if(!Number.isFinite(temperature)||temperature<0||temperature>2)throw new Error('Creativity 必須介於 0–2');
   return {provider:raw.provider,model,baseURL,temperature};
 }
-// Intentionally no storage: even configuration URLs may contain private details.
+// Separate, opt-in device credentials; never part of a game archive.
+export const CREDENTIALS_KEY='dreamWorldDeviceCredentialsV1';
 export class SessionCredentials {
-  #key=''; #config={...DEFAULT_AI_CONFIG};
-  configure(config,key=''){const next=validateConfig(config);if(this.#config.provider!==next.provider||this.#config.baseURL!==next.baseURL)this.#key='';this.#config=next;if(key)this.#key=key.trim();}
-  clear(){this.#key='';}
+  #key=''; #config={...DEFAULT_AI_CONFIG}; #storage; #remember=false; #entries={};
+  #storageError='';
+  get storageError(){return this.#storageError;}
+  constructor(storage=null){
+    try{this.#storage=typeof storage==='function'?storage():storage;const raw=JSON.parse(this.#storage?.getItem(CREDENTIALS_KEY)||'null');
+      if(raw?.version===1 && raw.entries && typeof raw.entries==='object')for(const [id,e] of Object.entries(raw.entries)){
+        try{const config=validateConfig(e.config);if(id===this.#id(config)&&typeof e.key==='string'&&e.key.trim()&&e.key.length<=500)this.#entries[id]={config,key:e.key};}catch{}
+      }
+      if(raw?.last && this.#entries[raw.last]){const e=this.#entries[raw.last];this.#config=e.config;this.#key=e.key;this.#remember=true;}
+    }catch{this.#storageError='無法讀取裝置金鑰；請重新輸入，或檢查瀏覽器儲存權限。';}
+  }
+  #id(c=this.#config){return c.provider+'|'+c.baseURL;}
+  #write(entries,last){
+    try{if(!this.#storage)throw new Error();const value=JSON.stringify({version:1,entries,last});this.#storage.setItem(CREDENTIALS_KEY,value);if(this.#storage.getItem(CREDENTIALS_KEY)!==value)throw new Error();this.#entries=entries;this.#storageError='';}
+    catch{this.#storageError='無法保存或清除裝置金鑰，請檢查瀏覽器儲存權限；尚未確認成功。';throw new Error(this.#storageError);}
+  }
+  configure(config,key=''){
+    const next=validateConfig(config);
+    if(this.#id()!==this.#id(next)){const saved=this.#entries[this.#id(next)];this.#key=saved?.key||'';this.#remember=!!saved;}
+    this.#config=next;if(key.trim())this.#key=key.trim();
+  }
+  selectProvider(provider){
+    const saved=Object.values(this.#entries).find(e=>e.config.provider===provider);
+    this.configure(saved?.config||{...DEFAULT_AI_CONFIG,provider,...(PROVIDER_PRESETS[provider]||{baseURL:'https://example.com/v1'})});
+  }
+  setRemember(enabled){
+    const entries={...this.#entries},id=this.#id();
+    if(enabled){if(!this.#key)throw new Error('請先輸入 API Key，再啟用記住金鑰。');entries[id]={config:this.config,key:this.#key};}
+    else delete entries[id];
+    if(enabled||this.#entries[id]){this.#remember=false;this.#write(entries,enabled?id:null);}
+    this.#remember=enabled;
+  }
+  clear(){this.#key='';this.#remember=false;}
+  clearSaved(){const entries={...this.#entries};delete entries[this.#id()];this.clear();this.#write(entries,null);}
   get config(){return {...this.#config};}
   get hasKey(){return !!this.#key;}
-  adapter(options={}){if(!this.#key)throw new Error('AI 暫不可用：尚未設定本次分頁的 API Key／Proxy Token。請到「設定 → AI 劇情」設定連線。');return new ChatCompletionsAdapter(this.#config,this.#key,options);}
+  get remembered(){return this.#remember;}
+  get maskedKey(){return this.hasKey?(this.#config.provider==='openrouter'?'sk-or-v1-••••••••••••':'••••••••••••'):'';}
+  adapter(options={}){if(!this.#key)throw new Error('AI 暫不可用：尚未設定 API Key／Proxy Token。請到「設定 → AI 劇情」設定連線。');return new ChatCompletionsAdapter(this.#config,this.#key,options);}
 }
 export class ChatCompletionsAdapter extends AIProvider {
   #key;

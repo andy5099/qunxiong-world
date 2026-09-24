@@ -2,7 +2,7 @@ import { SessionCredentials, PROVIDER_PRESETS } from './ai-adapters.js';
 import { StoryDirector, aiDisplayScene, setStoryMode } from './story-director.js';
 import { modeBar, aiWelcome, aiSettings, aiJournal } from './ai-ui.js';
 import { validateWorldState } from './save.js';
-const credentials=new SessionCredentials();
+const credentials=new SessionCredentials(()=>localStorage);
 let aiError='',pendingAI=null;
 const dialogueDrafts=new Map();
 import { createState, SAVE_KEY } from './state.js';
@@ -70,7 +70,7 @@ document.addEventListener('click',async event=>{
     busy=true;
     if(action==='ai-settings'){tab='settings';await render(true);}
     if(action==='ai-mode'){state=setStoryMode(state,id);aiError='';pendingAI=null;save();tab='story';await render(true);}
-    if(action==='ai-clear-key'){credentials.clear();await render();notify('本次分頁金鑰已清除。');}
+    if(action==='ai-clear-key'){credentials.clearSaved();await render();notify('目前 Provider 的裝置與記憶體金鑰已清除。');}
     if(action==='ai-generate')await runAI();
     if(action==='ai-rewrite')await runAI({rewrite:true});
     if(action==='ai-retry')await runAI(pendingAI||{});
@@ -120,11 +120,11 @@ document.addEventListener('submit',async event=>{
   try{
     busy=true;const data=Object.fromEntries(new FormData(event.target));
     if(event.target.id==='ai-form'){
-      credentials.configure(data,data.apiKey);event.target.querySelector('[name="apiKey"]').value='';
+      credentials.configure(data,data.apiKey);credentials.setRemember(data.rememberKey==='on');event.target.querySelector('[name="apiKey"]').value='';
       if(event.submitter?.value==='test'){
         document.querySelector('#ai-connection-result').textContent='正在測試連線…';
         await credentials.adapter().testConnection();
-        await render();document.querySelector('#ai-connection-result').textContent='連線成功，模型已回傳有效 JSON。';
+        await render();document.querySelector('#ai-connection-result').textContent='連線成功，模型已回傳有效 JSON。'+(credentials.remembered?' API Key 已儲存在此裝置。':'');
       }else {await render();notify('本次 AI 設定已套用，回到劇情即可生成。');}
     }else if(event.target.id==='world-form'){
       if(wizardStep===1 && wizard.worldType!==data.worldType)wizard=wizardDraft(data.worldType);
@@ -145,7 +145,13 @@ document.addEventListener('submit',async event=>{
 document.addEventListener('input',event=>{if(event.target.id==='custom-input' && state.ai.mode==='ai')dialogueDrafts.set(state.worldId,event.target.value);});
 document.addEventListener('change',async event=>{
   if(busy)return;
-  if(event.target.id==='ai-provider'){const preset=PROVIDER_PRESETS[event.target.value],input=document.querySelector('#ai-base-url');input.readOnly=!!preset;if(preset){input.value=preset.baseURL;document.querySelector('[name="model"]').value=preset.model;}credentials.clear();document.querySelector('[name="apiKey"]').value='';}
+  if(['ai-provider','ai-base-url','ai-remember'].includes(event.target.id)){
+    try{
+      if(event.target.id==='ai-provider')credentials.selectProvider(event.target.value);
+      else {const data=Object.fromEntries(new FormData(document.querySelector('#ai-form')));credentials.configure(data,event.target.id==='ai-remember'?data.apiKey:'');if(event.target.id==='ai-remember')credentials.setRemember(event.target.checked);}
+      await render();
+    }catch(error){await render();document.querySelector('#ai-connection-result').textContent=error.message;}
+  }
   if(event.target.id==='large-text')document.body.classList.toggle('large-text',event.target.checked);
   if(event.target.id==='gimmick-mode')document.querySelector('#custom-gimmick-fields').hidden=event.target.value!=='custom';
   if(event.target.id!=='import-file')return;

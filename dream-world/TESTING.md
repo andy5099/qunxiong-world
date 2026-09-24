@@ -1,3 +1,21 @@
+# V0.2.3 裝置金鑰驗證
+
+完整 Node 測試 51 組通過：`node --test dream-world/tests/*.test.js`。
+
+- A：測試金鑰勾選保存，瀏覽器 reload 後顯示已保存與固定遮罩。
+- B：關閉遊戲分頁再開仍恢復；自動測試多次建立全新憑證實例。未關閉整個瀏覽器程序測試。
+- C：建立／切換世界並寫入遊戲存檔後，獨立憑證仍存在（自動測試）。
+- D：遊戲匯出 JSON、憑證序列化及設定 HTML 均不含測試 Key。
+- E：清除後 reload、重新選取 Provider 都無 Key（瀏覽器與自動測試）。
+- F：OpenRouter／OpenAI 與不同相容 API Base URL 隔離；實際組裝的 Authorization 只送往所選端點。
+- G：既有 AI transport、模型切換、錯誤處理、三選項與多世界測試通過；本機 HTTP 模擬測試連線成功並顯示「API Key 已儲存在此裝置」。未使用真實金鑰或付費模型。
+- H：390×844 Chromium 設定頁與清除按鈕可操作、無橫向溢出；**手機 Safari 未實機驗收**。
+- 儲存被封鎖／寫入失敗時不宣稱保存成功；預設關閉、取消保存與清除行為均有測試。
+
+穩定 localStorage 名稱與遊戲存檔分離，Service Worker 升級只清 Cache Storage，不清除裝置金鑰。清除網站資料、私密瀏覽或瀏覽器清理仍可能使資料消失。
+
+以下為歷史版本紀錄；V0.2.3 已新增使用者自選本機保存，舊版「僅記憶體」描述不再適用。
+
 # V0.2.2 三選項驗證
 
 2026-09-24：48 組 Node 測試通過，執行 `node --test dream-world/tests/*.test.js`。

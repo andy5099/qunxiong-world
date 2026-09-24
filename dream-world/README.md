@@ -1,4 +1,4 @@
-# 夢境世界 V0.2.2
+# 夢境世界 V0.2.3
 
 手機文字 RPG：劇情 → ①②③ 動態選項 → NPC 主動推進 → 自動保存。保留多世界、五步建立世界、角色卡、造物臺、外掛、成年戀愛、存檔、匯入匯出及離線模板模式。所有程式與工具限於 `dream-world/`。
 
@@ -23,7 +23,7 @@ OpenAI 使用 `/v1/chat/completions`、JSON mode、temperature 與最多 6,000 o
 
 ## 金鑰與私人 Proxy
 
-API Key、Proxy Token、連線設定只存在目前分頁的 JS 私有記憶體，不存 localStorage、sessionStorage、存檔、匯出檔、Service Worker 或 repository。重新整理需重填，可手動清除。切換 Provider／Base URL 清除前一端點的金鑰。前端記憶體不是伺服器保密庫，不能抵擋惡意瀏覽器擴充套件；僅在自己的可信裝置與端點使用。
+預設只在目前分頁使用。設定頁勾選「記住 API Key（僅儲存在這台裝置）」後，金鑰和 Provider／Base URL／模型／Temperature 保存於獨立 localStorage 項目 `dreamWorldDeviceCredentialsV1`；不加入遊戲存檔、匯出、Service Worker 或 repository。一般重新整理、關閉再開、遊戲存檔更新與 Pages 部署不刪除此項目。每個 Provider 加完整 Base URL 分開保存，只載入目前端點的金鑰。OpenRouter 僅顯示固定遮罩。取消勾選會刪除目前端點的本機副本但保留本次分頁使用；「清除已儲存 Key」則同時清除目前端點的本機與記憶體金鑰。測試連線成功會確認保存狀態，寫入失敗明確提示。私密瀏覽、清除網站資料或瀏覽器自動清理可能移除資料；本機保存不是加密保管庫，同源腳本或裝置使用者可能讀取。前端記憶體不是伺服器保密庫，不能抵擋惡意瀏覽器擴充套件；僅在自己的可信裝置與端點使用。
 
 生成會把相關遊戲資料送往自己選擇的 Provider，可能產生費用。GitHub Pages 不提供 AI 額度，也沒有共用金鑰。請勿把真實金鑰放進聊天、Git commit 或公開程式。
 
