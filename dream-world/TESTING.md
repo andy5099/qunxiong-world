@@ -1,3 +1,9 @@
+# OpenRouter 分階段診斷
+
+完整 55 組測試通過。新增驗證 /key → /models → 短模型呼叫順序、目前模型不被替換、各 HTTP 錯誤與 provider message、金鑰遮蔽、無 response、逾時、非 JSON、無效金鑰不發付費請求、模型不存在明確失敗。本機保存與原遊戲測試保留。
+
+官方公開 models API 查詢確認指定 Dolphin 模型存在。正式 Pages origin 的瀏覽器驗證在部署後進行；未使用私人金鑰，不宣稱付費推論成功或已驗收 iPhone Safari。
+
 # V0.2.3 裝置金鑰驗證
 
 完整 Node 測試 51 組通過：`node --test dream-world/tests/*.test.js`。

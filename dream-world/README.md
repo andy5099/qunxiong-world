@@ -94,3 +94,12 @@ GitHub Pages：https://andy5099.github.io/qunxiong-world/dream-world/
 本次真實推論測試模型：**無**。沒有使用私人金鑰或付費額度，OpenRouter 指定模型只核對公開目錄及請求格式；对話品質和成人內容表現均未實測。[OpenRouter 官方快速開始](https://openrouter.ai/docs/quickstart)；[指定模型公開端點](https://openrouter.ai/api/v1/models/cognitivecomputations/dolphin-mistral-24b-venice-edition/endpoints)。不要把本機模擬回應視為模型表現。
 
 上線的靜態前端仍需個人帳戶可用金鑰與額度。未部署具登入、用量限額及伺服器端金鑰管理的後端，**不提供完全免設定、打開即用 AI**。私人 Proxy 範例保留，這些生產後端功能仍需另行部署。
+
+
+## OpenRouter 連線診斷
+
+測試先 GET `/key`（Bearer 驗證），再查公開 `/models`，金鑰有效且模型存在才 POST `/chat/completions`，使用目前模型、Temperature、16 tokens 與簡短 `Reply OK.`。測試不傳遊戲資料、不修改存檔。模型清單存在不代表帳戶有額度或供應商當下可用，不自動改模型。
+
+畫面逐階段顯示 API Key、OpenRouter、模型、HTTP Status、錯誤訊息。OpenRouter 成功表示收到 HTTP response，包括 401 等拒絕；不代表金鑰有效。模型未呼叫會顯示未測試。400／401／402／403／404／429／5xx 保留實際狀態；顯示經金鑰遮蔽的 error.message，透過 textContent 呈現。僅 fetch 未收到 response 才顯示網路/CORS失敗；逾時與 JSON 格式錯誤分別顯示。
+
+2026-09-24 公開 models API 仍有 `cognitivecomputations/dolphin-mistral-24b-venice-edition`。真實模型推論與 iPhone Safari 成功連線仍需有額度的有效金鑰及裝置驗收。

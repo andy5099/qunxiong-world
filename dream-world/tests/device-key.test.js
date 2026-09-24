@@ -7,7 +7,7 @@ import {exportSave,writeSave} from '../src/save.js';
 import {aiSettings} from '../src/ai-ui.js';
 const config=p=>({...DEFAULT_AI_CONFIG,provider:p,...PROVIDER_PRESETS[p]});
 const storage=()=>{const m=new Map();return {getItem:k=>m.get(k)||null,setItem:(k,v)=>m.set(k,v),removeItem:k=>m.delete(k)};};
-const transport=log=>async(url,options)=>{log.push({url,authorization:options.headers.Authorization});return new Response(JSON.stringify({choices:[{message:{content:'{"ok":true}'}}]}));};
+const transport=log=>async(url,options)=>{if(url.endsWith('/key'))return new Response(JSON.stringify({data:{}}));if(url.endsWith('/models'))return new Response(JSON.stringify({data:[{id:PROVIDER_PRESETS.openrouter.model}]}));log.push({url,authorization:options.headers.Authorization});return new Response(JSON.stringify({choices:[{message:{content:'{"ok":true}'}}]}));};
 test('device opt-in survives fresh sessions, game writes and exports; clear never restores',async()=>{
  const store=storage(),key='test-only-router-sentinel';let c=new SessionCredentials(store);assert.equal(c.remembered,false);c.configure(config('openrouter'),key);assert.equal(store.getItem(CREDENTIALS_KEY),null);c.setRemember(true);
  for(let i=0;i<3;i++){c=new SessionCredentials(store);assert.equal(c.hasKey,true);assert.equal(c.remembered,true);assert.equal(c.config.provider,'openrouter');}

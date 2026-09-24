@@ -1,4 +1,4 @@
-import { SessionCredentials, PROVIDER_PRESETS } from './ai-adapters.js';
+import { SessionCredentials, PROVIDER_PRESETS, diagnosticText } from './ai-adapters.js';
 import { StoryDirector, aiDisplayScene, setStoryMode } from './story-director.js';
 import { modeBar, aiWelcome, aiSettings, aiJournal } from './ai-ui.js';
 import { validateWorldState } from './save.js';
@@ -123,8 +123,8 @@ document.addEventListener('submit',async event=>{
       credentials.configure(data,data.apiKey);credentials.setRemember(data.rememberKey==='on');event.target.querySelector('[name="apiKey"]').value='';
       if(event.submitter?.value==='test'){
         document.querySelector('#ai-connection-result').textContent='正在測試連線…';
-        await credentials.adapter().testConnection();
-        await render();document.querySelector('#ai-connection-result').textContent='連線成功，模型已回傳有效 JSON。'+(credentials.remembered?' API Key 已儲存在此裝置。':'');
+        let diagnostic;await credentials.adapter().testConnection(d=>{diagnostic=d;document.querySelector('#ai-connection-result').textContent=diagnosticText(d);});
+        await render();document.querySelector('#ai-connection-result').textContent=(diagnostic?diagnosticText(diagnostic):'連線成功，模型已回傳有效 JSON。')+(credentials.remembered?' API Key 已儲存在此裝置。':'');
       }else {await render();notify('本次 AI 設定已套用，回到劇情即可生成。');}
     }else if(event.target.id==='world-form'){
       if(wizardStep===1 && wizard.worldType!==data.worldType)wizard=wizardDraft(data.worldType);

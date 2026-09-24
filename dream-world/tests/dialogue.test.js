@@ -26,7 +26,7 @@ test('free input reaches context verbatim, saves and reloads without losing conv
 });
 test('OpenRouter preset and model switching send exact model, protect credentials and do not change saves',async()=>{
  const credentials=new SessionCredentials(),requests=[];
- const transport=async(url,options)=>{requests.push({url,body:JSON.parse(options.body)});return new Response(JSON.stringify({choices:[{finish_reason:'stop',message:{content:'{"ok":true}'}}]}));};
+ const transport=async(url,options)=>{if(url.endsWith('/key'))return new Response(JSON.stringify({data:{}}));if(url.endsWith('/models'))return new Response(JSON.stringify({data:[{id:PROVIDER_PRESETS.openrouter.model},{id:'another-model'}]}));requests.push({url,body:JSON.parse(options.body)});return new Response(JSON.stringify({choices:[{finish_reason:'stop',message:{content:'{"ok":true}'}}]}));};
  const config={...DEFAULT_AI_CONFIG,provider:'openrouter',...PROVIDER_PRESETS.openrouter};
  credentials.configure(config,'test-only-sentinel');await credentials.adapter({fetchImpl:transport}).testConnection();
  assert.equal(requests[0].url,'https://openrouter.ai/api/v1/chat/completions');assert.equal(requests[0].body.model,'cognitivecomputations/dolphin-mistral-24b-venice-edition');
