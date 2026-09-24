@@ -1,9 +1,10 @@
 import { AIProvider } from './ai-provider.js';
+export const PROVIDER_PRESETS=Object.freeze({openai:{baseURL:'https://api.openai.com/v1',model:'gpt-4.1-mini'},openrouter:{baseURL:'https://openrouter.ai/api/v1',model:'cognitivecomputations/dolphin-mistral-24b-venice-edition'}});
 export const DEFAULT_AI_CONFIG=Object.freeze({provider:'openai',model:'gpt-4.1-mini',baseURL:'https://api.openai.com/v1',temperature:0.9});
 export function validateConfig(raw) {
-  if(!['openai','compatible','proxy'].includes(raw.provider))throw new Error('請選擇 Provider');
+  if(!['openai','openrouter','compatible','proxy'].includes(raw.provider))throw new Error('請選擇 Provider');
   const model=String(raw.model||'').trim();if(!model||model.length>100)throw new Error('請填寫模型 ID');
-  const baseURL=raw.provider==='openai'?DEFAULT_AI_CONFIG.baseURL:String(raw.baseURL||'').trim().replace(/\/+$/,'');
+  const baseURL=Object.hasOwn(PROVIDER_PRESETS,raw.provider)?PROVIDER_PRESETS[raw.provider].baseURL:String(raw.baseURL||'').trim().replace(/\/+$/,'');
   let url;try{url=new URL(baseURL);}catch{throw new Error('Base URL 格式錯誤');}
   if(url.username||url.password||url.search||url.hash||!(url.protocol==='https:'||(url.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(url.hostname))))throw new Error('端點須使用 HTTPS；本機 localhost 可用 HTTP，URL 不可夾帶金鑰');
   const temperature=Number(raw.temperature);if(!Number.isFinite(temperature)||temperature<0||temperature>2)throw new Error('Creativity 必須介於 0–2');
@@ -16,7 +17,7 @@ export class SessionCredentials {
   clear(){this.#key='';}
   get config(){return {...this.#config};}
   get hasKey(){return !!this.#key;}
-  adapter(options={}){if(!this.#key)throw new Error('請先在「設定 → AI 劇情」輸入本次分頁使用的 API Key／Proxy Token');return new ChatCompletionsAdapter(this.#config,this.#key,options);}
+  adapter(options={}){if(!this.#key)throw new Error('AI 暫不可用：尚未設定本次分頁的 API Key／Proxy Token。請到「設定 → AI 劇情」設定連線。');return new ChatCompletionsAdapter(this.#config,this.#key,options);}
 }
 export class ChatCompletionsAdapter extends AIProvider {
   #key;
@@ -26,7 +27,7 @@ export class ChatCompletionsAdapter extends AIProvider {
     const request=async()=>{
       let response;
       try{response=await this.fetch(this.config.baseURL+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${this.#key}`},body:JSON.stringify({model:this.config.model,temperature:this.config.temperature,response_format:{type:'json_object'},messages:[{role:'system',content:system},{role:'user',content:JSON.stringify(context)}],max_tokens:6000}),signal:controller.signal,credentials:'omit',redirect:'error',cache:'no-store',referrerPolicy:'no-referrer'});}catch{throw new Error('無法連線。請確認網路、HTTPS、Provider 的 CORS 或使用自己的 Proxy。');}
-      if(!response.ok)throw new Error(response.status===429?'Provider 額度不足或請求過於頻繁（429）':response.status===401||response.status===403?'API Key／Proxy Token 無效或沒有模型權限':`Provider 請求失敗（HTTP ${response.status}）`);
+      if(!response.ok)throw new Error(response.status===429?'AI 暫不可用：Provider 額度不足或請求過於頻繁（429），未切換離線模式':response.status===402?'AI 暫不可用：帳戶額度不足（402）':response.status===401||response.status===403?'API Key／Proxy Token 無效或沒有模型權限':`Provider 請求失敗（HTTP ${response.status}）`);
       let body;try{body=await response.json();}catch{throw new Error('Provider 回傳無效 JSON');}
       const choice=body?.choices?.[0];if(choice?.finish_reason && choice.finish_reason!=='stop')throw new Error('AI 回應未完整生成，請重新生成');
       const content=choice?.message?.content;if(typeof content!=='string'||content.length>60000)throw new Error('AI 回應為空或過長');

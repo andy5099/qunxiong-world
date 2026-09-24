@@ -1,12 +1,12 @@
-# 夢境世界 V0.2
+# 夢境世界 V0.2.1
 
-手機文字 RPG：AI 即時續寫 → 三選項 → 世界與角色記住 → 下一幕。保留多世界、五步建立世界、角色卡、造物臺、外掛、成年戀愛、存檔、匯入匯出及離線模板模式。所有程式與工具限於 `dream-world/`。
+手機文字 RPG：自由輸入 → 角色接話 → 世界與角色記住 → 繼續對話。保留多世界、五步建立世界、角色卡、造物臺、外掛、成年戀愛、存檔、匯入匯出及離線模板模式。所有程式與工具限於 `dream-world/`。
 
 ## 開始 AI 劇情
 
 1. 開啟【設定 → AI 劇情】。新世界預設推薦 AI；舊存檔保留離線模式與原進度。
-2. Provider 選 OpenAI，Model 預設 `gpt-4.1-mini`，輸入自己的 API Key，按【測試連線】。
-3. 切回【劇情】，按【生成開場／下一幕】。之後按 1／2／3 即時續寫，也可輸入一次自訂行動。
+2. Provider 可選 OpenRouter，自動帶入 `https://openrouter.ai/api/v1` 與 `cognitivecomputations/dolphin-mistral-24b-venice-edition`；也保留 OpenAI／相容 API／私人 Proxy。自行在頁面輸入金鑰後按【測試連線】，不要把金鑰交給他人。
+3. 切回【劇情】，開場就能直接輸入想說的話或行動。每輪回覆下方都有輸入框；0–3 個快捷行動只作輔助，沒有快捷行動也可繼續對話。亦可請角色先簡短開場。
 4. 【↻ 重寫這一幕】從該幕生成前的檢查點重新生成，取代該幕所有效果，不重複發放 EXP／道具／好感。
 5. 無金鑰或不想連線時，選【離線／模板劇情】。已保存 AI 場景可離線閱讀；繼續生成需要連線。
 
@@ -15,10 +15,11 @@ OpenAI 使用 `/v1/chat/completions`、JSON mode、temperature 與最多 6,000 o
 | Provider | 設定 | 驗證範圍 |
 |---|---|---|
 | OpenAI | 固定 `https://api.openai.com/v1`，預設 `gpt-4.1-mini`，自己的 API Key | 正式 HTTP 呼叫已實作；本次無私人金鑰，未做真實付費模型推論 |
+| OpenRouter | 固定 `https://openrouter.ai/api/v1`，預設指定 Dolphin 模型，需自己的 Key／額度 | 已核對官方公開模型端點的 response_format 支援；只完成模擬 transport 測試，未做真實推論 |
 | OpenAI 相容 API | 自填 HTTPS Base URL／模型／Key，需支援 Chat Completions JSON mode、temperature、CORS | 本機 HTTP 模擬端點通過自動測試與瀏覽器完整操作；第三方服務需自行測試 |
 | 自己的 Backend / Proxy | 相同協定；前端持有私人 Proxy Token | 附 `tools/ai-proxy.js`；未替使用者部署公開後端 |
 
-測試連線驗證 Provider 可回傳 JSON；每幕另外做完整 schema、世界 ID、數值、人物與界線驗證。失敗提供【重新生成】【切換離線模式】，不提交待處理回合。45 秒逾時中止請求。額度不足、權限錯誤、截斷、malformed JSON、無效效果都保留原存檔。
+測試連線驗證 Provider 可回傳 JSON；每幕另外做完整 schema、世界 ID、數值、人物與界線驗證。失敗提供【重新生成】【切換離線模式】，不提交待處理回合。45 秒逾時中止請求。缺少金鑰、402 或 429 明確顯示 AI 暫不可用；不自動切離線，不把模板冒充 AI。輸入草稿在本次分頁保留，成功回應後清空（草稿不持久保存）。額度不足、權限錯誤、截斷、malformed JSON、無效效果都保留原存檔。
 
 ## 金鑰與私人 Proxy
 
@@ -43,9 +44,9 @@ API Key、Proxy Token、連線設定只存在目前分頁的 JS 私有記憶體�
 
 - `ai-adapters.js`：可替換 `AIProvider.generateScene({system,context})`，正式 HTTP transport、記憶體憑證與測試連線。Story Director 不含廠商 API URL／金鑰／HTTP 規則。
 - `story-director.js`：clone 狀態 → Choice Engine 暫存行動／本地外掛效果 → context → Provider → schema 與語意限制 → 新狀態。UI 驗證完整存檔格式與大小後才提交。
-- `ai-schema.js`：必填欄位、正好三個不同 label／intent、有界文字／數值、成年人物、ID allowlist；拒絕任意效果程式與未知欄位。
+- `ai-schema.js`：必填欄位、0–3 個不重複 label／intent、有界文字／數值、成年人物、ID allowlist；拒絕任意效果程式與未知欄位。
 - AI 選項可带 `abilityAction:{ability,target}`，由本地 Gimmick Engine 檢查等級／能量／冷卻及意願，再請 AI 描寫後續；`gimmickEvents` 不直接提供任意能力或重複獎勵。
-- `intimacyChecks` 由既有 Intimacy Engine 判斷。曖昧、邀約、共鳴有不同門檻；拒絕／朋友界線不能被 AI 清除。成熟戀愛以非露骨形式呈現。文字語意與選項趣味仍取決於模型品質，程式不能證明所有自然語言完全合規。
+- `intimacyChecks` 由既有 Intimacy Engine 判斷。曖昧、邀約、共鳴有不同門檻；拒絕／朋友界線不能被 AI 清除。成年自願戀愛仍以非露骨形式呈現，並遵守所選模型政策；不強制固定淡出或制式委婉台詞。本次未實作解除非露骨限制。文字語意與選項趣味仍取決於模型品質，程式不能證明所有自然語言完全合規。
 - `ai-save.js`：子格式 `ai.version:1`，檢查點僅一層，避免遞迴保存整個歷史。
 - `story-engine.js` 保留離線模板、自訂行動、外掛面板與相處事件。Media Engine 保留；AI media 目前只接受 null，未加入影像生成。
 
@@ -76,8 +77,16 @@ node --test dream-world/tests/*.test.js
 
 網址 `http://127.0.0.1:4190/dream-world/`，無新增框架或依賴。詳見 `TESTING.md`。
 
-UI 模擬：另跑 `node dream-world/tests/mock-provider.js`，選相容 API，Base URL `http://127.0.0.1:4192/v1`，Model `local-ui-test`，任意測試 Token。回應明確標示本機模擬，不是 AI 推論，不會自動啟用。Model `test-malformed`／`test-error` 可測錯誤。不要填真實金鑰。
+UI 模擬：另跑 `node dream-world/tests/mock-provider.js`，選相容 API，Base URL `http://127.0.0.1:4192/v1`，Model `local-ui-test`，任意測試 Token。回應明確標示本機模擬，不是 AI 推論，不會自動啟用。Model `test-dialogue` 可測無快捷行動連續對話，`test-malformed`／`test-error` 可測錯誤。不要填真實金鑰。
 
 Service Worker 只快取本遊戲靜態檔；POST AI 請求不快取、不重播。更新後重新整理使用新版。原始 `tests/playable-save.json` 保持不動。
 
 GitHub Pages：https://andy5099.github.io/qunxiong-world/dream-world/
+
+## 自由對話與實測限制
+
+提示規則優先回應玩家當下說的話，依人物性格、關係和共同記憶接話；不要求 300–700 字，不重複開場。已移除連續聊天必須插入新事件的拒絕條件，PACING 只是參考。敘事文字供閱讀，人物／記憶／數值仍經原有結構驗證與交易保存。既有三選項存檔仍可讀取，離線玩法保持原樣。
+
+本次真實推論測試模型：**無**。沒有使用私人金鑰或付費額度，OpenRouter 指定模型只核對公開目錄及請求格式；对話品質和成人內容表現均未實測。[OpenRouter 官方快速開始](https://openrouter.ai/docs/quickstart)；[指定模型公開端點](https://openrouter.ai/api/v1/models/cognitivecomputations/dolphin-mistral-24b-venice-edition/endpoints)。不要把本機模擬回應視為模型表現。
+
+上線的靜態前端仍需個人帳戶可用金鑰與額度。未部署具登入、用量限額及伺服器端金鑰管理的後端，**不提供完全免設定、打開即用 AI**。私人 Proxy 範例保留，這些生產後端功能仍需另行部署。

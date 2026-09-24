@@ -29,7 +29,7 @@ export function validateAIResponse(raw) {
   if(raw.media!==null)throw new Error('AI 媒體暫只接受 null');
   const s={sceneText:text(raw.sceneText,6000),sceneType:raw.sceneType,location:id(raw.location),timeAdvance:number(raw.timeAdvance,0,1440),media:null};
   s.choices=list(raw.choices,3,c=>{object(c,['label','intent','risk','abilityAction']);const out={label:text(c.label,120),intent:text(c.intent,300),risk:text(c.risk,120)};if(c.abilityAction){object(c.abilityAction,['ability','target']);out.abilityAction={ability:id(c.abilityAction.ability),target:c.abilityAction.target===null?null:id(c.abilityAction.target)};}return out;});
-  if(s.choices.length!==3||new Set(s.choices.map(c=>c.label)).size!==3||new Set(s.choices.map(c=>c.intent)).size!==3)throw new Error('必須有三個不同的選項與行動意圖');
+  if(new Set(s.choices.map(c=>c.label)).size!==s.choices.length||new Set(s.choices.map(c=>c.intent)).size!==s.choices.length)throw new Error('快捷行動的標籤與意圖不可重複');
   const changes=object(raw.stateChanges,['stats','inventory','worldState','entities','threads']);
   s.stateChanges={stats:record(changes.stats??{},v=>number(v,-20,20)),inventory:record(changes.inventory??{},v=>number(v,-20,20)),worldState:record(changes.worldState??{},v=>number(v,-20,20)),entities:list(changes.entities??[],8,entity),threads:list(changes.threads??[],8,quest)};
   s.relationshipChanges=record(raw.relationshipChanges,c=>{

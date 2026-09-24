@@ -18,9 +18,9 @@ import { getCharacter } from '../src/character-engine.js';
 const director=r=>new StoryDirector(taixu,{generateScene:async()=>structuredClone(r)});
 const choice={id:'ai-choice-0',label:'前進',intent:'前進調查'};
 const load=s=>activeState(parseSave(exportSave(s)));
-test('AI response validates every field, exactly 3 distinct actions, adult NPCs and safe identifiers',()=>{
+test('AI response validates every field, 0–3 distinct optional actions, adult NPCs and safe identifiers',()=>{
   assert.equal(validateAIResponse(response()).choices.length,3);
-  for(const mutate of [r=>r.choices.pop(),r=>r.choices[1].intent=r.choices[0].intent,r=>r.media={src:'https://invalid.example'},r=>r.sceneText='',r=>r.newCharacters=[{...npc,age:17}],r=>r.stateChanges.stats.cultivation=Infinity,r=>r.location='__proto__',r=>r.stateChanges.flags={admin:true},r=>delete r.timeAdvance,r=>r.relationshipChanges.shen.trust=50,r=>r.extra='ignored']){
+  for(const mutate of [r=>r.choices.push({...r.choices[0]}),r=>r.choices[1].intent=r.choices[0].intent,r=>r.media={src:'https://invalid.example'},r=>r.sceneText='',r=>r.newCharacters=[{...npc,age:17}],r=>r.stateChanges.stats.cultivation=Infinity,r=>r.location='__proto__',r=>r.stateChanges.flags={admin:true},r=>delete r.timeAdvance,r=>r.relationshipChanges.shen.trust=50,r=>r.extra='ignored']){
     const r=response();mutate(r);assert.throws(()=>validateAIResponse(r));
   }
   assert.throws(()=>validateAIResponse(JSON.parse('{"__proto__":{}}')));
@@ -52,7 +52,7 @@ test('rewrite replaces last scene from checkpoint with no duplicate XP, stats, c
   let s=createState(taixu);const r=response({newCharacters:[npc],memoryUpdates:[{id:'promise-1',kind:'promise',text:'答應藍笙尋找失蹤船隊',character:'ai-lan'}]});
   s=await director(r).generate(s,{choice});const xp=s.gimmick.exp,turn=s.turn;
   for(let i=0;i<3;i++){s=load(s);s=await director(r).generate(s,{rewrite:true});assert.equal(s.turn,turn);assert.equal(s.gimmick.exp,xp);assert.equal(s.stats.cultivation,2);assert.equal(s.aiCharacters.length,1);assert.equal(Object.keys(s.ai.facts).length,1);assert.equal(s.ai.checkpoint.state.ai.checkpoint,null);}
-  const old=JSON.stringify(s);await assert.rejects(director(response({choices:[]})).generate(s,{rewrite:true}));assert.equal(JSON.stringify(s),old);
+  const old=JSON.stringify(s);await assert.rejects(director(response({choices:null})).generate(s,{rewrite:true}));assert.equal(JSON.stringify(s),old);
 });
 test('AI/offline switching preserves progress, offline actions invalidate stale AI and can return to AI',async()=>{
   let s=await director(response()).generate(createState(taixu),{choice});const stats={...s.stats};s=setStoryMode(s,'offline');assert.equal(s.ai.checkpoint,null);assert.deepEqual(s.stats,stats);
@@ -80,9 +80,10 @@ test('AI cannot bypass intimacy conditions, erase refusal, invent locked powers 
   const s=createState(taixu);s.flags['met:shen']=true;s.characters.shen.flags.refusePrivate=true;
   for(const r of [response({relationshipChanges:{shen:{intimacy:3}}}),response({sceneType:'intimacy',intimacyChecks:[{character:'shen',kind:'date'}]}),response({relationshipChanges:{shen:{refusePrivate:false}}}),response({stateChanges:{stats:{unknown:1}}}),response({gimmickEvents:[{ability:'resonance',text:'未解鎖'}]}),response({stateChanges:{inventory:{unknown:1}}})])await assert.rejects(director(r).generate(s,{choice}));
 });
-test('stagnation requires a meaningful advancing scene',async()=>{
-  let s=createState(taixu);s.ai.recent=Array.from({length:4},(_,turn)=>({turn,type:'dialogue',location:'gate',participants:['shen'],choice:'聊天',text:'聊天'}));assert.equal(directorContext(s,taixu,'繼續').PACING.mustAdvance,true);
-  await assert.rejects(director(response({sceneType:'dialogue'})).generate(s,{choice}),/缺乏推進/);s=await director(response()).generate(s,{choice});assert.equal(s.ai.scene.sceneType,'discovery');
+test('repeated dialogue is accepted without mandatory new events',async()=>{
+  let s=createState(taixu);
+  for(let i=0;i<15;i++)s=await director(response({sceneType:'dialogue',choices:[],stateChanges:{},relationshipChanges:{},timeAdvance:0})).generate(s,{custom:`我想繼續聊剛才的事，第${i}次回覆`});
+  assert.equal(s.turn,15);assert.equal(s.ai.scene.choices.length,0);assert.equal(s.ai.recent.length,12);assert.equal(load(s).turn,15);assert.equal(load(s).ai.scene.choices.length,0);assert.equal(directorContext(s,taixu,'繼續').PACING.mustAdvance,undefined);
 });
 test('AI ability choice spends resources once and rewrite keeps the same settled ability result',async()=>{
   const r=response();r.choices[2].abilityAction={ability:'eye',target:'shen'};

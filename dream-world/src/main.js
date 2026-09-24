@@ -1,9 +1,10 @@
-import { SessionCredentials } from './ai-adapters.js';
+import { SessionCredentials, PROVIDER_PRESETS } from './ai-adapters.js';
 import { StoryDirector, aiDisplayScene, setStoryMode } from './story-director.js';
 import { modeBar, aiWelcome, aiSettings, aiJournal } from './ai-ui.js';
 import { validateWorldState } from './save.js';
 const credentials=new SessionCredentials();
 let aiError='',pendingAI=null;
+const dialogueDrafts=new Map();
 import { createState, SAVE_KEY } from './state.js';
 import { StoryEngine } from './story-engine.js';
 import { applyChoice } from './choice-engine.js';
@@ -37,6 +38,7 @@ async function render(scroll=false,override=null){
   else if(tab==='world')app.innerHTML=worldsPage(archive);
   else if(tab==='forge')app.innerHTML=ui.forgePage(state);
   else app.innerHTML=aiSettings(state,credentials)+ui.settingsPage(state,storageError,archive.worlds.length);
+  if(tab==='story' && state.ai.mode==='ai'){const input=document.querySelector('#custom-input');if(input)input.value=dialogueDrafts.get(state.worldId)||'';}
   nav.innerHTML=ui.navigation(tab);nav.hidden=(!state.started && tab!=='settings') || !!wizard;
   if(tab==='settings' && !wizard)document.querySelector('#large-text').checked=document.body.classList.contains('large-text');
   if(scroll){window.scrollTo({top:0,behavior:'instant'});app.focus({preventScroll:true});}
@@ -46,12 +48,13 @@ async function runAI(options={}) {
   app.setAttribute('aria-busy','true');
   const status=document.createElement('p');status.className='ai-loading';status.setAttribute('role','status');status.textContent='夢境正在續寫…原旅程已保留，最長等待 45 秒。';app.prepend(status);
   document.querySelectorAll('button').forEach(b=>b.disabled=true);
+  const draftInput=document.querySelector('#custom-input');if(draftInput)draftInput.readOnly=true;
   try{
     const next=await new StoryDirector(world,credentials.adapter()).generate(state,options);
     validateWorldState(next);
     const candidate={...archive,worlds:archive.worlds.map(s=>s.worldId===next.worldId?next:s)};
     if(new TextEncoder().encode(exportSave(candidate)).length>MAX_SAVE_BYTES)throw new Error('存檔容量不足，請先匯出備份並整理世界');
-    state=next;pendingAI=null;save();
+    state=next;pendingAI=null;dialogueDrafts.delete(state.worldId);save();
   }catch(error){aiError=error.message;}
   finally{app.removeAttribute('aria-busy');document.querySelectorAll('button').forEach(b=>b.disabled=false);tab='story';await render(true);}
 }
@@ -91,7 +94,7 @@ document.addEventListener('click',async event=>{
       const next=engine.abilityScene(state,id,targetId);modal.close();tab='story';await render(true,next);
     }
     if(action==='private'){if(state.ai.mode==='ai')await runAI({custom:`向 ${state.characters[id]?id:''} 發出私人邀約；依角色當下意願決定是否接受。`});else {const next=engine.privateScene(state,id);tab='story';await render(true,next);}}
-    if(action==='social'){if(state.ai.mode==='ai')await runAI({custom:`與 ${id} 相處，依對方個性與共同記憶展開新事件。`});else {const next=engine.socialScene(state,id);tab='story';await render(true,next);}}
+    if(action==='social'){if(state.ai.mode==='ai')await runAI({custom:`與 ${id} 相處，依對方個性與共同記憶自然接話。`});else {const next=engine.socialScene(state,id);tab='story';await render(true,next);}}
     if(action==='new-world'){save();wizard=wizardDraft();wizardStep=1;await render(true);}
     if(action==='wizard-back'){collectWizard();wizardStep=Math.max(1,wizardStep-1);await render(true);}
     if(action==='wizard-cancel'){wizard=null;tab='world';await render(true);}
@@ -103,12 +106,12 @@ document.addEventListener('click',async event=>{
     if(action==='raw-export')download(localStorage.getItem(SAVE_KEY)||'{}','dream-world-recovery.json');
     if(action==='reset')showModal(`<h2>重置「${ui.esc(world.name)}」？</h2><p>只重置目前世界。其他 ${archive.worlds.length-1} 個世界保留。</p><button class="danger" data-action="confirm-reset">確認重置目前世界</button>`);
     if(action==='confirm-reset'){
-      aiError='';pendingAI=null;const old=state;state=createState(world);state.started=true;
+      aiError='';pendingAI=null;dialogueDrafts.delete(state.worldId);const old=state;state=createState(world);state.started=true;
       for(const card of old.customCharacters){state.customCharacters.push(structuredClone(card));state.characters[card.id]=createCharacterState();}
       tab='story';save();modal.close();await render(true);
     }
     if(action==='confirm-recovery-reset'){archive=createArchive();syncActive();recoveryBlocked=false;state.started=true;save();modal.close();await render(true);}
-    if(action==='confirm-import'){if(!pendingImport)throw new Error('請重新選取存檔');archive=pendingImport;pendingImport=null;recoveryBlocked=false;syncActive();tab='story';wizard=null;save();modal.close();await render(true);notify('全部世界與目前旅程已恢復。');}
+    if(action==='confirm-import'){if(!pendingImport)throw new Error('請重新選取存檔');archive=pendingImport;pendingImport=null;dialogueDrafts.clear();recoveryBlocked=false;syncActive();tab='story';wizard=null;save();modal.close();await render(true);notify('全部世界與目前旅程已恢復。');}
   }catch(error){notify(error.message);await render();}finally{busy=false;}
 });
 document.addEventListener('submit',async event=>{
@@ -139,9 +142,10 @@ document.addEventListener('submit',async event=>{
     }
   }catch(error){notify(error.message);if(event.target.id==='ai-form'){await render();document.querySelector('#ai-connection-result').textContent=error.message;}}finally{busy=false;}
 });
+document.addEventListener('input',event=>{if(event.target.id==='custom-input' && state.ai.mode==='ai')dialogueDrafts.set(state.worldId,event.target.value);});
 document.addEventListener('change',async event=>{
   if(busy)return;
-  if(event.target.id==='ai-provider'){const input=document.querySelector('#ai-base-url');input.readOnly=event.target.value==='openai';if(input.readOnly)input.value='https://api.openai.com/v1';}
+  if(event.target.id==='ai-provider'){const preset=PROVIDER_PRESETS[event.target.value],input=document.querySelector('#ai-base-url');input.readOnly=!!preset;if(preset){input.value=preset.baseURL;document.querySelector('[name="model"]').value=preset.model;}credentials.clear();document.querySelector('[name="apiKey"]').value='';}
   if(event.target.id==='large-text')document.body.classList.toggle('large-text',event.target.checked);
   if(event.target.id==='gimmick-mode')document.querySelector('#custom-gimmick-fields').hidden=event.target.value!=='custom';
   if(event.target.id!=='import-file')return;

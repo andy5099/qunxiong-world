@@ -34,7 +34,7 @@ export function directorContext(state,world,action) {
     CHARACTERS:scored.map(id=>({id,core:getCharacter(state,id),state:state.characters[id],consent:{flirt:intimacyAllowed(state,world,id,'flirt'),date:intimacyAllowed(state,world,id,'date'),resonance:intimacyAllowed(state,world,id,'resonance')}})),
     CHARACTER_CATALOG:Object.keys(state.characters).map(id=>({id,name:getCharacter(state,id)?.name,relationship:state.characters[id].relationship,met:!!state.flags['met:'+id]})),
     MEMORY:{recent:recent.length?recent:state.memory.recent.slice(-12),longTerm:select(Object.values(ai.facts)),legacyImportant:state.memory.long,olderSceneSummary:ai.summaries,compactedScenes:ai.compactedScenes,relationshipSummary:state.memory.relationshipSummary,worldSummary:state.memory.worldSummary,unresolvedThreads:Object.values(ai.threads).filter(t=>t.status==='active')},
-    PACING:{recentSceneTypes:last.map(s=>s.type),recentLocations:last.map(s=>s.location),recentCharacters:last.flatMap(s=>s.participants),stagnationScore,mustAdvance:stagnationScore>=4},
+    PACING:{recentSceneTypes:last.map(s=>s.type),recentLocations:last.map(s=>s.location),recentCharacters:last.flatMap(s=>s.participants),stagnationScore,guidance:'依玩家意圖延續對話；不強制新事件'},
     TONE:{style:world.theme,comedy:2,romance:3,adultFlirt:2,darkness:2,adventure:4,scale:'0–5；成熟曖昧但不露骨，成年人、自願、尊重界線'},
     ACTION:{intent:action,settledOutcome:state.lastOutcome,rule:'已套用的本地能力效果不可重複發放；敘述結果並建立後續劇情。'}
   });
