@@ -2,6 +2,12 @@ import { getCharacter } from './character-engine.js';
 export const MEMORY_LIMITS = { short:8, long:40, recent:12, character:24 };
 export function remember(state, memory) {
   const entry = { text:memory.text, turn:state.turn, character:memory.character || null };
+  if(memory.important && memory.permanent!==false && state.ai && !Object.values(state.ai.facts).some(f=>f.text===entry.text)){
+    const count=Object.keys(state.ai.facts).length;
+    if(count>=1000)throw new Error('重要記憶已達容量，請匯出後建立新世界；既有記憶保留。');
+    const id=`local-${state.turn}-${count}`;
+    state.ai.facts[id]={id,text:entry.text,character:entry.character,kind:memory.intimate?'romance':'event'};
+  }
   state.memory.short = [...state.memory.short, entry].slice(-MEMORY_LIMITS.short);
   if (memory.important && !state.memory.long.some(m => m.text === entry.text)) state.memory.long = [...state.memory.long, entry].slice(-MEMORY_LIMITS.long);
   if (memory.character && state.characters[memory.character]) {

@@ -4,7 +4,7 @@ export function createCharacterState(character) {
   return { affection:0, trust:0, intimacy:0, intimacyDialogueLevel:0, progress:0, relationship:'陌生人', memories:[], worldMemories:[], flags:{}, mood:'觀望', status:'尚未相遇', history:[], intimacyHistory:[], unlocked:[] };
 }
 export function getCharacter(state,id) {
-  const card=state.customCharacters.find(c=>c.id===id) || characters[id];
+  const card=state.aiCharacters?.find(c=>c.id===id) || state.customCharacters.find(c=>c.id===id) || characters[id];
   if(!card || card.personas.some(p=>p.worldId===state.worldId))return card;
   const preset=worldPresets[state.worldType] || worldPresets.custom,index=['shen','su','gu'].indexOf(id),identity=preset.identity[Math.max(0,index)];
   return {...card,personas:[...card.personas,{worldId:state.worldId,identity,occupation:identity,abilities:'觀察、合作、領域經驗',clothing:'符合目前世界的日常服裝',background:state.definition?.background || preset.background,worldMemories:[]}]};

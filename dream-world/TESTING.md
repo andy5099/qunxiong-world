@@ -1,3 +1,53 @@
+# V0.2 驗證紀錄
+
+日期：2026-09-24。42 組 Node 測試通過（原有 26 + AI 16）。
+
+```sh
+node --test dream-world/tests/*.test.js
+```
+
+## AI 自動測試
+
+- 完整 response schema、3 個不同 label／intent、未成年／原型鍵／未知欄位／數值界限拒絕。
+- 真正本機 HTTP roundtrip：Authorization、JSON mode、messages、回應解析及測試連線。
+- malformed JSON、空結果、截斷、401／429／500 及 timeout／AbortSignal：來源狀態不變。
+- 生成與重寫交易：只回傳新狀態，不突變來源。匯出重載後連續重寫仍無重複 XP、修為、資源、NPC 或重要記憶。
+- AI／離線切換後可繼續；AI 下一幕沒有固定 next scene。
+- AI 新 NPC（含秘密與界線）、地點、任務、伏筆、物品、勢力、秘密完整存檔往返與 context。
+- 120 幕自動摘要後保留最近 12 幕、12 份舊幕摘要、最早承諾及未完成任務，121 個永久事實（含敵人）與早期特殊物品均保留。
+- V0.1.1 migration 比對原數值／記憶；V0.1 真實 fixture 沿用。另一個世界與其他 storage key 不變。
+- 親密條件、拒絕不可撤銷、朋友界線、同意後戀愛成長、未知效果／未解鎖能力拒絕。
+- AI abilityAction 真正扣能量與冷卻，重写不重複扣款。
+- stagnationScore 達門檻時拒絕無推進對話。
+- SessionCredentials 不可 JSON 序列化出金鑰、端點變更清除舊 Key、拒絕非 HTTPS 遠端／URL 夾帶認證。
+- 巢狀檢查點拒絕，生成文字 HTML escaping，Service Worker 模組全量完整與隔離。
+
+原有 160 路線 × 40 回合（6,400 次選擇）及 7 世界 × 4 外掛 × 18 回合（504 次選擇）仍全部執行。
+
+## 瀏覽器操作驗證
+
+本機 `4190` 遊戲搭配 `4192` 模擬 Provider，回應明確標示「本機模擬，非真正 AI」。使用桌面 Chromium 的手機 viewport。
+
+1. 新存檔預設 AI，設定頁含 Provider／Model／Base URL／password Key／Creativity／連線測試。
+2. 真正透過瀏覽器 HTTP 連至本機端點，顯示連線成功。測試發現並修正瀏覽器 fetch 的呼叫綁定問題。
+3. 生成開場出現 3 選項；點第 1 項後第 2 幕、修為 4、EXP 5、能量 44。
+4. 重寫後仍是第 2 幕、修為 4、EXP 5、能量 44；AI 新人「藍笙」出現在角色名冊且只有一位。
+5. 改 Model 為 test-malformed，點選後顯示 JSON 錯誤、第 2 幕與資源不變，提供重新生成／切換離線。
+6. 修正 Model 後重試，進入第 3 幕、修為 6、EXP 10、能量 48，只結算一次。
+7. 自訂行動送出後進入第 4 幕，回到 3 選項，沒有聊天 UI。
+8. UI 匯出 JSON：含新 NPC、4 幕記憶、檢查點；DOM 中的匯出文字不含測試 Token 或 Provider URL。
+9. 切離線後數值保留，原模板三選項可玩；AI 世界資料保留。
+10. 重新開啟分頁保留第 4 幕、修為 8、EXP 15、能量 52；設定回到預設模型且金鑰欄為空。375px 畫面 documentWidth 與 clientWidth 同為 360（扣除捲軸），沒有橫向溢出；實際截圖檢查表單正常。
+
+## 尚未驗收
+
+- 無私人 API 金鑰／額度，未做真實 OpenAI 或第三方模型推論，也未主張通過。支援 OpenAI gpt-4.1-mini 的 HTTP 協定依官方文件實作；使用者需以自己的帳戶按「測試連線」及生成第一幕。
+- 未部署私人 Proxy；本機範例只適合個人使用。
+- 未提供 iPhone Safari 真機／PWA 安裝環境，未驗收；手機尺寸 Chromium 不等同真機。
+- AI 劇情品質與自然語言是否完全遵循提示需真實模型遊玩評估；程式驗證只對結構與機制負責。
+
+## V0.1.1 歷史紀錄（以下是當時版本結果）
+
 # V0.1.1 驗證紀錄
 
 日期：2026-09-24。26 組 Node 測試通過；桌面 Chromium 內嵌瀏覽器，390×844 與 375×812 viewport。

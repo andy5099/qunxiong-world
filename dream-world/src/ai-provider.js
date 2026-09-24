@@ -7,5 +7,5 @@ export function validateScene(scene) {
   if (!scene || typeof scene.sceneText !== 'string' || scene.choices?.length !== 3 || new Set(scene.choices.map(c=>c.id)).size !== 3 || scene.choices.some(c=>typeof c.id !== 'string' || typeof c.label !== 'string')) throw new Error('劇情必須提供三個不同選項');
   return scene;
 }
-// Remote providers must validate effects against the world's allowlist before committing.
-// Generation is read-only: effects are applied only when the player chooses an action.
+// Offline provider context remains compatible. Remote transport lives in ai-adapters.js;
+// StoryDirector validates and atomically commits remote scenes via ai-schema.js.

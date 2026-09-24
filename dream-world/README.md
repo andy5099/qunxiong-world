@@ -1,80 +1,83 @@
-# 夢境世界 V0.1.1
+# 夢境世界 V0.2
 
-多世界手機文字 RPG。全部程式、資料、工具與測試都位於 `dream-world/`；沒有變更其他遊戲。
+手機文字 RPG：AI 即時續寫 → 三選項 → 世界與角色記住 → 下一幕。保留多世界、五步建立世界、角色卡、造物臺、外掛、成年戀愛、存檔、匯入匯出及離線模板模式。所有程式與工具限於 `dream-world/`。
 
-## 遊玩
+## 開始 AI 劇情
 
-- 【世界】→【＋ 建立新世界】：五步完成世界類型、設定、外掛、成年角色、確認建立。
-- 可選修仙、奇幻、現代都市、末日、古代、科幻、自訂世界。建立後立即提供可玩的第一幕與三選項。
-- 每個世界獨立保存玩家、外掛、數值、角色身份與關係、短長期記憶、背包、事件旗標及劇情位置。最多 12 個世界，每個世界最多 20 位自創成年角色。
-- 可繼續／切換／刪除世界；刪除有第二次確認，至少保留一個世界。重置只影響目前世界。
-- 外掛面板可選能力與目標，回到三選項確認使用。一般有效行動 +5 EXP，能力 +7 EXP；15／40／75／120 EXP 依序解鎖 Lv.2–5。
-- 所有世界都能搭配太虛、安全屋、十倍返還、族群繁榮。自訂外掛保存名稱、描述、核心能力、成長方式、資源及觸發條件，並選取一套可執行模板；自由文字不會變成任意執行的程式，也未串接 AI。
+1. 開啟【設定 → AI 劇情】。新世界預設推薦 AI；舊存檔保留離線模式與原進度。
+2. Provider 選 OpenAI，Model 預設 `gpt-4.1-mini`，輸入自己的 API Key，按【測試連線】。
+3. 切回【劇情】，按【生成開場／下一幕】。之後按 1／2／3 即時續寫，也可輸入一次自訂行動。
+4. 【↻ 重寫這一幕】從該幕生成前的檢查點重新生成，取代該幕所有效果，不重複發放 EXP／道具／好感。
+5. 無金鑰或不想連線時，選【離線／模板劇情】。已保存 AI 場景可離線閱讀；繼續生成需要連線。
 
-## 已完成系統
+OpenAI 使用 `/v1/chat/completions`、JSON mode、temperature 與最多 6,000 output tokens。依官方文件核對：[模型](https://developers.openai.com/api/docs/models/gpt-4.1-mini)、[JSON mode](https://developers.openai.com/api/docs/guides/structured-outputs)。需要自己的 API 帳戶權限與額度。
 
-| 系統 | 本版行為 |
+| Provider | 設定 | 驗證範圍 |
+|---|---|---|
+| OpenAI | 固定 `https://api.openai.com/v1`，預設 `gpt-4.1-mini`，自己的 API Key | 正式 HTTP 呼叫已實作；本次無私人金鑰，未做真實付費模型推論 |
+| OpenAI 相容 API | 自填 HTTPS Base URL／模型／Key，需支援 Chat Completions JSON mode、temperature、CORS | 本機 HTTP 模擬端點通過自動測試與瀏覽器完整操作；第三方服務需自行測試 |
+| 自己的 Backend / Proxy | 相同協定；前端持有私人 Proxy Token | 附 `tools/ai-proxy.js`；未替使用者部署公開後端 |
+
+測試連線驗證 Provider 可回傳 JSON；每幕另外做完整 schema、世界 ID、數值、人物與界線驗證。失敗提供【重新生成】【切換離線模式】，不提交待處理回合。45 秒逾時中止請求。額度不足、權限錯誤、截斷、malformed JSON、無效效果都保留原存檔。
+
+## 金鑰與私人 Proxy
+
+API Key、Proxy Token、連線設定只存在目前分頁的 JS 私有記憶體，不存 localStorage、sessionStorage、存檔、匯出檔、Service Worker 或 repository。重新整理需重填，可手動清除。切換 Provider／Base URL 清除前一端點的金鑰。前端記憶體不是伺服器保密庫，不能抵擋惡意瀏覽器擴充套件；僅在自己的可信裝置與端點使用。
+
+生成會把相關遊戲資料送往自己選擇的 Provider，可能產生費用。GitHub Pages 不提供 AI 額度，也沒有共用金鑰。請勿把真實金鑰放進聊天、Git commit 或公開程式。
+
+可選私人 Proxy：Node 22+，透過執行環境的秘密管理／環境變數提供以下值，執行 `node dream-world/tools/ai-proxy.js`。不需建立 `.env` 或金鑰檔。
+
+| 環境變數 | 用途 |
 |---|---|
-| 多世界 | 7 類世界、五步建立、三選項探索／防衛／協商／日常，切換與獨立進度 |
-| 世界規則 | 自訂 2–8 項數值，第一項為成長、第二項為可投入資源；人口／領地／外交等預設會綁定世界系統 |
-| 太虛系統 | 開局仙緣之眼；Lv.2 共夢、Lv.3 共鳴、Lv.4 仙元煉化；能量、體力、冷卻與任務 |
-| 仙緣之眼 | Lv.1 基本身份／關係／契合，Lv.2 喜好心情，Lv.3 瓶頸提示，Lv.4 且有信任時揭露隱藏情報 |
-| 仙緣共鳴 | 成年、相識、信任與個性判定；兩方獲得成長，依能力層次／契合／信任計算，消耗能量及體力，產生仙元 |
-| 其他外掛 | 安全屋建設、招募／人口與領地、十倍資源返還，均有實際世界效果與成長解鎖 |
-| 成年角色 | 跨世界核心人格、當地身份；好感／信任／親密獨立，對話等級 0–4 |
-| 關係互動 | 三位角色不同的曖昧、調情、邀約與親近後對話；私人邀約可被拒絕，朋友界線不會被數值覆蓋 |
-| 自創角色 | 可在目前世界相處／邀約；建立新世界時也可選入，關係與記憶重新開始 |
-| 保存 | 全世界自動／手動保存、JSON 匯出匯入、4 MB 上限、覆蓋確認、格式驗證與文字備份入口 |
+| `DREAM_AI_KEY` | 後端供應器金鑰，必填 |
+| `DREAM_PROXY_TOKEN` | 隨機私人 Token，至少 24 字元，必填 |
+| `DREAM_AI_MODEL` | 預設 `gpt-4.1-mini`，後端固定模型 |
+| `DREAM_AI_BASE_URL` | 預設 `https://api.openai.com/v1/`，僅 HTTPS |
+| `DREAM_ALLOWED_ORIGINS` | 逗號分隔 Origin，預設 Pages Origin 與本機 4190 |
+| `DREAM_PROXY_PORT` | 預設 4191，只綁 `127.0.0.1` |
 
-新建立世界使用本地可重玩的事件模板與動態狀態文字，不是任意 AI 長篇生成。本版沒有新增大量固定主線，太虛第一卷仍保留。高親密互動以非露骨的成年恋愛對話呈現。
+本機前端 Base URL 填 `http://127.0.0.1:4191/v1`，金鑰欄填 Proxy Token。遠端使用自己管理的 HTTPS 反向代理連到 loopback，保持 Token 驗證與精確 Origin 白名單，勿直接公開此服務。範例供私人單人使用，有單請求限制、body 上限、逾時、禁止轉址，不記錄請求／金鑰。多人服務另需帳號認證、配額及監控。Pages 連到本機 HTTP 可能受瀏覽器政策限制，遠端使用 HTTPS Proxy。
 
-## 資料與引擎
+## 引擎與交易
 
-- `src/archive-engine.js`：世界集合、目前世界、建立／切換／刪除、可共用角色名冊。
-- `src/world-factory.js`、`data/worlds/presets.js`：世界設定驗證、各類預設、生成可玩模組。成長和資源以 World Module 的 growthStat／resourceStat 對應，核心不要求「修為」。
-- `src/gimmick-engine.js`、`data/gimmicks/templates.js`：能力模板、分級、EXP、資源、任務、冷卻、已知機制結算。
-- `src/character-engine.js`、`relationship-engine.js`：跨世界人格、當地身份、獨立關係與 intimacyDialogueLevel。
-- `data/intimacy/dialogue.js`：分角色、分等級台詞及意願門檻；`events.js` 是通用相處／私人邀約；`moon.js` 是原有月下事件。
-- `src/intimacy-engine.js`：成年、關係、信任、親密、旗標與私人界線判定；沒有內嵌事件台詞。機器可判定的界線為角色 flags.platonic／refusePrivate，搭配人物資料中的溝通界線與個性門檻。
-- `src/story-engine.js`、`choice-engine.js`：三選項、外掛選項替換、共通結算、記憶與事件更新；自訂行動確認後回到原故事。
-- `src/ai-provider.js`：保留供應器替換介面，context 含世界、玩家、外掛、背包、關係與有界記憶。未接 API。
-- `src/media-engine.js`：沿用 image／video／none 占位與播放後結算。未接任何生成 API。
-- `src/world-ui.js`：世界管理、五步建立與外掛面板；`src/ui.js` 是閱讀／角色／存檔頁；`main.js` 負責操作協調。
+- `ai-adapters.js`：可替換 `AIProvider.generateScene({system,context})`，正式 HTTP transport、記憶體憑證與測試連線。Story Director 不含廠商 API URL／金鑰／HTTP 規則。
+- `story-director.js`：clone 狀態 → Choice Engine 暫存行動／本地外掛效果 → context → Provider → schema 與語意限制 → 新狀態。UI 驗證完整存檔格式與大小後才提交。
+- `ai-schema.js`：必填欄位、正好三個不同 label／intent、有界文字／數值、成年人物、ID allowlist；拒絕任意效果程式與未知欄位。
+- AI 選項可带 `abilityAction:{ability,target}`，由本地 Gimmick Engine 檢查等級／能量／冷卻及意願，再請 AI 描寫後續；`gimmickEvents` 不直接提供任意能力或重複獎勵。
+- `intimacyChecks` 由既有 Intimacy Engine 判斷。曖昧、邀約、共鳴有不同門檻；拒絕／朋友界線不能被 AI 清除。成熟戀愛以非露骨形式呈現。文字語意與選項趣味仍取決於模型品質，程式不能證明所有自然語言完全合規。
+- `ai-save.js`：子格式 `ai.version:1`，檢查點僅一層，避免遞迴保存整個歷史。
+- `story-engine.js` 保留離線模板、自訂行動、外掛面板與相處事件。Media Engine 保留；AI media 目前只接受 null，未加入影像生成。
 
-## 存檔 migration
+## 記憶與世界連續性
 
-仍使用 `qunxiongDreamWorldSaveV1`，不讀写其他遊戲的 key。格式升為：
+每世界獨立保存場景、最近 12 幕完整文字、世界時間、AI 人物、地點、物品／勢力／秘密／事件／能力、任務與伏筆。AI NPC 有 Character Card，可在角色頁查看、相處並保存共同記憶。
 
-```js
-{
-  version: 2,
-  activeWorldId: 'taixu',
-  worlds: [ /* 完整、彼此獨立的 World State */ ],
-  savedAt: '...'
-}
-```
+超過 12 幕，自動抽取舊幕的回合／類型／地點／人物／行動與前 240 字摘要，保留最近 12 份舊幕摘要。不靠模型重寫歷史。重要事實另存永久 ledger，不因摘要被刪除；人物／物品／能力／任務另有永久表。升級時將舊版長期記憶複製到 ledger；後續離線重要事件也會寫入。
 
-World State 保留原命名，避免無必要的轉換：worldId、worldType、definition（世界規則／數值定義）、player、gimmick、stats、characters（含 relationships）、customCharacters、memory、inventory、worldState、flags、sceneId（currentScene）、memory.recent（eventHistory）。不另外維護容易失去同步的別名。
+每次提供 WORLD、PLAYER、相關最多 6 人（完整人格、身份、關係、意願）、最近 12 幕、相關最多 40 個重要事實、摘要、未完成任務與伏筆、PACING、TONE。另附人物與世界內容的精簡名冊。近期參與或行動提到的人物優先；承諾、敵人、戀愛、伏筆優先。完整歷史與檢查點不傳給 AI；有界檢索不表示每次將所有永久記憶放入 prompt。
 
-讀取或匯入 V0.1 單世界存檔時，包裝為 worlds[0]，原 sceneId、turn、stats、characters、memories、flags 不清除；補上新欄位與太虛系統，按既有回合數給予初始 EXP。首次本機自動升級會先備份原 JSON 到 `qunxiongDreamWorldSaveV1MigrationBackupV1`。備份／保存遇到配額問題時保留已讀取的旅程於記憶體，提示匯出，不假裝寫入成功。
+容量：最多 12 世界；每世界 20 位手動角色、100 AI NPC、200 地點、500 世界內容、200 任務、200 伏筆、1,000 重要事實。整份存檔 4 MB。達上限拒絕新回合並提示備份，不悄悄刪除重要記憶。普通舊幕逐字原文會摘要化；重要承諾與結果由永久資料保存。模型若未填入結構欄位，程式不能辨識所有隱含的重要事實。
 
-匯入先完整驗證所有世界，再讓使用者確認覆蓋。拒絕重複 worldId、缺失的 activeWorldId、非法場景／能力資料／資源、原型鍵值和過量資料。界面對使用者文字做 escaping；自訂描述不作為程式執行。
+## 存檔與原功能
+
+仍只使用 `qunxiongDreamWorldSaveV1`，外層 `version:2` 與 worlds 集合相容 V0.1.1。缺少 AI 欄位的舊存檔補資料並保持 offline；原回合、sceneId、數值、角色關係、記憶與世界保留。V0.1 原始 JSON 升級前另作專用 migration backup。匯入完整驗證後再確認取代；不讀寫其他遊戲 key。
+
+AI 模式保留 sceneId 作離線返回位置，但 AI 下一幕不查事件樹。切離線可繼續原模板路線；既有 AI 人物與永久資料保留。離線行動後清除過期 AI 畫面，下次切回重新續寫。切世界、重置、匯入及造物臺會清除不再適用的待生成請求或重寫檢查點。
+
+七種世界、五步建立、四種外掛、Lv.1–5、EXP／能量／冷卻／共鳴／仙元／安全屋／十倍返還／族群繁榮、角色對話等級與原 UI 均保留。世界可個別刪除或重置，匯出涵蓋全部世界。
 
 ## 本機開發
 
 ```sh
-node dream-world/tools/serve.js 4181
+node dream-world/tools/serve.js 4190
 node --test dream-world/tests/*.test.js
 ```
 
-網址：`http://127.0.0.1:4181/dream-world/`。無套件安裝與大型 framework。
+網址 `http://127.0.0.1:4190/dream-world/`，無新增框架或依賴。詳見 `TESTING.md`。
 
-`tests/playable-save.json` 是原始 V0.1 migration fixture，請保留；`tests/create-fixture.js` 另產生 `generated-v011-save.json`，不覆蓋舊 fixture。
+UI 模擬：另跑 `node dream-world/tests/mock-provider.js`，選相容 API，Base URL `http://127.0.0.1:4192/v1`，Model `local-ui-test`，任意測試 Token。回應明確標示本機模擬，不是 AI 推論，不會自動啟用。Model `test-malformed`／`test-error` 可測錯誤。不要填真實金鑰。
 
-Service worker 的 GET 處理與 cache 清理只限 Dream World，完整快取所有本地模組。新版快取完成後啟用；已開啟的舊頁請重新整理載入新模組。Manifest scope 仍是本遊戲目錄。
+Service Worker 只快取本遊戲靜態檔；POST AI 請求不快取、不重播。更新後重新整理使用新版。原始 `tests/playable-save.json` 保持不動。
 
-## 驗證與範圍
-
-詳見 `TESTING.md`。目前以桌面 Chromium 的 375／390 viewport 驗證，未聲稱 iPhone Safari 真機或安裝 PWA 已驗收。圖片／影片實際內容、AI API、完整的策略戰爭模擬與自由文字生成主線不在本次範圍。
-
-GitHub Pages： https://andy5099.github.io/qunxiong-world/dream-world/
+GitHub Pages：https://andy5099.github.io/qunxiong-world/dream-world/

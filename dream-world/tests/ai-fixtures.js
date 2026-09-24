@@ -1,0 +1,4 @@
+export function response(overrides={}) {
+  return {sceneText:'霧中傳來三聲鐘響。沈清霜收起劍，將一張寫著潮汐時刻的紙條放在你掌心。「這次別落在我後面。」山道另一端，一盞青燈忽然熄滅。',sceneType:'discovery',location:'gate',timeAdvance:15,participants:['shen'],intimacyChecks:[],choices:[{label:'沿山道調查鐘聲',intent:'謹慎調查鐘聲來源',risk:'較穩健'}, {label:'追上熄燈的旅人',intent:'冒險追蹤可疑旅人',risk:'可能遭遇埋伏'},{label:'請沈清霜解讀紙條',intent:'與沈清霜合作研究線索',risk:'需要彼此信任'}],stateChanges:{stats:{cultivation:2},inventory:{},worldState:{},entities:[],threads:[]},relationshipChanges:{shen:{met:true,trust:2,affection:1}},memoryUpdates:[],newCharacters:[],newLocations:[],questUpdates:[],gimmickEvents:[],media:null,...overrides};
+}
+export const npc={id:'ai-lan',name:'藍笙',age:28,identity:'行商',corePersonality:'機敏而重諾',speechStyle:'喜歡用航海比喻',background:'帶著失蹤船隊的線索',boundaries:'不接受強迫；討厭被欺騙',secret:'正在尋找姐姐'};
