@@ -1,0 +1,9 @@
+export const worldPresets = {
+  cultivation:{name:'修仙',title:'雲外仙途',role:'初入宗門的散修',intro:'靈脈重現，山門重新向異鄉人開啟。',rules:'宗門、散修與靈獸共存。機緣需要探索，修行需要積累。',background:'一座失落洞府最近重現於雲海。',stats:'修為|0\n靈石|10\n靈力|50',gimmick:'taixu',place:'山門集市',goal:'洞府線索',identity:['同行劍修','靈物商人','山門掌事']},
+  fantasy:{name:'奇幻',title:'哥布林異世界',role:'最低階哥布林',intro:'魔物、精靈、人類、獸人與魔族共享這片大地。',rules:'種族不決定善惡。領地、資源、外交與戰爭都會改變族群命運。',background:'你的部落只剩一處營火，邊境使者卻已抵達。',stats:'血脈|0\n資源|10\n體力|50\n人口|5\n領地|1\n外交|0\n戰備|0',gimmick:'prosperity',place:'邊境營地',goal:'部落盟約',identity:['成年遊俠','行商','城邦使者']},
+  modern:{name:'現代都市',title:'霓虹之下',role:'剛到城市的自由工作者',intro:'工作、行程與人際關係，交織成城市裡的新生活。',rules:'金錢有限，時間有價。社會關係來自持續的行動。',background:'一份意外邀約，讓你接觸到城市的另一面。',stats:'工作能力|0\n金錢|10\n心情|50\n行程進度|0\n人脈|0',gimmick:'return',place:'街角咖啡館',goal:'合作邀約',identity:['專案主管','咖啡館主理人','企業負責人']},
+  apocalypse:{name:'末日',title:'末日安全屋',role:'失去基地的倖存者',intro:'長夜籠罩城市，安全的燈火比黃金更珍貴。',rules:'生命與物資有限。基地、科技與倖存者的協作決定能走多遠。',background:'無線電中傳來一段反覆播放的求援訊號。',stats:'科技|0\n物資|10\n生命|50\n基地|0\n倖存者|1\n危險度|10',gimmick:'shelter',place:'廢棄車站',goal:'求援訊號',identity:['生存隊長','物資調度員','基地指揮官']},
+  ancient:{name:'古代',title:'長安夜雨',role:'初至京城的遊士',intro:'驛道與市井相通，一封書信牽動各方命運。',rules:'聲望、盤纏與人情同樣重要。承諾會留下後果。',background:'客棧裡有人在等一位從未見過的信使。',stats:'見識|0\n盤纏|10\n精神|50',gimmick:'return',place:'城南客棧',goal:'密函去向',identity:['女俠','商會掌櫃','城主']},
+  scifi:{name:'科幻',title:'星港餘光',role:'停泊邊境的領航員',intro:'躍遷航道之外，失聯的星站再次發出座標。',rules:'能源、科技與艦隊協作決定生存。未知訊號必須驗證。',background:'你的導航系統出現一組不屬於任何星圖的路徑。',stats:'科技|0\n能源|10\n艦體|50',gimmick:'shelter',place:'邊境星港',goal:'失聯座標',identity:['護航艦長','情報經紀人','星站指揮官']},
+  custom:{name:'自訂世界',title:'未命名的夢',role:'異鄉旅人',intro:'這個世界的第一條規則，由你寫下。',rules:'所有可發展關係的角色均為成年人，互動尊重意願。',background:'一道陌生的門向你敞開。',stats:'成長|0\n資源|10\n狀態|50',gimmick:'taixu',place:'初始據點',goal:'世界的祕密',identity:['同行者','情報商','引路人']}
+};

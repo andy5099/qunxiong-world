@@ -5,13 +5,15 @@ import { createState, SAVE_KEY } from '../src/state.js';
 import { StoryEngine } from '../src/story-engine.js';
 import { applyChoice } from '../src/choice-engine.js';
 import { createAdultCharacter, createCharacterState } from '../src/character-engine.js';
-import { parseSave, exportSave, readSave, writeSave } from '../src/save.js';
+import { parseSave as parseArchive, exportSave, readSave as readArchive, writeSave } from '../src/save.js';
 import { eligibleIntimacyEvent } from '../src/intimacy-engine.js';
 import { buildContext } from '../src/ai-provider.js';
 import { registerWorld } from '../src/world-engine.js';
 import { safeMediaURL, presentMedia } from '../src/media-engine.js';
 import { characters } from '../data/characters/cast.js';
 const engine=new StoryEngine(world);
+const parseSave=text=>parseArchive(text).worlds[0];
+const readSave=storage=>readArchive(storage).worlds[0];
 async function choose(state,id){const scene=await engine.scene(state),choice=scene.choices.find(c=>c.id===id);assert.ok(choice,`${state.sceneId} missing ${id}`);return applyChoice(state,world,choice);}
 async function complete(){let s=createState(world);s.started=true;for(const id of ['greet','cake','shield','invite','sync','credit','su-respect','together'])s=await choose(s,id);return s;}
 test('first world, adult cast, and media contracts',async()=>{
@@ -20,7 +22,7 @@ test('first world, adult cast, and media contracts',async()=>{
  for(const e of Object.values(world.events)){assert.deepEqual(e.media,{type:'none',src:null,prompt:null});for(const c of e.choices)assert.ok(world.events[c.next]);}
 });
 test('opening choices change route, trust, flags and memories independently',async()=>{
- const outcomes=await Promise.all(['greet','tease','scan'].map(id=>choose(createState(world),id)));
+ const outcomes=await Promise.all(['greet','tease','gimmick-eye'].map(id=>choose(createState(world),id)));
  assert.equal(new Set(outcomes.map(s=>s.sceneId)).size,3);assert.equal(new Set(outcomes.map(s=>s.characters.shen.trust)).size,3);assert.equal(new Set(outcomes.map(s=>s.memory.long[0].text)).size,3);
 });
 test('complete shared route, breakthrough, Su and Gu, relationship event',async()=>{
@@ -30,7 +32,7 @@ test('complete shared route, breakthrough, Su and Gu, relationship event',async(
  assert.equal((await engine.scene(s)).choices.length,3);
 });
 test('low-trust route respects refusal and still progresses',async()=>{
- let s=createState(world);for(const id of ['scan','stepback','leaf','seal'])s=await choose(s,id);
+ let s=createState(world);for(const id of ['tease','double','leaf','seal'])s=await choose(s,id);
  assert.ok(!(await engine.scene(s)).choices.some(c=>c.id==='invite'));s=await choose(s,'hesitant');assert.equal(s.sceneId,'soloDream');assert.ok(s.flags.declined);
  for(const id of ['rune','boast','su-flirt','su-advice'])s=await choose(s,id);assert.equal(s.sceneId,'hub');assert.equal((await engine.scene(s)).choices.length,3);
 });
@@ -48,8 +50,8 @@ test('save, reload, export/import and isolated namespace',async()=>{
  const map=new Map([['other-game','untouched']]),storage={getItem:k=>map.get(k)||null,setItem:(k,v)=>map.set(k,v)};const s=await complete();writeSave(s,storage);const loaded=readSave(storage);assert.equal(loaded.sceneId,s.sceneId);assert.deepEqual(loaded.characters,s.characters);assert.deepEqual(loaded.memory,s.memory);assert.equal(map.get('other-game'),'untouched');assert.ok(map.has(SAVE_KEY));assert.equal(parseSave(exportSave(s)).stats.realm,2);
 });
 test('reject malformed/oversized saves and preserve current state',async()=>{
- const s=await complete(),copy=structuredClone(s);for(const patch of [{version:2},{worldId:'missing'},{sceneId:'missing'},{sceneId:'constructor'},{stats:{}},{characters:{}},{memory:null},{flags:{constructor:true}}])assert.throws(()=>parseSave(JSON.stringify({...s,...patch})));
- assert.throws(()=>parseSave('{'));assert.throws(()=>parseSave(' '.repeat(500001)));assert.deepEqual(s,copy);
+ const s=await complete(),copy=structuredClone(s);for(const patch of [{version:99},{worldId:'missing'},{sceneId:'missing'},{sceneId:'constructor'},{stats:{}},{characters:{}},{memory:null},{flags:{constructor:true}}])assert.throws(()=>parseSave(JSON.stringify({...s,...patch})));
+ assert.throws(()=>parseSave('{'));assert.throws(()=>parseSave(' '.repeat(4000001)));assert.deepEqual(s,copy);
 });
 test('adult creation, validation and save roundtrip',()=>{
  assert.throws(()=>createAdultCharacter({name:'A',age:17},world.id,'custom-a'));const s=createState(world),c=createAdultCharacter({name:'江聽雨',age:24,appearance:'深色短髮'},world.id,'custom-a');s.customCharacters.push(c);s.characters[c.id]=createCharacterState();const loaded=parseSave(exportSave(s));assert.equal(loaded.customCharacters[0].name,'江聽雨');assert.equal(loaded.customCharacters[0].appearance,'深色短髮');

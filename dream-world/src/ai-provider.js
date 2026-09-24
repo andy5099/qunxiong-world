@@ -1,6 +1,6 @@
 import { getCharacter } from './character-engine.js';
 export function buildContext(state, world) {
-  return structuredClone({ world:{id:world.id,name:world.name,theme:world.theme,rules:world.rules,stats:world.stats}, recentStory:state.memory.recent.slice(-6), player:{...state.player,stats:state.stats}, characters:Object.keys(state.characters).filter(id=>state.flags[`met:${id}`]).map(id=>({core:getCharacter(state,id),persona:getCharacter(state,id)?.personas.find(p=>p.worldId===world.id),state:state.characters[id]})), memories:{short:state.memory.short,long:state.memory.long,relationshipSummary:state.memory.relationshipSummary,worldSummary:state.memory.worldSummary},flags:state.flags });
+  return structuredClone({ world:{id:world.id,name:world.name,theme:world.theme,rules:world.rules,stats:world.stats}, gimmick:state.gimmick,inventory:state.inventory,worldState:state.worldState,recentStory:state.memory.recent.slice(-6), player:{...state.player,stats:state.stats}, characters:Object.keys(state.characters).filter(id=>state.flags[`met:${id}`]).map(id=>({core:getCharacter(state,id),persona:getCharacter(state,id)?.personas.find(p=>p.worldId===world.id),state:state.characters[id]})), memories:{short:state.memory.short,long:state.memory.long,relationshipSummary:state.memory.relationshipSummary,worldSummary:state.memory.worldSummary},flags:state.flags });
 }
 export class AIProvider { async generateScene(_context) { throw new Error('請實作 generateScene(context)'); } }
 export function validateScene(scene) {

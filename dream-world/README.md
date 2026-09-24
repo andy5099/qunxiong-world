@@ -1,73 +1,80 @@
-# 夢境世界 V0.1
+# 夢境世界 V0.1.1
 
-獨立手機文字 RPG，第一個 World Module 為《太虛仙緣》。不依賴其他遊戲的程式或素材。
+多世界手機文字 RPG。全部程式、資料、工具與測試都位於 `dream-world/`；沒有變更其他遊戲。
 
-## 遊玩與開發
+## 遊玩
 
-從儲存庫根目錄執行：
+- 【世界】→【＋ 建立新世界】：五步完成世界類型、設定、外掛、成年角色、確認建立。
+- 可選修仙、奇幻、現代都市、末日、古代、科幻、自訂世界。建立後立即提供可玩的第一幕與三選項。
+- 每個世界獨立保存玩家、外掛、數值、角色身份與關係、短長期記憶、背包、事件旗標及劇情位置。最多 12 個世界，每個世界最多 20 位自創成年角色。
+- 可繼續／切換／刪除世界；刪除有第二次確認，至少保留一個世界。重置只影響目前世界。
+- 外掛面板可選能力與目標，回到三選項確認使用。一般有效行動 +5 EXP，能力 +7 EXP；15／40／75／120 EXP 依序解鎖 Lv.2–5。
+- 所有世界都能搭配太虛、安全屋、十倍返還、族群繁榮。自訂外掛保存名稱、描述、核心能力、成長方式、資源及觸發條件，並選取一套可執行模板；自由文字不會變成任意執行的程式，也未串接 AI。
+
+## 已完成系統
+
+| 系統 | 本版行為 |
+|---|---|
+| 多世界 | 7 類世界、五步建立、三選項探索／防衛／協商／日常，切換與獨立進度 |
+| 世界規則 | 自訂 2–8 項數值，第一項為成長、第二項為可投入資源；人口／領地／外交等預設會綁定世界系統 |
+| 太虛系統 | 開局仙緣之眼；Lv.2 共夢、Lv.3 共鳴、Lv.4 仙元煉化；能量、體力、冷卻與任務 |
+| 仙緣之眼 | Lv.1 基本身份／關係／契合，Lv.2 喜好心情，Lv.3 瓶頸提示，Lv.4 且有信任時揭露隱藏情報 |
+| 仙緣共鳴 | 成年、相識、信任與個性判定；兩方獲得成長，依能力層次／契合／信任計算，消耗能量及體力，產生仙元 |
+| 其他外掛 | 安全屋建設、招募／人口與領地、十倍資源返還，均有實際世界效果與成長解鎖 |
+| 成年角色 | 跨世界核心人格、當地身份；好感／信任／親密獨立，對話等級 0–4 |
+| 關係互動 | 三位角色不同的曖昧、調情、邀約與親近後對話；私人邀約可被拒絕，朋友界線不會被數值覆蓋 |
+| 自創角色 | 可在目前世界相處／邀約；建立新世界時也可選入，關係與記憶重新開始 |
+| 保存 | 全世界自動／手動保存、JSON 匯出匯入、4 MB 上限、覆蓋確認、格式驗證與文字備份入口 |
+
+新建立世界使用本地可重玩的事件模板與動態狀態文字，不是任意 AI 長篇生成。本版沒有新增大量固定主線，太虛第一卷仍保留。高親密互動以非露骨的成年恋愛對話呈現。
+
+## 資料與引擎
+
+- `src/archive-engine.js`：世界集合、目前世界、建立／切換／刪除、可共用角色名冊。
+- `src/world-factory.js`、`data/worlds/presets.js`：世界設定驗證、各類預設、生成可玩模組。成長和資源以 World Module 的 growthStat／resourceStat 對應，核心不要求「修為」。
+- `src/gimmick-engine.js`、`data/gimmicks/templates.js`：能力模板、分級、EXP、資源、任務、冷卻、已知機制結算。
+- `src/character-engine.js`、`relationship-engine.js`：跨世界人格、當地身份、獨立關係與 intimacyDialogueLevel。
+- `data/intimacy/dialogue.js`：分角色、分等級台詞及意願門檻；`events.js` 是通用相處／私人邀約；`moon.js` 是原有月下事件。
+- `src/intimacy-engine.js`：成年、關係、信任、親密、旗標與私人界線判定；沒有內嵌事件台詞。機器可判定的界線為角色 flags.platonic／refusePrivate，搭配人物資料中的溝通界線與個性門檻。
+- `src/story-engine.js`、`choice-engine.js`：三選項、外掛選項替換、共通結算、記憶與事件更新；自訂行動確認後回到原故事。
+- `src/ai-provider.js`：保留供應器替換介面，context 含世界、玩家、外掛、背包、關係與有界記憶。未接 API。
+- `src/media-engine.js`：沿用 image／video／none 占位與播放後結算。未接任何生成 API。
+- `src/world-ui.js`：世界管理、五步建立與外掛面板；`src/ui.js` 是閱讀／角色／存檔頁；`main.js` 負責操作協調。
+
+## 存檔 migration
+
+仍使用 `qunxiongDreamWorldSaveV1`，不讀写其他遊戲的 key。格式升為：
+
+```js
+{
+  version: 2,
+  activeWorldId: 'taixu',
+  worlds: [ /* 完整、彼此獨立的 World State */ ],
+  savedAt: '...'
+}
+```
+
+World State 保留原命名，避免無必要的轉換：worldId、worldType、definition（世界規則／數值定義）、player、gimmick、stats、characters（含 relationships）、customCharacters、memory、inventory、worldState、flags、sceneId（currentScene）、memory.recent（eventHistory）。不另外維護容易失去同步的別名。
+
+讀取或匯入 V0.1 單世界存檔時，包裝為 worlds[0]，原 sceneId、turn、stats、characters、memories、flags 不清除；補上新欄位與太虛系統，按既有回合數給予初始 EXP。首次本機自動升級會先備份原 JSON 到 `qunxiongDreamWorldSaveV1MigrationBackupV1`。備份／保存遇到配額問題時保留已讀取的旅程於記憶體，提示匯出，不假裝寫入成功。
+
+匯入先完整驗證所有世界，再讓使用者確認覆蓋。拒絕重複 worldId、缺失的 activeWorldId、非法場景／能力資料／資源、原型鍵值和過量資料。界面對使用者文字做 escaping；自訂描述不作為程式執行。
+
+## 本機開發
 
 ```sh
-node dream-world/tools/serve.js
+node dream-world/tools/serve.js 4181
 node --test dream-world/tests/*.test.js
 ```
 
-預覽：`http://127.0.0.1:4173/dream-world/`。使用 HTTP 靜態伺服器，不能直接以 `file://` 開啟 ES Modules。
+網址：`http://127.0.0.1:4181/dream-world/`。無套件安裝與大型 framework。
 
-GitHub Pages 預定位置：https://andy5099.github.io/qunxiong-world/dream-world/
+`tests/playable-save.json` 是原始 V0.1 migration fixture，請保留；`tests/create-fixture.js` 另產生 `generated-v011-save.json`，不覆蓋舊 fixture。
 
-沿用儲存庫既有 Pages workflow；推送至部署分支後才會發布。此目錄沒有新增部署設定，也不修改入口或其他遊戲。
+Service worker 的 GET 處理與 cache 清理只限 Dream World，完整快取所有本地模組。新版快取完成後啟用；已開啟的舊頁請重新整理載入新模組。Manifest scope 仍是本遊戲目錄。
 
-## V0.1 範圍
+## 驗證與範圍
 
-- 第一卷包含 17 個場景。三種初遇路線、試劍坪事件、尊重拒絕的夢境邀請、共修或獨自探索、煉氣二層突破、蘇媚璃登場及顧傾城召見伏筆。
-- 通關後可繼續日常互動、共修、聽雨閣交流；月下事件可成為戀人、慢慢來或保留朋友關係。朋友界線不會被後續數值自動覆蓋。
-- 每幕恰好三個可用選項；桌面可按 1／2／3，手機使用大型按鈕。
-- 三位成年角色的 Core / World Persona、三條獨立關係數值、角色狀態、資訊解鎖、互動及親密事件記憶。
-- 自訂行動是本地意圖規劃：確認後回到原本三選項。不會假裝理解所有自由輸入，也不會憑空完成輸入中宣稱的事件。
-- 造物臺可建立至多 20 位成年角色並保存於目前世界；專屬劇情尚未實作。
-- 自動保存、手動保存、JSON 匯出／匯入／格式驗證／覆蓋確認、獨立重置。下載受限時可使用匯出對話框的完整 JSON 文字。
-- 深色直式閱讀、加大字體（目前頁面工作階段）、safe-area 底部導航、減少動態偏好。
+詳見 `TESTING.md`。目前以桌面 Chromium 的 375／390 viewport 驗證，未聲稱 iPhone Safari 真機或安裝 PWA 已驗收。圖片／影片實際內容、AI API、完整的策略戰爭模擬與自由文字生成主線不在本次範圍。
 
-## 五層架構
-
-| 層 | 檔案 | 職責 |
-|---|---|---|
-| Core | `src/state.js`、`world-engine.js`、`choice-engine.js` | 依世界定義初始化／限制數值，驗證選項條件，純函式結算 |
-| World Module | `data/worlds/taixu.js` | 題材、玩家身份、地點、數值、規則、場景入口、世界語氣 |
-| Character | `data/characters/cast.js`、`character-engine.js`、`relationship-engine.js` | 跨世界人格及各世界身份，關係與解鎖資料 |
-| Story / Event | `data/events/taixu.js`、`story-engine.js`、`intimacy-engine.js` | 條件式分支、文字、選項、效果、記憶、成年及關係門檻 |
-| Media | `src/media-engine.js`、事件的 `media` | 圖／影播放與文字降級；關閉或播放結束才結算選擇 |
-
-`ui.js` 負責資料呈現，`main.js` 負責操作協調，兩者不定義角色人格或故事結果。
-
-新增世界：提供必要 World Module 欄位，透過 `registerWorld()` 註冊並給 `StoryEngine`；加入初始 registry／世界切換介面即可。核心不檢查煉氣、修為或特定角色名字。測試使用獨立的都市金錢數值驗證這點。V0.1 尚未提供世界切換 UI 或多存檔槽，state 已包含 worldId、slotId。
-
-新增角色：提供 Core 與 personas（worldId、identity、occupation、abilities、clothing、background、worldMemories），將 ID 加入 World Module 的 characters，故事事件用 ID 指向該角色。成年判定為 `adult: true` 且年齡至少 18。
-
-新增事件：提供 id、text（字串或依 state 產生的函式）、choices；每個選項包含 requirements、next、result、effects、memoryEffects、media。候選選項依條件過濾後取前三個，必須提供足夠 fallback。親密事件另有 characters、requirements、relationshipRequirement、affectionRequirement、trustRequirement、intimacyRequirement、worldRequirement；進入時與播放前均需符合條件。一次性事件以旗標記錄。
-
-## AI Provider 與記憶
-
-`StoryEngine(world, provider)` 可替換或混用 `AIProvider.generateScene(context)`。本地供應器不只讀固定 JSON，也會依旗標、關係、數值篩選選項與產生文字。
-
-供應器回應契約：sceneText、choices[3]、stateEffects、memoryUpdates、possibleMediaEvent。V0.1 效果放在選項中，由玩家確認後結算；不會自動執行模型輸出。接遠端模型前，需再做 effects allowlist／完整輸出 schema 驗證與後端代理；目前沒有 API 金鑰或外部請求。
-
-context 包含世界法則、玩家、已相遇角色卡／身份／關係、最近六次劇情、短期及重要記憶、關係／世界摘要與旗標。短期 8 筆、長期 40 筆、最近事件 12 筆、每角色 24 筆；不無限累積聊天紀錄。保存的記憶在選擇時更新，UI 揭露弱點／秘密受信任或 unlock 控制。
-
-## 存檔與隔離
-
-- 唯一 localStorage key：`qunxiongDreamWorldSaveV1`。
-- 匯入上限 500 KB；驗證版本、世界、場景、角色、成年、數值、旗標、記憶結構；剔除非 schema 欄位。輸入文字以 HTML escaping 呈現。
-- 壞存檔不自動覆蓋：首次開啟會提供原始備份及明確重置選項。
-- Manifest scope／start_url 都限於此目錄。
-- Service worker 的 scope 為 `/dream-world/`；僅處理該 scope 的 GET，僅清理 `dream-world-` 開頭 cache。版本更新改 CACHE 名稱；舊頁面關閉後啟用新版本。
-- 媒體路徑僅允許此遊戲同源 `assets/` 之下，不抓取任意外部內容。沒有 media 時立即回到文字流程。V0.1 沒有實際事件圖／影片素材。
-- 所有新增檔案、工具、測試都在此目錄。沒有改動 `/lineage-text/` 或其他既有遊戲。
-
-## 後續範圍
-
-AI API、多世界生成與切換、多存檔槽、自創角色劇情、宗主後續章節、實際圖片／影片內容、進一步境界成長尚未完成。V0.1 主線提升至煉氣二層，通關後修為可持續累積。未聲稱 iOS 真機／Safari 或安裝型 PWA 已驗證。
-
-## 測試
-
-見 `TESTING.md`。`tests/create-fixture.js` 可重建 `tests/playable-save.json`，用於在匯入介面測試第一卷完成與月下事件。
+GitHub Pages： https://andy5099.github.io/qunxiong-world/dream-world/

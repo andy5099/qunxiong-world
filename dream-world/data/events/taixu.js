@@ -1,14 +1,15 @@
+import { moonEvent } from '../intimacy/moon.js';
 const media = {type:'none',src:null,prompt:null};
 const memory = (text, character='shen', intimate=false) => [{text,character,important:true,intimate}];
 const c = (id,label,hint,next,result,effects={},memoryEffects=[],requirements={}) => ({id,label,hint,next,result,effects,memoryEffects,requirements,media});
 const shen = (changes, extra={}) => ({characters:{shen:changes},...extra});
 const event = (id,title,text,choices,extra={}) => ({id,title,text,choices,eyebrow:'太虛仙緣 / 第一卷',media,...extra});
 export const events = {
-  arrival:event('arrival','山門有雪，眼前有她','青玄宗的晨鐘穿過薄霧。你，白見微，剛以煉氣一層的修為走完九百級石階。\n\n一位月白劍袍的女子抱劍而立。\n\n「沈清霜。負責帶你入門。」她看了一眼你發抖的腿，「你就是新來的人？」',[
+  arrival:event('arrival','山門有雪，眼前有她','你，白見微，來到這個修仙世界，卻發現自己只有煉氣一層。\n\n【叮！太虛系統覺醒。】解鎖：仙緣之眼 Lv.1。它能看見公開仙緣，不能替別人決定心意。\n\n青玄宗的晨鐘穿過薄霧，系統在山門前標出一位高契合成年目標。\n\n一位月白劍袍的女子抱劍而立。\n\n「沈清霜。負責帶你入門。」她看了一眼你發抖的腿，「你就是新來的人？」',[
     c('greet','禮貌介紹自己','真誠 · 先把名字交給她','courtesy','「白見微……記住了。」她接過行囊，腳步刻意慢了半拍。',shen({affection:6,trust:8,status:'帶你入門',mood:'稍感安心'},{flags:{'met:shen':true,polite:true}}),memory('初見時，你認真介紹自己，她替你拿了行囊。')),
     c('tease','「師姐是在等我嗎？」','玩笑 · 試探她的反應','banter','「我在等所有新弟子。」她看著空無一人的石階，補了一句：「今天只有你。」',shen({affection:9,trust:1,mood:'耳尖微紅',status:'與你鬥嘴'},{flags:{'met:shen':true,teased:true}}),memory('初見時你逗她，她說今天只有你一個新弟子。')),
     c('scan','用太虛仙體觀察她','特殊能力 · 窺探可能越界','boundary','一道霜意切斷了探查。「看別人之前，先學會問。」她沒有拔劍，但向後退了一步。',shen({trust:-5,mood:'警戒',status:'要求你保持距離'},{flags:{'met:shen':true,scanned:true},stats:{insight:2}}),memory('你未經允許探查她，被她明確制止。'))
-  ],{speaker:'沈清霜',aside:'天賦：太虛仙體。當前用途：爬樓梯後恢復呼吸。'}),
+  ],{showGimmick:true,speaker:'沈清霜',aside:'天賦：太虛仙體。當前用途：爬樓梯後恢復呼吸。'}),
   courtesy:event('courtesy','她放慢的半步','她帶你經過竹林，問起你為何修行。石桌上放著兩塊桂花糕，她卻只拿走一塊。\n\n「剩下那個……別浪費。」',[
     c('cake','把桂花糕分她一半','分享 · 留下一段小記憶','trial','她說不餓，最後還是接了。「下次別徒手掰，笨。」',shen({affection:9,trust:5},{flags:{cake:true}}),memory('你第一次與她分享桂花糕。')),
     c('purpose','說想保護重要的人','坦誠 · 她在意你的動機','trial','「先學會保護自己。」她把護心訣第一句寫在你掌心旁的紙上。',shen({trust:10,affection:3},{stats:{insight:1}}),memory('你告訴她，修行是為了保護重要的人。')),
@@ -77,7 +78,7 @@ export const events = {
     c('walk','陪她整理試劍坪','日常 · 可靠比說得好聽有用','practice','你默默搬走碎石。她遞來一杯水，這次沒有找藉口。',shen({trust:6,affection:4}),memory('你陪她整理試劍坪，她主動遞水。')),
     c('visit','去聽雨閣喝一杯茶','蘇媚璃 · 茶裡有新消息','tea','蘇媚璃替你留著靠窗的位置。「這次想聽故事，還是說故事？」'),
     c('reflect','整理夢境中的線索','研究 · 為下一卷準備','practice','你把線索整理在紙上，再去請教清霜。',{stats:{insight:1}})
-  ],{showAttitude:true,aside:'第一卷已通關，但關係不會自動滿級。陪伴才是日常任務。'}),
+  ],{showGimmick:true,showAttitude:true,aside:'第一卷已通關，但關係不會自動滿級。陪伴才是日常任務。'}),
   practice:event('practice','把日常練成默契',s=>s.characters.shen.trust >= 20 ? '她確認你今日的狀態，才與你一同閉眼。夢裡的星河不再陌生。\n\n「今天，照你的步調。」' : '她還不願一同入夢，卻願意陪你從最基本的吐納開始。\n\n「先把眼前這一步做好。」',[
     c('listen','先聽她說今天的心情','傾聽 · 關係也需要練習','hub','她談起北境的一場雪。你沒有打斷，只替她添了茶。',shen({trust:5,affection:4,intimacy:4},{stats:{cultivation:2}}),memory('你安靜聽她說起北境的雪。','shen',true)),
     c('advance','循序練習，互相護法','修煉 · 不逞強','hub','一輪吐納結束，她對你點头。穩定的陪伴比冒進更讓人安心。',shen({trust:4,affection:3,intimacy:3},{stats:{cultivation:3}}),memory('你們循序練習，互相照看靈力的變化。','shen',true)),
@@ -88,11 +89,7 @@ export const events = {
     c('trade','分享一個自己的糗事','坦率 · 交換的不是祕密','hub','她笑得茶都忘了喝。「好，這故事我替你保密。」',{characters:{su:{affection:6,trust:5,intimacy:3,mood:'開懷'}}},memory('你向蘇媚璃分享糗事，她答應只留在茶桌。','su')),
     c('investigate','一起研究夢碑拓印','研究 · 留待下一卷的謎題','hub','拓印的一角亮起「歸夢」二字。她收好紙張：「下次，帶你見個人。」',{stats:{insight:1},flags:{nextClue:true},characters:{su:{trust:6,affection:2}}},memory('你與蘇媚璃在拓印上發現「歸夢」二字。','su'))
   ],{speaker:'蘇媚璃',aside:'情報可以明碼標價。有人關心你，通常不在價目表上。'}),
-  moon:event('moon','月光不必替誰說話','沈清霜走在你身旁，腳步與初見時一樣慢。\n\n「以前只是怕你跟不上。」她看著月光，耳尖泛紅，「現在……是想多走一會兒。」\n\n她停下來，等你的回答。',[
-    c('mutual','「我也想，和妳一直走下去。」','確認彼此心意 · 戀人','hub','她認真看著你。「那就說好了。」得到你的回應後，她才輕輕牽住你的手。',shen({affection:10,trust:8,intimacy:10,relationship:'戀人',mood:'溫柔',unlock:['secret','weakness']},{flags:{'event:moon':true,lovers:true}}),memory('月下，你們確認彼此心意，自願牽手成為戀人。','shen',true)),
-    c('slow','「我很在意妳，想慢慢來。」','坦誠 · 保留自己的步調','hub','「我沒有催你。」她嘴上仍硬，卻笑了。「明晚也可以再走一段。」',shen({trust:10,affection:5,intimacy:5,unlock:['weakness']},{flags:{'event:moon':true,slowLove:true}}),memory('月下，你坦白想慢慢來，她尊重你的步調。','shen',true)),
-    c('friend','「我珍惜妳，作為朋友。」','界線 · 友誼也是完整關係','hub','她安靜片刻，然後點頭。「好。那朋友，明天也別遲到。」',shen({trust:10,relationship:'朋友',unlock:['weakness']},{flags:{'event:moon':true,friendship:true}}),memory('月下，你們坦誠決定以朋友的身份相伴。'))
-  ],{intimacyEvent:true,characters:['shen'],requirements:{flags:{chapterComplete:true}},relationshipRequirement:'朋友',affectionRequirement:40,trustRequirement:35,intimacyRequirement:12,worldRequirement:'taixu',effects:{},memoryEffects:[],aside:'這一次，系統決定安靜一點。'})
+  moon:moonEvent
 };
 // Use an explicit complementary condition so every state has exactly three options.
 events.dreamGate.choices[1].requirements = { character:'shen', maxTrust:19 };

@@ -1,6 +1,9 @@
 import { updateRelationship, relationships } from './relationship-engine.js';
 import { remember, summarize } from './memory-engine.js';
+import { resolveGimmick, settleGimmick } from './gimmick-engine.js';
+import { resolveConsent } from './intimacy-engine.js';
 export function meets(state, req = {}) {
+  if(req.gimmickLevel && state.gimmick.level<req.gimmickLevel)return false;
   if (req.flags && !Object.entries(req.flags).every(([k,v])=>state.flags[k] === v)) return false;
   if (req.stats && !Object.entries(req.stats).every(([k,v])=>state.stats[k] >= v)) return false;
   if (req.character) {
@@ -12,6 +15,7 @@ export function meets(state, req = {}) {
   return true;
 }
 export function applyChoice(state, world, choice) {
+  choice=resolveConsent(state,resolveGimmick(state,world,choice));
   const next = structuredClone(state), effects = choice.effects || {};
   if (!meets(state, choice.requirements)) throw new Error('條件尚未達成');
   next.turn++;
@@ -23,9 +27,13 @@ export function applyChoice(state, world, choice) {
   Object.assign(next.flags, effects.flags || {});
   for (const [id,changes] of Object.entries(effects.characters || {})) { if (!next.characters[id]) throw new Error('未知角色'); updateRelationship(next.characters[id], changes); }
   if (effects.location) next.location = effects.location;
+  for(const [key,value] of Object.entries(effects.worldState||{}))next.worldState[key]=Math.min(99999,(next.worldState[key]||0)+value);
+  for(const [key,value] of Object.entries(effects.inventory||{}))next.inventory[key]=Math.min(99999,(next.inventory[key]||0)+value);
+  for(const [key,stat] of Object.entries(world.systemBindings||{}))if(effects.worldState?.[key])next.stats[stat]=Math.min(world.stats[stat].max,next.stats[stat]+effects.worldState[key]);
   for (const memory of choice.memoryEffects || []) remember(next, memory);
   next.sceneId = choice.next || next.sceneId;
   next.lastOutcome = { text:choice.result || '你做出了選擇。', changes:effects, label:choice.label };
+  settleGimmick(next,world,choice);
   next.memory.recent = [...next.memory.recent,{turn:next.turn,choice:choice.label,text:next.lastOutcome.text}].slice(-12);
   summarize(next, world);
   return next;
