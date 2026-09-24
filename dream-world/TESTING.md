@@ -2,7 +2,9 @@
 
 完整 55 組測試通過。新增驗證 /key → /models → 短模型呼叫順序、目前模型不被替換、各 HTTP 錯誤與 provider message、金鑰遮蔽、無 response、逾時、非 JSON、無效金鑰不發付費請求、模型不存在明確失敗。本機保存與原遊戲測試保留。
 
-官方公開 models API 查詢確認指定 Dolphin 模型存在。正式 Pages origin 的瀏覽器驗證在部署後進行；未使用私人金鑰，不宣稱付費推論成功或已驗收 iPhone Safari。
+官方公開 models API 查詢確認指定 Dolphin 模型存在。已在 https://andy5099.github.io/qunxiong-world/dream-world/（無 query）以 Chromium 設定頁呼叫真實 OpenRouter，使用刻意無效、未保存的測試字串：/key 回 HTTP 401，error.message 為 Missing Authentication header；/models 回 HTTP 200，指定 Dolphin 模型在清單內。畫面分別顯示金鑰失敗、OpenRouter 已取得 response、模型清單存在但推論未測試，未誤報 CORS。未使用私人金鑰，第二階段付費成功路徑僅自動測試，不能宣稱有效金鑰推論成功或 iPhone Safari 已驗收。
+
+更新資源時遇到舊快取，已讓 Service Worker 安裝資源使用 cache:reload，並確認不帶參數的正式遊戲頁已載入新診斷介面；不清除 localStorage 或遊戲存檔。
 
 # V0.2.3 裝置金鑰驗證
 
